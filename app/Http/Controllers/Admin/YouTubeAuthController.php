@@ -48,6 +48,12 @@ class YouTubeAuthController extends Controller
 
         $authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
 
+        Log::info('YouTube OAuth redirect initiated', [
+            'client_id' => $this->clientId,
+            'redirect_uri' => $this->redirectUri,
+            'full_auth_url' => $authUrl,
+        ]);
+
         return redirect()->away($authUrl);
     }
 
