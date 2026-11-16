@@ -44,7 +44,7 @@ return [
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
-        'redirect' => env('GOOGLE_YOUTUBE_REDIRECT_URI', env('APP_URL', 'http://localhost:8201') . '/auth/youtube/callback'),
+        'redirect' => env('GOOGLE_YOUTUBE_REDIRECT_URI', 'https://socialmanager.rezel.online/auth/youtube/callback'),
     ],
 
     'facebook' => [

@@ -19,7 +19,7 @@ class YouTubeAuthController extends Controller
     {
         $this->clientId = (string) (config('services.google.client_id') ?: env('GOOGLE_CLIENT_ID', ''));
         $this->clientSecret = (string) (config('services.google.client_secret') ?: env('GOOGLE_CLIENT_SECRET', ''));
-        $this->redirectUri = (string) (config('services.google.redirect') ?: url('/auth/youtube/callback'));
+        $this->redirectUri = url('/auth/youtube/callback');
     }
 
     /**
@@ -27,6 +27,7 @@ class YouTubeAuthController extends Controller
      */
     public function redirect(Request $request)
     {
+        $this->redirectUri = url('/auth/youtube/callback');
         $state = Str::random(40);
         session(['youtube_oauth_state' => $state]);
 
@@ -62,6 +63,8 @@ class YouTubeAuthController extends Controller
      */
     public function callback(Request $request)
     {
+        $this->redirectUri = url('/auth/youtube/callback');
+
         // 1. Check for cancellation or error from Google
         if ($request->has('error')) {
             $errorDescription = $request->get('error_description', $request->get('error'));
