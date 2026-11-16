@@ -216,12 +216,41 @@ class FacebookAuthController extends Controller
                 'access_token' => $effectiveUserToken,
             ])->json();
 
+            Log::info('Meta /me/accounts raw response', ['response' => $pagesResponse]);
+
             $pages = $pagesResponse['data'] ?? [];
 
+            // Fallback 1: Try simplified fields (in case v20.0 deprecated nested fan_count/fields)
             if (empty($pages)) {
-                $msg = ($connectIntent === 'instagram')
-                    ? 'No Facebook Pages found. Instagram Business/Creator accounts must be linked to a Facebook Page to connect. Please create or manage a Facebook Page first.'
-                    : 'Login successful, but no Facebook Pages were found under your Meta profile. Please create or manage a Facebook Page first.';
+                $simpleResponse = Http::timeout(25)->get("https://graph.facebook.com/{$this->apiVersion}/me/accounts", [
+                    'fields' => 'id,name,access_token,category,picture{url}',
+                    'access_token' => $effectiveUserToken,
+                ])->json();
+                Log::info('Meta /me/accounts simple fallback response', ['response' => $simpleResponse]);
+                if (!empty($simpleResponse['data'])) {
+                    $pages = $simpleResponse['data'];
+                }
+            }
+
+            // Fallback 2: Try original short-lived userAccessToken
+            if (empty($pages) && $effectiveUserToken !== $userAccessToken) {
+                $userTokenResponse = Http::timeout(25)->get("https://graph.facebook.com/{$this->apiVersion}/me/accounts", [
+                    'fields' => 'id,name,access_token,category,picture{url}',
+                    'access_token' => $userAccessToken,
+                ])->json();
+                Log::info('Meta /me/accounts userToken response', ['response' => $userTokenResponse]);
+                if (!empty($userTokenResponse['data'])) {
+                    $pages = $userTokenResponse['data'];
+                }
+            }
+
+            if (empty($pages)) {
+                $errorMsg = $pagesResponse['error']['message'] ?? null;
+                $msg = $errorMsg 
+                    ? "Meta API Error: {$errorMsg}"
+                    : (($connectIntent === 'instagram')
+                        ? 'No Facebook Pages found. Instagram Business/Creator accounts must be linked to a Facebook Page to connect. Please create or manage a Facebook Page first.'
+                        : 'Login successful, but no Facebook Pages were found under your Meta profile. Please create or manage a Facebook Page first.');
                 return redirect()->route('admin.accounts.index')->with('warning', $msg);
             }
 
@@ -384,6 +413,8 @@ class FacebookAuthController extends Controller
             $permRes = Http::timeout(10)->get("https://graph.facebook.com/{$this->apiVersion}/me/permissions", [
                 'access_token' => $userToken,
             ])->json();
+
+            Log::info('Meta user permissions response', ['permissions' => $permRes['data'] ?? []]);
 
             $declined = [];
             foreach ($permRes['data'] ?? [] as $perm) {
