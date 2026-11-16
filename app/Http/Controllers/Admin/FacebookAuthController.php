@@ -75,6 +75,7 @@ class FacebookAuthController extends Controller
             'pages_read_engagement',
             'pages_read_user_content',
             'pages_manage_posts',
+            'business_management',
             // Instagram Professional Scopes
             'instagram_basic',
             'instagram_manage_comments',
@@ -232,15 +233,27 @@ class FacebookAuthController extends Controller
                 }
             }
 
-            // Fallback 2: Try original short-lived userAccessToken
+            // Fallback 2: Facebook Login for Business — Discover pages from debug_token granular_scopes target_ids
+            if (empty($pages)) {
+                $granularPages = $this->discoverPagesFromGranularScopes($effectiveUserToken);
+                if (!empty($granularPages)) {
+                    $pages = $granularPages;
+                }
+            }
+
+            // Fallback 3: Query Meta Business Portfolio assets
+            if (empty($pages)) {
+                $bizPages = $this->discoverPagesFromBusinesses($effectiveUserToken);
+                if (!empty($bizPages)) {
+                    $pages = $bizPages;
+                }
+            }
+
+            // Fallback 4: Try with short-lived userAccessToken
             if (empty($pages) && $effectiveUserToken !== $userAccessToken) {
-                $userTokenResponse = Http::timeout(25)->get("https://graph.facebook.com/{$this->apiVersion}/me/accounts", [
-                    'fields' => 'id,name,access_token,category,picture{url}',
-                    'access_token' => $userAccessToken,
-                ])->json();
-                Log::info('Meta /me/accounts userToken response', ['response' => $userTokenResponse]);
-                if (!empty($userTokenResponse['data'])) {
-                    $pages = $userTokenResponse['data'];
+                $userGranular = $this->discoverPagesFromGranularScopes($userAccessToken);
+                if (!empty($userGranular)) {
+                    $pages = $userGranular;
                 }
             }
 
@@ -370,6 +383,92 @@ class FacebookAuthController extends Controller
             return redirect()->route('admin.accounts.index')
                 ->with('error', 'Connection failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Fallback for Facebook Login for Business:
+     * When Meta Business Suite assets are selected, /me/accounts returns empty,
+     * but debug_token exposes the selected Page IDs in granular_scopes.target_ids.
+     */
+    private function discoverPagesFromGranularScopes(string $userToken): array
+    {
+        $discovered = [];
+        try {
+            $appToken = "{$this->appId}|{$this->appSecret}";
+            $debugRes = Http::timeout(15)->get("https://graph.facebook.com/{$this->apiVersion}/debug_token", [
+                'input_token' => $userToken,
+                'access_token' => $appToken,
+            ])->json();
+
+            Log::info('Meta debug_token response', ['debug' => $debugRes]);
+
+            $granular = $debugRes['data']['granular_scopes'] ?? [];
+            $targetIds = [];
+
+            foreach ($granular as $gScope) {
+                if (!empty($gScope['target_ids']) && is_array($gScope['target_ids'])) {
+                    foreach ($gScope['target_ids'] as $tid) {
+                        $targetIds[(string) $tid] = true;
+                    }
+                }
+            }
+
+            Log::info('Discovered granular target Page IDs', ['target_ids' => array_keys($targetIds)]);
+
+            foreach (array_keys($targetIds) as $pageId) {
+                $pageRes = Http::timeout(15)->get("https://graph.facebook.com/{$this->apiVersion}/{$pageId}", [
+                    'fields' => 'id,name,username,picture{url},category,fan_count,access_token,instagram_business_account{id,username,name,profile_picture_url,followers_count,follows_count,media_count}',
+                    'access_token' => $userToken,
+                ])->json();
+
+                Log::info("Fetched granular Page {$pageId}", ['res' => $pageRes]);
+
+                if (!empty($pageRes['id']) && empty($pageRes['error'])) {
+                    if (empty($pageRes['access_token'])) {
+                        $pageRes['access_token'] = $userToken;
+                    }
+                    $discovered[] = $pageRes;
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::error('Error discovering pages from granular scopes: ' . $e->getMessage());
+        }
+
+        return $discovered;
+    }
+
+    /**
+     * Fallback: Query Meta Business Portfolios for owned and client pages
+     */
+    private function discoverPagesFromBusinesses(string $userToken): array
+    {
+        $discovered = [];
+        try {
+            $bizRes = Http::timeout(15)->get("https://graph.facebook.com/{$this->apiVersion}/me/businesses", [
+                'access_token' => $userToken,
+            ])->json();
+
+            Log::info('Meta /me/businesses response', ['biz' => $bizRes]);
+
+            foreach ($bizRes['data'] ?? [] as $biz) {
+                $bizId = $biz['id'];
+                foreach (['owned_pages', 'client_pages'] as $endpoint) {
+                    $pagesRes = Http::timeout(15)->get("https://graph.facebook.com/{$this->apiVersion}/{$bizId}/{$endpoint}", [
+                        'fields' => 'id,name,username,picture{url},category,fan_count,access_token,instagram_business_account{id,username,name,profile_picture_url,followers_count,follows_count,media_count}',
+                        'access_token' => $userToken,
+                    ])->json();
+                    if (!empty($pagesRes['data'])) {
+                        foreach ($pagesRes['data'] as $p) {
+                            $discovered[$p['id']] = $p;
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::debug('Error discovering pages from businesses: ' . $e->getMessage());
+        }
+
+        return array_values($discovered);
     }
 
     /**
