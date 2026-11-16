@@ -94,42 +94,25 @@
                     <div class="d-flex gap-2 flex-wrap" id="platform-btn-group">
                         <button type="button" class="btn composer-platform-btn platform-fb {{ $initialPlatform === 1 ? 'active' : '' }}" data-platform="1" data-name="Facebook">
                             <i class="ti ti-brand-facebook fs-2 me-1.5"></i>Facebook
-                            <span class="badge ms-1.5 platform-count-badge {{ $fbCount > 0 ? 'bg-primary text-white' : 'bg-secondary-subtle text-secondary' }}">
-                                {{ $fbCount }}
-                            </span>
                         </button>
                         <button type="button" class="btn composer-platform-btn platform-ig {{ $initialPlatform === 2 ? 'active' : '' }}" data-platform="2" data-name="Instagram">
                             <i class="ti ti-brand-instagram fs-2 me-1.5"></i>Instagram
-                            <span class="badge ms-1.5 platform-count-badge {{ $igCount > 0 ? 'bg-pink text-white' : 'bg-secondary-subtle text-secondary' }}">
-                                {{ $igCount }}
-                            </span>
                         </button>
                         <button type="button" class="btn composer-platform-btn platform-yt {{ $initialPlatform === 3 ? 'active' : '' }}" data-platform="3" data-name="YouTube">
                             <i class="ti ti-brand-youtube fs-2 me-1.5"></i>YouTube
-                            <span class="badge ms-1.5 platform-count-badge {{ $ytCount > 0 ? 'bg-danger text-white' : 'bg-secondary-subtle text-secondary' }}">
-                                {{ $ytCount }}
-                            </span>
                         </button>
                     </div>
                 </div>
 
                 {{-- Empty State: Displayed when the selected platform has NO connected accounts --}}
                 <div id="no-account-state" class="p-4 p-md-5 my-3 text-center rounded-3 border border-dashed bg-light-subtle d-none">
-                    <div class="empty-icon mb-3">
-                        <span class="avatar avatar-xl rounded-circle shadow-sm" id="no-account-avatar" style="width: 64px; height: 64px;">
-                            <i class="ti ti-plug fs-1" id="no-account-icon"></i>
-                        </span>
-                    </div>
                     <h3 class="fw-bold text-dark mb-2" id="no-account-title">Please Connect Your Facebook Account</h3>
-                    <p class="text-secondary mx-auto mb-4" style="max-width: 520px; font-size: 0.95rem;" id="no-account-desc">
-                        You don't have any connected Facebook accounts. Please connect a Facebook Page to create, schedule, or publish posts.
+                    <p class="text-secondary mx-auto mb-3 small" style="max-width: 480px;" id="no-account-desc">
+                        Please connect your Facebook Page to create or schedule posts.
                     </p>
-                    <div class="d-flex justify-content-center gap-2 flex-wrap">
-                        <a href="{{ route('admin.accounts.index') }}" class="btn px-4" id="no-account-connect-btn">
-                            <i class="ti ti-plug me-1.5"></i><span id="no-account-btn-text">Connect Account</span>
-                        </a>
-                        <a href="{{ route('admin.posts.schedule') }}" class="btn btn-outline-secondary">
-                            <i class="ti ti-calendar me-1"></i>View Calendar
+                    <div class="d-flex justify-content-center">
+                        <a href="{{ route('admin.accounts.index') }}" class="btn btn-primary px-4" id="no-account-connect-btn">
+                            <i class="ti ti-plug me-1.5"></i><span id="no-account-btn-text">Connect Facebook Account</span>
                         </a>
                     </div>
                 </div>
@@ -160,9 +143,9 @@
                         <div class="d-flex flex-wrap gap-2" id="post-type-pills-container">
                             <span class="post-type-pill {{ old('post_type') == 'text' ? 'active' : '' }}" data-type="text" id="pill-type-text"><i class="ti ti-typography"></i> Text</span>
                             <span class="post-type-pill {{ old('post_type', 'photo') == 'photo' ? 'active' : '' }}" data-type="photo"><i class="ti ti-photo"></i> Photo</span>
-                            <span class="post-type-pill {{ old('post_type') == 'carousel' ? 'active' : '' }}" data-type="carousel"><i class="ti ti-photo-circle"></i> Carousel</span>
-                            <span class="post-type-pill {{ old('post_type') == 'video' ? 'active' : '' }}" data-type="video"><i class="ti ti-video"></i> Video</span>
-                            <span class="post-type-pill {{ old('post_type') == 'reel' ? 'active' : '' }}" data-type="reel" id="pill-type-reel"><i class="ti ti-player-play"></i> Reel</span>
+                            <span class="post-type-pill {{ old('post_type', 'carousel') == 'carousel' ? 'active' : '' }}" data-type="carousel"><i class="ti ti-photo-circle"></i> Carousel</span>
+                            <span class="post-type-pill {{ old('post_type', 'video') == 'video' ? 'active' : '' }}" data-type="video"><i class="ti ti-video"></i> Video</span>
+                            <span class="post-type-pill {{ old('post_type', 'reel') == 'reel' ? 'active' : '' }}" data-type="reel" id="pill-type-reel"><i class="ti ti-player-play"></i> Reel</span>
                         </div>
                     </div>
 
@@ -291,54 +274,17 @@
         border-color: #1877f2 !important;
         box-shadow: 0 2px 6px rgba(24, 119, 242, 0.25);
     }
-    .composer-platform-btn.platform-fb.active .badge {
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        color: #ffffff !important;
-    }
     .composer-platform-btn.platform-ig.active {
         background-color: #e1306c !important;
         color: #ffffff !important;
         border-color: #e1306c !important;
         box-shadow: 0 2px 6px rgba(225, 48, 108, 0.25);
     }
-    .composer-platform-btn.platform-ig.active .badge {
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        color: #ffffff !important;
-    }
     .composer-platform-btn.platform-yt.active {
         background-color: #e02424 !important;
         color: #ffffff !important;
         border-color: #e02424 !important;
         box-shadow: 0 2px 6px rgba(224, 36, 36, 0.25);
-    }
-    .composer-platform-btn.platform-yt.active .badge {
-        background-color: rgba(255, 255, 255, 0.25) !important;
-        color: #ffffff !important;
-    }
-    .platform-count-badge {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.5rem;
-        border-radius: 20px;
-        font-weight: 600;
-    }
-    .btn-pink {
-        background-color: #e1306c !important;
-        border-color: #e1306c !important;
-        color: #ffffff !important;
-    }
-    .btn-pink:hover {
-        background-color: #c8235a !important;
-        border-color: #c8235a !important;
-        color: #ffffff !important;
-    }
-    .bg-pink {
-        background-color: #e1306c !important;
-    }
-    .bg-pink-subtle {
-        background-color: rgba(225, 48, 108, 0.12) !important;
-    }
-    .text-pink {
-        color: #e1306c !important;
     }
     .post-type-pill {
         cursor: pointer;
@@ -378,29 +324,20 @@ document.addEventListener('DOMContentLoaded', function () {
         1: {
             name: 'Facebook',
             emptyTitle: 'Please Connect Your Facebook Account',
-            emptyDesc: 'You do not have any connected Facebook accounts. Please connect a Facebook Page in the Accounts Hub before you can create, schedule, or publish posts.',
-            connectBtnText: 'Connect Facebook Account',
-            connectBtnClass: 'btn-primary',
-            iconClass: 'ti ti-brand-facebook',
-            avatarBg: 'bg-primary-subtle text-primary'
+            emptyDesc: 'Please connect your Facebook Page to create or schedule posts.',
+            connectBtnText: 'Connect Facebook Account'
         },
         2: {
             name: 'Instagram',
             emptyTitle: 'Please Connect Your Instagram Account',
-            emptyDesc: 'You do not have any connected Instagram Business accounts. Please connect your Instagram account linked to a Meta Page in the Accounts Hub to create, schedule, or publish posts and reels.',
-            connectBtnText: 'Connect Instagram Account',
-            connectBtnClass: 'btn-pink',
-            iconClass: 'ti ti-brand-instagram',
-            avatarBg: 'bg-pink-subtle text-pink'
+            emptyDesc: 'Please connect your Instagram Business account to create or schedule posts.',
+            connectBtnText: 'Connect Instagram Account'
         },
         3: {
             name: 'YouTube',
             emptyTitle: 'Please Connect Your YouTube Channel',
-            emptyDesc: 'You do not have any connected YouTube Channels. Please connect your YouTube Channel via Google in the Accounts Hub before you can upload, schedule, or publish videos.',
-            connectBtnText: 'Connect YouTube Channel',
-            connectBtnClass: 'btn-danger',
-            iconClass: 'ti ti-brand-youtube',
-            avatarBg: 'bg-danger-subtle text-danger'
+            emptyDesc: 'Please connect your YouTube Channel to upload or schedule videos.',
+            connectBtnText: 'Connect YouTube Channel'
         }
     };
 
@@ -428,11 +365,6 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#no-account-title').text(config.emptyTitle);
             $('#no-account-desc').text(config.emptyDesc);
             $('#no-account-btn-text').text(config.connectBtnText);
-
-            $('#no-account-icon').attr('class', config.iconClass + ' fs-1');
-            $('#no-account-avatar').attr('class', 'avatar avatar-xl rounded-circle shadow-sm ' + config.avatarBg);
-            $('#no-account-connect-btn').attr('class', 'btn px-4 ' + config.connectBtnClass);
-
             $('#no-account-state').removeClass('d-none');
 
             // Remove required flags so they don't block anything
