@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin\User;
 
 use App\Models\User;
-use App\Rules\IndianPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -16,16 +15,15 @@ class UpdateUserRequest extends FormRequest
 
     public function rules(): array
     {
-        // Get user from route binding
-        $userId = $this->route('user')->id;
+        $userId = $this->route('user') instanceof User ? $this->route('user')->id : $this->route('user');
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', new IndianPhoneNumber, Rule::unique('users', 'phone')->ignore($userId)],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
+            'password' => ['nullable', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($userId)],
+            'role' => ['nullable', 'integer', Rule::in(array_keys(User::getRoleList()))],
             'status' => ['required', 'integer', Rule::in(array_keys(User::getStatusList()))],
-            'pincode' => ['nullable', 'string', 'max:10'],
-            'city' => ['nullable', 'string', 'max:100'],
         ];
     }
 }

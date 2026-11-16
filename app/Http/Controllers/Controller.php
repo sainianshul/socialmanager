@@ -6,9 +6,9 @@ use OpenApi\Attributes as OA;
 
 #[OA\Info(
     version: '1.0.0',
-    description: 'API endpoints for VVyaparMitra B2B Platform',
-    title: 'VVyaparMitra API Documentation',
-    contact: new OA\Contact(email: 'admin@vvyaparmitra.com')
+    description: 'API endpoints for SocialManager Platform',
+    title: 'SocialManager API Documentation',
+    contact: new OA\Contact(email: 'admin@socialmanager.com')
 )]
 #[OA\Server(
     url: L5_SWAGGER_CONST_HOST,

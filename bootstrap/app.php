@@ -28,7 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
-            'nurse_approved' => \App\Http\Middleware\EnsureNurseIsApproved::class,
+            'admin.manager' => \App\Http\Middleware\EnsureAdminOrManager::class,
+        ]);
+
+        $middleware->validateCsrfTokens(except: [
+            'webhook/*',
         ]);
 
         $middleware->api(prepend: [

@@ -4,11 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <title>Sign In — VVyaparMitra Admin</title>
+    <title>Sign In — SocialManager Admin</title>
+    
+    <!-- Tabler Core CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    
+    <!-- Plus Jakarta Sans Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ asset('css/admin-custom.css') }}">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+            background-color: #f8fafc;
+        }
+    </style>
 </head>
-<body class="d-flex flex-column">
+<body class="d-flex flex-column bg-white">
     <script>
         var mode = localStorage.getItem('data-bs-theme') || 'light';
         document.body.setAttribute('data-bs-theme', mode);
@@ -18,14 +34,23 @@
         <div class="container container-tight py-4">
 
             <div class="text-center mb-4">
-                <a href="/" class="navbar-brand navbar-brand-autodark">
-                    <h1>VVyaparMitra</h1>
+                <a href="{{ url('/') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none">
+                    <div class="text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #0f172a !important;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3v18" />
+                            <path d="M3 12h18" />
+                            <path d="M5.636 5.636l12.728 12.728" />
+                            <path d="M18.364 5.636L5.636 18.364" />
+                        </svg>
+                    </div>
+                    <span class="fw-bold text-dark fs-1 lh-1">SocialManager</span>
                 </a>
             </div>
 
-            <div class="card card-md">
-                <div class="card-body">
-                    <h2 class="h2 text-center mb-4">Login to your account</h2>
+            <div class="card card-md border shadow-sm rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <h2 class="h2 text-center fw-bold text-dark mb-1">Login to your account</h2>
+                    <p class="text-center text-secondary small mb-4">Enter your credentials to access the dashboard</p>
 
                     @if ($errors->any())
                         <div class="alert alert-danger" role="alert">
@@ -39,20 +64,20 @@
                         @csrf
 
                         <div class="mb-3">
-                            <label class="form-label">Email address</label>
+                            <label class="form-label fw-semibold text-dark">Email address</label>
                             <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
-                                   value="{{ old('email') }}" placeholder="your@email.com" autocomplete="off">
+                                   value="{{ old('email') }}" placeholder="admin@vcancare.com" autocomplete="off" required>
                             @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
 
-                        <div class="mb-2">
-                            <label class="form-label">Password</label>
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-dark">Password</label>
                             <div class="input-group input-group-flat">
                                 <input type="password" name="password" id="password"
                                        class="form-control @error('password') is-invalid @enderror"
-                                       placeholder="Your password" autocomplete="off">
+                                       placeholder="••••••••" autocomplete="off" required>
                                 <span class="input-group-text">
                                     <a href="#" class="link-secondary" id="toggle-password" title="Show password"
                                        data-bs-toggle="tooltip">
@@ -65,16 +90,16 @@
                             @enderror
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-4">
                             <label class="form-check">
                                 <input type="checkbox" class="form-check-input" name="remember" value="1"
                                        {{ old('remember') ? 'checked' : '' }}>
-                                <span class="form-check-label">Remember me on this device</span>
+                                <span class="form-check-label text-secondary small">Remember me on this device</span>
                             </label>
                         </div>
 
                         <div class="form-footer">
-                            <button type="submit" class="btn btn-primary w-100" id="submit-btn">
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold" id="submit-btn">
                                 Sign in
                             </button>
                         </div>
@@ -82,8 +107,8 @@
                 </div>
             </div>
 
-            <div class="text-center text-muted mt-3">
-                &copy; {{ date('Y') }} VVyaparMitra
+            <div class="text-center text-secondary small mt-4">
+                &copy; {{ date('Y') }} SocialManager. All rights reserved.
             </div>
 
         </div>

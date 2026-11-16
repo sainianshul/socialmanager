@@ -3,97 +3,123 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Account;
+use App\Models\Comment;
+use App\Models\Post;
+use App\Models\ScheduledPost;
 use App\Models\User;
-use App\Models\Product;
-use App\Models\Requirement;
-use App\Models\Lead;
-use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        return view('admin.dashboard');
+        $user = auth()->user();
+        $startDate = Carbon::now()->subDays(29)->startOfDay();
+        $endDate = Carbon::now()->endOfDay();
+
+        if (!$user->isAdmin()) {
+            // Scope all metrics and feeds to authenticated user's own accounts
+            $userAccountIds = Account::where('user_id', $user->id)->pluck('id')->toArray();
+
+            $channelsCount = count($userAccountIds);
+            $totalPosts = Post::whereIn('account_id', $userAccountIds)->count();
+            $totalComments = Comment::whereIn('account_id', $userAccountIds)->count();
+            $scheduledCount = ScheduledPost::where('user_id', $user->id)->where('status', ScheduledPost::STATUS_SCHEDULED)->count();
+            $totalReach = Account::where('user_id', $user->id)->sum('followers_count') ?: 0;
+            $commentsToday = Comment::whereIn('account_id', $userAccountIds)->whereDate('created_at', Carbon::today())->count();
+            $repliedCount = Comment::whereIn('account_id', $userAccountIds)->where('status', Comment::STATUS_REPLIED)->count();
+            $newPostsMonth = Post::whereIn('account_id', $userAccountIds)->where('published_at', '>=', Carbon::now()->subDays(30))->count();
+
+            $accounts = Account::where('user_id', $user->id)->withCount(['posts', 'comments'])->get();
+            $recentPosts = Post::whereIn('account_id', $userAccountIds)->with('account')->latest('published_at')->take(6)->get();
+            $recentComments = Comment::whereIn('account_id', $userAccountIds)->with(['post', 'account'])->latest('commented_at')->take(5)->get();
+
+            $postsGrouped = Post::whereIn('account_id', $userAccountIds)
+                ->whereBetween('published_at', [$startDate, $endDate])
+                ->selectRaw('DATE(published_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->pluck('count', 'date');
+
+            $commentsGrouped = Comment::whereIn('account_id', $userAccountIds)
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->pluck('count', 'date');
+        } else {
+            // Admin sees global system overview across all connected accounts
+            $channelsCount = Account::count();
+            $totalPosts = Post::count();
+            $totalComments = Comment::count();
+            $scheduledCount = ScheduledPost::where('status', ScheduledPost::STATUS_SCHEDULED)->count();
+            $totalReach = Account::sum('followers_count') ?: 0;
+            $commentsToday = Comment::whereDate('created_at', Carbon::today())->count();
+            $repliedCount = Comment::where('status', Comment::STATUS_REPLIED)->count();
+            $newPostsMonth = Post::where('published_at', '>=', Carbon::now()->subDays(30))->count();
+
+            $accounts = Account::withCount(['posts', 'comments'])->get();
+            $recentPosts = Post::with('account')->latest('published_at')->take(6)->get();
+            $recentComments = Comment::with(['post', 'account'])->latest('commented_at')->take(5)->get();
+
+            $postsGrouped = Post::whereBetween('published_at', [$startDate, $endDate])
+                ->selectRaw('DATE(published_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->pluck('count', 'date');
+
+            $commentsGrouped = Comment::whereBetween('created_at', [$startDate, $endDate])
+                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
+                ->groupBy('date')
+                ->pluck('count', 'date');
+        }
+
+        // 30 Days Activity Chart Data
+        $chartDates = [];
+        $postCounts = [];
+        $commentCounts = [];
+
+        for ($date = clone $startDate; $date->lte($endDate); $date->addDay()) {
+            $dStr = $date->format('Y-m-d');
+            $chartDates[] = $date->format('d M');
+            $postCounts[] = (int) ($postsGrouped[$dStr] ?? 0);
+            $commentCounts[] = (int) ($commentsGrouped[$dStr] ?? 0);
+        }
+
+        return view('admin.dashboard', compact(
+            'channelsCount',
+            'totalPosts',
+            'totalComments',
+            'scheduledCount',
+            'totalReach',
+            'commentsToday',
+            'repliedCount',
+            'newPostsMonth',
+            'accounts',
+            'recentPosts',
+            'recentComments',
+            'chartDates',
+            'postCounts',
+            'commentCounts'
+        ));
     }
 
     public function stats()
     {
-        // Cache the dashboard stats for 5 minutes
-        $data = Cache::remember('admin.dashboard.stats', 300, function () {
-            
-            // Top Level Stats
-            $totalUsers = User::count();
-            $totalRequirements = Requirement::where('status', Requirement::STATUS_OPEN)->count();
-            $activeProducts = Product::where('status', Product::STATUS_ACTIVE)->count();
-            $newLeadsToday = Lead::whereDate('created_at', Carbon::today())->count();
-            
-            // Recent Users for the table
-            $recentUsers = User::users()
-                ->latest()
-                ->take(5)
-                ->get()
-                ->map(function($user) {
-                    return [
-                        'id' => $user->id,
-                        'name' => $user->name,
-                        'initials' => strtoupper(substr($user->name, 0, 2)),
-                        'phone' => $user->phone,
-                        'joined' => $user->created_at->format('d M Y'),
-                        'status' => $user->status,
-                        'status_name' => $user->status_name,
-                        'status_color' => $user->status === User::STATUS_ACTIVE ? 'success' : ($user->status === User::STATUS_PENDING ? 'warning' : 'danger')
-                    ];
-                });
+        $user = auth()->user();
 
-            // Recent Products for the table
-            $recentProducts = Product::with(['primaryImage'])
-                ->latest()
-                ->take(5)
-                ->get()
-                ->map(function($product) {
-                    return [
-                        'id' => $product->id,
-                        'name' => $product->title,
-                        'image' => $product->primaryImage ? asset('storage/' . $product->primaryImage->image_path) : null,
-                        'created_at' => $product->created_at->diffForHumans()
-                    ];
-                });
+        if (!$user->isAdmin()) {
+            $userAccountIds = Account::where('user_id', $user->id)->pluck('id')->toArray();
+            return response()->json([
+                'channels_count' => count($userAccountIds),
+                'total_posts' => Post::whereIn('account_id', $userAccountIds)->count(),
+                'total_comments' => Comment::whereIn('account_id', $userAccountIds)->count(),
+            ]);
+        }
 
-            // Chart Data: Users added in the last 30 days
-            $chartDates = [];
-            $chartCounts = [];
-            
-            $startDate = Carbon::now()->subDays(29)->startOfDay();
-            $endDate = Carbon::now()->endOfDay();
-            
-            // Get counts grouped by date
-            $userCounts = User::whereBetween('created_at', [$startDate, $endDate])
-                ->selectRaw('DATE(created_at) as date, COUNT(*) as count')
-                ->groupBy('date')
-                ->pluck('count', 'date');
-                
-            // Fill missing dates with 0
-            for ($date = clone $startDate; $date->lte($endDate); $date->addDay()) {
-                $dateStr = $date->format('Y-m-d');
-                $chartDates[] = $date->format('d M');
-                $chartCounts[] = $userCounts[$dateStr] ?? 0;
-            }
-
-            return [
-                'total_users' => number_format($totalUsers),
-                'total_requirements' => number_format($totalRequirements),
-                'active_products' => number_format($activeProducts),
-                'new_leads_today' => number_format($newLeadsToday),
-                'recent_users' => $recentUsers,
-                'recent_products' => $recentProducts,
-                'chart' => [
-                    'dates' => $chartDates,
-                    'counts' => $chartCounts
-                ]
-            ];
-        });
-
-        return response()->json($data);
+        return response()->json([
+            'total_users' => User::users()->count(),
+            'channels_count' => Account::count(),
+            'total_posts' => Post::count(),
+            'total_comments' => Comment::count(),
+        ]);
     }
 }

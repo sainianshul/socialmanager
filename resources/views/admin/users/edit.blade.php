@@ -2,16 +2,19 @@
 
 @section('title', 'Edit User')
 
+@section('breadcrumbs')
+    <x-breadcrumb :items="[
+        ['url' => route('admin.users.index'), 'label' => 'Users'],
+        ['label' => 'Edit User'],
+    ]" />
+@endsection
+
 @section('content')
 
     <div class="page-header d-print-none mb-4">
         <div class="row align-items-center">
             <div class="col">
-                <x-breadcrumb :items="[
-                    ['url' => route('admin.users.index'), 'label' => 'Users'],
-                    ['label' => 'Edit User'],
-                ]" />
-                <h2 class="page-title">Edit User: {{ $user->name ?? $user->phone }}</h2>
+                <h2 class="page-title">Edit User: {{ $user->name ?? $user->email }}</h2>
             </div>
             <div class="col-auto">
                 <a href="{{ route('admin.users.index') }}" class="btn">
@@ -38,9 +41,38 @@
                     </div>
 
                     <div class="col-md-6">
-                        <label class="form-label required">Phone Number</label>
-                        <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $user->phone) }}" placeholder="Enter 10-digit phone number" required>
+                        <label class="form-label required">Email Address</label>
+                        <input type="email" name="email" class="form-control @error('email') is-invalid @enderror" value="{{ old('email', $user->email) }}" placeholder="user@example.com" required>
+                        @error('email')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">New Password</label>
+                        <input type="password" name="password" class="form-control @error('password') is-invalid @enderror" placeholder="Leave empty to keep existing password">
+                        <small class="form-hint">Leave blank if you don't want to change the password.</small>
+                        @error('password')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Phone Number (Optional)</label>
+                        <input type="text" name="phone" class="form-control @error('phone') is-invalid @enderror" value="{{ old('phone', $user->phone) }}" placeholder="e.g. 9876543210">
                         @error('phone')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label required">Role</label>
+                        <select name="role" class="form-select @error('role') is-invalid @enderror" required>
+                            @foreach (\App\Models\User::getRoleList() as $val => $label)
+                                <option value="{{ $val }}" {{ old('role', $user->role) == $val ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('role')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -56,28 +88,14 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
-                    <div class="col-md-6">
-                        <label class="form-label">City</label>
-                        <input type="text" name="city" class="form-control @error('city') is-invalid @enderror" value="{{ old('city', $user->city) }}" placeholder="Enter city">
-                        @error('city')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label">Pincode</label>
-                        <input type="text" name="pincode" class="form-control @error('pincode') is-invalid @enderror" value="{{ old('pincode', $user->pincode) }}" placeholder="Enter pincode">
-                        @error('pincode')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                 </div>
             </div>
 
             <div class="card-footer text-end">
-                <button type="submit" class="btn btn-primary">Update User</button>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ti ti-check me-1"></i>Update User
+                </button>
             </div>
         </form>
     </div>

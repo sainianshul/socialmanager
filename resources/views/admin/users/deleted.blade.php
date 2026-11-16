@@ -7,10 +7,6 @@
     <div class="page-header d-print-none mb-4">
         <div class="row align-items-center">
             <div class="col">
-                <x-breadcrumb :items="[
-                    ['url' => route('admin.users.index'), 'label' => 'Users'],
-                    ['label' => 'Trash'],
-                ]" />
                 <h2 class="page-title">Deleted Users (Trash)</h2>
             </div>
             <div class="col-auto">

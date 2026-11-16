@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        if (Auth::guard('web')->check() && Auth::user()->status == User::STATUS_ACTIVE && Auth::user()->isAdmin()) {
+        if (Auth::guard('web')->check() && Auth::user()->isActive()) {
             return redirect()->route('admin.dashboard');
         }
 
@@ -34,14 +34,6 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-
-        // Role check
-        if (!$user->isAdmin()) {
-            Auth::logout();
-            return back()
-                ->withInput($request->only('email', 'remember'))
-                ->withErrors(['email' => 'You do not have admin access.']);
-        }
 
         // Status check
         if (!$user->isActive()) {

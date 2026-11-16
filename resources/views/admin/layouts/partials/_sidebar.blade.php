@@ -1,172 +1,242 @@
-<aside class="navbar navbar-vertical navbar-expand-lg" data-bs-theme="dark">
+<aside class="navbar navbar-vertical navbar-expand-lg bg-white">
     <div class="container-fluid">
+        <!-- Mobile Toggler -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <h1 class="navbar-brand navbar-brand-autodark">
-            <a href="{{ url('/admin') }}">
-                VVyaparMitra
+
+        <!-- Brand Logo (Desktop) -->
+        <h1 class="navbar-brand navbar-brand-autodark d-none d-lg-flex align-items-center w-100 mb-0 py-3 px-3">
+            <a href="{{ url('/admin') }}" class="d-flex align-items-center gap-2 text-decoration-none text-reset" title="SocialManager">
+                <div class="navbar-brand-image text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background-color: #1db8ab !important;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v18" />
+                        <path d="M3 12h18" />
+                        <path d="M5.636 5.636l12.728 12.728" />
+                        <path d="M18.364 5.636L5.636 18.364" />
+                    </svg>
+                </div>
+                <span class="navbar-brand-title fw-bold text-dark fs-3 mb-0">SocialManager</span>
             </a>
         </h1>
+
+        <!-- Brand Logo (Mobile) -->
+        <h1 class="navbar-brand navbar-brand-autodark d-lg-none mb-0 py-2">
+            <a href="{{ url('/admin') }}" class="d-flex align-items-center gap-2 text-decoration-none text-reset">
+                <div class="navbar-brand-image text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background-color: #1db8ab !important;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3v18" />
+                        <path d="M3 12h18" />
+                        <path d="M5.636 5.636l12.728 12.728" />
+                        <path d="M18.364 5.636L5.636 18.364" />
+                    </svg>
+                </div>
+                <span class="navbar-brand-title fw-bold text-dark fs-3">SocialManager</span>
+            </a>
+        </h1>
+
+        <!-- Mobile Quick Actions -->
         <div class="navbar-nav flex-row d-lg-none">
             <div class="nav-item d-flex me-3">
                 <a href="#" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
-		   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'dark'); window.location.reload();">
+                   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'dark'); window.location.reload();">
                     <i class="ti ti-moon fs-2"></i>
                 </a>
                 <a href="#" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
-		   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'light'); window.location.reload();">
+                   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'light'); window.location.reload();">
                     <i class="ti ti-sun fs-2"></i>
                 </a>
             </div>
             <div class="nav-item dropdown">
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
-                    <span class="avatar avatar-sm" style="background-image: url('https://ui-avatars.com/api/?name=Admin')"></span>
+                    <span class="avatar avatar-sm rounded-circle" style="background-image: url('https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'Admin') }}&background=1db8ab&color=fff&rounded=true')"></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
                     <a href="{{ route('admin.profile.index') }}" class="dropdown-item">Profile</a>
                     <div class="dropdown-divider"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
-                        <button type="submit" class="dropdown-item">Logout</button>
+                        <button type="submit" class="dropdown-item text-danger">Logout</button>
                     </form>
                 </div>
             </div>
         </div>
+
+        <!-- Sidebar Collapse Menu -->
         <div class="collapse navbar-collapse" id="sidebar-menu">
-            <ul class="navbar-nav pt-lg-3">
-                
-                {{-- ===================== --}}
-                {{-- CORE --}}
-                {{-- ===================== --}}
+            <ul class="navbar-nav pt-lg-2">
+                {{-- MAIN MENU --}}
+                <li class="nav-section-title">Main Menu</li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/admin') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ url('/admin') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Dashboard">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-home"></i>
+                            <i class="ti ti-smart-home fs-2"></i>
                         </span>
                         <span class="nav-link-title">Dashboard</span>
                     </a>
                 </li>
-                
-                {{-- ===================== --}}
-                {{-- USERS --}}
-                {{-- ===================== --}}
-                <li class="nav-item mt-3 mb-1">
-                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Users</div>
-                </li>
-                
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.users.index') }}">
+                    <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Analytics">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-users"></i>
+                            <i class="ti ti-chart-dots fs-2"></i>
                         </span>
-                        <span class="nav-link-title">All Users</span>
-                    </a>
-                </li>
-                
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.users.blocked') }}">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-user-off"></i>
-                        </span>
-                        <span class="nav-link-title">Blocked Users</span>
-                    </a>
-                </li>
-                
-                {{-- ===================== --}}
-                {{-- CATALOG --}}
-                {{-- ===================== --}}
-                <li class="nav-item mt-3 mb-1">
-                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Catalog</div>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.categories.index') }}">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-category"></i>
-                        </span>
-                        <span class="nav-link-title">Category</span>
+                        <span class="nav-link-title">Analytics</span>
                     </a>
                 </li>
 
+                {{-- ACCOUNTS HUB --}}
+                <li class="nav-section-title">Accounts</li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.products.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.accounts.*') ? 'active' : '' }}" href="{{ route('admin.accounts.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Connected Accounts">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-packages"></i>
+                            <i class="ti ti-plug-connected fs-2"></i>
                         </span>
-                        <span class="nav-link-title">Product</span>
+                        <span class="nav-link-title">Connected Accounts</span>
                     </a>
                 </li>
 
+                {{-- CONTENT --}}
+                <li class="nav-section-title">Content</li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.requirements.index') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.posts.create') ? 'active' : '' }}" href="{{ route('admin.posts.create') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="New Post">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-clipboard-list"></i>
+                            <i class="ti ti-square-plus fs-2"></i>
                         </span>
-                        <span class="nav-link-title">Requirements</span>
+                        <span class="nav-link-title">New Post</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.posts.instagram') ? 'active' : '' }}" href="{{ route('admin.posts.instagram') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Instagram Posts">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-pink">
+                            <i class="ti ti-brand-instagram fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">Instagram Posts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.posts.facebook') ? 'active' : '' }}" href="{{ route('admin.posts.facebook') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Facebook Posts">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-facebook">
+                            <i class="ti ti-brand-facebook fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">Facebook Posts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.posts.youtube') ? 'active' : '' }}" href="{{ route('admin.posts.youtube') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="YouTube Videos">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-danger">
+                            <i class="ti ti-brand-youtube fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">YouTube Videos</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.posts.schedule*') ? 'active' : '' }}" href="{{ route('admin.posts.schedule') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Schedule & Publish">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
+                            <i class="ti ti-calendar-event fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">Schedule & Publish</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Media Library">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-photo-plus fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">Media Library</span>
                     </a>
                 </li>
 
+                {{-- ENGAGEMENT & AI MODERATION --}}
+                <li class="nav-section-title">Engagement</li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.banners.index') }}">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-photo"></i>
+                    <a class="nav-link {{ request()->routeIs('admin.comments.instagram*') ? 'active' : '' }}" href="{{ route('admin.comments.instagram') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Insta Comment">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-pink">
+                            <i class="ti ti-messages fs-2"></i>
                         </span>
-                        <span class="nav-link-title">Banners</span>
+                        <span class="nav-link-title">Insta Comment</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.comments.facebook*') ? 'active' : '' }}" href="{{ route('admin.comments.facebook') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="FB Comment">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-facebook">
+                            <i class="ti ti-message-circle fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">FB Comment</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.comments.youtube*') ? 'active' : '' }}" href="{{ route('admin.comments.youtube') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="YouTube Comments">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-danger">
+                            <i class="ti ti-message-chatbot fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">YouTube Comments</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.auto-dm.*') ? 'active' : '' }}" href="{{ route('admin.auto-dm.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Auto DM">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block">
+                            <i class="ti ti-mail-forward fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">Auto DM</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="AI Assistant">
+                        <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
+                            <i class="ti ti-sparkles fs-2"></i>
+                        </span>
+                        <span class="nav-link-title">AI Assistant</span>
                     </a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.feedbacks.index') }}">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-message-report"></i>
-                        </span>
-                        <span class="nav-link-title">Feedbacks</span>
-                    </a>
-                </li>
 
-                {{-- ===================== --}}
-                {{-- TRASH --}}
-                {{-- ===================== --}}
-                <li class="nav-item mt-3 mb-1">
-                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">Trash</div>
-                </li>
+                {{-- USERS (Admin / Manager only) --}}
+                @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isManager()))
+                    <li class="nav-section-title">Users</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.users.index') ? 'active' : '' }}" href="{{ route('admin.users.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="All Users">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="ti ti-users fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">All Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.users.blocked*') ? 'active' : '' }}" href="{{ route('admin.users.blocked') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Blocked Users">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="ti ti-user-off fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Blocked Users</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.users.deleted*') ? 'active' : '' }}" href="{{ route('admin.users.deleted') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Deleted Users">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="ti ti-trash fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Deleted Users</span>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.users.deleted') }}">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-trash"></i>
-                        </span>
-                        <span class="nav-link-title">Deleted User</span>
-                    </a>
-                </li>
-
-                {{-- ===================== --}}
                 {{-- SYSTEM --}}
-                {{-- ===================== --}}
-                <li class="nav-item mt-3 mb-1">
-                    <div class="nav-link text-uppercase text-muted fs-8 fw-bold">System</div>
-                </li>
-
+                <li class="nav-section-title">System</li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.communication-logs.index') }}">
+                    <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Settings">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-message-dots"></i>
+                            <i class="ti ti-settings fs-2"></i>
                         </span>
-                        <span class="nav-link-title">Communication Logs</span>
+                        <span class="nav-link-title">Settings</span>
                     </a>
                 </li>
-                
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url('/api/documentation') }}" target="_blank">
+                    <a class="nav-link" href="{{ url('/api/documentation') }}" target="_blank" data-bs-toggle="tooltip" data-bs-placement="right" title="API Docs (Swagger)">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-api-app"></i>
+                            <i class="ti ti-code fs-2"></i>
                         </span>
                         <span class="nav-link-title">API Docs (Swagger)</span>
                     </a>
                 </li>
-
             </ul>
         </div>
     </div>

@@ -13,9 +13,11 @@ The $id variable MUST match the ID you target in JS: $('#patients-empty').remove
                 <path d="M3 3l18 18"></path>
             </svg>
         </div>
-        <p class="empty-title">No data found</p>
-        <p class="empty-subtitle text-secondary">
-            We couldn't find any records matching your criteria.
-        </p>
+        <p class="empty-title mb-0">{{ $title ?? 'No data found' }}</p>
+        @if(!empty($subtitle))
+            <p class="empty-subtitle text-secondary">
+                {{ $subtitle }}
+            </p>
+        @endif
     </div>
 </div>

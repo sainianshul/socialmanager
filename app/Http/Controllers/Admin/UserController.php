@@ -32,14 +32,14 @@ class UserController extends Controller
     {
         $data = $request->validated();
         
-        $data['role'] = User::ROLE_USER;
+        $data['role'] = $data['role'] ?? User::ROLE_USER;
         $data['created_by'] = auth()->id() ?? User::CREATED_BY_ADMIN;
         
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
             // Optional: If no password is provided, generate a random one
-            $data['password'] = Hash::make(Str::random(16));
+            $data['password'] = Hash::make(Str::random(12));
         }
 
         User::create($data);
@@ -50,23 +50,25 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        abort_unless($user->isUser(), 404);
-        
         return view('admin.users.show', compact('user'));
     }
 
     public function edit(User $user)
     {
-        abort_unless($user->isUser(), 404);
-
         return view('admin.users.edit', compact('user'));
     }
 
     public function update(UpdateUserRequest $request, User $user)
     {
-        abort_unless($user->isUser(), 404);
+        $data = $request->validated();
 
-        $user->update($request->validated());
+        if (!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+        $user->update($data);
 
         return redirect()->back()
             ->with('success', 'User updated successfully.');
@@ -74,7 +76,12 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        abort_unless($user->isUser(), 404);
+        if ($user->id === auth()->id()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You cannot delete your own account.'
+            ], 403);
+        }
 
         $user->delete();
 
@@ -86,8 +93,6 @@ class UserController extends Controller
 
     public function updateStatus(Request $request, User $user)
     {
-        abort_unless($user->isUser(), 404);
-
         $request->validate([
             'status' => 'required|integer|in:' . implode(',', array_keys(User::getStatusList())),
         ]);
@@ -112,8 +117,6 @@ class UserController extends Controller
 
     public function unblock(User $user)
     {
-        abort_unless($user->isUser(), 404);
-
         $user->update([
             'status' => User::STATUS_ACTIVE,
             'blocked_reason' => null
@@ -138,7 +141,6 @@ class UserController extends Controller
     public function restore($id)
     {
         $user = User::onlyTrashed()->findOrFail($id);
-        abort_unless($user->isUser(), 404);
 
         $user->restore();
 
@@ -168,33 +170,6 @@ class UserController extends Controller
         ]);
     }
 
-    public function userProductsData(User $user, \App\DataTables\Users\UserProductsDataTable $dataTable)
-    {
-        abort_unless($user->isUser(), 404);
-        $dataTable->userId = $user->id;
-        return $dataTable->ajax();
-    }
-
-    public function userRequirementsData(User $user, \App\DataTables\Users\UserRequirementsDataTable $dataTable)
-    {
-        abort_unless($user->isUser(), 404);
-        $dataTable->userId = $user->id;
-        return $dataTable->ajax();
-    }
-
-    public function userLeadsData(User $user, \App\DataTables\Users\UserLeadsDataTable $dataTable)
-    {
-        abort_unless($user->isUser(), 404);
-        $dataTable->userId = $user->id;
-        return $dataTable->ajax();
-    }
-
-    public function userRecentViewsData(User $user, \App\DataTables\Users\UserRecentViewsDataTable $dataTable)
-    {
-        abort_unless($user->isUser(), 404);
-        $dataTable->userId = $user->id;
-        return $dataTable->ajax();
-    }
 
     public function search(Request $request)
     {

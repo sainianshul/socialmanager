@@ -7,84 +7,103 @@ Route::get('/', function () {
 });
 
 Route::prefix('admin')->group(function () {
-    // Auth Routes (Named login instead of admin.login)
+    // Auth Routes
     Route::get('login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('login');
     Route::post('login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->name('login.post');
     Route::post('logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
 
     Route::name('admin.')->group(function () {
+        Route::middleware(['auth'])->group(function () {
+            // Dashboard
+            Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+            Route::get('/dashboard/stats', [\App\Http\Controllers\Admin\DashboardController::class, 'stats'])->name('dashboard.stats');
 
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/dashboard/stats', [\App\Http\Controllers\Admin\DashboardController::class, 'stats'])->name('dashboard.stats');
+            // Profile
+            Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
+            Route::post('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
-        // Profile
-        Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
-        Route::post('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
+            // Connected Social Accounts (Meta / Facebook & Instagram)
+            Route::prefix('accounts')->name('accounts.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\AccountController::class, 'index'])->name('index');
+                Route::post('{account}/settings', [\App\Http\Controllers\Admin\AccountController::class, 'updateSettings'])->name('update-settings');
+                Route::post('{account}/toggle-status', [\App\Http\Controllers\Admin\AccountController::class, 'toggleStatus'])->name('toggle-status');
+                Route::post('{account}/sync', [\App\Http\Controllers\Admin\AccountController::class, 'syncAccount'])->name('sync');
+                Route::delete('{account}', [\App\Http\Controllers\Admin\AccountController::class, 'destroy'])->name('destroy');
+            });
 
+            // Social Posts (Synced Feed, Gallery & Engagement)
+            Route::prefix('posts')->name('posts.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\PostController::class, 'index'])->name('index');
+                Route::get('instagram', [\App\Http\Controllers\Admin\PostController::class, 'instagram'])->name('instagram');
+                Route::get('facebook', [\App\Http\Controllers\Admin\PostController::class, 'facebook'])->name('facebook');
+                Route::get('youtube', [\App\Http\Controllers\Admin\PostController::class, 'youtube'])->name('youtube');
+                Route::post('sync', [\App\Http\Controllers\Admin\PostController::class, 'sync'])->name('sync');
 
-        // Users (Buyers/Sellers) CRUD
-        Route::prefix('users')->name('users.')->group(function () {
-            Route::get('data', [\App\Http\Controllers\Admin\UserController::class, 'data'])->name('data');
-            
-            Route::get('search', [\App\Http\Controllers\Admin\UserController::class, 'search'])->name('search');
-            Route::get('blocked', [\App\Http\Controllers\Admin\UserController::class, 'blocked'])->name('blocked');
-            Route::get('blocked/data', [\App\Http\Controllers\Admin\UserController::class, 'blockedData'])->name('blocked.data');
-            Route::post('{user}/unblock', [\App\Http\Controllers\Admin\UserController::class, 'unblock'])->name('unblock');
-            
-            Route::get('deleted', [\App\Http\Controllers\Admin\UserController::class, 'deleted'])->name('deleted');
-            Route::get('deleted/data', [\App\Http\Controllers\Admin\UserController::class, 'deletedData'])->name('deleted.data');
-            Route::post('{user}/restore', [\App\Http\Controllers\Admin\UserController::class, 'restore'])->name('restore');
-            
-            Route::post('{user}/status', [\App\Http\Controllers\Admin\UserController::class, 'updateStatus'])->name('update-status');
-            Route::post('{user}/revoke-token', [\App\Http\Controllers\Admin\UserController::class, 'revokeToken'])->name('revoke-token');
-            Route::get('{user}/products/data', [\App\Http\Controllers\Admin\UserController::class, 'userProductsData'])->name('products.data');
-            Route::get('{user}/requirements/data', [\App\Http\Controllers\Admin\UserController::class, 'userRequirementsData'])->name('requirements.data');
-            Route::get('{user}/leads/data', [\App\Http\Controllers\Admin\UserController::class, 'userLeadsData'])->name('leads.data');
-            Route::get('{user}/recent-views/data', [\App\Http\Controllers\Admin\UserController::class, 'userRecentViewsData'])->name('recent-views.data');
+                // Content Calendar & Scheduled Publishing
+                Route::get('create', [\App\Http\Controllers\Admin\SchedulePostController::class, 'create'])->name('create');
+                Route::get('schedule', [\App\Http\Controllers\Admin\SchedulePostController::class, 'index'])->name('schedule');
+                Route::get('schedule/events', [\App\Http\Controllers\Admin\SchedulePostController::class, 'events'])->name('schedule.events');
+                Route::post('schedule/store', [\App\Http\Controllers\Admin\SchedulePostController::class, 'store'])->name('schedule.store');
+                Route::get('schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'show'])->name('schedule.show');
+                Route::get('schedule/{scheduledPost}/edit', [\App\Http\Controllers\Admin\SchedulePostController::class, 'edit'])->name('schedule.edit');
+                Route::match(['put', 'post'], 'schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'update'])->name('schedule.update');
+                Route::post('schedule/{scheduledPost}/publish-now', [\App\Http\Controllers\Admin\SchedulePostController::class, 'publishNow'])->name('schedule.publish-now');
+                Route::delete('schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'destroy'])->name('schedule.destroy');
+            });
+
+            // Auto DM (Comment-to-Inbox Automation)
+            Route::prefix('auto-dm')->name('auto-dm.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\AutoDmController::class, 'index'])->name('index');
+            });
+
+            // Constituent Comments & AI Moderation
+            Route::prefix('comments')->name('comments.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\CommentController::class, 'index'])->name('index');
+                Route::get('instagram', [\App\Http\Controllers\Admin\CommentController::class, 'instagram'])->name('instagram');
+                Route::get('instagram/data', [\App\Http\Controllers\Admin\CommentController::class, 'instagramData'])->name('instagram.data');
+                Route::get('facebook', [\App\Http\Controllers\Admin\CommentController::class, 'facebook'])->name('facebook');
+                Route::get('facebook/data', [\App\Http\Controllers\Admin\CommentController::class, 'facebookData'])->name('facebook.data');
+                Route::get('youtube', [\App\Http\Controllers\Admin\CommentController::class, 'youtube'])->name('youtube');
+                Route::get('youtube/data', [\App\Http\Controllers\Admin\CommentController::class, 'youtubeData'])->name('youtube.data');
+                Route::get('data', [\App\Http\Controllers\Admin\CommentController::class, 'data'])->name('data');
+                Route::post('sync', [\App\Http\Controllers\Admin\CommentController::class, 'sync'])->name('sync');
+                Route::post('store-manual', [\App\Http\Controllers\Admin\CommentController::class, 'storeManual'])->name('store-manual');
+                Route::post('{comment}/reply', [\App\Http\Controllers\Admin\CommentController::class, 'reply'])->name('reply');
+                Route::post('{comment}/approve', [\App\Http\Controllers\Admin\CommentController::class, 'approve'])->name('approve');
+                Route::post('{comment}/toggle-hide', [\App\Http\Controllers\Admin\CommentController::class, 'toggleHide'])->name('toggle-hide');
+            });
+
+            // Users CRUD & Actions (Admin & Manager only)
+            Route::middleware(['admin.manager'])->group(function () {
+                Route::prefix('users')->name('users.')->group(function () {
+                    Route::get('data', [\App\Http\Controllers\Admin\UserController::class, 'data'])->name('data');
+                    Route::get('search', [\App\Http\Controllers\Admin\UserController::class, 'search'])->name('search');
+                    Route::get('blocked', [\App\Http\Controllers\Admin\UserController::class, 'blocked'])->name('blocked');
+                    Route::get('blocked/data', [\App\Http\Controllers\Admin\UserController::class, 'blockedData'])->name('blocked.data');
+                    Route::post('{user}/unblock', [\App\Http\Controllers\Admin\UserController::class, 'unblock'])->name('unblock');
+                    Route::get('deleted', [\App\Http\Controllers\Admin\UserController::class, 'deleted'])->name('deleted');
+                    Route::get('deleted/data', [\App\Http\Controllers\Admin\UserController::class, 'deletedData'])->name('deleted.data');
+                    Route::post('{user}/restore', [\App\Http\Controllers\Admin\UserController::class, 'restore'])->name('restore');
+                    Route::post('{user}/status', [\App\Http\Controllers\Admin\UserController::class, 'updateStatus'])->name('update-status');
+                    Route::post('{user}/revoke-token', [\App\Http\Controllers\Admin\UserController::class, 'revokeToken'])->name('revoke-token');
+                });
+                Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+            });
         });
-        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
-
-        // Comments (Admin Notes)
-        Route::post('comments', [\App\Http\Controllers\Admin\CommentController::class, 'store'])->name('comments.store');
-        Route::delete('comments/{comment}', [\App\Http\Controllers\Admin\CommentController::class, 'destroy'])->name('comments.destroy');
-        // Categories CRUD
-        Route::get('categories/data', [\App\Http\Controllers\Admin\CategoryController::class, 'data'])->name('categories.data');
-        Route::get('categories/{category}/children', [\App\Http\Controllers\Admin\CategoryController::class, 'children'])->name('categories.children');
-        Route::post('categories/{category}/status', [\App\Http\Controllers\Admin\CategoryController::class, 'updateStatus'])->name('categories.update-status');
-        Route::post('categories/{category}/featured', [\App\Http\Controllers\Admin\CategoryController::class, 'updateFeatured'])->name('categories.update-featured');
-        Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
-
-        // Products CRUD
-        Route::get('products/data', [\App\Http\Controllers\Admin\ProductController::class, 'data'])->name('products.data');
-        Route::post('products/{product}/status', [\App\Http\Controllers\Admin\ProductController::class, 'updateStatus'])->name('products.update-status');
-        Route::post('products/{product}/featured', [\App\Http\Controllers\Admin\ProductController::class, 'updateFeatured'])->name('products.update-featured');
-        Route::get('products/{product}/views-data', [\App\Http\Controllers\Admin\ProductController::class, 'viewsData'])->name('products.views-data');
-        Route::get('products/{product}/leads-data', [\App\Http\Controllers\Admin\ProductController::class, 'leadsData'])->name('products.leads-data');
-        Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
-
-        // Leads
-        Route::get('leads/{lead}', [\App\Http\Controllers\Admin\LeadController::class, 'show'])->name('leads.show');
-
-        // Banners CRUD
-        Route::get('banners/data', [\App\Http\Controllers\Admin\BannerController::class, 'data'])->name('banners.data');
-        Route::post('banners/{banner}/status', [\App\Http\Controllers\Admin\BannerController::class, 'updateStatus'])->name('banners.update-status');
-        Route::resource('banners', \App\Http\Controllers\Admin\BannerController::class)->except(['create', 'edit', 'show']);
-
-        // Communication Logs
-        Route::post('communication-logs/truncate', [\App\Http\Controllers\Admin\CommunicationLogController::class, 'truncate'])->name('communication-logs.truncate');
-        Route::resource('communication-logs', \App\Http\Controllers\Admin\CommunicationLogController::class)->only(['index', 'destroy']);
-
-        Route::get('feedbacks/data', [\App\Http\Controllers\Admin\FeedbackController::class, 'data'])->name('feedbacks.data');
-        Route::post('feedbacks/{feedback}/status', [\App\Http\Controllers\Admin\FeedbackController::class, 'updateStatus'])->name('feedbacks.update-status');
-        Route::resource('feedbacks', \App\Http\Controllers\Admin\FeedbackController::class)->except(['create', 'edit', 'show']);
-
-        // Requirements CRUD
-        Route::get('requirements/data', [\App\Http\Controllers\Admin\RequirementController::class, 'data'])->name('requirements.data');
-        Route::get('requirements/{requirement}/leads-data', [\App\Http\Controllers\Admin\RequirementController::class, 'leadsData'])->name('requirements.leads-data');
-        Route::post('requirements/{requirement}/status', [\App\Http\Controllers\Admin\RequirementController::class, 'updateStatus'])->name('requirements.update-status');
-        Route::resource('requirements', \App\Http\Controllers\Admin\RequirementController::class);
-
-    });
     });
 });
+
+// Meta (Facebook & Instagram) OAuth Routes (Matches Registered Redirect URI in Meta Developer Portal)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/auth/facebook/redirect', [\App\Http\Controllers\Admin\FacebookAuthController::class, 'redirect'])->name('facebook.redirect');
+    Route::get('/auth/instagram/redirect', [\App\Http\Controllers\Admin\InstagramAuthController::class, 'redirect'])->name('instagram.redirect');
+    Route::get('/auth/youtube/redirect', [\App\Http\Controllers\Admin\YouTubeAuthController::class, 'redirect'])->name('youtube.redirect');
+});
+
+// OAuth Callback routes (Protected by cryptographic state token & auto-restores user session)
+Route::get('/auth/facebook/callback', [\App\Http\Controllers\Admin\FacebookAuthController::class, 'callback'])->name('facebook.callback');
+Route::get('/auth/instagram/callback', [\App\Http\Controllers\Admin\InstagramAuthController::class, 'callback'])->name('instagram.callback');
+Route::get('/auth/youtube/callback', [\App\Http\Controllers\Admin\YouTubeAuthController::class, 'callback'])->name('youtube.callback');
+
+// Meta Webhook Endpoint (Challenge Verification & Live Event Receiver)
+Route::match(['GET', 'POST'], '/webhook/meta', [\App\Http\Controllers\MetaWebhookController::class, 'handle'])->name('meta.webhook');

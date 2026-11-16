@@ -26,14 +26,27 @@ class UserDataTable extends DataTable
                     <div class="d-flex align-items-center">
                         <a href="' . $showUrl . '" class="d-block"><span class="avatar avatar-sm me-2">' . $user->avatar_html . '</span></a>
                         <div>
-                            <a href="' . $showUrl . '" class="fw-semibold text-reset text-decoration-none">' . e($user->name ?? 'Unknown') . '</a>
+                            <a href="' . $showUrl . '" class="fw-semibold text-reset text-decoration-none d-block">' . e($user->name ?? 'Unknown') . '</a>
                         </div>
                     </div>
                 ';
             })
             
+            ->addColumn('email', function (User $user) {
+                return e($user->email ?? '—');
+            })
+            
             ->addColumn('phone', function (User $user) {
                 return '<span class="text-secondary fw-semibold">' . e($user->phone ?? '—') . '</span>';
+            })
+
+            ->addColumn('role', function (User $user) {
+                $color = match($user->role) {
+                    User::ROLE_ADMIN => 'purple',
+                    User::ROLE_MANAGER => 'azure',
+                    default => 'blue',
+                };
+                return '<span class="badge bg-' . $color . '-lt">' . e($user->role_name) . '</span>';
             })
 
             // ── Status ───────────────────────────────────────────────
@@ -89,7 +102,9 @@ class UserDataTable extends DataTable
             })
             ->rawColumns([
                 'name',
+                'email',
                 'phone',
+                'role',
                 'status',
                 'last_login_at',
                 'created_at',
@@ -100,9 +115,12 @@ class UserDataTable extends DataTable
     public function query(User $model)
     {
         $query = $model->newQuery()
-            ->where('role', User::ROLE_USER)
             ->select('users.*')
             ->latest();
+
+        if (request()->filled('role')) {
+            $query->where('role', request('role'));
+        }
 
         if (request()->filled('status')) {
             $query->where('status', request('status'));

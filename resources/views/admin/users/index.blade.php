@@ -7,10 +7,7 @@
     <div class="page-header d-print-none mb-4">
         <div class="row align-items-center">
             <div class="col">
-                <x-breadcrumb :items="[
-                    ['label' => 'Users'],
-                ]" />
-                <h2 class="page-title">Users (Buyers & Sellers)</h2>
+                <h2 class="page-title">Users</h2>
             </div>
             <div class="col-auto">
                 <a href="{{ route('admin.users.create') }}" class="btn btn-primary">
@@ -71,7 +68,9 @@
                         <tr>
                             <th class="w-1">S.No</th>
                             <th>User Info</th>
+                            <th>Email</th>
                             <th>Phone</th>
+                            <th>Role</th>
                             <th>Status</th>
                             <th>Last Login</th>
                             <th>Joined</th>
@@ -146,14 +145,16 @@
                 columns: [
                     { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
                     { data: 'name', name: 'name' },
+                    { data: 'email', name: 'email' },
                     { data: 'phone', name: 'phone', orderable: false },
+                    { data: 'role', name: 'role' },
                     { data: 'status', name: 'status' },
                     { data: 'last_login_at', name: 'last_login_at' },
                     { data: 'created_at', name: 'created_at' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
                 ],
 
-                order: [[5, 'desc']], // Order by created_at desc (index 5)
+                order: [[7, 'desc']], // Order by created_at desc (index 7)
                 pageLength: 15,
                 lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]],
 

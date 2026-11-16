@@ -11,15 +11,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(
-            \App\Contracts\PaymentGatewayInterface::class,
-            \App\Services\Gateways\DummyPaymentGateway::class
-        );
+        // Bind the active AI service provider (Gemini, OpenAI, Qwen, DeepSeek)
+        $this->app->bind(\App\Contracts\AIServiceInterface::class, function ($app) {
+            $provider = strtolower(config('services.ai.default', 'gemini'));
 
-        $this->app->bind(
-            \App\Contracts\SmsServiceInterface::class,
-            \App\Services\Sms\TwilioSmsService::class
-        );
+            return match ($provider) {
+                'openai'   => new \App\Services\AI\OpenAICompatibleAIService('openai'),
+                'qwen'     => new \App\Services\AI\OpenAICompatibleAIService('qwen'),
+                'deepseek' => new \App\Services\AI\OpenAICompatibleAIService('deepseek'),
+                default    => $app->make(\App\Services\GeminiAIService::class),
+            };
+        });
     }
 
     /**

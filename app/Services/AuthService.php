@@ -32,7 +32,7 @@ class AuthService
         OtpVerification::clearPhoneOtps($phone);
 
         $otp = (string) random_int(100000, 999999);
-        
+
         // PlayStore Review / Apple App Store bypass
         if ($phone === '9999999999') {
             $otp = '123456';
@@ -48,7 +48,8 @@ class AuthService
             'status' => OtpVerification::STATUS_ACTIVE,
         ]);
 
-        $messageText = "Your OTP for Login is {$otp}, Valid for 10 minutes. Do not share it with anyone. Thanks CAN WINN FOUNDATION";
+        $appName = config('app.name', 'SocialManager');
+        $messageText = "Your OTP for Login is {$otp}, Valid for 10 minutes. Do not share it with anyone. Thanks {$appName}";
         $messageEncoded = str_replace(' ', '%20', $messageText);
 
         $smartpingUser = config('services.smartping.user');
@@ -69,20 +70,16 @@ class AuthService
                 $response = \Illuminate\Support\Facades\Http::get($url);
                 if ($response->successful()) {
                     \Illuminate\Support\Facades\Log::info('SmartPing OTP sent successfully', ['phone' => $phone, 'response' => $response->body()]);
-                    \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_SENT);
                 } else {
                     \Illuminate\Support\Facades\Log::error('SmartPing OTP failed', ['phone' => $phone, 'response' => $response->body()]);
-                    \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_FAILED);
                 }
             } catch (\Exception $e) {
                 \Illuminate\Support\Facades\Log::error('SmartPing API Exception', ['error' => $e->getMessage()]);
-                \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_FAILED);
             }
         } else {
-            // Log pending if credentials missing
-            \App\Models\CommunicationLog::log($phone, $messageText, \App\Models\CommunicationLog::STATUS_PENDING);
+            \Illuminate\Support\Facades\Log::info('OTP generated (SMS not sent - credentials missing or test mode)', ['phone' => $phone]);
         }
-        
+
         return [
             'otp' => $otp,
         ];
@@ -165,7 +162,7 @@ class AuthService
     {
         // Create token
         $tokenResult = $user->createToken('auth-token');
-        
+
         // Update the token with device info
         $accessToken = $tokenResult->accessToken;
         $accessToken->device_id = $data['device_id'] ?? null;

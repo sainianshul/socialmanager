@@ -1,5 +1,5 @@
 # ============================================================
-# VCanCare — Docker Compose (FrankenPHP + Octane + Redis)
+# SocialManager — Docker Compose (FrankenPHP + Octane + Redis)
 # ============================================================
 
 services:
@@ -8,13 +8,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vvyapar_mitra_app
+    container_name: socialmanager_app
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     working_dir: /var/www
     ports:
-      - "8101:8000"
+      - "8201:8000"
     volumes:
       - ./:/var/www
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -22,17 +26,28 @@ services:
         condition: service_started
     environment:
       - OCTANE_SERVER=frankenphp
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # Queue Worker — processes jobs from Redis
   queue:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: vvyapar_mitra_queue
+    container_name: socialmanager_queue
     restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
     working_dir: /var/www
+    healthcheck:
+      disable: true
     volumes:
       - ./:/var/www
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
     depends_on:
       mysql:
         condition: service_healthy
@@ -42,17 +57,17 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: vvyapar_mitra_mysql
+    container_name: socialmanager_mysql
     restart: unless-stopped
     environment:
-      MYSQL_DATABASE: laravel
+      MYSQL_DATABASE: socialmanager
       MYSQL_ROOT_PASSWORD: root
       MYSQL_PASSWORD: root
-      MYSQL_USER: laravel
+      MYSQL_USER: socialmanager
     ports:
-      - "3307:3306"
+      - "3308:3306"
     volumes:
-      - vvyapar_mitra_mysql_data:/var/lib/mysql
+      - socialmanager_mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -61,10 +76,10 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: vvyapar_mitra_phpmyadmin
+    container_name: socialmanager_phpmyadmin
     restart: unless-stopped
     ports:
-      - "8081:80"
+      - "8082:80"
     environment:
       PMA_HOST: mysql
       MYSQL_ROOT_PASSWORD: root
@@ -73,14 +88,14 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: vvyapar_mitra_redis
+    container_name: socialmanager_redis
     restart: unless-stopped
     ports:
-      - "6380:6379"
+      - "6381:6379"
     volumes:
-      - vvyapar_mitra_redis_data:/data
+      - socialmanager_redis_data:/data
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
 
 volumes:
-  vvyapar_mitra_mysql_data:
-  vvyapar_mitra_redis_data:
+  socialmanager_mysql_data:
+  socialmanager_redis_data:

@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin\User;
 
 use App\Models\User;
-use App\Rules\IndianPhoneNumber;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -18,12 +17,11 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'phone' => ['required', new IndianPhoneNumber, Rule::unique('users', 'phone')],
-            'email' => ['nullable', 'email', 'max:255', Rule::unique('users', 'email')],
-            'password' => ['nullable', 'string', 'min:8'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')],
+            'password' => ['nullable', 'string', 'min:6'],
+            'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')],
+            'role' => ['nullable', 'integer', Rule::in([User::ROLE_MANAGER, User::ROLE_USER])],
             'status' => ['required', 'integer', Rule::in(array_keys(User::getStatusList()))],
-            'pincode' => ['nullable', 'string', 'max:10'],
-            'city' => ['nullable', 'string', 'max:100'],
         ];
     }
 }

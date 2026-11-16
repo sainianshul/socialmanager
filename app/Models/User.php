@@ -21,6 +21,9 @@ class User extends Authenticatable
     const STATUS_BLOCKED = 2;
     const STATUS_SUSPENDED = 3;
 
+    const CREATED_BY_SELF = 0;
+    const CREATED_BY_ADMIN = 1;
+
 
     protected $fillable = [
         'profile_completed_at',
@@ -176,15 +179,9 @@ class User extends Authenticatable
 
     // ─── Relationships ────────────────────────
 
-    public function loginHistories()
+    public function accounts(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        // If LoginHistory model exists
-        return $this->hasMany(LoginHistory::class);
-    }
-
-    public function products()
-    {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Account::class);
     }
 
     // ─── API Response ────────────────────────
