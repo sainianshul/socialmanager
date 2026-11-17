@@ -20,26 +20,33 @@ class AccountManagementTest extends TestCase
         $response->assertStatus(200);
         $content = $response->getContent();
 
-        // Should see Accounts in sidebar
-        $this->assertStringContainsString('Accounts</span>', $content);
+        // Regular user should see Accounts and Content
+        $this->assertStringContainsString('Connected Accounts</span>', $content);
+        $this->assertStringContainsString('New Post</span>', $content);
 
-        // Should NOT see Users in sidebar for regular User
+        // Regular user should NOT see Users or System settings/API in sidebar
         $this->assertStringNotContainsString('All Users</span>', $content);
         $this->assertStringNotContainsString('Blocked Users</span>', $content);
+        $this->assertStringNotContainsString('API Docs (Swagger)</span>', $content);
     }
 
-    public function test_sidebar_shows_users_and_accounts_for_admin(): void
+    public function test_sidebar_shows_users_and_system_and_hides_accounts_for_admin(): void
     {
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
 
-        $response = $this->actingAs($admin)->get(route('admin.accounts.index'));
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertStatus(200);
         $content = $response->getContent();
 
-        // Admin should see both Accounts and All Users
-        $this->assertStringContainsString('Accounts</span>', $content);
+        // Admin sees Users and System & API in sidebar
         $this->assertStringContainsString('All Users</span>', $content);
+        $this->assertStringContainsString('Add User</span>', $content);
+        $this->assertStringContainsString('API Docs (Swagger)</span>', $content);
+
+        // Admin does NOT see personal Connected Accounts or Content creation (managed via Ghost/Shadow mode)
+        $this->assertStringNotContainsString('Connected Accounts</span>', $content);
+        $this->assertStringNotContainsString('New Post</span>', $content);
     }
 
     public function test_accounts_empty_state_renders_when_no_accounts_exist(): void

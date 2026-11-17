@@ -11,12 +11,21 @@
             </div>
             <div class="col-auto ms-auto d-print-none">
                 <div class="d-flex align-items-center gap-2">
-                    <a href="{{ route('admin.accounts.index') }}" class="btn btn-outline-secondary">
-                        <i class="ti ti-brand-meta me-1"></i>Channels ({{ $channelsCount }})
-                    </a>
-                    <a href="{{ route('admin.posts.schedule') }}" class="btn btn-primary d-inline-flex align-items-center">
-                        <i class="ti ti-plus me-1"></i>Schedule Post
-                    </a>
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary">
+                            <i class="ti ti-users me-1"></i>Manage Users
+                        </a>
+                        <a href="{{ route('admin.users.create') }}" class="btn btn-primary d-inline-flex align-items-center">
+                            <i class="ti ti-user-plus me-1"></i>Add User
+                        </a>
+                    @else
+                        <a href="{{ route('admin.accounts.index') }}" class="btn btn-outline-secondary">
+                            <i class="ti ti-brand-meta me-1"></i>Channels ({{ $channelsCount }})
+                        </a>
+                        <a href="{{ route('admin.posts.schedule') }}" class="btn btn-primary d-inline-flex align-items-center">
+                            <i class="ti ti-plus me-1"></i>Schedule Post
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
