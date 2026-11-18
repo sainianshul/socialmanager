@@ -6,34 +6,70 @@
     @include('admin.layouts.partials._datatable-cdn-css')
     <style>
         /* Modern Social Inbox Card & Feed View Styling */
-        .view-feed #comments-table thead {
+        #comments-table thead {
             display: none !important;
         }
-        .view-feed #comments-table,
-        .view-feed #comments-table tbody,
-        .view-feed #comments-table tbody tr,
-        .view-feed #comments-table tbody td {
+        #comments-table,
+        #comments-table tbody,
+        #comments-table tbody tr,
+        #comments-table tbody td {
             background: transparent !important;
             border: none !important;
             box-shadow: none !important;
             padding: 0 !important;
         }
-        .view-feed #comments-table tbody tr {
+        #comments-table tbody tr {
             display: block;
             margin-bottom: 0.95rem;
         }
-        .view-feed #comments-table tbody td {
+        #comments-table tbody td {
             display: block;
             width: 100% !important;
         }
         .social-inbox-card {
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            transition: all 0.15s ease-in-out;
         }
         .social-inbox-card:hover {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 10px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            border-color: #cbd5e1 !important;
         }
         .comment-text-expandable a {
             font-weight: 600;
+        }
+
+        /* Card Action Buttons Hover Styling */
+        .btn-action-platform {
+            border-color: #cbd5e1;
+            color: #334155;
+            background-color: #ffffff;
+            font-weight: 500;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-action-platform:hover {
+            background-color: #eff6ff;
+            border-color: #93c5fd;
+            color: #1d4ed8;
+        }
+        .btn-action-reply {
+            font-weight: 500;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-action-reply:hover {
+            background-color: #206bc4;
+            color: #ffffff;
+        }
+        .btn-action-hide {
+            border-color: #fca5a5;
+            color: #dc2626;
+            background-color: #ffffff;
+            font-weight: 500;
+            transition: all 0.15s ease-in-out;
+        }
+        .btn-action-hide:hover {
+            background-color: #fef2f2;
+            border-color: #f87171;
+            color: #b91c1c;
         }
     </style>
 @endpush
@@ -212,18 +248,6 @@
                         data-bs-toggle="tooltip" title="Refresh Comments">
                         <i class="ti ti-refresh"></i>
                     </button>
-
-                    {{-- View Mode Toggle (Feed Cards vs Table) --}}
-                    <div class="btn-group ms-1" role="group" aria-label="View Mode">
-                        <button type="button" class="btn btn-icon btn-primary" id="btn-view-feed"
-                            data-bs-toggle="tooltip" title="Social Feed Cards View">
-                            <i class="ti ti-layout-cards fs-2"></i>
-                        </button>
-                        <button type="button" class="btn btn-icon btn-outline-secondary" id="btn-view-table"
-                            data-bs-toggle="tooltip" title="Data Table View">
-                            <i class="ti ti-list fs-2"></i>
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -348,8 +372,6 @@
     <script>
         $(function () {
             let activeStatus = '';
-            let currentView = localStorage.getItem('socialmanager_comment_view') || 'feed';
-            let table = null;
 
             function showFlashAlert(type, message) {
                 let icon = (type === 'success') ? 'ti-check' : 'ti-alert-triangle';
@@ -365,96 +387,61 @@
                 $('#flash-alerts-container').html(alertHtml);
             }
 
-            function updateViewButtons() {
-                if (currentView === 'feed') {
-                    $('#btn-view-feed').removeClass('btn-outline-secondary').addClass('btn-primary');
-                    $('#btn-view-table').removeClass('btn-primary').addClass('btn-outline-secondary');
-                    $('#comments-table-wrapper').addClass('view-feed');
-                } else {
-                    $('#btn-view-table').removeClass('btn-outline-secondary').addClass('btn-primary');
-                    $('#btn-view-feed').removeClass('btn-primary').addClass('btn-outline-secondary');
-                    $('#comments-table-wrapper').removeClass('view-feed');
-                }
-            }
+            let table = $('#comments-table').DataTable({
+                serverSide: true,
+                processing: false,
 
-            function initDataTable() {
-                if ($.fn.DataTable.isDataTable('#comments-table')) {
-                    $('#comments-table').DataTable().destroy();
-                    $('#comments-table').empty();
-                }
+                ajax: {
+                    url: '{{ route('admin.comments.facebook.data') }}',
+                    data: function (d) {
+                        d.account_id = $('#filter-account').val();
+                        d.status = activeStatus;
+                        d.sentiment = $('#filter-sentiment').val();
+                    }
+                },
 
-                updateViewButtons();
+                columns: [
+                    { data: 'card', name: 'card', orderable: false, searchable: false }
+                ],
 
-                let columns = [];
-                if (currentView === 'feed') {
-                    $('#comments-table').html('<thead class="d-none"><tr><th>Card</th></tr></thead><tbody></tbody>');
-                    columns = [
-                        { data: 'card', name: 'card', orderable: false, searchable: false }
-                    ];
-                } else {
-                    $('#comments-table').html(`
-                        <thead>
-                            <tr>
-                                <th class="w-1">#</th>
-                                <th style="min-width: 170px;">Post</th>
-                                <th style="min-width: 360px;">Conversation & AI Reply</th>
-                                <th style="min-width: 110px;">Sentiment</th>
-                                <th style="min-width: 110px;">Status</th>
-                                <th class="text-end" style="min-width: 135px;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody></tbody>
-                    `);
-                    columns = [
-                        { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
-                        { data: 'post', name: 'post', orderable: false },
-                        { data: 'message', name: 'message' },
-                        { data: 'sentiment', name: 'sentiment' },
-                        { data: 'status', name: 'status' },
-                        { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
-                    ];
-                }
+                order: [],
+                pageLength: 15,
+                lengthMenu: [[10, 15, 25, 50, 100], [10, 15, 25, 50, 100]],
 
-                table = $('#comments-table').DataTable({
-                    serverSide: true,
-                    processing: false,
+                dom:
+                    "<'row'<'col-12'tr>>" +
+                    "<'row align-items-center mt-3 pt-3 flex-nowrap'" +
+                    "<'col-sm-12 col-md-5'i>" +
+                    "<'col-sm-12 col-md-7 d-flex justify-content-md-end align-items-center gap-3'lp>>",
 
-                    ajax: {
-                        url: '{{ route('admin.comments.facebook.data') }}',
-                        data: function (d) {
-                            d.account_id = $('#filter-account').val();
-                            d.status = activeStatus;
-                            d.sentiment = $('#filter-sentiment').val();
-                        }
+                language: {
+                    emptyTable: ' ',
+                    zeroRecords: ' ',
+                    loadingRecords: ' ',
+                    info: 'Showing _START_–_END_ of _TOTAL_ comments',
+                    infoEmpty: 'No comments to show',
+                    infoFiltered: '(filtered from _MAX_)',
+                    lengthMenu: 'Show _MENU_',
+                    paginate: {
+                        previous: '<i class="ti ti-chevron-left"></i>',
+                        next: '<i class="ti ti-chevron-right"></i>',
                     },
+                },
 
-                    columns: columns,
-                    order: [],
-                    pageLength: 15,
-                    lengthMenu: [[10, 15, 25, 50, 100], [10, 15, 25, 50, 100]],
+                initComplete: function () {
+                    $('#comments-loader').remove();
+                    let total = this.api().page.info().recordsDisplay;
+                    if (total === 0) {
+                        $('#comments-table-wrapper').addClass('d-none');
+                        $('#comments-empty').removeClass('d-none');
+                    } else {
+                        $('#comments-empty').addClass('d-none');
+                        $('#comments-table-wrapper').removeClass('d-none');
+                    }
+                },
 
-                    dom:
-                        "<'row'<'col-12'tr>>" +
-                        "<'row align-items-center mt-3 pt-3 flex-nowrap'" +
-                        "<'col-sm-12 col-md-5'i>" +
-                        "<'col-sm-12 col-md-7 d-flex justify-content-md-end align-items-center gap-3'lp>>",
-
-                    language: {
-                        emptyTable: ' ',
-                        zeroRecords: ' ',
-                        loadingRecords: ' ',
-                        info: 'Showing _START_–_END_ of _TOTAL_ comments',
-                        infoEmpty: 'No comments to show',
-                        infoFiltered: '(filtered from _MAX_)',
-                        lengthMenu: 'Show _MENU_',
-                        paginate: {
-                            previous: '<i class="ti ti-chevron-left"></i>',
-                            next: '<i class="ti ti-chevron-right"></i>',
-                        },
-                    },
-
-                    initComplete: function () {
-                        $('#comments-loader').remove();
+                drawCallback: function () {
+                    if ($('#comments-loader').length === 0) {
                         let total = this.api().page.info().recordsDisplay;
                         if (total === 0) {
                             $('#comments-table-wrapper').addClass('d-none');
@@ -463,41 +450,8 @@
                             $('#comments-empty').addClass('d-none');
                             $('#comments-table-wrapper').removeClass('d-none');
                         }
-                    },
-
-                    drawCallback: function () {
-                        if ($('#comments-loader').length === 0) {
-                            let total = this.api().page.info().recordsDisplay;
-                            if (total === 0) {
-                                $('#comments-table-wrapper').addClass('d-none');
-                                $('#comments-empty').removeClass('d-none');
-                            } else {
-                                $('#comments-empty').addClass('d-none');
-                                $('#comments-table-wrapper').removeClass('d-none');
-                            }
-                        }
-                        $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
                     }
-                });
-            }
-
-            // Initial Launch
-            initDataTable();
-
-            // View Toggle Listeners
-            $('#btn-view-feed').on('click', function () {
-                if (currentView !== 'feed') {
-                    currentView = 'feed';
-                    localStorage.setItem('socialmanager_comment_view', 'feed');
-                    initDataTable();
-                }
-            });
-
-            $('#btn-view-table').on('click', function () {
-                if (currentView !== 'table') {
-                    currentView = 'table';
-                    localStorage.setItem('socialmanager_comment_view', 'table');
-                    initDataTable();
+                    $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
                 }
             });
 

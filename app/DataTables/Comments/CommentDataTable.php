@@ -334,7 +334,7 @@ class CommentDataTable extends DataTable
             $platformUrl = !empty($fbId) ? "https://facebook.com/{$fbId}" : ($post?->permalink_url ?? 'https://facebook.com');
         }
 
-        // Status Stripe Color & Badges (Standard Tabler Palette)
+        // Status Stripe Color & Badges (Vibrant High-Contrast Badges)
         $isReplied = ($comment->status === Comment::STATUS_REPLIED);
         $isPending = ($comment->status === Comment::STATUS_PENDING_REVIEW || $comment->status === Comment::STATUS_NEW);
         $isHidden = ($comment->status === Comment::STATUS_HIDDEN);
@@ -349,18 +349,18 @@ class CommentDataTable extends DataTable
         };
 
         $statusBadge = match (true) {
-            $isReplied => '<span class="badge badge-outline text-success py-1 px-2"><i class="ti ti-check me-1"></i>Replied</span>',
-            $isPending => '<span class="badge badge-outline text-warning py-1 px-2"><span class="status-dot bg-warning me-1.5" style="width: 6px; height: 6px;"></span>Pending Review</span>',
-            $isFlagged => '<span class="badge badge-outline text-danger py-1 px-2"><i class="ti ti-flag me-1"></i>Flagged</span>',
-            $isHidden  => '<span class="badge badge-outline text-secondary py-1 px-2"><i class="ti ti-eye-off me-1"></i>Hidden</span>',
-            default    => '<span class="badge badge-outline text-secondary py-1 px-2">Ignored</span>',
+            $isReplied => '<span class="badge bg-success-lt text-success px-2.5 py-1 fw-bold fs-7" style="border: 1px solid rgba(47, 179, 68, 0.35);"><i class="ti ti-check me-1"></i>Replied</span>',
+            $isPending => '<span class="badge bg-warning-lt text-warning px-2.5 py-1 fw-bold fs-7" style="border: 1px solid rgba(245, 159, 0, 0.35);"><span class="status-dot bg-warning me-1.5" style="width: 7px; height: 7px; border-radius: 50%; display: inline-block;"></span>Pending Review</span>',
+            $isFlagged => '<span class="badge bg-danger-lt text-danger px-2.5 py-1 fw-bold fs-7" style="border: 1px solid rgba(214, 57, 57, 0.35);"><i class="ti ti-flag me-1"></i>Flagged</span>',
+            $isHidden  => '<span class="badge bg-secondary-lt text-secondary px-2.5 py-1 fw-bold fs-7" style="border: 1px solid rgba(98, 105, 118, 0.35);"><i class="ti ti-eye-off me-1"></i>Hidden</span>',
+            default    => '<span class="badge bg-secondary-lt text-secondary px-2 py-1">Ignored</span>',
         };
 
-        // Sentiment Badge (Standard Tabler Outline)
+        // Sentiment Badge (Soft-tinted with clean border)
         $sentimentBadge = match (strtolower($comment->sentiment ?? '')) {
-            'positive' => '<span class="badge badge-outline text-success py-1 px-2"><i class="ti ti-mood-smile me-1"></i>Positive</span>',
-            'negative' => '<span class="badge badge-outline text-danger py-1 px-2"><i class="ti ti-mood-sad me-1"></i>Negative</span>',
-            'neutral'  => '<span class="badge badge-outline text-secondary py-1 px-2"><i class="ti ti-minus me-1"></i>Neutral</span>',
+            'positive' => '<span class="badge bg-success-lt text-success px-2 py-1 fs-7" style="border: 1px solid rgba(47, 179, 68, 0.25);"><i class="ti ti-mood-smile me-1"></i>Positive</span>',
+            'negative' => '<span class="badge bg-danger-lt text-danger px-2 py-1 fs-7" style="border: 1px solid rgba(214, 57, 57, 0.25);"><i class="ti ti-mood-sad me-1"></i>Negative</span>',
+            'neutral'  => '<span class="badge bg-secondary-lt text-secondary px-2 py-1 fs-7" style="border: 1px solid rgba(98, 105, 118, 0.25);"><i class="ti ti-minus me-1"></i>Neutral</span>',
             default    => '',
         };
 
@@ -411,65 +411,63 @@ class CommentDataTable extends DataTable
             }
 
             $repliedAgo = $comment->replied_at ? $comment->replied_at->diffForHumans() : 'Replied';
-            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 200, 'text-secondary', '0.88rem');
+            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 200, 'text-dark', '0.90rem');
 
             $replyThreadHtml = '
-                <div class="mt-2.5 ps-3 ms-2" style="border-left: 2px solid #e2e8f0;">
-                    <div class="bg-light-subtle rounded-2 p-2 px-3 border">
-                        <div class="d-flex align-items-center justify-content-between mb-1 flex-wrap gap-1">
-                            <div class="d-flex align-items-center gap-1.5">
-                                ' . $pageAvatar . '
-                                <span class="fw-semibold text-dark small">' . e($accountName) . '</span>
-                                <span class="text-muted fs-7 ms-1"><i class="ti ti-check text-success me-0.5"></i>Replied</span>
-                            </div>
-                            <span class="text-muted fs-7">' . e($repliedAgo) . '</span>
+                <div class="mt-3 p-3 rounded-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2fb344;">
+                    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            ' . $pageAvatar . '
+                            <span class="fw-bold text-dark small">' . e($accountName) . '</span>
+                            <span class="badge bg-success-lt text-success px-2 py-0.5 fw-semibold fs-7" style="border: 1px solid rgba(47, 179, 68, 0.35);">
+                                <i class="ti ti-check me-0.5"></i>Official Reply Sent
+                            </span>
                         </div>
-                        <div class="mt-0.5">
-                            ' . $replyBodyHtml . '
-                        </div>
+                        <span class="text-muted small fs-7"><i class="ti ti-clock me-0.5"></i>' . e($repliedAgo) . '</span>
+                    </div>
+                    <div class="text-dark" style="line-height: 1.5; font-size: 0.90rem;">
+                        ' . $replyBodyHtml . '
                     </div>
                 </div>
             ';
         } elseif ($isPending && !empty($comment->ai_reply)) {
             // Ready-to-approve AI Draft
-            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 220, 'text-dark', '0.88rem');
+            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 220, 'text-dark', '0.90rem');
 
             $replyThreadHtml = '
-                <div class="mt-2.5 ps-3 ms-2" style="border-left: 2px solid #cbd5e1;">
-                    <div class="bg-light-subtle rounded-2 p-2.5 px-3 border">
-                        <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-1">
-                            <div class="d-flex align-items-center gap-1.5">
-                                <span class="avatar avatar-xs rounded-circle bg-primary-lt text-primary flex-shrink-0" style="width: 20px; height: 20px;">
-                                    <i class="ti ti-sparkles fs-4"></i>
-                                </span>
-                                <span class="fw-semibold text-dark small">AI Suggested Draft</span>
-                            </div>
-                            <span class="badge badge-outline text-warning py-0 px-1.5 fs-7">
-                                <span class="status-dot bg-warning me-1"></span>Action Required
+                <div class="mt-3 p-3 rounded-2" style="background-color: #fffbeb; border: 1px dashed #fcd34d; border-left: 3px solid #f59f00;">
+                    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-1.5">
+                            <span class="avatar avatar-xs rounded-circle bg-warning-lt text-warning flex-shrink-0" style="width: 22px; height: 22px;">
+                                <i class="ti ti-sparkles fs-4"></i>
                             </span>
+                            <span class="fw-bold text-dark small">AI Suggested Draft</span>
                         </div>
-                        <div class="p-2 bg-white rounded border mb-2">
-                            ' . $replyBodyHtml . '
-                        </div>
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <form method="POST" action="' . route('admin.comments.approve', $comment->id) . '" class="d-inline m-0 form-approve-reply">
-                                ' . csrf_field() . '
-                                <button type="submit" class="btn btn-sm btn-outline-success px-2.5 d-inline-flex align-items-center gap-1 btn-approve-action" style="height: 32px;">
-                                    <i class="ti ti-check"></i>
-                                    <span>Approve & Send</span>
-                                </button>
-                            </form>
-                            <button type="button" class="btn btn-sm btn-ghost-secondary px-2.5 d-inline-flex align-items-center gap-1 btn-reply-comment"
-                                data-id="' . $comment->id . '"
-                                data-name="' . e($displayName) . '"
-                                data-comment="' . e($comment->message ?? '') . '"
-                                data-reply="' . e($comment->ai_reply ?? '') . '"
-                                data-action="' . route('admin.comments.reply', $comment->id) . '"
-                                style="height: 32px;">
-                                <i class="ti ti-edit"></i>
-                                <span>Edit</span>
+                        <span class="badge bg-warning-lt text-warning py-0.5 px-2 fs-7 fw-semibold" style="border: 1px solid rgba(245, 159, 0, 0.35);">
+                            <span class="status-dot bg-warning me-1"></span>Action Required
+                        </span>
+                    </div>
+                    <div class="p-2.5 bg-white rounded border mb-2.5 text-dark" style="line-height: 1.5; font-size: 0.90rem;">
+                        ' . $replyBodyHtml . '
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <form method="POST" action="' . route('admin.comments.approve', $comment->id) . '" class="d-inline m-0 form-approve-reply">
+                            ' . csrf_field() . '
+                            <button type="submit" class="btn btn-sm btn-success px-3 d-inline-flex align-items-center gap-1.5 shadow-xs btn-approve-action" style="height: 32px;">
+                                <i class="ti ti-check"></i>
+                                <span class="fw-semibold">Approve & Send</span>
                             </button>
-                        </div>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-outline-secondary px-3 d-inline-flex align-items-center gap-1.5 btn-reply-comment"
+                            data-id="' . $comment->id . '"
+                            data-name="' . e($displayName) . '"
+                            data-comment="' . e($comment->message ?? '') . '"
+                            data-reply="' . e($comment->ai_reply ?? '') . '"
+                            data-action="' . route('admin.comments.reply', $comment->id) . '"
+                            style="height: 32px;">
+                            <i class="ti ti-edit"></i>
+                            <span>Edit</span>
+                        </button>
                     </div>
                 </div>
             ';
@@ -481,7 +479,7 @@ class CommentDataTable extends DataTable
         $hideLabel = $isHidden ? 'Unhide' : 'Hide';
 
         return '
-            <div class="card social-inbox-card mb-3 border shadow-xs" style="border-left: 3px solid ' . $stripeColor . ' !important; background: #ffffff;">
+            <div class="card social-inbox-card mb-3 border shadow-xs" style="border-left: 4px solid ' . $stripeColor . ' !important; background: #ffffff;">
                 <div class="card-header py-2 px-3 bg-light-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 border-bottom">
                     <div class="d-flex align-items-center gap-1 min-w-0">
                         ' . $postThumbHtml . '
@@ -517,12 +515,12 @@ class CommentDataTable extends DataTable
 
                 <div class="card-footer py-2 px-3 bg-light-subtle d-flex align-items-center justify-content-end gap-2 border-top">
                     ' . ($platformUrl ? '
-                    <a href="' . e($platformUrl) . '" target="_blank" class="btn btn-sm btn-ghost-secondary d-inline-flex align-items-center gap-1 text-secondary" style="height: 32px;" title="View on ' . $platformName . '">
+                    <a href="' . e($platformUrl) . '" target="_blank" class="btn btn-sm btn-action-platform d-inline-flex align-items-center gap-1.5" style="height: 32px;" title="View on ' . $platformName . '">
                         <i class="' . $platformIcon . '"></i>
-                        <span class="d-none d-sm-inline">View on ' . $platformName . '</span>
+                        <span>View on ' . $platformName . '</span>
                         <i class="ti ti-external-link fs-7"></i>
                     </a>' : '') . '
-                    <button type="button" class="btn btn-sm btn-ghost-primary d-inline-flex align-items-center gap-1 btn-reply-comment"
+                    <button type="button" class="btn btn-sm btn-outline-primary btn-action-reply d-inline-flex align-items-center gap-1.5 btn-reply-comment"
                         data-id="' . $comment->id . '"
                         data-name="' . e($displayName) . '"
                         data-comment="' . e($comment->message ?? '') . '"
@@ -534,9 +532,9 @@ class CommentDataTable extends DataTable
                     </button>
                     <form method="POST" action="' . route('admin.comments.toggle-hide', $comment->id) . '" class="d-inline m-0 form-toggle-hide">
                         ' . csrf_field() . '
-                        <button type="submit" class="btn btn-sm btn-ghost-secondary text-secondary d-inline-flex align-items-center gap-1" style="height: 32px;" title="' . $hideTitle . '">
+                        <button type="submit" class="btn btn-sm ' . ($isHidden ? 'btn-outline-secondary' : 'btn-outline-danger btn-action-hide') . ' d-inline-flex align-items-center gap-1.5" style="height: 32px;" title="' . $hideTitle . '">
                             <i class="' . $hideIcon . '"></i>
-                            <span class="d-none d-sm-inline">' . $hideLabel . '</span>
+                            <span>' . $hideLabel . '</span>
                         </button>
                     </form>
                 </div>
