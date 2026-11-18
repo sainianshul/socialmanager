@@ -414,7 +414,7 @@ class CommentDataTable extends DataTable
             $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 200, 'text-dark', '0.90rem');
 
             $replyThreadHtml = '
-                <div class="mt-3 p-3 rounded-2" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid #2fb344;">
+                <div class="mt-3 p-3 rounded-2 thread-reply-box" style="border-left: 3px solid #2fb344 !important;">
                     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-2">
                             ' . $pageAvatar . '
@@ -435,7 +435,7 @@ class CommentDataTable extends DataTable
             $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 220, 'text-dark', '0.90rem');
 
             $replyThreadHtml = '
-                <div class="mt-3 p-3 rounded-2" style="background-color: #fffbeb; border: 1px dashed #fcd34d; border-left: 3px solid #f59f00;">
+                <div class="mt-3 p-3 rounded-2 thread-draft-box" style="border-left: 3px solid #f59f00 !important;">
                     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-1.5">
                             <span class="avatar avatar-xs rounded-circle bg-warning-lt text-warning flex-shrink-0" style="width: 22px; height: 22px;">
@@ -479,7 +479,7 @@ class CommentDataTable extends DataTable
         $hideLabel = $isHidden ? 'Unhide' : 'Hide';
 
         return '
-            <div class="card social-inbox-card mb-3 border shadow-xs" style="border-left: 4px solid ' . $stripeColor . ' !important; background: #ffffff;">
+            <div class="card social-inbox-card mb-3 border shadow-xs" style="border-left: 4px solid ' . $stripeColor . ' !important;">
                 <div class="card-header py-2 px-3 bg-light-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 border-bottom">
                     <div class="d-flex align-items-center gap-1 min-w-0">
                         ' . $postThumbHtml . '

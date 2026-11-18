@@ -2,6 +2,7 @@
 <body>
     <script>
         var mode = localStorage.getItem('data-bs-theme') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', mode);
         document.body.setAttribute('data-bs-theme', mode);
         if (localStorage.getItem('sidebar-folded') === 'true') {
             document.documentElement.setAttribute('data-bs-sidebar', 'folded');

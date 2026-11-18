@@ -5,6 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+
+    {{-- Early Theme Initialization to Prevent Flash of Unstyled Content --}}
+    <script>
+        (function() {
+            var theme = localStorage.getItem('data-bs-theme') || 'light';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            if (localStorage.getItem('sidebar-folded') === 'true') {
+                document.documentElement.setAttribute('data-bs-sidebar', 'folded');
+            }
+        })();
+    </script>
     
     <!-- Tabler Core CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">

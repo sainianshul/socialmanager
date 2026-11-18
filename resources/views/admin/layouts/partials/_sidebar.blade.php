@@ -1,4 +1,4 @@
-<aside class="navbar navbar-vertical navbar-expand-lg bg-white">
+<aside class="navbar navbar-vertical navbar-expand-lg">
     <div class="container-fluid">
         <!-- Mobile Toggler -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-menu" aria-controls="sidebar-menu" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,7 +16,7 @@
                         <path d="M18.364 5.636L5.636 18.364" />
                     </svg>
                 </div>
-                <span class="navbar-brand-title fw-bold text-dark fs-3 mb-0">SocialManager</span>
+                <span class="navbar-brand-title fw-bold text-body fs-3 mb-0">SocialManager</span>
             </a>
         </h1>
 
@@ -31,19 +31,19 @@
                         <path d="M18.364 5.636L5.636 18.364" />
                     </svg>
                 </div>
-                <span class="navbar-brand-title fw-bold text-dark fs-3">SocialManager</span>
+                <span class="navbar-brand-title fw-bold text-body fs-3">SocialManager</span>
             </a>
         </h1>
 
         <!-- Mobile Quick Actions -->
         <div class="navbar-nav flex-row d-lg-none">
             <div class="nav-item d-flex me-3">
-                <a href="#" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
-                   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'dark'); window.location.reload();">
+                <a href="javascript:void(0)" class="nav-link px-0 hide-theme-dark btn-theme-toggle" title="Enable dark mode" data-bs-toggle="tooltip"
+                   data-bs-placement="bottom" data-theme="dark">
                     <i class="ti ti-moon fs-2"></i>
                 </a>
-                <a href="#" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
-                   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'light'); window.location.reload();">
+                <a href="javascript:void(0)" class="nav-link px-0 hide-theme-light btn-theme-toggle" title="Enable light mode" data-bs-toggle="tooltip"
+                   data-bs-placement="bottom" data-theme="light">
                     <i class="ti ti-sun fs-2"></i>
                 </a>
             </div>

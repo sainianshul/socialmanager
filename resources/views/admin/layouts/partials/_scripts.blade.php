@@ -96,6 +96,18 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Theme Toggle Handler (Smooth & Instant without page reload)
+    document.addEventListener('click', function (e) {
+        var themeTrigger = e.target.closest('.btn-theme-toggle');
+        if (themeTrigger) {
+            e.preventDefault();
+            var targetTheme = themeTrigger.getAttribute('data-theme') || 'light';
+            localStorage.setItem('data-bs-theme', targetTheme);
+            document.documentElement.setAttribute('data-bs-theme', targetTheme);
+            document.body.setAttribute('data-bs-theme', targetTheme);
+        }
+    });
+
     // Initialize tooltips
     if (window.bootstrap && bootstrap.Tooltip) {
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));

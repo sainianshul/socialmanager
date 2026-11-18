@@ -6,7 +6,7 @@
 @source "../**/*.jsx";
 @source "../**/*.js";
 
-@custom-variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *, [data-bs-theme="dark"] *, [data-bs-theme="dark"]));
 
 @theme {
     --font-sans: 'Plus Jakarta Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
@@ -51,7 +51,8 @@
 }
 
 /* ===== DARK MODE (Zinc) ===== */
-.dark {
+.dark,
+[data-bs-theme="dark"] {
     --color-background: hsl(240, 10%, 3.9%);
     --color-foreground: hsl(0, 0%, 98%);
     --color-card: hsl(240, 10%, 3.9%);

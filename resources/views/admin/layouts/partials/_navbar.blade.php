@@ -1,8 +1,8 @@
-<header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom bg-white">
+<header class="navbar navbar-expand-md d-none d-lg-flex d-print-none border-bottom">
     <div class="container-fluid px-3 px-lg-4">
         {{-- Left: Sidebar Toggle & Breadcrumbs (in place of search) --}}
         <div class="d-flex align-items-center gap-2">
-            <button type="button" class="btn btn-icon btn-ghost-secondary border-0 text-dark p-0 d-inline-flex align-items-center justify-content-center" id="btn-toggle-sidebar-navbar" title="Toggle Sidebar" aria-label="Toggle Sidebar" style="width: 36px; height: 36px; min-width: 36px;">
+            <button type="button" class="btn btn-icon btn-ghost-secondary border-0 text-body p-0 d-inline-flex align-items-center justify-content-center" id="btn-toggle-sidebar-navbar" title="Toggle Sidebar" aria-label="Toggle Sidebar" style="width: 36px; height: 36px; min-width: 36px;">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sidebar-toggle-icon">
                     <rect width="18" height="18" x="3" y="3" rx="2" />
                     <path d="M9 3v18" />
@@ -23,12 +23,12 @@
         {{-- Right: Theme Toggle & User Info --}}
         <div class="navbar-nav flex-row order-md-last ms-auto align-items-center">
             <div class="nav-item d-none d-md-flex me-3">
-                <a href="#" class="nav-link px-0 hide-theme-dark" title="Enable dark mode" data-bs-toggle="tooltip"
-		   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'dark'); window.location.reload();">
+                <a href="javascript:void(0)" class="nav-link px-0 hide-theme-dark btn-theme-toggle" title="Enable dark mode" data-bs-toggle="tooltip"
+		   data-bs-placement="bottom" data-theme="dark">
                     <i class="ti ti-moon fs-2"></i>
                 </a>
-                <a href="#" class="nav-link px-0 hide-theme-light" title="Enable light mode" data-bs-toggle="tooltip"
-		   data-bs-placement="bottom" onclick="localStorage.setItem('data-bs-theme', 'light'); window.location.reload();">
+                <a href="javascript:void(0)" class="nav-link px-0 hide-theme-light btn-theme-toggle" title="Enable light mode" data-bs-toggle="tooltip"
+		   data-bs-placement="bottom" data-theme="light">
                     <i class="ti ti-sun fs-2"></i>
                 </a>
             </div>
@@ -36,7 +36,7 @@
                 <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
                     <span class="avatar avatar-sm rounded-circle" style="background-image: url('https://ui-avatars.com/api/?name={{ urlencode(auth()->user()->name ?? 'Admin') }}&background=1db8ab&color=fff&bold=true')"></span>
                     <div class="d-none d-xl-block ps-2">
-                        <div class="fw-semibold text-dark">{{ auth()->user()->name ?? 'Admin' }}</div>
+                        <div class="fw-semibold text-body">{{ auth()->user()->name ?? 'Admin' }}</div>
                         <div class="mt-1 small text-secondary">{{ auth()->user()->isManager() ? 'Manager' : (auth()->user()->isAdmin() ? 'Administrator' : 'User') }}</div>
                     </div>
                 </a>
