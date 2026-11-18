@@ -37,6 +37,16 @@ class ProcessCommentJob implements ShouldQueue
         }
 
         $account = $comment->account;
+
+        // Defensive: Do not process or reply to the channel's own comments/replies
+        if ($account && (
+            ($comment->commenter_meta_id && $comment->commenter_meta_id === (string) $account->meta_account_id) ||
+            stripos((string) $comment->commenter_name, '(Page)') !== false ||
+            ($account->name && strcasecmp((string) $comment->commenter_name, $account->name) === 0)
+        )) {
+            return;
+        }
+
         $post = $comment->post;
         $rawText = trim($comment->message ?? '');
         $text = strtolower($rawText);
@@ -122,7 +132,8 @@ class ProcessCommentJob implements ShouldQueue
         }
 
         // Mode 2: Auto comment & Auto approved -> Publish live immediately to social platform
-        if ($autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN) {
+        $alreadyReplied = ($status === Comment::STATUS_REPLIED || !empty($comment->meta_reply_id));
+        if ($autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN && !$alreadyReplied) {
             try {
                 $publishSuccess = false;
                 if ($account->isYouTube()) {
