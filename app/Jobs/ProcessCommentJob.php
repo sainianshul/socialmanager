@@ -106,6 +106,17 @@ class ProcessCommentJob implements ShouldQueue
         if ($account?->auto_hide_trolls && $shouldHide) {
             $status = Comment::STATUS_HIDDEN;
             $hiddenAt = now();
+
+            // Also hide on Meta / YouTube via live API
+            try {
+                if ($account->isYouTube()) {
+                    app(\App\Services\YouTubeCommentSyncService::class)->setModerationStatus($comment, true);
+                } else {
+                    app(\App\Services\MetaCommentSyncService::class)->toggleHideComment($comment, true);
+                }
+            } catch (\Throwable $e) {
+                Log::warning("ProcessCommentJob: Failed to auto-hide comment #{$comment->id} on live platform: " . $e->getMessage());
+            }
         } elseif ($status === Comment::STATUS_NEW) {
             $status = Comment::STATUS_PENDING_REVIEW;
         }

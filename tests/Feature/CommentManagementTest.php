@@ -182,15 +182,27 @@ class CommentManagementTest extends TestCase
             'status' => Comment::STATUS_PENDING_REVIEW,
         ]);
 
+        Http::fake([
+            'https://graph.facebook.com/v20.0/comment_777' => Http::response(['success' => true], 200),
+        ]);
+
         // Hide
         $response = $this->actingAs($user)->post(route('admin.comments.toggle-hide', $comment->id));
         $response->assertRedirect();
         $this->assertEquals(Comment::STATUS_HIDDEN, $comment->fresh()->status);
 
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'comment_777') && ($request['is_hidden'] ?? false) === true;
+        });
+
         // Unhide
         $response2 = $this->actingAs($user)->post(route('admin.comments.toggle-hide', $comment->id));
         $response2->assertRedirect();
         $this->assertEquals(Comment::STATUS_PENDING_REVIEW, $comment->fresh()->status);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'comment_777') && ($request['is_hidden'] ?? null) === false;
+        });
     }
 
     public function test_comments_sync_fetches_and_persists_comments_from_meta(): void

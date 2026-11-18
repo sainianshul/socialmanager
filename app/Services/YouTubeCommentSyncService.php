@@ -271,6 +271,46 @@ class YouTubeCommentSyncService
     }
 
     /**
+     * Set moderation status for a YouTube Comment (e.g. rejected to hide, or published to unhide)
+     */
+    public function setModerationStatus(Comment $comment, bool $hide = true): array
+    {
+        $account = $comment->account;
+        if (!$account || empty($account->access_token)) {
+            return ['success' => false, 'message' => 'No active access token for YouTube channel.'];
+        }
+
+        try {
+            $accessToken = $this->ensureFreshAccessToken($account);
+            $commentId = $comment->platform_comment_id ?: $comment->meta_comment_id;
+
+            if (empty($commentId)) {
+                return ['success' => false, 'message' => 'YouTube comment ID is missing.'];
+            }
+
+            $status = $hide ? 'rejected' : 'published';
+
+            $response = Http::timeout(20)
+                ->withToken($accessToken)
+                ->post("https://www.googleapis.com/youtube/v3/comments/setModerationStatus?id={$commentId}&moderationStatus={$status}");
+
+            if (!$response->successful()) {
+                $err = $response->json()['error']['message'] ?? 'YouTube API error setting moderation status.';
+                Log::warning("YouTube moderation status error: {$err}", $response->json() ?? []);
+                return ['success' => false, 'message' => $err];
+            }
+
+            return [
+                'success' => true,
+                'message' => $hide ? 'Comment hidden on YouTube.' : 'Comment unhidden on YouTube.',
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Failed to set moderation status on YouTube: {$e->getMessage()}");
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
      * Ensure access token is valid, refreshing via Google OAuth if expired
      */
     protected function ensureFreshAccessToken(Account $account): string

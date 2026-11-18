@@ -338,24 +338,57 @@ class CommentController extends Controller
     }
 
     /**
-     * Toggle or set comment status to Hidden
+     * Toggle or set comment status to Hidden on local DB and live social platform
      */
     public function toggleHide(Request $request, Comment $comment)
     {
         $this->authorizeComment($comment);
 
-        if ($comment->status === Comment::STATUS_HIDDEN) {
-            $comment->update([
-                'status' => Comment::STATUS_PENDING_REVIEW,
-                'hidden_at' => null,
-            ]);
-            $msg = 'Comment unhidden and returned to review.';
-        } else {
+        $account = $comment->account;
+        $willHide = ($comment->status !== Comment::STATUS_HIDDEN);
+        $apiNotice = '';
+
+        if ($account) {
+            try {
+                if ($account->isYouTube()) {
+                    $ytService = app(\App\Services\YouTubeCommentSyncService::class);
+                    $res = $ytService->setModerationStatus($comment, $willHide);
+                    if (!$res['success']) {
+                        $apiNotice = " (Note: YouTube sync: {$res['message']})";
+                    }
+                } else {
+                    $metaService = app(\App\Services\MetaCommentSyncService::class);
+                    $res = $metaService->toggleHideComment($comment, $willHide);
+                    if (!$res['success']) {
+                        $apiNotice = " (Note: Meta sync: {$res['message']})";
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::warning("toggleHide API call exception: " . $e->getMessage());
+                $apiNotice = " (Note: Platform sync warning: {$e->getMessage()})";
+            }
+        }
+
+        if ($willHide) {
             $comment->update([
                 'status' => Comment::STATUS_HIDDEN,
                 'hidden_at' => now(),
             ]);
-            $msg = 'Comment marked as Hidden from public.';
+            $msg = 'Comment marked as Hidden from public.' . $apiNotice;
+        } else {
+            $comment->update([
+                'status' => Comment::STATUS_PENDING_REVIEW,
+                'hidden_at' => null,
+            ]);
+            $msg = 'Comment unhidden and returned to review.' . $apiNotice;
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+                'status' => $comment->status,
+            ]);
         }
 
         return redirect()->back()->with('success', $msg);

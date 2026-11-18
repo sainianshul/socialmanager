@@ -278,4 +278,62 @@ class MetaCommentSyncService
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }
+
+    /**
+     * Hide or unhide a comment on Meta (Facebook Page or Instagram Business)
+     *
+     * @param Comment $comment
+     * @param bool $hide True to hide, false to unhide
+     * @return array ['success' => bool, 'message' => string]
+     */
+    public function toggleHideComment(Comment $comment, bool $hide = true): array
+    {
+        $account = $comment->account;
+        if (!$account || empty($account->access_token)) {
+            return ['success' => false, 'message' => 'No active access token for this channel.'];
+        }
+
+        $commentId = $comment->effective_comment_id ?: $comment->meta_comment_id;
+        if (empty($commentId)) {
+            return ['success' => false, 'message' => 'Comment ID is missing.'];
+        }
+
+        $url = "https://graph.facebook.com/v20.0/{$commentId}";
+
+        // Facebook uses 'is_hidden', Instagram uses 'hide'
+        $payload = [
+            'access_token' => $account->access_token,
+        ];
+
+        if ($account->isInstagram()) {
+            $payload['hide'] = $hide;
+        } else {
+            $payload['is_hidden'] = $hide;
+        }
+
+        try {
+            $response = Http::timeout(20)->post($url, $payload)->json();
+
+            if (isset($response['error'])) {
+                $msg = $response['error']['message'] ?? 'Meta Graph API returned an error.';
+                Log::warning("Meta hide/unhide error: {$msg}", [
+                    'comment_id' => $comment->id,
+                    'meta_comment_id' => $commentId,
+                    'is_instagram' => $account->isInstagram(),
+                    'error' => $response['error'],
+                ]);
+                return ['success' => false, 'message' => $msg];
+            }
+
+            return [
+                'success' => true,
+                'message' => $hide
+                    ? 'Comment successfully hidden from public on ' . ($account->isInstagram() ? 'Instagram' : 'Facebook') . '.'
+                    : 'Comment unhidden on ' . ($account->isInstagram() ? 'Instagram' : 'Facebook') . '.',
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Failed to toggle hide comment on Meta: {$e->getMessage()}");
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
 }
