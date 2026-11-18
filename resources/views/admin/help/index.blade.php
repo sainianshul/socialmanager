@@ -25,17 +25,8 @@
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary">
-                                <i class="ti ti-ticket fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL TICKETS</div>
-                            <div class="h2 mb-0 fw-bold text-body" id="kpi-total-tickets">{{ number_format($totalTicketsCount) }}</div>
-                        </div>
-                    </div>
+                    <div class="text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;">Total Tickets</div>
+                    <div class="h2 mb-0 fw-bold mt-1 text-body" id="kpi-total-tickets">{{ number_format($totalTicketsCount) }}</div>
                 </div>
             </div>
         </div>
@@ -44,17 +35,8 @@
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-azure-lt text-azure">
-                                <i class="ti ti-clock-play fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">OPEN TICKETS</div>
-                            <div class="h2 mb-0 fw-bold text-body" id="kpi-open-tickets">{{ number_format($openTicketsCount) }}</div>
-                        </div>
-                    </div>
+                    <div class="text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;">Open Tickets</div>
+                    <div class="h2 mb-0 fw-bold mt-1 text-body" id="kpi-open-tickets">{{ number_format($openTicketsCount) }}</div>
                 </div>
             </div>
         </div>
@@ -63,17 +45,8 @@
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-warning-lt text-warning">
-                                <i class="ti ti-progress fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">IN PROGRESS</div>
-                            <div class="h2 mb-0 fw-bold text-body" id="kpi-progress-tickets">{{ number_format($inProgressTicketsCount) }}</div>
-                        </div>
-                    </div>
+                    <div class="text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;">In Progress</div>
+                    <div class="h2 mb-0 fw-bold mt-1 text-body" id="kpi-progress-tickets">{{ number_format($inProgressTicketsCount) }}</div>
                 </div>
             </div>
         </div>
@@ -82,17 +55,8 @@
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-success-lt text-success">
-                                <i class="ti ti-circle-check fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">RESOLVED</div>
-                            <div class="h2 mb-0 fw-bold text-body" id="kpi-resolved-tickets">{{ number_format($resolvedTicketsCount) }}</div>
-                        </div>
-                    </div>
+                    <div class="text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;">Resolved</div>
+                    <div class="h2 mb-0 fw-bold mt-1 text-body" id="kpi-resolved-tickets">{{ number_format($resolvedTicketsCount) }}</div>
                 </div>
             </div>
         </div>
@@ -199,12 +163,7 @@
                 <form id="create-ticket-form">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title d-flex align-items-center gap-2">
-                            <span class="avatar avatar-xs bg-primary-lt text-primary rounded">
-                                <i class="ti ti-ticket fs-3"></i>
-                            </span>
-                            <span>Create Support Ticket</span>
-                        </h5>
+                        <h5 class="modal-title">Create Support Ticket</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
 
@@ -271,11 +230,12 @@
         <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <div>
-                        <div class="d-flex align-items-center gap-2 mb-1">
-                            <span class="badge bg-dark-lt font-monospace fs-7 fw-bold" id="vt-number">#TCK</span>
-                            <span class="badge" id="vt-status-badge">Open</span>
-                            <span class="badge" id="vt-priority-badge">Medium</span>
+                    <div class="w-100 pe-3">
+                        <div class="d-flex align-items-center gap-2 mb-1.5 flex-wrap">
+                            <span class="badge badge-outline text-secondary font-monospace" id="vt-number">#TCK</span>
+                            <span class="badge badge-outline" id="vt-status-badge">Open</span>
+                            <span class="badge badge-outline" id="vt-priority-badge">Medium</span>
+                            <span class="badge badge-outline text-secondary" id="vt-category-badge">Technical</span>
                         </div>
                         <h4 class="modal-title text-body fw-bold mb-0" id="vt-title">Ticket Subject</h4>
                     </div>
@@ -283,75 +243,66 @@
                 </div>
 
                 <div class="modal-body">
-                    @if(auth()->user()->isAdmin())
-                        <div class="mb-3 p-2.5 rounded bg-blue-lt border border-blue-subtle d-flex align-items-center justify-content-between">
+                    {{-- Metadata info row --}}
+                    <div class="d-flex flex-wrap align-items-center justify-content-between text-secondary small pb-3 mb-3 border-bottom">
+                        @if(auth()->user()->isAdmin())
                             <div>
-                                <span class="text-secondary small d-block">Submitted by User:</span>
-                                <span class="fw-semibold text-body" id="vt-user-info">—</span>
+                                <span class="text-secondary">Submitted by:</span>
+                                <span class="fw-semibold text-body ms-1" id="vt-user-info">—</span>
                             </div>
-                            <span class="badge bg-purple-lt">Super Admin Review</span>
-                        </div>
-                    @endif
-
-                    {{-- Metadata Row --}}
-                    <div class="row g-2 mb-3 py-2 px-3 bg-body-tertiary rounded border border-light">
-                        <div class="col-sm-6">
-                            <span class="text-secondary small d-block">Category:</span>
-                            <span class="badge" id="vt-category-badge">Technical</span>
-                        </div>
-                        <div class="col-sm-6 text-sm-end">
-                            <span class="text-secondary small d-block">Submitted:</span>
-                            <span class="text-body fw-semibold small" id="vt-created-at">—</span>
+                        @else
+                            <div>
+                                <span class="text-secondary">Support Ticket Details</span>
+                            </div>
+                        @endif
+                        <div>
+                            <span class="text-secondary">Created:</span>
+                            <span class="text-body fw-medium ms-1" id="vt-created-at">—</span>
                         </div>
                     </div>
 
                     {{-- Description --}}
-                    <div class="mb-4">
-                        <label class="form-label text-secondary fw-semibold fs-7 text-uppercase">Description</label>
-                        <div class="p-3 rounded bg-body border text-body" id="vt-description" style="white-space: pre-wrap; min-height: 90px; line-height: 1.6;">
-                            —
-                        </div>
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;">Description</label>
+                        <div class="text-body" id="vt-description" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;">—</div>
                     </div>
 
                     @if(auth()->user()->isAdmin())
-                        {{-- Admin Resolution Note Input --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold text-uppercase fs-7 text-secondary">Admin Response / Resolution Note (Visible to User)</label>
-                            <textarea id="vt-admin-notes-input" class="form-control" rows="3" placeholder="Enter resolution details or reply to user..."></textarea>
-                        </div>
-                    @else
-                        {{-- Admin Response / Resolution Notes for Regular User --}}
-                        <div id="vt-resolution-box" class="d-none">
-                            <label class="form-label text-success fw-semibold fs-7 text-uppercase d-flex align-items-center gap-1">
-                                <i class="ti ti-message-check fs-3"></i>Support Team Response / Resolution
-                            </label>
-                            <div class="alert alert-success border-success-subtle mb-0" id="vt-admin-notes" style="white-space: pre-wrap; line-height: 1.6;">
-                                —
+                        {{-- Admin Status & Resolution Notes --}}
+                        <div class="border-top pt-3 mt-4">
+                            <div class="row g-3">
+                                <div class="col-sm-4">
+                                    <label class="form-label text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;" for="vt-admin-status-select">Status</label>
+                                    <select id="vt-admin-status-select" class="form-select">
+                                        <option value="open">Open</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="resolved">Resolved</option>
+                                        <option value="closed">Closed</option>
+                                    </select>
+                                </div>
+                                <div class="col-sm-8">
+                                    <label class="form-label text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;" for="vt-admin-notes-input">
+                                        Resolution Note <span class="text-muted fw-normal">(visible to user)</span>
+                                    </label>
+                                    <textarea id="vt-admin-notes-input" class="form-control" rows="2" placeholder="Enter resolution details or reply to user..."></textarea>
+                                </div>
                             </div>
                         </div>
-
-                        <div id="vt-pending-box" class="alert alert-info d-flex align-items-center gap-2 mb-0">
-                            <i class="ti ti-info-circle fs-2"></i>
-                            <div>Our technical support team is reviewing your ticket and will update you shortly.</div>
+                    @else
+                        {{-- User view of resolution notes --}}
+                        <div id="vt-resolution-box" class="d-none border-top pt-3 mt-4">
+                            <label class="form-label text-secondary small fw-medium text-uppercase" style="letter-spacing: 0.04em;">Support Response</label>
+                            <div class="p-3 border rounded text-body bg-body-tertiary" id="vt-admin-notes" style="white-space: pre-wrap; line-height: 1.6;">—</div>
                         </div>
                     @endif
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Close</button>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-link link-secondary text-decoration-none" data-bs-dismiss="modal">Close</button>
                     @if(auth()->user()->isAdmin())
-                        <div class="d-flex align-items-center gap-2">
-                            <label class="form-label mb-0 small text-secondary">Status:</label>
-                            <select id="vt-admin-status-select" class="form-select form-select-sm" style="width: 140px;">
-                                <option value="open">Open</option>
-                                <option value="in_progress">In Progress</option>
-                                <option value="resolved">Resolved</option>
-                                <option value="closed">Closed</option>
-                            </select>
-                            <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center" id="btn-update-ticket-status">
-                                <i class="ti ti-check me-1"></i>Save Status
-                            </button>
-                        </div>
+                        <button type="button" class="btn btn-primary d-inline-flex align-items-center" id="btn-update-ticket-status">
+                            <i class="ti ti-check me-1.5"></i>Save Changes
+                        </button>
                     @endif
                 </div>
             </div>
@@ -523,27 +474,24 @@
                 // Status Badge
                 let statusColor = $btn.data('status-color');
                 $('#vt-status-badge').text($btn.data('status'))
-                    .attr('class', 'badge bg-' + statusColor + '-lt');
+                    .attr('class', 'badge badge-outline text-' + statusColor);
 
                 // Priority Badge
                 let priorityColor = $btn.data('priority-color');
                 $('#vt-priority-badge').text($btn.data('priority'))
-                    .attr('class', 'badge bg-' + priorityColor + '-lt');
+                    .attr('class', 'badge badge-outline text-' + priorityColor);
 
                 // Category Badge
-                let categoryColor = $btn.data('category-color');
                 $('#vt-category-badge').text($btn.data('category'))
-                    .attr('class', 'badge bg-' + categoryColor + '-lt');
+                    .attr('class', 'badge badge-outline text-secondary');
 
                 // Admin Notes / Resolution
                 let notes = $btn.data('notes');
                 if (notes && notes.trim() !== '') {
                     $('#vt-admin-notes').text(notes);
                     $('#vt-resolution-box').removeClass('d-none');
-                    $('#vt-pending-box').addClass('d-none');
                 } else {
                     $('#vt-resolution-box').addClass('d-none');
-                    $('#vt-pending-box').removeClass('d-none');
                 }
 
                 @if(auth()->user()->isAdmin())
