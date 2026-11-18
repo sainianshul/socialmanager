@@ -75,14 +75,16 @@
                         <span class="nav-link-title">Dashboard</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" href="{{ route('admin.analytics.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Politics Analyses">
-                        <span class="nav-link-icon d-md-none d-lg-inline-block">
-                            <i class="ti ti-chart-dots fs-2"></i>
-                        </span>
-                        <span class="nav-link-title">Politics Analyses</span>
-                    </a>
-                </li>
+                @if(auth()->check() && !auth()->user()->isAdmin())
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" href="{{ route('admin.analytics.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Politics Analyses">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block">
+                                <i class="ti ti-chart-dots fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Politics Analyses</span>
+                        </a>
+                    </li>
+                @endif
 
                 {{-- USER MANAGEMENT (Admin / Manager only) --}}
                 @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isManager()))
