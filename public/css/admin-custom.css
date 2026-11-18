@@ -849,6 +849,166 @@ body,
 }
 
 /* ==========================================================================
+   Vertical Sidebar — Dark Mode Overrides (Crisp Typography & Elevated Squircles)
+   Note: Light mode rules remain untouched!
+   ========================================================================== */
+[data-bs-theme="dark"] .navbar-vertical,
+[data-bs-theme="dark"] .navbar-vertical.navbar,
+[data-bs-theme="dark"] .navbar-vertical.navbar-expand-lg,
+[data-bs-theme="dark"] .navbar-vertical .container-fluid,
+[data-bs-theme="dark"] .navbar-vertical .navbar-collapse {
+    background-color: #0d1527 !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical.navbar-expand-lg {
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-brand .navbar-brand-title {
+    color: #ffffff !important;
+}
+
+/* Nav Section Titles (MAIN MENU, ACCOUNTS, CONTENT, etc.) */
+[data-bs-theme="dark"] .navbar-vertical .nav-section-title {
+    color: #7b8b9e !important;
+}
+
+/* Nav Link Title (Clean, crisp, high-contrast readable text) */
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-title {
+    color: #cbd5e1 !important;
+    font-weight: 500 !important;
+}
+
+/* Nav Link Icon Squircle Container in Dark Mode */
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon {
+    background-color: #172338 !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: #94a3b8 !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon svg,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon .ti {
+    color: #94a3b8 !important;
+}
+
+/* Preserve specific colored icons if applied on .nav-link-icon in blade */
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-pink i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-pink .ti {
+    color: #f472b6 !important;
+}
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-facebook i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-facebook .ti {
+    color: #60a5fa !important;
+}
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-danger i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-danger .ti {
+    color: #f87171 !important;
+}
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-azure i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-azure .ti {
+    color: #38bdf8 !important;
+}
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-success i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-success .ti {
+    color: #4ade80 !important;
+}
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-warning i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link .nav-link-icon.text-warning .ti {
+    color: #fbbf24 !important;
+}
+
+/* Nav Link Hover State in Dark Mode */
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link:hover .nav-link-icon {
+    background-color: #1e2f4a !important;
+    border-color: rgba(255, 255, 255, 0.16) !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link:hover .nav-link-icon i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link:hover .nav-link-icon svg,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link:hover .nav-link-icon .ti {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link:hover .nav-link-title {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+/* Nav Link Active State in Dark Mode (Vibrant Teal Highlight) */
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link.active {
+    background-color: rgba(29, 184, 171, 0.14) !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link.active .nav-link-icon {
+    background-color: #1db8ab !important;
+    border-color: #1db8ab !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(29, 184, 171, 0.45) !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link.active .nav-link-icon i,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link.active .nav-link-icon svg,
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link.active .nav-link-icon .ti {
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-nav .nav-link.active .nav-link-title {
+    color: #2dd4bf !important;
+    font-weight: 600 !important;
+}
+
+/* Sidebar Footer Profile in Dark Mode */
+[data-bs-theme="dark"] .navbar-vertical .navbar-footer {
+    background-color: #0b1320 !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-footer .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-footer .nav-link-title {
+    color: #f8fafc !important;
+}
+
+[data-bs-theme="dark"] .navbar-vertical .navbar-footer .nav-link-title .small {
+    color: #8896ab !important;
+}
+
+/* Folded / Compact Rail Mode in Dark Mode */
+[data-bs-theme="dark"] html[data-bs-sidebar="folded"] .navbar-vertical,
+[data-bs-theme="dark"] html[data-bs-sidebar="folded"] .navbar-vertical.navbar-expand-lg,
+[data-bs-theme="dark"] body.sidebar-folded .navbar-vertical,
+[data-bs-theme="dark"] body.sidebar-folded .navbar-vertical.navbar-expand-lg {
+    background-color: #0d1527 !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+[data-bs-theme="dark"] html[data-bs-sidebar="folded"] .navbar-vertical .navbar-brand,
+[data-bs-theme="dark"] body.sidebar-folded .navbar-vertical .navbar-brand {
+    background-color: #0d1527 !important;
+}
+
+[data-bs-theme="dark"] html[data-bs-sidebar="folded"] .navbar-vertical .nav-section-title,
+[data-bs-theme="dark"] body.sidebar-folded .navbar-vertical .nav-section-title {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sidebar Scrollbar in Dark Mode */
+[data-bs-theme="dark"] .navbar.navbar-vertical .navbar-collapse::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+}
+[data-bs-theme="dark"] .navbar.navbar-vertical .navbar-collapse::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+/* ==========================================================================
    Folded / Compact Sidebar (Icon-Only Rail Mode from Screenshot 2)
    ========================================================================== */
 html[data-bs-sidebar="folded"] .navbar-vertical,
