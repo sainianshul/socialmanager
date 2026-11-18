@@ -8,7 +8,6 @@
     <div class="page-header d-print-none mb-3">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle text-secondary">Customer & Technical Support</div>
                 <h2 class="page-title text-body">Help Center & Support Tickets</h2>
             </div>
             <div class="col-auto">
@@ -123,7 +122,7 @@
                 <div class="input-icon">
                     <span class="input-icon-addon"><i class="ti ti-search"></i></span>
                     <input type="text" id="dt-search" class="form-control" style="width: 280px;"
-                        placeholder="Search tickets by subject, ID..." />
+                        placeholder="Search tickets..." />
                 </div>
 
                 {{-- Right Filters --}}
@@ -226,8 +225,7 @@
                         <div class="mb-3">
                             <label class="form-label required">Subject / Title</label>
                             <input type="text" name="title" id="ticket-title" class="form-control"
-                                placeholder="Brief summary of the issue (e.g. Meta token expired or Post scheduling failed)" required maxlength="255">
-                            <div class="form-hint">A clear subject helps our technical team assist you faster.</div>
+                                placeholder="Enter title" required maxlength="255">
                         </div>
 
                         <div class="row">
@@ -246,10 +244,10 @@
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Priority</label>
                                 <select name="priority" id="ticket-priority" class="form-select">
-                                    <option value="low">Low - General query</option>
-                                    <option value="medium" selected>Medium - Normal issue</option>
-                                    <option value="high">High - Feature blocked</option>
-                                    <option value="urgent">Urgent - Complete outage</option>
+                                    <option value="low">Low</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="high">High</option>
+                                    <option value="urgent">Urgent</option>
                                 </select>
                             </div>
                         </div>
@@ -258,8 +256,7 @@
                         <div class="mb-3">
                             <label class="form-label required">Description</label>
                             <textarea name="description" id="ticket-description" rows="5" class="form-control"
-                                placeholder="Explain the issue, error message, or question in detail. Mention affected social channels if relevant..." required minlength="10"></textarea>
-                            <div class="form-hint">Minimum 10 characters required.</div>
+                                placeholder="Enter description..." required minlength="10"></textarea>
                         </div>
                     </div>
 
