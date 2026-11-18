@@ -121,6 +121,14 @@
                             <span class="nav-link-title">Deleted Users</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.help.*') ? 'active' : '' }}" href="{{ route('admin.help.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Support Tickets">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
+                                <i class="ti ti-ticket fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Support Tickets</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- CLIENT SOCIAL ACCOUNTS, CONTENT & ENGAGEMENT (Only for Regular Users / Non-Admin) --}}

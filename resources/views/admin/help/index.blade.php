@@ -35,9 +35,6 @@
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL TICKETS</div>
                             <div class="h2 mb-0 fw-bold text-body" id="kpi-total-tickets">{{ number_format($totalTicketsCount) }}</div>
                         </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-primary-lt small fw-semibold">Support</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -56,9 +53,6 @@
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">OPEN TICKETS</div>
                             <div class="h2 mb-0 fw-bold text-body" id="kpi-open-tickets">{{ number_format($openTicketsCount) }}</div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-azure-lt small fw-semibold">Pending</span>
                         </div>
                     </div>
                 </div>
@@ -79,9 +73,6 @@
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">IN PROGRESS</div>
                             <div class="h2 mb-0 fw-bold text-body" id="kpi-progress-tickets">{{ number_format($inProgressTicketsCount) }}</div>
                         </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-warning-lt small fw-semibold">Working</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -100,9 +91,6 @@
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">RESOLVED</div>
                             <div class="h2 mb-0 fw-bold text-body" id="kpi-resolved-tickets">{{ number_format($resolvedTicketsCount) }}</div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-success-lt small fw-semibold">Solved</span>
                         </div>
                     </div>
                 </div>
@@ -178,6 +166,9 @@
                     <thead>
                         <tr>
                             <th class="w-1">Ticket ID</th>
+                            @if(auth()->user()->isAdmin())
+                                <th>User</th>
+                            @endif
                             <th>Subject &amp; Description</th>
                             <th>Category</th>
                             <th>Priority</th>
@@ -292,6 +283,16 @@
                 </div>
 
                 <div class="modal-body">
+                    @if(auth()->user()->isAdmin())
+                        <div class="mb-3 p-2.5 rounded bg-blue-lt border border-blue-subtle d-flex align-items-center justify-content-between">
+                            <div>
+                                <span class="text-secondary small d-block">Submitted by User:</span>
+                                <span class="fw-semibold text-body" id="vt-user-info">—</span>
+                            </div>
+                            <span class="badge bg-purple-lt">Super Admin Review</span>
+                        </div>
+                    @endif
+
                     {{-- Metadata Row --}}
                     <div class="row g-2 mb-3 py-2 px-3 bg-body-tertiary rounded border border-light">
                         <div class="col-sm-6">
@@ -312,33 +313,44 @@
                         </div>
                     </div>
 
-                    {{-- Admin Response / Resolution Notes --}}
-                    <div id="vt-resolution-box" class="d-none">
-                        <label class="form-label text-success fw-semibold fs-7 text-uppercase d-flex align-items-center gap-1">
-                            <i class="ti ti-message-check fs-3"></i>Support Team Response / Resolution
-                        </label>
-                        <div class="alert alert-success border-success-subtle mb-0" id="vt-admin-notes" style="white-space: pre-wrap; line-height: 1.6;">
-                            —
+                    @if(auth()->user()->isAdmin())
+                        {{-- Admin Resolution Note Input --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold text-uppercase fs-7 text-secondary">Admin Response / Resolution Note (Visible to User)</label>
+                            <textarea id="vt-admin-notes-input" class="form-control" rows="3" placeholder="Enter resolution details or reply to user..."></textarea>
                         </div>
-                    </div>
+                    @else
+                        {{-- Admin Response / Resolution Notes for Regular User --}}
+                        <div id="vt-resolution-box" class="d-none">
+                            <label class="form-label text-success fw-semibold fs-7 text-uppercase d-flex align-items-center gap-1">
+                                <i class="ti ti-message-check fs-3"></i>Support Team Response / Resolution
+                            </label>
+                            <div class="alert alert-success border-success-subtle mb-0" id="vt-admin-notes" style="white-space: pre-wrap; line-height: 1.6;">
+                                —
+                            </div>
+                        </div>
 
-                    <div id="vt-pending-box" class="alert alert-info d-flex align-items-center gap-2 mb-0">
-                        <i class="ti ti-info-circle fs-2"></i>
-                        <div>Our technical support team is reviewing your ticket and will update you shortly.</div>
-                    </div>
+                        <div id="vt-pending-box" class="alert alert-info d-flex align-items-center gap-2 mb-0">
+                            <i class="ti ti-info-circle fs-2"></i>
+                            <div>Our technical support team is reviewing your ticket and will update you shortly.</div>
+                        </div>
+                    @endif
                 </div>
 
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary me-auto" data-bs-dismiss="modal">Close</button>
                     @if(auth()->user()->isAdmin())
                         <div class="d-flex align-items-center gap-2">
+                            <label class="form-label mb-0 small text-secondary">Status:</label>
                             <select id="vt-admin-status-select" class="form-select form-select-sm" style="width: 140px;">
                                 <option value="open">Open</option>
                                 <option value="in_progress">In Progress</option>
                                 <option value="resolved">Resolved</option>
                                 <option value="closed">Closed</option>
                             </select>
-                            <button type="button" class="btn btn-sm btn-primary" id="btn-update-ticket-status">Update Status</button>
+                            <button type="button" class="btn btn-sm btn-primary d-inline-flex align-items-center" id="btn-update-ticket-status">
+                                <i class="ti ti-check me-1"></i>Save Status
+                            </button>
                         </div>
                     @endif
                 </div>
@@ -373,6 +385,9 @@
                 },
                 columns: [
                     { data: 'ticket_number', name: 'ticket_number', className: 'text-nowrap' },
+                    @if(auth()->user()->isAdmin())
+                    { data: 'user', name: 'user.name' },
+                    @endif
                     { data: 'title', name: 'title' },
                     { data: 'category', name: 'category', className: 'text-nowrap' },
                     { data: 'priority', name: 'priority', className: 'text-nowrap' },
@@ -380,7 +395,7 @@
                     { data: 'created_at', name: 'created_at', className: 'text-nowrap' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end text-nowrap' },
                 ],
-                order: [[5, 'desc']], // Order by created_at desc
+                order: [[ {{ auth()->user()->isAdmin() ? 6 : 5 }}, 'desc']],
                 pageLength: 15,
                 lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]],
                 dom: '<"top">rt<"d-flex align-items-center justify-content-between p-3 flex-wrap gap-2"li<"ms-auto"p>><"clear">',
@@ -532,7 +547,9 @@
                 }
 
                 @if(auth()->user()->isAdmin())
-                    $('#vt-admin-status-select').val($btn.data('status').toLowerCase().replace(' ', '_'));
+                    $('#vt-user-info').text(($btn.data('user-name') || 'User') + ' (' + ($btn.data('user-email') || '') + ')');
+                    $('#vt-admin-notes-input').val($btn.data('notes') || '');
+                    $('#vt-admin-status-select').val($btn.data('status-val') || 'open');
                 @endif
 
                 let modal = new bootstrap.Modal(document.getElementById('view-ticket-modal'));
@@ -544,6 +561,7 @@
                 $('#btn-update-ticket-status').on('click', function () {
                     if (!activeTicketId) return;
                     let newStatus = $('#vt-admin-status-select').val();
+                    let adminNotes = $('#vt-admin-notes-input').val();
                     let $btn = $(this);
                     $btn.prop('disabled', true);
 
@@ -552,11 +570,13 @@
                         method: 'PATCH',
                         data: {
                             _token: '{{ csrf_token() }}',
-                            status: newStatus
+                            status: newStatus,
+                            admin_notes: adminNotes
                         },
                         success: function (res) {
                             $btn.prop('disabled', false);
-                            let modal = bootstrap.Modal.getInstance(document.getElementById('view-ticket-modal'));
+                            let modalEl = document.getElementById('view-ticket-modal');
+                            let modal = bootstrap.Modal.getInstance(modalEl);
                             if (modal) modal.hide();
                             table.ajax.reload(null, false);
                         },

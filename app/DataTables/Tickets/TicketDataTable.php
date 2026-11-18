@@ -25,6 +25,21 @@ class TicketDataTable extends DataTable
                 return '<span class="badge bg-dark-lt fw-bold font-monospace">#' . e($ticket->ticket_number) . '</span>';
             })
 
+            ->addColumn('user', function (Ticket $ticket) {
+                if (!$ticket->user) {
+                    return '<span class="text-secondary">—</span>';
+                }
+                return '
+                    <div class="d-flex align-items-center">
+                        <span class="avatar avatar-xs rounded-circle me-1.5 bg-primary-lt text-primary">' . mb_strtoupper(mb_substr($ticket->user->name, 0, 1)) . '</span>
+                        <div class="text-truncate" style="max-width: 140px;">
+                            <span class="fw-semibold text-body d-block text-truncate small">' . e($ticket->user->name) . '</span>
+                            <span class="text-secondary fs-7 d-block text-truncate">' . e($ticket->user->email) . '</span>
+                        </div>
+                    </div>
+                ';
+            })
+
             ->editColumn('title', function (Ticket $ticket) {
                 $title = e($ticket->title);
                 $desc = e(Str::limit($ticket->description, 75));
@@ -66,8 +81,11 @@ class TicketDataTable extends DataTable
                             data-priority="' . e(ucfirst($ticket->priority)) . '"
                             data-priority-color="' . $ticket->priority_color . '"
                             data-status="' . e($ticket->status_name) . '"
+                            data-status-val="' . e($ticket->status) . '"
                             data-status-color="' . $ticket->status_color . '"
                             data-created="' . $ticket->created_at->format('d M Y, h:i A') . '"
+                            data-user-name="' . e($ticket->user?->name ?? 'User') . '"
+                            data-user-email="' . e($ticket->user?->email ?? '') . '"
                             data-notes="' . e($ticket->admin_notes ?? '') . '">
                             <i class="ti ti-eye me-1"></i>View
                         </button>
@@ -77,6 +95,7 @@ class TicketDataTable extends DataTable
 
             ->rawColumns([
                 'ticket_number',
+                'user',
                 'title',
                 'category',
                 'priority',

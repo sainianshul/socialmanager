@@ -133,4 +133,49 @@ class TicketManagementTest extends TestCase
         $resB = $this->actingAs($userB)->getJson(route('admin.help.show', $ticketA->id));
         $resB->assertStatus(403);
     }
+
+    public function test_super_admin_can_view_all_tickets_and_update_status(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $client = User::factory()->create(['role' => User::ROLE_USER, 'name' => 'Client David']);
+
+        $ticket = Ticket::create([
+            'ticket_number' => 'TCK-DAVID01',
+            'user_id'       => $client->id,
+            'category'      => Ticket::CATEGORY_TECHNICAL,
+            'title'         => 'System issue with YouTube',
+            'description'   => 'Cannot connect YouTube channel properly',
+            'status'        => Ticket::STATUS_OPEN,
+        ]);
+
+        // Admin views datatable -> sees client's ticket and user name
+        $response = $this->actingAs($admin)->getJson(route('admin.help.data'));
+        $response->assertStatus(200);
+        $response->assertSee('TCK-DAVID01');
+        $response->assertSee('Client David');
+
+        // Admin updates status to resolved with admin notes
+        $updateRes = $this->actingAs($admin)->patchJson(route('admin.help.update-status', $ticket->id), [
+            'status'      => Ticket::STATUS_RESOLVED,
+            'admin_notes' => 'We updated your YouTube OAuth credentials, please re-sync.',
+        ]);
+
+        $updateRes->assertStatus(200);
+        $updateRes->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('tickets', [
+            'id'          => $ticket->id,
+            'status'      => Ticket::STATUS_RESOLVED,
+            'admin_notes' => 'We updated your YouTube OAuth credentials, please re-sync.',
+        ]);
+    }
+
+    public function test_super_admin_sees_support_tickets_in_sidebar(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+        $response->assertStatus(200);
+        $response->assertSee('Support Tickets</span>', false);
+    }
 }
