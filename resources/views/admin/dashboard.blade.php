@@ -315,14 +315,9 @@
     <div class="row row-deck row-cards">
         <div class="col-12">
             <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <div>
-                        <h3 class="card-title fw-bold text-body mb-0">Recent Published Posts & Activity</h3>
-                        <div class="text-secondary small">Latest multi-channel broadcasts and synced interactions</div>
-                    </div>
-                    <a href="{{ route('admin.posts.index') }}" class="btn btn-sm btn-outline-secondary">
-                        View all posts <i class="ti ti-arrow-right ms-1"></i>
-                    </a>
+                <div class="card-header">
+                    <h3 class="card-title fw-bold text-body mb-0">Recent Published Posts & Activity</h3>
+                    <div class="text-secondary small">Latest multi-channel broadcasts and synced interactions</div>
                 </div>
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
@@ -337,7 +332,7 @@
                                         </span>
                                     @endif
                                     <div class="flex-grow-1 text-truncate pe-3">
-                                        <div class="fw-semibold text-dark text-truncate small">
+                                        <div class="fw-semibold text-body text-truncate small">
                                             {{ $p->message ?: 'New media published to ' . ($p->account ? $p->account->name : 'Channel') }}
                                         </div>
                                         <div class="text-secondary fs-7 mt-1">
