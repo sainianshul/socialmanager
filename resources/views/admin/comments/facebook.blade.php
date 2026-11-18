@@ -27,12 +27,10 @@
             width: 100% !important;
         }
         .social-inbox-card {
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
         }
         .social-inbox-card:hover {
-            transform: translateY(-1.5px);
-            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
-            border-color: #cbd5e1 !important;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
         }
         .comment-text-expandable a {
             font-weight: 600;
