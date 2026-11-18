@@ -76,7 +76,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Politics Analyses">
+                    <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" href="{{ route('admin.analytics.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Politics Analyses">
                         <span class="nav-link-icon d-md-none d-lg-inline-block">
                             <i class="ti ti-chart-dots fs-2"></i>
                         </span>

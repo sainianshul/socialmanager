@@ -22,6 +22,9 @@ Route::prefix('admin')->group(function () {
             Route::get('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'index'])->name('profile.index');
             Route::post('profile', [\App\Http\Controllers\Admin\ProfileController::class, 'update'])->name('profile.update');
 
+            // Political Analytics (Politics Analyses)
+            Route::get('analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
+
             // Connected Social Accounts (Meta / Facebook & Instagram)
             Route::prefix('accounts')->name('accounts.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\AccountController::class, 'index'])->name('index');
