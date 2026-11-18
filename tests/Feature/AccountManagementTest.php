@@ -20,9 +20,12 @@ class AccountManagementTest extends TestCase
         $response->assertStatus(200);
         $content = $response->getContent();
 
-        // Regular user should see Accounts and Content
+        // Regular user should see Accounts, Content, and Help & Support
         $this->assertStringContainsString('Connected Accounts</span>', $content);
         $this->assertStringContainsString('New Post</span>', $content);
+        $this->assertStringContainsString('Help & Support', $content);
+        $this->assertStringContainsString('Help</span>', $content);
+        $this->assertStringContainsString('Documentation</span>', $content);
 
         // Regular user should NOT see Users or System settings/API in sidebar
         $this->assertStringNotContainsString('All Users</span>', $content);

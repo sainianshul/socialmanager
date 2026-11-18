@@ -228,6 +228,25 @@
                             <span class="nav-link-title">AI Assistant</span>
                         </a>
                     </li>
+
+                    {{-- HELP & SUPPORT --}}
+                    <li class="nav-section-title">Help & Support</li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Help">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
+                                <i class="ti ti-help-circle fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Help</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Documentation">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
+                                <i class="ti ti-book fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Documentation</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- SYSTEM & API (Admin only) --}}
