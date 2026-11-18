@@ -84,7 +84,7 @@ class TicketDataTable extends DataTable
                             data-user-name="' . e($ticket->user?->name ?? 'User') . '"
                             data-user-email="' . e($ticket->user?->email ?? '') . '"
                             data-notes="' . e($ticket->admin_notes ?? '') . '">
-                            View
+                            <i class="ti ti-eye me-1"></i>View
                         </button>
                     </div>
                 ';
