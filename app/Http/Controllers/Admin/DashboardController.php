@@ -26,9 +26,11 @@ class DashboardController extends Controller
             $totalPosts = Post::whereIn('account_id', $userAccountIds)->count();
             $totalComments = Comment::whereIn('account_id', $userAccountIds)->count();
             $scheduledCount = ScheduledPost::where('user_id', $user->id)->where('status', ScheduledPost::STATUS_SCHEDULED)->count();
-            $totalReach = Account::where('user_id', $user->id)->sum('followers_count') ?: 0;
+            $publishedScheduledCount = ScheduledPost::where('user_id', $user->id)->where('status', ScheduledPost::STATUS_PUBLISHED)->count();
             $commentsToday = Comment::whereIn('account_id', $userAccountIds)->whereDate('created_at', Carbon::today())->count();
             $repliedCount = Comment::whereIn('account_id', $userAccountIds)->where('status', Comment::STATUS_REPLIED)->count();
+            $pendingReviewCount = Comment::whereIn('account_id', $userAccountIds)->whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count();
+            $hiddenCount = Comment::whereIn('account_id', $userAccountIds)->where('status', Comment::STATUS_HIDDEN)->count();
             $newPostsMonth = Post::whereIn('account_id', $userAccountIds)->where('published_at', '>=', Carbon::now()->subDays(30))->count();
 
             $accounts = Account::where('user_id', $user->id)->withCount(['posts', 'comments'])->get();
@@ -52,9 +54,11 @@ class DashboardController extends Controller
             $totalPosts = Post::count();
             $totalComments = Comment::count();
             $scheduledCount = ScheduledPost::where('status', ScheduledPost::STATUS_SCHEDULED)->count();
-            $totalReach = Account::sum('followers_count') ?: 0;
+            $publishedScheduledCount = ScheduledPost::where('status', ScheduledPost::STATUS_PUBLISHED)->count();
             $commentsToday = Comment::whereDate('created_at', Carbon::today())->count();
             $repliedCount = Comment::where('status', Comment::STATUS_REPLIED)->count();
+            $pendingReviewCount = Comment::whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count();
+            $hiddenCount = Comment::where('status', Comment::STATUS_HIDDEN)->count();
             $newPostsMonth = Post::where('published_at', '>=', Carbon::now()->subDays(30))->count();
 
             $accounts = Account::withCount(['posts', 'comments'])->get();
@@ -89,9 +93,11 @@ class DashboardController extends Controller
             'totalPosts',
             'totalComments',
             'scheduledCount',
-            'totalReach',
+            'publishedScheduledCount',
             'commentsToday',
             'repliedCount',
+            'pendingReviewCount',
+            'hiddenCount',
             'newPostsMonth',
             'accounts',
             'recentPosts',
@@ -112,6 +118,11 @@ class DashboardController extends Controller
                 'channels_count' => count($userAccountIds),
                 'total_posts' => Post::whereIn('account_id', $userAccountIds)->count(),
                 'total_comments' => Comment::whereIn('account_id', $userAccountIds)->count(),
+                'scheduled_count' => ScheduledPost::where('user_id', $user->id)->where('status', ScheduledPost::STATUS_SCHEDULED)->count(),
+                'published_scheduled_count' => ScheduledPost::where('user_id', $user->id)->where('status', ScheduledPost::STATUS_PUBLISHED)->count(),
+                'replied_count' => Comment::whereIn('account_id', $userAccountIds)->where('status', Comment::STATUS_REPLIED)->count(),
+                'pending_review_count' => Comment::whereIn('account_id', $userAccountIds)->whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count(),
+                'hidden_count' => Comment::whereIn('account_id', $userAccountIds)->where('status', Comment::STATUS_HIDDEN)->count(),
             ]);
         }
 
@@ -120,6 +131,11 @@ class DashboardController extends Controller
             'channels_count' => Account::count(),
             'total_posts' => Post::count(),
             'total_comments' => Comment::count(),
+            'scheduled_count' => ScheduledPost::where('status', ScheduledPost::STATUS_SCHEDULED)->count(),
+            'published_scheduled_count' => ScheduledPost::where('status', ScheduledPost::STATUS_PUBLISHED)->count(),
+            'replied_count' => Comment::where('status', Comment::STATUS_REPLIED)->count(),
+            'pending_review_count' => Comment::whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count(),
+            'hidden_count' => Comment::where('status', Comment::STATUS_HIDDEN)->count(),
         ]);
     }
 }

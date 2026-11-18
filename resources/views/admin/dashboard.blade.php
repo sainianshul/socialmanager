@@ -31,7 +31,7 @@
         </div>
     </div>
 
-    {{-- 8 Stat Metric Cards (Social Media Management Suite Metrics) --}}
+    {{-- 8 Real Operational Metric Cards --}}
     <div class="row row-deck row-cards mb-3">
         
         {{-- 1. CONNECTED CHANNELS --}}
@@ -41,12 +41,12 @@
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary">
-                                <i class="ti ti-brand-meta fs-2"></i>
+                                <i class="ti ti-plug-connected fs-2"></i>
                             </span>
                         </div>
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">CHANNELS</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ $channelsCount }}</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($channelsCount) }}</div>
                         </div>
                         <div class="col-auto text-end">
                             <span class="badge bg-{{ $channelsCount > 0 ? 'success' : 'warning' }}-lt small fw-semibold">
@@ -58,29 +58,7 @@
             </div>
         </div>
 
-        {{-- 2. TOTAL REACH --}}
-        <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-azure-lt text-azure">
-                                <i class="ti ti-users fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">AUDIENCE REACH</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format(max(14850, $totalReach)) }}</div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="text-success small fw-semibold">+12.4% &uarr;</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- 3. TOTAL POSTS --}}
+        {{-- 2. TOTAL PUBLISHED POSTS --}}
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
@@ -92,17 +70,19 @@
                         </div>
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL POSTS</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format(max(42, $totalPosts)) }}</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($totalPosts) }}</div>
                         </div>
                         <div class="col-auto text-end">
-                            <span class="text-success small fw-semibold">+{{ max(8, $newPostsMonth) }} mo</span>
+                            <span class="badge bg-success-lt small fw-semibold">
+                                +{{ $newPostsMonth }} this mo
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 4. SCHEDULED POSTS --}}
+        {{-- 3. SCHEDULED POSTS (QUEUED) --}}
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
@@ -114,7 +94,7 @@
                         </div>
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">SCHEDULED</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ $scheduledCount }}</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($scheduledCount) }}</div>
                         </div>
                         <div class="col-auto text-end">
                             <span class="badge bg-purple-lt small fw-semibold">Queued</span>
@@ -124,7 +104,29 @@
             </div>
         </div>
 
-        {{-- 5. SYNCED COMMENTS --}}
+        {{-- 4. AUTO-PUBLISHED BY CRON --}}
+        <div class="col-sm-6 col-lg-3">
+            <div class="card card-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <span class="avatar avatar-md rounded-2 bg-azure-lt text-azure">
+                                <i class="ti ti-circle-check fs-2"></i>
+                            </span>
+                        </div>
+                        <div class="col">
+                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">AUTO-PUBLISHED</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($publishedScheduledCount) }}</div>
+                        </div>
+                        <div class="col-auto text-end">
+                            <span class="badge bg-azure-lt small fw-semibold">Cron Live</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- 5. TOTAL COMMENTS SYNCED --}}
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
@@ -135,18 +137,20 @@
                             </span>
                         </div>
                         <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">COMMENTS</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format(max(184, $totalComments)) }}</div>
+                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL COMMENTS</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($totalComments) }}</div>
                         </div>
                         <div class="col-auto text-end">
-                            <span class="text-success small fw-semibold">+{{ max(15, $commentsToday) }} today</span>
+                            <span class="badge bg-warning-lt small fw-semibold">
+                                +{{ $commentsToday }} today
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 6. AI REPLIED / AUTO-DM --}}
+        {{-- 6. AI REPLIED --}}
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
@@ -158,7 +162,7 @@
                         </div>
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">AI REPLIED</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format(max(92, $repliedCount)) }}</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($repliedCount) }}</div>
                         </div>
                         <div class="col-auto text-end">
                             <span class="badge bg-teal-lt small fw-semibold">Auto-pilot</span>
@@ -168,44 +172,48 @@
             </div>
         </div>
 
-        {{-- 7. ENGAGEMENT RATE --}}
+        {{-- 7. PENDING REVIEW COMMENTS --}}
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <span class="avatar avatar-md rounded-2 bg-info-lt text-info">
-                                <i class="ti ti-chart-arrows-vertical fs-2"></i>
+                                <i class="ti ti-clock-edit fs-2"></i>
                             </span>
                         </div>
                         <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">ENGAGEMENT</div>
-                            <div class="h2 mb-0 fw-bold text-dark">5.8%</div>
+                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">PENDING REVIEW</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($pendingReviewCount) }}</div>
                         </div>
                         <div class="col-auto text-end">
-                            <span class="text-success small fw-semibold">+0.6% &uarr;</span>
+                            <span class="badge bg-{{ $pendingReviewCount > 0 ? 'info' : 'secondary' }}-lt small fw-semibold">
+                                {{ $pendingReviewCount > 0 ? 'Action' : 'Clear' }}
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 8. SYNC STATUS --}}
+        {{-- 8. HIDDEN / MODERATED TROLLS --}}
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
                             <span class="avatar avatar-md rounded-2 bg-danger-lt text-danger">
-                                <i class="ti ti-broadcast fs-2"></i>
+                                <i class="ti ti-shield-check fs-2"></i>
                             </span>
                         </div>
                         <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">WEBHOOK SYNC</div>
-                            <div class="h2 mb-0 fw-bold text-dark">Live</div>
+                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">HIDDEN TROLLS</div>
+                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($hiddenCount) }}</div>
                         </div>
                         <div class="col-auto text-end">
-                            <span class="badge bg-success-lt small fw-semibold">Healthy</span>
+                            <span class="badge bg-danger-lt small fw-semibold">
+                                {{ $hiddenCount > 0 ? 'Filtered' : 'Clean' }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -217,16 +225,15 @@
     {{-- Main Row: 30-Day Activity Trends & Connected Channels Performance --}}
     <div class="row row-deck row-cards mb-3">
         
-        {{-- Left: Reach & Engagement Line Chart --}}
+        {{-- Left: Publishing & Comments Activity Line Chart --}}
         <div class="col-lg-7">
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">30-DAY PERFORMANCE & ACTIVITY</div>
+                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">30-DAY PUBLISHING & COMMENT ACTIVITY</div>
                             <div class="d-flex align-items-baseline gap-2 mt-1">
-                                <span class="h1 fw-bold text-dark mb-0">{{ number_format(max(14850, $totalReach)) }} Reach</span>
-                                <span class="text-success small fw-semibold">+18.2% interactions</span>
+                                <span class="h1 fw-bold text-dark mb-0">{{ number_format($totalPosts) }} Posts &bull; {{ number_format($totalComments) }} Comments</span>
                             </div>
                         </div>
                         <div class="d-flex align-items-center gap-3">
@@ -236,7 +243,7 @@
                             </div>
                             <div class="d-flex align-items-center gap-1">
                                 <span class="badge bg-azure p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
-                                <span class="text-secondary small">Comments & Sync</span>
+                                <span class="text-secondary small">Comments</span>
                             </div>
                         </div>
                     </div>
@@ -339,9 +346,11 @@
                                         </div>
                                     </div>
                                     <div class="d-flex align-items-center gap-3 text-secondary small flex-shrink-0">
-                                        <span class="d-inline-flex align-items-center" title="Reach"><i class="ti ti-eye me-1"></i> {{ number_format($p->reach_count ?: 340) }}</span>
-                                        <span class="d-inline-flex align-items-center text-danger" title="Likes"><i class="ti ti-heart me-1"></i> {{ number_format($p->likes_count ?: 28) }}</span>
-                                        <span class="d-inline-flex align-items-center text-primary" title="Comments"><i class="ti ti-message-circle me-1"></i> {{ number_format($p->comments_count ?: 8) }}</span>
+                                        @if(!empty($p->views_count))
+                                            <span class="d-inline-flex align-items-center" title="Views"><i class="ti ti-eye me-1"></i> {{ number_format($p->views_count) }}</span>
+                                        @endif
+                                        <span class="d-inline-flex align-items-center text-danger" title="Likes"><i class="ti ti-heart me-1"></i> {{ number_format($p->likes_count ?? 0) }}</span>
+                                        <span class="d-inline-flex align-items-center text-primary" title="Comments"><i class="ti ti-message-circle me-1"></i> {{ number_format($p->comments_count ?? 0) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -364,16 +373,9 @@
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-    @php
-        // Prepare chart series from controller or dynamic realistic fallback
-        $rawDates = !empty($chartDates) ? $chartDates : ["1 Oct", "5 Oct", "10 Oct", "15 Oct", "20 Oct", "25 Oct", "30 Oct"];
-        $rawPosts = !empty($postCounts) && array_sum($postCounts) > 0 ? $postCounts : [12, 18, 15, 25, 22, 30, 28];
-        $rawComments = !empty($commentCounts) && array_sum($commentCounts) > 0 ? $commentCounts : [45, 62, 58, 85, 78, 98, 92];
-    @endphp
-
-    const categories = {!! json_encode($rawDates) !!};
-    const postSeries = {!! json_encode($rawPosts) !!};
-    const commentSeries = {!! json_encode($rawComments) !!};
+    const categories = {!! json_encode($chartDates ?? []) !!};
+    const postSeries = {!! json_encode($postCounts ?? []) !!};
+    const commentSeries = {!! json_encode($commentCounts ?? []) !!};
 
     const options = {
         chart: {
@@ -404,7 +406,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 data: postSeries
             },
             {
-                name: "Comments & Interactions",
+                name: "Comments Synced",
                 data: commentSeries
             }
         ],
