@@ -76,6 +76,15 @@ Route::prefix('admin')->group(function () {
                 Route::post('{comment}/toggle-hide', [\App\Http\Controllers\Admin\CommentController::class, 'toggleHide'])->name('toggle-hide');
             });
 
+            // Help Center & Support Tickets
+            Route::prefix('help')->name('help.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\TicketController::class, 'index'])->name('index');
+                Route::get('data', [\App\Http\Controllers\Admin\TicketController::class, 'data'])->name('data');
+                Route::post('/', [\App\Http\Controllers\Admin\TicketController::class, 'store'])->name('store');
+                Route::get('{ticket}', [\App\Http\Controllers\Admin\TicketController::class, 'show'])->name('show');
+                Route::patch('{ticket}/status', [\App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])->name('update-status');
+            });
+
             // Users CRUD & Actions (Admin & Manager only)
             Route::middleware(['admin.manager'])->group(function () {
                 Route::prefix('users')->name('users.')->group(function () {

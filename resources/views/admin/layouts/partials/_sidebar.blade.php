@@ -227,7 +227,7 @@
                     {{-- HELP & SUPPORT --}}
                     <li class="nav-section-title">Help & Support</li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Help">
+                        <a class="nav-link {{ request()->routeIs('admin.help.*') ? 'active' : '' }}" href="{{ route('admin.help.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Help Center">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
                                 <i class="ti ti-help-circle fs-2"></i>
                             </span>
