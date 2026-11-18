@@ -15,7 +15,7 @@ class GeminiAIService implements AIServiceInterface
     public function __construct()
     {
         $this->apiKey = config('services.gemini.api_key') ?: env('GEMINI_API_KEY');
-        $this->model = config('services.gemini.model') ?: env('GEMINI_MODEL', 'gemini-1.5-flash');
+        $this->model = config('services.gemini.model') ?: env('GEMINI_MODEL', 'gemini-flash-lite-latest');
         $this->endpoint = "https://generativelanguage.googleapis.com/v1beta/models/{$this->model}:generateContent";
     }
 
@@ -97,22 +97,14 @@ OUTPUT FORMAT (JSON ONLY, NO MARKDOWN, NO BACKTICKS):
 EOT;
 
         try {
-            $response = Http::timeout(10)->post("{$this->endpoint}?key={$this->apiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ],
-                'generationConfig' => [
-                    'temperature' => 0.2,
-                    'topK' => 40,
-                    'topP' => 0.95,
-                    'maxOutputTokens' => 600,
-                    'responseMimeType' => 'application/json',
-                ]
-            ]);
+            $response = $this->callGemini($this->endpoint, $prompt);
+
+            // If temporary high demand (503) or not found (404), fallback to gemini-flash-lite-latest
+            if (!$response->successful() && $this->model !== 'gemini-flash-lite-latest') {
+                Log::info("Gemini {$this->model} returned status {$response->status()}, falling back to gemini-flash-lite-latest");
+                $fallbackEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent";
+                $response = $this->callGemini($fallbackEndpoint, $prompt);
+            }
 
             if (!$response->successful()) {
                 Log::warning('Gemini API call failed with status ' . $response->status(), [
@@ -163,6 +155,34 @@ EOT;
             Log::warning('Gemini API exception during comment analysis: ' . $e->getMessage());
             return null;
         }
+    }
+
+    /**
+     * Dispatch HTTP POST request to Google Gemini API
+     */
+    protected function callGemini(string $endpoint, string $prompt)
+    {
+        return Http::timeout(15)
+            ->withHeaders([
+                'X-goog-api-key' => $this->apiKey,
+                'Content-Type'   => 'application/json',
+            ])
+            ->post("{$endpoint}?key={$this->apiKey}", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.2,
+                    'topK' => 40,
+                    'topP' => 0.95,
+                    'maxOutputTokens' => 600,
+                    'responseMimeType' => 'application/json',
+                ]
+            ]);
     }
 }
 
