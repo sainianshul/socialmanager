@@ -133,7 +133,10 @@ class ProcessCommentJob implements ShouldQueue
 
         // Mode 2: Auto comment & Auto approved -> Publish live immediately to social platform
         $alreadyReplied = ($status === Comment::STATUS_REPLIED || !empty($comment->meta_reply_id));
-        if ($autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN && !$alreadyReplied) {
+        // Safety: Only auto-reply live to fresh comments (within last 48 hours) to prevent replying to months/years-old comments
+        $isFreshComment = empty($comment->commented_at) || $comment->commented_at->greaterThanOrEqualTo(now()->subDays(2));
+
+        if ($autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN && !$alreadyReplied && $isFreshComment) {
             try {
                 $publishSuccess = false;
                 if ($account->isYouTube()) {
