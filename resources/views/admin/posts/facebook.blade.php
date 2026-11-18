@@ -129,6 +129,9 @@
                         @if($selectedAccountId)
                             <input type="hidden" name="account_id" value="{{ $selectedAccountId }}">
                         @endif
+                        @if(request('date'))
+                            <input type="hidden" name="date" value="{{ request('date') }}">
+                        @endif
                         <div class="input-icon">
                             <span class="input-icon-addon"><i class="ti ti-search"></i></span>
                             <input type="text" name="q" value="{{ request('q') }}" class="form-control" style="width: 240px;" placeholder="Search Facebook posts..." />
@@ -136,21 +139,21 @@
                     </form>
 
                     @if(request('q'))
-                        <a href="{{ route('admin.posts.facebook', ['view' => $viewMode, 'account_id' => $selectedAccountId]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Clear Search">
+                        <a href="{{ route('admin.posts.facebook', ['view' => $viewMode, 'account_id' => $selectedAccountId, 'date' => request('date')]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Clear Search">
                             <i class="ti ti-x me-1"></i>Clear
                         </a>
                     @endif
                 </div>
 
-                {{-- Right: Account Select Filter, Total Count & View Mode Toggle --}}
+                {{-- Right: Account Select Filter, Date Filter, Total Count & View Mode Toggle --}}
                 <div class="d-flex align-items-center flex-wrap gap-2 ms-auto">
-                    {{-- Facebook Page Filter --}}
-                    <form method="GET" action="{{ route('admin.posts.facebook') }}" class="m-0">
+                    {{-- Facebook Page & Date Filter --}}
+                    <form method="GET" action="{{ route('admin.posts.facebook') }}" class="m-0 d-flex align-items-center flex-wrap gap-2">
                         <input type="hidden" name="view" value="{{ $viewMode }}">
                         @if(request('q'))
                             <input type="hidden" name="q" value="{{ request('q') }}">
                         @endif
-                        <select name="account_id" class="form-select" style="width: 220px;" onchange="this.form.submit()">
+                        <select name="account_id" class="form-select" style="width: 200px;" onchange="this.form.submit()">
                             <option value="">All Facebook Pages ({{ $accounts->count() }})</option>
                             @foreach($accounts as $acc)
                                 <option value="{{ $acc->id }}" {{ $selectedAccountId == $acc->id ? 'selected' : '' }}>
@@ -158,10 +161,20 @@
                                 </option>
                             @endforeach
                         </select>
+                        <div class="input-icon" style="width: 155px;" data-bs-toggle="tooltip" title="Filter by date">
+                            <span class="input-icon-addon"><i class="ti ti-calendar"></i></span>
+                            <input type="date" name="date" value="{{ request('date') }}" class="form-control" onchange="this.form.submit()">
+                        </div>
                     </form>
 
+                    @if(request('date'))
+                        <a href="{{ route('admin.posts.facebook', ['view' => $viewMode, 'q' => request('q'), 'account_id' => $selectedAccountId]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Clear Date Filter">
+                            <i class="ti ti-x me-1"></i>{{ request('date') }}
+                        </a>
+                    @endif
+
                     @if($selectedAccountId)
-                        <a href="{{ route('admin.posts.facebook', ['view' => $viewMode, 'q' => request('q')]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Reset Account Filter">
+                        <a href="{{ route('admin.posts.facebook', ['view' => $viewMode, 'q' => request('q'), 'date' => request('date')]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Reset Account Filter">
                             <i class="ti ti-x me-1"></i>Reset
                         </a>
                     @endif

@@ -499,5 +499,37 @@ class PostManagementTest extends TestCase
             'views_count' => 3200,
         ]);
     }
+
+    public function test_posts_filter_by_date(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => '123456789',
+            'name' => 'Date Filter Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $postOld = Post::create([
+            'account_id' => $account->id,
+            'meta_post_id' => 'post_old_1',
+            'message' => 'Old Post from October',
+            'published_at' => '2026-10-15 10:00:00',
+        ]);
+
+        $postTarget = Post::create([
+            'account_id' => $account->id,
+            'meta_post_id' => 'post_target_2',
+            'message' => 'Target Post on November 10',
+            'published_at' => '2026-11-10 15:30:00',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('admin.posts.index', ['date' => '2026-11-10']));
+
+        $response->assertStatus(200);
+        $response->assertSee('Target Post on November 10');
+        $response->assertDontSee('Old Post from October');
+    }
 }
 

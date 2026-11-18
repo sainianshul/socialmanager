@@ -594,6 +594,17 @@ class CommentDataTable extends DataTable
             $query->where('sentiment', request('sentiment'));
         }
 
+        // Filter by Date (Single Date or Date Range)
+        if (request()->filled('date')) {
+            $selectedDate = request('date');
+            $query->where(function ($q) use ($selectedDate) {
+                $q->whereDate('commented_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('commented_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
+        }
+
         return $query;
     }
 

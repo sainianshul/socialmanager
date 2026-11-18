@@ -1182,5 +1182,48 @@ class CommentManagementTest extends TestCase
         $this->assertEquals(Account::AUTO_REPLY_AUTO_APPROVED, $account->auto_reply_mode);
         $this->assertTrue($account->auto_hide_trolls);
     }
+
+    public function test_comments_filter_by_date(): void
+    {
+        $user = User::factory()->create();
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_date_test',
+            'name' => 'Date Filter Testing',
+            'access_token' => 'mock_token',
+        ]);
+
+        $post = Post::create([
+            'account_id' => $account->id,
+            'meta_post_id' => 'post_d1',
+            'message' => 'Post for comment date testing',
+        ]);
+
+        $commentOct = Comment::create([
+            'post_id' => $post->id,
+            'account_id' => $account->id,
+            'meta_comment_id' => 'c_oct_1',
+            'commenter_name' => 'Rahul Sharma',
+            'message' => 'Comment from October 10',
+            'commented_at' => '2026-10-10 12:00:00',
+        ]);
+
+        $commentNov = Comment::create([
+            'post_id' => $post->id,
+            'account_id' => $account->id,
+            'meta_comment_id' => 'c_nov_1',
+            'commenter_name' => 'Pooja Verma',
+            'message' => 'Comment from November 15',
+            'commented_at' => '2026-11-15 09:30:00',
+        ]);
+
+        $response = $this->actingAs($user)->getJson(route('admin.comments.facebook.data', ['date' => '2026-11-15']));
+
+        $response->assertStatus(200);
+        $content = $response->getContent();
+        $this->assertStringContainsString('Pooja Verma', $content);
+        $this->assertStringNotContainsString('Rahul Sharma', $content);
+    }
 }
 

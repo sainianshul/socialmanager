@@ -243,6 +243,15 @@
                         <option value="negative">Negative</option>
                     </select>
 
+                    {{-- Date Filter --}}
+                    <div class="input-icon" style="width: 155px;" data-bs-toggle="tooltip" title="Filter by date">
+                        <span class="input-icon-addon"><i class="ti ti-calendar"></i></span>
+                        <input type="date" id="filter-date" class="form-control" title="Filter by date">
+                    </div>
+                    <button type="button" class="btn btn-icon btn-ghost-secondary d-none" id="btn-clear-date" data-bs-toggle="tooltip" title="Clear Date Filter">
+                        <i class="ti ti-x"></i>
+                    </button>
+
                     {{-- Refresh Button --}}
                     <button type="button" class="btn btn-icon btn-outline-secondary" id="refresh-table-btn"
                         data-bs-toggle="tooltip" title="Refresh Comments">
@@ -397,6 +406,7 @@
                         d.account_id = $('#filter-account').val();
                         d.status = activeStatus;
                         d.sentiment = $('#filter-sentiment').val();
+                        d.date = $('#filter-date').val();
                     }
                 },
 
@@ -468,6 +478,24 @@
             // Live Dropdown Filter Changes
             $('#filter-status, #filter-account, #filter-sentiment').on('change', function () {
                 activeStatus = $('#filter-status').val();
+                table.draw();
+            });
+
+            // Date Filter Change
+            $('#filter-date').on('change', function () {
+                let val = $(this).val();
+                if (val) {
+                    $('#btn-clear-date').removeClass('d-none');
+                } else {
+                    $('#btn-clear-date').addClass('d-none');
+                }
+                table.draw();
+            });
+
+            // Clear Date Filter
+            $('#btn-clear-date').on('click', function () {
+                $('#filter-date').val('');
+                $(this).addClass('d-none');
                 table.draw();
             });
 

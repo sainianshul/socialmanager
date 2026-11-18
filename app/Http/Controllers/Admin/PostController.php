@@ -29,6 +29,7 @@ class PostController extends Controller
         // 2. Filter states
         $selectedAccountId = $request->filled('account_id') ? (int) $request->get('account_id') : null;
         $search = $request->get('q');
+        $selectedDate = $request->get('date');
         $viewMode = $request->get('view', 'gallery'); // 'gallery' or 'table'
 
         // Validate selected account belongs to user (unless admin)
@@ -49,6 +50,15 @@ class PostController extends Controller
             $postsQuery->where('message', 'like', "%{$search}%");
         }
 
+        if ($request->filled('date')) {
+            $postsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
+        }
+
         $posts = $postsQuery->orderBy('published_at', 'desc')->paginate(12)->withQueryString();
 
         // 4. Quick aggregate metrics for header counters
@@ -57,6 +67,15 @@ class PostController extends Controller
             $statsQuery->where('account_id', $selectedAccountId);
         } else {
             $statsQuery->whereIn('account_id', $accountIds);
+        }
+
+        if ($request->filled('date')) {
+            $statsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
         }
 
         $totalPosts = (clone $statsQuery)->count();
@@ -70,6 +89,7 @@ class PostController extends Controller
             'accounts',
             'selectedAccountId',
             'selectedAccount',
+            'selectedDate',
             'search',
             'viewMode',
             'totalPosts',
@@ -96,6 +116,7 @@ class PostController extends Controller
         // 2. Filter states
         $selectedAccountId = $request->filled('account_id') ? (int) $request->get('account_id') : null;
         $search = $request->get('q');
+        $selectedDate = $request->get('date');
         $viewMode = $request->get('view', 'gallery');
 
         if ($selectedAccountId && !in_array($selectedAccountId, $accountIds)) {
@@ -115,6 +136,15 @@ class PostController extends Controller
             $postsQuery->where('message', 'like', "%{$search}%");
         }
 
+        if ($request->filled('date')) {
+            $postsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
+        }
+
         $posts = $postsQuery->orderBy('published_at', 'desc')->paginate(12)->withQueryString();
 
         // 4. Quick aggregate metrics
@@ -123,6 +153,15 @@ class PostController extends Controller
             $statsQuery->where('account_id', $selectedAccountId);
         } else {
             $statsQuery->whereIn('account_id', $accountIds);
+        }
+
+        if ($request->filled('date')) {
+            $statsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
         }
 
         $totalPosts = (clone $statsQuery)->count();
@@ -136,6 +175,7 @@ class PostController extends Controller
             'accounts',
             'selectedAccountId',
             'selectedAccount',
+            'selectedDate',
             'search',
             'viewMode',
             'totalPosts',
@@ -162,6 +202,7 @@ class PostController extends Controller
         // 2. Filter states
         $selectedAccountId = $request->filled('account_id') ? (int) $request->get('account_id') : null;
         $search = $request->get('q');
+        $selectedDate = $request->get('date');
         $viewMode = $request->get('view', 'gallery');
 
         if ($selectedAccountId && !in_array($selectedAccountId, $accountIds)) {
@@ -181,6 +222,15 @@ class PostController extends Controller
             $postsQuery->where('message', 'like', "%{$search}%");
         }
 
+        if ($request->filled('date')) {
+            $postsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
+        }
+
         $posts = $postsQuery->orderBy('published_at', 'desc')->paginate(12)->withQueryString();
 
         // 4. Quick aggregate metrics
@@ -189,6 +239,15 @@ class PostController extends Controller
             $statsQuery->where('account_id', $selectedAccountId);
         } else {
             $statsQuery->whereIn('account_id', $accountIds);
+        }
+
+        if ($request->filled('date')) {
+            $statsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
         }
 
         $totalPosts = (clone $statsQuery)->count();
@@ -203,6 +262,7 @@ class PostController extends Controller
             'accounts',
             'selectedAccountId',
             'selectedAccount',
+            'selectedDate',
             'search',
             'viewMode',
             'totalPosts',
@@ -230,6 +290,7 @@ class PostController extends Controller
         // 2. Filter states
         $selectedAccountId = $request->filled('account_id') ? (int) $request->get('account_id') : null;
         $search = $request->get('q');
+        $selectedDate = $request->get('date');
         $viewMode = $request->get('view', 'gallery');
 
         if ($selectedAccountId && !in_array($selectedAccountId, $accountIds)) {
@@ -253,6 +314,15 @@ class PostController extends Controller
             });
         }
 
+        if ($request->filled('date')) {
+            $postsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
+        }
+
         $posts = $postsQuery->orderBy('published_at', 'desc')->paginate(12)->withQueryString();
 
         // 4. Quick aggregate metrics
@@ -261,6 +331,15 @@ class PostController extends Controller
             $statsQuery->where('account_id', $selectedAccountId);
         } else {
             $statsQuery->whereIn('account_id', $accountIds);
+        }
+
+        if ($request->filled('date')) {
+            $statsQuery->where(function ($q) use ($selectedDate) {
+                $q->whereDate('published_at', $selectedDate)
+                  ->orWhere(function ($sub) use ($selectedDate) {
+                      $sub->whereNull('published_at')->whereDate('created_at', $selectedDate);
+                  });
+            });
         }
 
         $totalPosts = (clone $statsQuery)->count();
@@ -275,6 +354,7 @@ class PostController extends Controller
             'accounts',
             'selectedAccountId',
             'selectedAccount',
+            'selectedDate',
             'search',
             'viewMode',
             'totalPosts',
