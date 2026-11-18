@@ -4,6 +4,40 @@
 
 @push('datatables_css')
     @include('admin.layouts.partials._datatable-cdn-css')
+    <style>
+        /* Modern Social Inbox Card & Feed View Styling */
+        .view-feed #comments-table thead {
+            display: none !important;
+        }
+        .view-feed #comments-table,
+        .view-feed #comments-table tbody,
+        .view-feed #comments-table tbody tr,
+        .view-feed #comments-table tbody td {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            padding: 0 !important;
+        }
+        .view-feed #comments-table tbody tr {
+            display: block;
+            margin-bottom: 0.95rem;
+        }
+        .view-feed #comments-table tbody td {
+            display: block;
+            width: 100% !important;
+        }
+        .social-inbox-card {
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .social-inbox-card:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04) !important;
+            border-color: #cbd5e1 !important;
+        }
+        .comment-text-expandable a {
+            font-weight: 600;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -29,6 +63,8 @@
     </div>
 
     {{-- Alert Messages --}}
+    <div id="flash-alerts-container"></div>
+
     @if(session('success'))
         <div class="alert alert-success alert-dismissible mb-3" role="alert">
             <div class="d-flex align-items-center">
@@ -178,6 +214,18 @@
                         data-bs-toggle="tooltip" title="Refresh Comments">
                         <i class="ti ti-refresh"></i>
                     </button>
+
+                    {{-- View Mode Toggle (Feed Cards vs Table) --}}
+                    <div class="btn-group ms-1" role="group" aria-label="View Mode">
+                        <button type="button" class="btn btn-icon btn-primary" id="btn-view-feed"
+                            data-bs-toggle="tooltip" title="Social Feed Cards View">
+                            <i class="ti ti-layout-cards fs-2"></i>
+                        </button>
+                        <button type="button" class="btn btn-icon btn-outline-secondary" id="btn-view-table"
+                            data-bs-toggle="tooltip" title="Data Table View">
+                            <i class="ti ti-list fs-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -193,16 +241,11 @@
             </div>
 
             {{-- DataTable Container --}}
-            <div id="comments-table-wrapper" class="table-responsive d-none">
+            <div id="comments-table-wrapper" class="table-responsive d-none view-feed">
                 <table id="comments-table" class="table table-vcenter w-100">
-                    <thead>
-                        <tr>
-                            <th class="w-1">#</th>
-                            <th style="min-width: 170px;">Post</th>
-                            <th style="min-width: 360px;">Conversation & AI Reply</th>
-                            <th style="min-width: 110px;">Sentiment</th>
-                            <th style="min-width: 110px;">Status</th>
-                            <th class="text-end" style="min-width: 135px;">Action</th>
+                    <thead id="comments-table-head">
+                        <tr class="d-none">
+                            <th>Card</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -307,67 +350,113 @@
     <script>
         $(function () {
             let activeStatus = '';
+            let currentView = localStorage.getItem('socialmanager_comment_view') || 'feed';
+            let table = null;
 
-            let table = $('#comments-table').DataTable({
-                serverSide: true,
-                processing: false,
+            function showFlashAlert(type, message) {
+                let icon = (type === 'success') ? 'ti-check' : 'ti-alert-triangle';
+                let alertHtml = `
+                    <div class="alert alert-${type} alert-dismissible mb-3 animate-fade-in" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="ti ${icon} fs-2 me-2"></i>
+                            <div>${message}</div>
+                        </div>
+                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
+                    </div>
+                `;
+                $('#flash-alerts-container').html(alertHtml);
+            }
 
-                ajax: {
-                    url: '{{ route('admin.comments.instagram.data') }}',
-                    data: function (d) {
-                        d.account_id = $('#filter-account').val();
-                        d.status = activeStatus;
-                        d.sentiment = $('#filter-sentiment').val();
-                    }
-                },
+            function updateViewButtons() {
+                if (currentView === 'feed') {
+                    $('#btn-view-feed').removeClass('btn-outline-secondary').addClass('btn-primary');
+                    $('#btn-view-table').removeClass('btn-primary').addClass('btn-outline-secondary');
+                    $('#comments-table-wrapper').addClass('view-feed');
+                } else {
+                    $('#btn-view-table').removeClass('btn-outline-secondary').addClass('btn-primary');
+                    $('#btn-view-feed').removeClass('btn-primary').addClass('btn-outline-secondary');
+                    $('#comments-table-wrapper').removeClass('view-feed');
+                }
+            }
 
-                columns: [
-                    { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
-                    { data: 'post', name: 'post', orderable: false },
-                    { data: 'message', name: 'message' },
-                    { data: 'sentiment', name: 'sentiment' },
-                    { data: 'status', name: 'status' },
-                    { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
-                ],
+            function initDataTable() {
+                if ($.fn.DataTable.isDataTable('#comments-table')) {
+                    $('#comments-table').DataTable().destroy();
+                    $('#comments-table').empty();
+                }
 
-                order: [],
-                pageLength: 15,
-                lengthMenu: [[10, 15, 25, 50, 100], [10, 15, 25, 50, 100]],
+                updateViewButtons();
 
-                dom:
-                    "<'row'<'col-12'tr>>" +
-                    "<'row align-items-center mt-3 pt-3 flex-nowrap'" +
-                    "<'col-sm-12 col-md-5'i>" +
-                    "<'col-sm-12 col-md-7 d-flex justify-content-md-end align-items-center gap-3'lp>>",
+                let columns = [];
+                if (currentView === 'feed') {
+                    $('#comments-table').html('<thead class="d-none"><tr><th>Card</th></tr></thead><tbody></tbody>');
+                    columns = [
+                        { data: 'card', name: 'card', orderable: false, searchable: false }
+                    ];
+                } else {
+                    $('#comments-table').html(`
+                        <thead>
+                            <tr>
+                                <th class="w-1">#</th>
+                                <th style="min-width: 170px;">Post</th>
+                                <th style="min-width: 360px;">Conversation & AI Reply</th>
+                                <th style="min-width: 110px;">Sentiment</th>
+                                <th style="min-width: 110px;">Status</th>
+                                <th class="text-end" style="min-width: 135px;">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    `);
+                    columns = [
+                        { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
+                        { data: 'post', name: 'post', orderable: false },
+                        { data: 'message', name: 'message' },
+                        { data: 'sentiment', name: 'sentiment' },
+                        { data: 'status', name: 'status' },
+                        { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
+                    ];
+                }
 
-                language: {
-                    emptyTable: ' ',
-                    zeroRecords: ' ',
-                    loadingRecords: ' ',
-                    info: 'Showing _START_–_END_ of _TOTAL_ comments',
-                    infoEmpty: 'No comments to show',
-                    infoFiltered: '(filtered from _MAX_)',
-                    lengthMenu: 'Show _MENU_',
-                    paginate: {
-                        previous: '<i class="ti ti-chevron-left"></i>',
-                        next: '<i class="ti ti-chevron-right"></i>',
+                table = $('#comments-table').DataTable({
+                    serverSide: true,
+                    processing: false,
+
+                    ajax: {
+                        url: '{{ route('admin.comments.instagram.data') }}',
+                        data: function (d) {
+                            d.account_id = $('#filter-account').val();
+                            d.status = activeStatus;
+                            d.sentiment = $('#filter-sentiment').val();
+                        }
                     },
-                },
 
-                initComplete: function () {
-                    $('#comments-loader').remove();
-                    let total = this.api().page.info().recordsDisplay;
-                    if (total === 0) {
-                        $('#comments-table-wrapper').addClass('d-none');
-                        $('#comments-empty').removeClass('d-none');
-                    } else {
-                        $('#comments-empty').addClass('d-none');
-                        $('#comments-table-wrapper').removeClass('d-none');
-                    }
-                },
+                    columns: columns,
+                    order: [],
+                    pageLength: 15,
+                    lengthMenu: [[10, 15, 25, 50, 100], [10, 15, 25, 50, 100]],
 
-                drawCallback: function () {
-                    if ($('#comments-loader').length === 0) {
+                    dom:
+                        "<'row'<'col-12'tr>>" +
+                        "<'row align-items-center mt-3 pt-3 flex-nowrap'" +
+                        "<'col-sm-12 col-md-5'i>" +
+                        "<'col-sm-12 col-md-7 d-flex justify-content-md-end align-items-center gap-3'lp>>",
+
+                    language: {
+                        emptyTable: ' ',
+                        zeroRecords: ' ',
+                        loadingRecords: ' ',
+                        info: 'Showing _START_–_END_ of _TOTAL_ comments',
+                        infoEmpty: 'No comments to show',
+                        infoFiltered: '(filtered from _MAX_)',
+                        lengthMenu: 'Show _MENU_',
+                        paginate: {
+                            previous: '<i class="ti ti-chevron-left"></i>',
+                            next: '<i class="ti ti-chevron-right"></i>',
+                        },
+                    },
+
+                    initComplete: function () {
+                        $('#comments-loader').remove();
                         let total = this.api().page.info().recordsDisplay;
                         if (total === 0) {
                             $('#comments-table-wrapper').addClass('d-none');
@@ -376,8 +465,41 @@
                             $('#comments-empty').addClass('d-none');
                             $('#comments-table-wrapper').removeClass('d-none');
                         }
+                    },
+
+                    drawCallback: function () {
+                        if ($('#comments-loader').length === 0) {
+                            let total = this.api().page.info().recordsDisplay;
+                            if (total === 0) {
+                                $('#comments-table-wrapper').addClass('d-none');
+                                $('#comments-empty').removeClass('d-none');
+                            } else {
+                                $('#comments-empty').addClass('d-none');
+                                $('#comments-table-wrapper').removeClass('d-none');
+                            }
+                        }
+                        $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
                     }
-                    $('[data-bs-toggle="tooltip"]').tooltip({ trigger: 'hover' });
+                });
+            }
+
+            // Initial Launch
+            initDataTable();
+
+            // View Toggle Listeners
+            $('#btn-view-feed').on('click', function () {
+                if (currentView !== 'feed') {
+                    currentView = 'feed';
+                    localStorage.setItem('socialmanager_comment_view', 'feed');
+                    initDataTable();
+                }
+            });
+
+            $('#btn-view-table').on('click', function () {
+                if (currentView !== 'table') {
+                    currentView = 'table';
+                    localStorage.setItem('socialmanager_comment_view', 'table');
+                    initDataTable();
                 }
             });
 
@@ -416,6 +538,71 @@
 
                 let replyModal = new bootstrap.Modal(document.getElementById('modal-reply-comment'));
                 replyModal.show();
+            });
+
+            // 1-Click Interactive AJAX Approve & Send Live
+            $(document).on('submit', '.form-approve-reply', function (e) {
+                e.preventDefault();
+                let form = $(this);
+                let btn = form.find('.btn-approve-action');
+                let originalHtml = btn.html();
+
+                btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Sending...');
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (res) {
+                        showFlashAlert('success', res.message || 'AI reply successfully approved and published live!');
+                        table.draw(false);
+                    },
+                    error: function (xhr) {
+                        let msg = xhr.responseJSON?.message || 'Failed to publish approved reply.';
+                        showFlashAlert('danger', 'Error: ' + msg);
+                        btn.prop('disabled', false).html(originalHtml);
+                    }
+                });
+            });
+
+            // 1-Click Interactive AJAX Toggle Hide / Unhide
+            $(document).on('submit', '.form-toggle-hide', function (e) {
+                e.preventDefault();
+                let form = $(this);
+                let btn = form.find('button[type="submit"]');
+                btn.prop('disabled', true);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: form.serialize(),
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    success: function (res) {
+                        showFlashAlert('success', res.message || 'Comment visibility updated successfully.');
+                        table.draw(false);
+                    },
+                    error: function (xhr) {
+                        let msg = xhr.responseJSON?.message || 'Failed to update visibility.';
+                        showFlashAlert('danger', 'Error: ' + msg);
+                        btn.prop('disabled', false);
+                    }
+                });
+            });
+
+            // Expand / Collapse long comment text
+            $(document).on('click', '.btn-comment-more', function (e) {
+                e.preventDefault();
+                let container = $(this).closest('.comment-text-expandable');
+                container.find('.comment-text-short').addClass('d-none');
+                container.find('.comment-text-full').removeClass('d-none');
+            });
+
+            $(document).on('click', '.btn-comment-less', function (e) {
+                e.preventDefault();
+                let container = $(this).closest('.comment-text-expandable');
+                container.find('.comment-text-full').addClass('d-none');
+                container.find('.comment-text-short').removeClass('d-none');
             });
 
             // Sync Button Spinner Feedback

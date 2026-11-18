@@ -330,6 +330,9 @@ class CommentController extends Controller
                 'status' => Comment::STATUS_REPLIED,
                 'replied_at' => now(),
             ]);
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => true, 'message' => 'Comment marked as reviewed & replied.']);
+            }
             return redirect()->back()->with('success', 'Comment marked as reviewed & replied.');
         }
 
@@ -345,7 +348,14 @@ class CommentController extends Controller
         }
 
         if (!$result['success']) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => "Could not publish approved reply to {$platformName}: " . $result['message']], 422);
+            }
             return redirect()->back()->with('error', "Could not publish approved reply to {$platformName}: " . $result['message']);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => "AI reply successfully approved and published live to {$platformName}!"]);
         }
 
         return redirect()->back()->with('success', "AI reply successfully approved and published live to {$platformName}!");

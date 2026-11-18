@@ -15,6 +15,11 @@ class CommentDataTable extends DataTable
         return datatables()
             ->eloquent($query)
 
+            // ── Modern Social Inbox Card (Feed View) ───────────────────
+            ->addColumn('card', function (Comment $comment) {
+                return $this->renderCardHtml($comment);
+            })
+
             // ── S.No / Row Index ──────────────────────────────────────
             ->addIndexColumn()
 
@@ -34,7 +39,7 @@ class CommentDataTable extends DataTable
                 $thumbSrc = $post->thumbnail_url ?: $post->media_url;
                 $thumb = '';
                 if (!empty($thumbSrc)) {
-                    $thumb = '<img src="' . e($thumbSrc) . '" class="rounded me-2 border flex-shrink-0" style="width: 40px; height: 32px; object-fit: cover;" alt="post media">';
+                    $thumb = '<img src="' . e($thumbSrc) . '" class="rounded me-2 border flex-shrink-0" style="width: 40px; height: 32px; object-fit: cover;" alt="post media" onerror="this.style.display=\'none\';">';
                 } else {
                     $icon = $post->account?->isYouTube() ? 'ti ti-brand-youtube text-danger' : ($post->account?->isInstagram() ? 'ti ti-brand-instagram text-pink' : 'ti ti-brand-facebook text-primary');
                     $thumb = '<div class="avatar avatar-sm rounded bg-light text-secondary me-2 flex-shrink-0"><i class="' . $icon . '"></i></div>';
@@ -298,7 +303,256 @@ class CommentDataTable extends DataTable
                 ';
             })
 
-            ->rawColumns(['post', 'commenter', 'message', 'sentiment', 'status', 'actions']);
+            ->rawColumns(['card', 'post', 'commenter', 'message', 'sentiment', 'status', 'actions']);
+    }
+
+    /**
+     * Render the Modern Social Inbox Card (Feed View) for a Comment.
+     * Features: Left Status Stripe, Context Post Bar, Real Commenter Profile,
+     * Inline AI Suggested Reply with 1-Click Approve, and Quick Social Actions.
+     */
+    public function renderCardHtml(Comment $comment): string
+    {
+        $account = $comment->account;
+        $post = $comment->post;
+        $isInstagram = $account?->isInstagram();
+        $isYouTube = $account?->isYouTube();
+        $isFacebook = !$isInstagram && !$isYouTube;
+
+        $platformName = $isYouTube ? 'YouTube' : ($isInstagram ? 'Instagram' : 'Facebook');
+        $platformIcon = $isYouTube ? 'ti ti-brand-youtube text-danger' : ($isInstagram ? 'ti ti-brand-instagram text-pink' : 'ti ti-brand-facebook text-primary');
+        $platformBadgeBg = $isYouTube ? 'bg-danger-subtle text-danger' : ($isInstagram ? 'bg-pink-subtle text-pink' : 'bg-primary-subtle text-primary');
+
+        // External Link to Post / Comment
+        $platformUrl = null;
+        if ($isInstagram) {
+            $platformUrl = $post?->permalink_url ?? 'https://instagram.com';
+        } elseif ($isYouTube) {
+            $ytId = $post?->platform_post_id;
+            $platformUrl = $post?->permalink_url ?? ($ytId ? "https://youtube.com/watch?v={$ytId}" : 'https://youtube.com');
+        } else {
+            $fbId = $comment->meta_comment_id;
+            $platformUrl = !empty($fbId) ? "https://facebook.com/{$fbId}" : ($post?->permalink_url ?? 'https://facebook.com');
+        }
+
+        // Status Stripe Color & Badges
+        $isReplied = ($comment->status === Comment::STATUS_REPLIED);
+        $isPending = ($comment->status === Comment::STATUS_PENDING_REVIEW || $comment->status === Comment::STATUS_NEW);
+        $isHidden = ($comment->status === Comment::STATUS_HIDDEN);
+        $isFlagged = ($comment->status === Comment::STATUS_FLAGGED);
+
+        $stripeColor = match (true) {
+            $isReplied => '#10b981', // Emerald
+            $isPending => '#f59e0b', // Amber
+            $isFlagged => '#ef4444', // Rose/Red
+            $isHidden  => '#94a3b8', // Slate
+            default    => '#64748b',
+        };
+
+        $statusBadge = match (true) {
+            $isReplied => '<span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill fw-medium"><i class="ti ti-check me-1"></i>Replied</span>',
+            $isPending => '<span class="badge bg-warning-subtle text-warning border border-warning-subtle px-2.5 py-1 rounded-pill fw-medium"><span class="status-dot bg-warning me-1.5" style="width: 7px; height: 7px; border-radius: 50%; display: inline-block;"></span>Pending Review</span>',
+            $isFlagged => '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill fw-medium"><i class="ti ti-flag me-1"></i>Flagged</span>',
+            $isHidden  => '<span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-2.5 py-1 rounded-pill fw-medium"><i class="ti ti-eye-off me-1"></i>Hidden</span>',
+            default    => '<span class="badge bg-light text-secondary border px-2.5 py-1 rounded-pill fw-medium">Ignored</span>',
+        };
+
+        // Sentiment Badge
+        $sentimentBadge = match (strtolower($comment->sentiment ?? '')) {
+            'positive' => '<span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill fw-medium"><i class="ti ti-mood-smile me-1"></i>Positive</span>',
+            'negative' => '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2.5 py-1 rounded-pill fw-medium"><i class="ti ti-mood-sad me-1"></i>Negative</span>',
+            'neutral'  => '<span class="badge bg-light text-secondary border px-2.5 py-1 rounded-pill fw-medium"><i class="ti ti-minus me-1"></i>Neutral</span>',
+            default    => '',
+        };
+
+        // Post Context Bar
+        $postThumbHtml = '';
+        $postCaption = 'Recent Post';
+        $postDate = '';
+        if ($post) {
+            $thumbSrc = $post->thumbnail_url ?: $post->media_url;
+            if (!empty($thumbSrc)) {
+                $postThumbHtml = '<img src="' . e($thumbSrc) . '" class="rounded flex-shrink-0 border" style="width: 28px; height: 28px; object-fit: cover;" alt="post media" onerror="this.style.display=\'none\';">';
+            }
+            $postCaption = !empty($post->message) ? Str::limit($post->message, 45) : (!empty($post->display_title) ? Str::limit($post->display_title, 45) : 'Post #' . substr($post->platform_post_id ?? $post->meta_post_id ?? '', -6));
+            $postDate = $post->published_at ? $post->published_at->format('d M, H:i') : '';
+        }
+
+        // Commenter Identity & Avatar
+        $defaultName = $isInstagram ? 'Instagram User' : ($isYouTube ? 'YouTube User' : 'Facebook User');
+        $displayName = (!empty($comment->commenter_name) && strtolower($comment->commenter_name) !== 'user') ? $comment->commenter_name : $defaultName;
+        $initial = strtoupper(substr($displayName, 0, 1));
+
+        if (!empty($comment->commenter_photo_url)) {
+            $userAvatar = '<span class="avatar avatar-md rounded-circle border shadow-xs flex-shrink-0" style="background-image: url(' . e($comment->commenter_photo_url) . '); width: 40px; height: 40px;"></span>';
+        } else {
+            $userAvatar = '<span class="avatar avatar-md rounded-circle fw-bold flex-shrink-0 shadow-xs" style="width: 40px; height: 40px; font-size: 1rem; background: #e0f2fe; color: #0284c7; border: 1.5px solid #bae6fd;">' . e($initial) . '</span>';
+        }
+
+        $timeAgo = $comment->commented_at ? $comment->commented_at->diffForHumans() : $comment->created_at->diffForHumans();
+
+        $likesHtml = '';
+        if ($comment->likes_count > 0) {
+            $likesHtml = '<span class="badge bg-danger-subtle text-danger border border-danger-subtle px-2 py-0.5 rounded-pill small ms-1" title="' . $comment->likes_count . ' likes"><i class="ti ti-heart-filled me-1"></i>' . $comment->likes_count . '</span>';
+        }
+
+        $commentMessageHtml = $this->formatExpandableText((string) ($comment->message ?? ''), 250, 'text-dark', '0.95rem');
+
+        // AI Reply / Conversation Thread
+        $replyThreadHtml = '';
+        $accountName = $account?->name ?: 'Official Page';
+
+        if ($isReplied && !empty($comment->ai_reply)) {
+            // Channel Avatar
+            $pageAvatar = '';
+            if (!empty($account?->profile_pic_url)) {
+                $pageAvatar = '<span class="avatar avatar-xs rounded-circle border flex-shrink-0" style="background-image: url(' . e($account->profile_pic_url) . '); width: 26px; height: 26px;"></span>';
+            } else {
+                $pageAvatar = '<span class="avatar avatar-xs rounded-circle bg-primary text-white flex-shrink-0" style="width: 26px; height: 26px;"><i class="ti ti-robot fs-5"></i></span>';
+            }
+
+            $repliedAgo = $comment->replied_at ? 'Replied ' . $comment->replied_at->diffForHumans() : 'Replied';
+            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 200, 'text-secondary', '0.90rem');
+
+            $replyThreadHtml = '
+                <div class="mt-3 p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 3.5px solid #10b981;">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5 flex-wrap gap-1">
+                        <div class="d-flex align-items-center gap-2">
+                            ' . $pageAvatar . '
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="fw-bold text-dark small">' . e($accountName) . '</span>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill fs-7 py-0 px-1.5">
+                                    <i class="ti ti-check me-0.5"></i>Official Reply Sent
+                                </span>
+                            </div>
+                        </div>
+                        <span class="text-muted small fs-7">' . e($repliedAgo) . '</span>
+                    </div>
+                    <div class="mt-1">
+                        ' . $replyBodyHtml . '
+                    </div>
+                </div>
+            ';
+        } elseif ($isPending && !empty($comment->ai_reply)) {
+            // Ready-to-approve AI Draft
+            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 220, 'text-dark', '0.90rem');
+
+            $replyThreadHtml = '
+                <div class="mt-3 p-3 rounded-3" style="background: #f0fdf4; border: 1.5px dashed #86efac; border-left: 3.5px solid #f59e0b;">
+                    <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-1">
+                        <div class="d-flex align-items-center gap-1.5">
+                            <span class="avatar avatar-xs rounded-circle bg-success text-white flex-shrink-0" style="width: 22px; height: 22px;">
+                                <i class="ti ti-sparkles" style="font-size: 0.75rem;"></i>
+                            </span>
+                            <span class="fw-bold text-success small">AI Suggested Reply (Ready to Approve)</span>
+                        </div>
+                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill fs-7">
+                            <span class="status-dot bg-warning me-1"></span>Action Required
+                        </span>
+                    </div>
+                    <div class="p-2.5 bg-white rounded-2 border mb-2.5">
+                        ' . $replyBodyHtml . '
+                    </div>
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <form method="POST" action="' . route('admin.comments.approve', $comment->id) . '" class="d-inline m-0 form-approve-reply">
+                            ' . csrf_field() . '
+                            <button type="submit" class="btn btn-sm btn-success px-3 d-inline-flex align-items-center gap-1.5 shadow-xs btn-approve-action">
+                                <i class="ti ti-send"></i>
+                                <span class="fw-semibold">Approve & Send Live</span>
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-sm btn-outline-secondary px-3 d-inline-flex align-items-center gap-1 btn-reply-comment"
+                            data-id="' . $comment->id . '"
+                            data-name="' . e($displayName) . '"
+                            data-comment="' . e($comment->message ?? '') . '"
+                            data-reply="' . e($comment->ai_reply ?? '') . '"
+                            data-action="' . route('admin.comments.reply', $comment->id) . '">
+                            <i class="ti ti-edit"></i>
+                            <span>Edit Reply</span>
+                        </button>
+                    </div>
+                </div>
+            ';
+        }
+
+        // Hide / Unhide action metadata
+        $hideTitle = $isHidden ? 'Unhide Comment' : 'Hide from Public';
+        $hideIcon = $isHidden ? 'ti ti-eye' : 'ti ti-eye-off';
+        $hideLabel = $isHidden ? 'Unhide' : 'Hide';
+
+        return '
+            <div class="card social-inbox-card mb-3 border shadow-xs" style="border-radius: 12px; border-left: 5px solid ' . $stripeColor . ' !important; background: #ffffff;">
+                {{-- Context Header --}}
+                <div class="card-header py-2 px-3 bg-light-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 border-bottom">
+                    <div class="d-flex align-items-center gap-2 min-w-0">
+                        <span class="badge ' . $platformBadgeBg . ' px-2 py-0.5 rounded d-inline-flex align-items-center gap-1">
+                            <i class="' . $platformIcon . '"></i> ' . $platformName . '
+                        </span>
+                        ' . $postThumbHtml . '
+                        <div class="text-truncate" style="max-width: 340px;">
+                            <span class="fw-medium text-dark small" title="' . e($post?->message ?? $post?->display_title ?? '') . '">' . e($postCaption) . '</span>
+                            ' . ($postDate ? '<span class="text-muted fs-7 ms-1">(' . e($postDate) . ')</span>' : '') . '
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 ms-auto">
+                        ' . $sentimentBadge . '
+                        ' . $statusBadge . '
+                        <span class="text-muted small d-inline-flex align-items-center gap-1 ms-1 fs-7">
+                            <i class="ti ti-clock"></i> ' . e($timeAgo) . '
+                        </span>
+                    </div>
+                </div>
+
+                {{-- Card Body --}}
+                <div class="card-body p-3">
+                    <div class="d-flex align-items-start gap-3">
+                        ' . $userAvatar . '
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center gap-1.5 mb-1 flex-wrap">
+                                <span class="fw-bold text-dark fs-3">' . e($displayName) . '</span>
+                                ' . $likesHtml . '
+                            </div>
+                            <div class="text-dark fs-3" style="line-height: 1.5; color: #1e293b;">
+                                ' . $commentMessageHtml . '
+                            </div>
+                        </div>
+                    </div>
+                    ' . $replyThreadHtml . '
+                </div>
+
+                {{-- Card Footer --}}
+                <div class="card-footer py-2 px-3 bg-light-subtle d-flex align-items-center justify-content-between flex-wrap gap-2 border-top">
+                    <div class="d-flex align-items-center gap-1.5 text-muted small">
+                        <i class="ti ti-building text-secondary fs-6"></i>
+                        <span>Channel: <strong class="text-dark">' . e($accountName) . '</strong></span>
+                    </div>
+                    <div class="d-flex align-items-center gap-1.5 ms-auto">
+                        ' . ($platformUrl ? '
+                        <a href="' . e($platformUrl) . '" target="_blank" class="btn btn-sm btn-ghost-secondary d-inline-flex align-items-center gap-1 text-secondary" title="View live on ' . $platformName . '">
+                            <i class="' . $platformIcon . '"></i>
+                            <span class="d-none d-sm-inline">View on ' . $platformName . '</span>
+                            <i class="ti ti-external-link fs-7"></i>
+                        </a>' : '') . '
+                        <button type="button" class="btn btn-sm btn-ghost-primary d-inline-flex align-items-center gap-1 btn-reply-comment"
+                            data-id="' . $comment->id . '"
+                            data-name="' . e($displayName) . '"
+                            data-comment="' . e($comment->message ?? '') . '"
+                            data-reply="' . e($comment->ai_reply ?? '') . '"
+                            data-action="' . route('admin.comments.reply', $comment->id) . '">
+                            <i class="ti ti-arrow-back-up"></i>
+                            <span>' . ($isReplied ? 'Reply Again' : 'Reply') . '</span>
+                        </button>
+                        <form method="POST" action="' . route('admin.comments.toggle-hide', $comment->id) . '" class="d-inline m-0 form-toggle-hide">
+                            ' . csrf_field() . '
+                            <button type="submit" class="btn btn-sm btn-ghost-secondary text-secondary d-inline-flex align-items-center gap-1" title="' . $hideTitle . '">
+                                <i class="' . $hideIcon . '"></i>
+                                <span class="d-none d-sm-inline">' . $hideLabel . '</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        ';
     }
 
     public function query(Comment $model): Builder
