@@ -89,7 +89,7 @@ class PostManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Free medical camp organized this weekend');
         $response->assertSee('Health Care Initiative');
-        $response->assertSee('ID: 123456789_111222333');
+        $response->assertDontSee('ID: 123456789_111222333');
     }
 
     public function test_posts_filter_by_account(): void

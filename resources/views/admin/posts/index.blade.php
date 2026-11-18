@@ -184,7 +184,6 @@
                                                 <span class="text-muted fst-italic">[Media attachment without caption]</span>
                                             @endif
                                         </div>
-                                        <small class="text-secondary font-monospace">ID: {{ $post->meta_post_id }}</small>
                                     </td>
 
                                     {{-- Channel --}}

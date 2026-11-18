@@ -249,7 +249,6 @@
                                                 <span class="text-muted fst-italic">[Media attachment without caption]</span>
                                             @endif
                                         </div>
-                                        <small class="text-secondary font-monospace">ID: {{ $post->meta_post_id ?: $post->platform_post_id }}</small>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
@@ -258,7 +257,6 @@
                                             @endif
                                             <div>
                                                 <div class="fw-semibold text-dark">{{ $post->account->name }}</div>
-                                                <small class="text-secondary font-monospace">{{ $post->account->meta_account_id }}</small>
                                             </div>
                                         </div>
                                     </td>

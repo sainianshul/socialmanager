@@ -254,7 +254,6 @@
                                                 {{ $post->display_title }}
                                             </span>
                                         </div>
-                                        <small class="text-secondary font-monospace">ID: {{ $post->platform_post_id ?: $post->meta_post_id }}</small>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">

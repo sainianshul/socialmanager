@@ -233,7 +233,6 @@
                                                 <span class="text-muted fst-italic">[Media attachment]</span>
                                             @endif
                                         </div>
-                                        <small class="text-secondary font-monospace">ID: {{ $post->meta_post_id ?: $post->platform_post_id }}</small>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-2">
