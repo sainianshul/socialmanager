@@ -177,14 +177,7 @@
                             <span class="nav-link-title">Schedule & Publish</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Media Library">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block">
-                                <i class="ti ti-photo-plus fs-2"></i>
-                            </span>
-                            <span class="nav-link-title">Media Library</span>
-                        </a>
-                    </li>
+
 
                     {{-- ENGAGEMENT & AI MODERATION --}}
                     <li class="nav-section-title">Engagement</li>
