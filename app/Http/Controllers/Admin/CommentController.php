@@ -28,7 +28,7 @@ class CommentController extends Controller
         $accountIds = $accounts->pluck('id')->toArray();
 
         // Calculate summary metrics for Instagram comments
-        $baseCommentsQuery = Comment::whereIn('account_id', $accountIds);
+        $baseCommentsQuery = Comment::whereIn('account_id', $accountIds)->whereNull('parent_comment_id')->where('commenter_name', 'not like', '%(Page)%');
         $totalComments = (clone $baseCommentsQuery)->count();
         $pendingReview = (clone $baseCommentsQuery)->whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count();
         $repliedCount = (clone $baseCommentsQuery)->where('status', Comment::STATUS_REPLIED)->count();
@@ -80,7 +80,7 @@ class CommentController extends Controller
         $accountIds = $accounts->pluck('id')->toArray();
 
         // Calculate summary metrics for Facebook comments
-        $baseCommentsQuery = Comment::whereIn('account_id', $accountIds);
+        $baseCommentsQuery = Comment::whereIn('account_id', $accountIds)->whereNull('parent_comment_id')->where('commenter_name', 'not like', '%(Page)%');
         $totalComments = (clone $baseCommentsQuery)->count();
         $pendingReview = (clone $baseCommentsQuery)->whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count();
         $repliedCount = (clone $baseCommentsQuery)->where('status', Comment::STATUS_REPLIED)->count();
@@ -132,7 +132,7 @@ class CommentController extends Controller
         $accountIds = $accounts->pluck('id')->toArray();
 
         // Calculate summary metrics for YouTube comments
-        $baseCommentsQuery = Comment::whereIn('account_id', $accountIds);
+        $baseCommentsQuery = Comment::whereIn('account_id', $accountIds)->whereNull('parent_comment_id')->where('commenter_name', 'not like', '%(Page)%');
         $totalComments = (clone $baseCommentsQuery)->count();
         $pendingReview = (clone $baseCommentsQuery)->whereIn('status', [Comment::STATUS_NEW, Comment::STATUS_PENDING_REVIEW])->count();
         $repliedCount = (clone $baseCommentsQuery)->where('status', Comment::STATUS_REPLIED)->count();

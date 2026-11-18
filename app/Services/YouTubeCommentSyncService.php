@@ -115,6 +115,14 @@ class YouTubeCommentSyncService
                 $likeCount = (int) ($topComment['likeCount'] ?? 0);
                 $commentedAt = isset($topComment['publishedAt']) ? Carbon::parse($topComment['publishedAt']) : now();
 
+                // Skip channel's own comments / replies
+                $isOwnChannel = ($authorMetaId && $authorMetaId === (string) $account->meta_account_id)
+                    || ($account->name && strcasecmp($authorName, $account->name) === 0);
+
+                if ($isOwnChannel) {
+                    continue;
+                }
+
                 $comment = Comment::firstOrNew([
                     'post_id' => $post->id,
                     'platform_comment_id' => $topCommentId,

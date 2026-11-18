@@ -98,7 +98,16 @@ class MetaCommentSyncService
 
         if (isset($response['error'])) {
             $msg = $response['error']['message'] ?? 'Failed to retrieve comments from Meta.';
+            $subcode = (int) ($response['error']['error_subcode'] ?? 0);
+            $code = (int) ($response['error']['code'] ?? 0);
             Log::warning("Meta comment fetch error on post {$post->id}: {$msg}", $response['error']);
+
+            // If object does not exist on Meta (deleted post, expired story, container ID, subcode 33)
+            if ($code === 100 || $subcode === 33 || stripos($msg, 'does not exist') !== false || stripos($msg, 'cannot be loaded') !== false) {
+                Log::info("Meta post {$post->id} ({$post->meta_post_id}) does not exist on platform, skipping without error.");
+                return 0;
+            }
+
             throw new \RuntimeException($msg);
         }
 
@@ -123,10 +132,32 @@ class MetaCommentSyncService
 
             // Handle nested reply hierarchy if present
             $parentLocalCommentId = null;
+            $parentMetaId = null;
             if (isset($item['parent']['id'])) {
                 $parentMetaId = (string) $item['parent']['id'];
                 $parentLocalComment = Comment::where('meta_comment_id', $parentMetaId)->first();
                 $parentLocalCommentId = $parentLocalComment?->id;
+            }
+
+            // Exclude channel/page's own replies & comments from constituent list
+            $isOwnChannel = ($commenterMetaId && $commenterMetaId === (string) $account->meta_account_id)
+                || (stripos($commenterName, '(Page)') !== false)
+                || ($account->name && strcasecmp($commenterName, $account->name) === 0)
+                || ($account->username && strcasecmp($commenterName, $account->username) === 0)
+                || Comment::where('meta_reply_id', $metaCommentId)->exists();
+
+            if ($isOwnChannel) {
+                // If this is a reply to an existing comment in our DB, mark parent as Replied
+                if (!empty($parentMetaId)) {
+                    Comment::where('meta_comment_id', $parentMetaId)
+                        ->where('status', '!=', Comment::STATUS_REPLIED)
+                        ->update([
+                            'status' => Comment::STATUS_REPLIED,
+                            'meta_reply_id' => $metaCommentId,
+                            'replied_at' => $commentedAt,
+                        ]);
+                }
+                continue;
             }
 
             // Persist without duplicates (safe idempotent upsert)
@@ -251,26 +282,6 @@ class MetaCommentSyncService
                 'meta_reply_id' => $metaReplyId,
                 'replied_at' => now(),
             ]);
-
-            // Also create child comment record if meta id returned
-            if ($metaReplyId) {
-                Comment::firstOrCreate(
-                    [
-                        'post_id' => $comment->post_id,
-                        'meta_comment_id' => $metaReplyId,
-                    ],
-                    [
-                        'account_id' => $account->id,
-                        'parent_comment_id' => $comment->id,
-                        'commenter_name' => $account->name . ' (Page)',
-                        'commenter_photo_url' => $account->profile_pic_url,
-                        'message' => $replyMessage,
-                        'status' => Comment::STATUS_REPLIED,
-                        'commented_at' => now(),
-                        'replied_at' => now(),
-                    ]
-                );
-            }
 
             return ['success' => true, 'message' => 'Reply posted successfully.'];
         } catch (\Throwable $e) {

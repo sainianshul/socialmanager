@@ -349,11 +349,10 @@ class CommentManagementTest extends TestCase
         $this->assertEquals('Timing is 10:00 AM to 5:00 PM.', $comment->fresh()->ai_reply);
         $this->assertEquals('reply_meta_comment_456', $comment->fresh()->meta_reply_id);
 
-        // Verify child comment persisted
-        $this->assertDatabaseHas('comments', [
+        // Verify parent comment is updated and channel's own reply is not inserted as separate row
+        $this->assertDatabaseMissing('comments', [
             'parent_comment_id' => $comment->id,
             'meta_comment_id' => 'reply_meta_comment_456',
-            'message' => 'Timing is 10:00 AM to 5:00 PM.',
         ]);
     }
 

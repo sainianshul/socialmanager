@@ -308,6 +308,8 @@ class CommentDataTable extends DataTable
         $query = $model->newQuery()
             ->with(['post', 'account'])
             ->select('comments.*')
+            ->whereNull('parent_comment_id')
+            ->where('commenter_name', 'not like', '%(Page)%')
             ->latest('commented_at');
 
         // Scope to user's accounts if not admin
