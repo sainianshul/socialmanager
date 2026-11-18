@@ -54,11 +54,18 @@ class SuperAdminDashboardTest extends TestCase
         $response->assertSee('System Overview & Administration', false);
         $response->assertSee('TOTAL USERS');
         $response->assertSee('AI REPLIES');
-        $response->assertSee('CHANNELS CONNECTED');
-        $response->assertSee('Recent Registered Users');
-        $response->assertSee('Live AI & Constituent Stream', false);
-        $response->assertSee('Client A');
-        $response->assertSee('Citizen John');
+        $response->assertSee('TOTAL POSTS');
+        $response->assertSee('TOTAL COMMENTS');
+        $response->assertSee('FACEBOOK CONNECTED');
+        $response->assertSee('INSTAGRAM CONNECTED');
+        $response->assertSee('YOUTUBE CONNECTED');
+
+        // Verify removed sections are NOT rendered
+        $response->assertDontSee('Recent Registered Users');
+        $response->assertDontSee('Live AI & Constituent Stream', false);
+        $response->assertDontSee('Platform Infrastructure');
+        $response->assertDontSee('GRIEVANCES FLAGGED');
+        $response->assertDontSee('TROLLS / ABUSE BLOCKED');
     }
 
     public function test_sidebar_hides_politics_analyses_for_super_admin(): void

@@ -22,8 +22,6 @@ class DashboardController extends Controller
             // ── Super Admin System Overview Metrics ───────────────────
             $totalUsers = User::where('role', '!=', User::ROLE_ADMIN)->count();
             $newUsersThisMonth = User::where('role', '!=', User::ROLE_ADMIN)->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
-            $activeUsersCount = User::where('role', '!=', User::ROLE_ADMIN)->where('status', User::STATUS_ACTIVE)->count();
-            $blockedUsersCount = User::where('role', '!=', User::ROLE_ADMIN)->where('status', User::STATUS_BLOCKED)->count();
 
             $totalAccounts = Account::count();
             $fbAccountsCount = Account::where('account_type', Account::TYPE_FACEBOOK)->count();
@@ -35,7 +33,6 @@ class DashboardController extends Controller
 
             $totalComments = Comment::count();
             $commentsThisMonth = Comment::where('created_at', '>=', Carbon::now()->startOfMonth())->count();
-            $commentsToday = Comment::whereDate('created_at', Carbon::today())->count();
 
             $totalAiReplies = Comment::where(function ($q) {
                 $q->whereNotNull('ai_reply')->orWhere('status', Comment::STATUS_REPLIED);
@@ -44,24 +41,6 @@ class DashboardController extends Controller
             $aiRepliesThisMonth = Comment::where(function ($q) {
                 $q->whereNotNull('ai_reply')->orWhere('status', Comment::STATUS_REPLIED);
             })->where('created_at', '>=', Carbon::now()->startOfMonth())->count();
-
-            $aiRepliesToday = Comment::where(function ($q) {
-                $q->whereNotNull('ai_reply')->orWhere('status', Comment::STATUS_REPLIED);
-            })->whereDate('created_at', Carbon::today())->count();
-
-            $hiddenTrollsCount = Comment::where(function ($q) {
-                $q->where('is_abusive', true)->orWhere('status', Comment::STATUS_HIDDEN);
-            })->count();
-
-            $grievancesCount = Comment::where('is_complaint', true)->count();
-            $scheduledCount = ScheduledPost::where('status', ScheduledPost::STATUS_SCHEDULED)->count();
-            $publishedScheduledCount = ScheduledPost::where('status', ScheduledPost::STATUS_PUBLISHED)->count();
-
-            // Recent registered users with accounts count
-            $recentUsers = User::where('role', '!=', User::ROLE_ADMIN)->withCount('accounts')->latest()->take(6)->get();
-
-            // Recent system-wide comments stream
-            $recentComments = Comment::with(['post', 'account.user'])->latest('created_at')->take(6)->get();
 
             // 30 Days Activity Chart Data for Super Admin
             $commentsGrouped = Comment::whereBetween('created_at', [$startDate, $endDate])
@@ -98,8 +77,6 @@ class DashboardController extends Controller
             return view('admin.dashboard', compact(
                 'totalUsers',
                 'newUsersThisMonth',
-                'activeUsersCount',
-                'blockedUsersCount',
                 'totalAccounts',
                 'fbAccountsCount',
                 'igAccountsCount',
@@ -108,16 +85,8 @@ class DashboardController extends Controller
                 'postsThisMonth',
                 'totalComments',
                 'commentsThisMonth',
-                'commentsToday',
                 'totalAiReplies',
                 'aiRepliesThisMonth',
-                'aiRepliesToday',
-                'hiddenTrollsCount',
-                'grievancesCount',
-                'scheduledCount',
-                'publishedScheduledCount',
-                'recentUsers',
-                'recentComments',
                 'chartDates',
                 'commentCounts',
                 'aiReplyCounts',
