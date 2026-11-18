@@ -395,6 +395,15 @@
         color: #ffffff;
         border-color: #1db8ab;
     }
+    [data-bs-theme="dark"] .post-type-pill {
+        background: #111a2d !important;
+        color: #cbd5e1 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    [data-bs-theme="dark"] .post-type-pill:hover {
+        background: #162035 !important;
+        color: #f8fafc !important;
+    }
 </style>
 @endpush
 

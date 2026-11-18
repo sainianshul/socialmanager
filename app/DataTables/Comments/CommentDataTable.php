@@ -144,12 +144,12 @@ class CommentDataTable extends DataTable
                     $replyTextHtml = $this->formatExpandableText((string) $comment->ai_reply, 150, 'text-secondary', '0.85rem');
 
                     $replyHtml = '
-                        <div class="d-flex align-items-start gap-2 ms-4 ps-2.5 mt-2" style="border-left: 2px solid #e2e8f0;">
+                        <div class="d-flex align-items-start gap-2 ms-4 ps-2.5 mt-2" style="border-left: 2px solid var(--tblr-border-color, #e2e8f0);">
                             ' . $aiAvatar . '
                             <div class="bg-light-subtle rounded-3 p-2 px-3 border w-100">
                                 <div class="d-flex align-items-center justify-content-between gap-2 mb-1">
                                     <div class="d-flex align-items-center gap-1.5">
-                                        <span class="fw-semibold text-dark small">' . e($accountName) . '</span>
+                                        <span class="fw-semibold text-body small">' . e($accountName) . '</span>
                                         <span class="text-muted fs-7"><i class="ti ti-sparkles text-primary me-0.5"></i>AI</span>
                                     </div>
                                     ' . $statusPill . '
@@ -160,7 +160,7 @@ class CommentDataTable extends DataTable
                     ';
                 }
 
-                $commentMessageHtml = $this->formatExpandableText((string) ($comment->message ?? ''), 140, 'text-dark', '0.88rem', $likesHtml);
+                $commentMessageHtml = $this->formatExpandableText((string) ($comment->message ?? ''), 140, 'text-body', '0.88rem', $likesHtml);
 
                 return '
                     <div class="comment-thread py-1" style="min-width: 300px; max-width: 580px;">
@@ -168,7 +168,7 @@ class CommentDataTable extends DataTable
                             ' . $userAvatar . '
                             <div class="min-w-0 w-100">
                                 <div class="d-flex align-items-center gap-2 flex-wrap mb-0.5">
-                                    <span class="fw-bold text-dark fs-4">' . e($displayName) . '</span>
+                                    <span class="fw-bold text-body fs-4">' . e($displayName) . '</span>
                                     <span class="text-muted small fs-7">' . e($timeAgo) . '</span>
                                 </div>
                                 ' . $commentMessageHtml . '
@@ -385,7 +385,7 @@ class CommentDataTable extends DataTable
         if (!empty($comment->commenter_photo_url)) {
             $userAvatar = '<span class="avatar avatar-sm rounded-circle border shadow-xs flex-shrink-0" style="background-image: url(' . e($comment->commenter_photo_url) . '); width: 36px; height: 36px;"></span>';
         } else {
-            $userAvatar = '<span class="avatar avatar-sm rounded-circle bg-light text-dark fw-bold border flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.9rem;">' . e($initial) . '</span>';
+            $userAvatar = '<span class="avatar avatar-sm rounded-circle bg-body-secondary text-body fw-bold border flex-shrink-0" style="width: 36px; height: 36px; font-size: 0.9rem;">' . e($initial) . '</span>';
         }
 
         $timeAgo = $comment->commented_at ? $comment->commented_at->diffForHumans() : $comment->created_at->diffForHumans();
@@ -395,7 +395,7 @@ class CommentDataTable extends DataTable
             $likesHtml = '<span class="badge badge-outline text-danger ms-1 py-0 px-1.5 fs-7" title="' . $comment->likes_count . ' likes"><i class="ti ti-heart me-1"></i>' . $comment->likes_count . '</span>';
         }
 
-        $commentMessageHtml = $this->formatExpandableText((string) ($comment->message ?? ''), 250, 'text-dark', '0.92rem');
+        $commentMessageHtml = $this->formatExpandableText((string) ($comment->message ?? ''), 250, 'text-body', '0.92rem');
 
         // AI Reply / Conversation Thread
         $replyThreadHtml = '';
@@ -411,28 +411,28 @@ class CommentDataTable extends DataTable
             }
 
             $repliedAgo = $comment->replied_at ? $comment->replied_at->diffForHumans() : 'Replied';
-            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 200, 'text-dark', '0.90rem');
+            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 200, 'text-body', '0.90rem');
 
             $replyThreadHtml = '
                 <div class="mt-3 p-3 rounded-2 thread-reply-box" style="border-left: 3px solid #2fb344 !important;">
                     <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
                         <div class="d-flex align-items-center gap-2">
                             ' . $pageAvatar . '
-                            <span class="fw-bold text-dark small">' . e($accountName) . '</span>
+                            <span class="fw-bold text-body small">' . e($accountName) . '</span>
                             <span class="badge bg-success-lt text-success px-2 py-0.5 fw-semibold fs-7" style="border: 1px solid rgba(47, 179, 68, 0.35);">
                                 <i class="ti ti-check me-0.5"></i>Official Reply Sent
                             </span>
                         </div>
                         <span class="text-muted small fs-7"><i class="ti ti-clock me-0.5"></i>' . e($repliedAgo) . '</span>
                     </div>
-                    <div class="text-dark" style="line-height: 1.5; font-size: 0.90rem;">
+                    <div class="text-body" style="line-height: 1.5; font-size: 0.90rem;">
                         ' . $replyBodyHtml . '
                     </div>
                 </div>
             ';
         } elseif ($isPending && !empty($comment->ai_reply)) {
             // Ready-to-approve AI Draft
-            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 220, 'text-dark', '0.90rem');
+            $replyBodyHtml = $this->formatExpandableText((string) $comment->ai_reply, 220, 'text-body', '0.90rem');
 
             $replyThreadHtml = '
                 <div class="mt-3 p-3 rounded-2 thread-draft-box" style="border-left: 3px solid #f59f00 !important;">
@@ -441,13 +441,13 @@ class CommentDataTable extends DataTable
                             <span class="avatar avatar-xs rounded-circle bg-warning-lt text-warning flex-shrink-0" style="width: 22px; height: 22px;">
                                 <i class="ti ti-sparkles fs-4"></i>
                             </span>
-                            <span class="fw-bold text-dark small">AI Suggested Draft</span>
+                            <span class="fw-bold text-body small">AI Suggested Draft</span>
                         </div>
                         <span class="badge bg-warning-lt text-warning py-0.5 px-2 fs-7 fw-semibold" style="border: 1px solid rgba(245, 159, 0, 0.35);">
                             <span class="status-dot bg-warning me-1"></span>Action Required
                         </span>
                     </div>
-                    <div class="p-2.5 bg-white rounded border mb-2.5 text-dark" style="line-height: 1.5; font-size: 0.90rem;">
+                    <div class="p-2.5 bg-body rounded border mb-2.5 text-body thread-draft-inner" style="line-height: 1.5; font-size: 0.90rem;">
                         ' . $replyBodyHtml . '
                     </div>
                     <div class="d-flex align-items-center gap-2 flex-wrap">
@@ -484,7 +484,7 @@ class CommentDataTable extends DataTable
                     <div class="d-flex align-items-center gap-1 min-w-0">
                         ' . $postThumbHtml . '
                         <div class="text-truncate" style="max-width: 360px;">
-                            <span class="fw-medium text-dark small" title="' . e($post?->message ?? $post?->display_title ?? '') . '">' . e($postCaption) . '</span>
+                            <span class="fw-medium text-body small" title="' . e($post?->message ?? $post?->display_title ?? '') . '">' . e($postCaption) . '</span>
                             ' . ($postDate ? '<span class="text-muted fs-7 ms-1">(' . e($postDate) . ')</span>' : '') . '
                         </div>
                     </div>
@@ -502,10 +502,10 @@ class CommentDataTable extends DataTable
                         ' . $userAvatar . '
                         <div class="flex-grow-1 min-w-0">
                             <div class="d-flex align-items-center gap-1 mb-0.5 flex-wrap">
-                                <span class="fw-semibold text-dark fs-4">' . e($displayName) . '</span>
+                                <span class="fw-semibold text-body fs-4">' . e($displayName) . '</span>
                                 ' . $likesHtml . '
                             </div>
-                            <div class="text-dark" style="line-height: 1.5;">
+                            <div class="text-body" style="line-height: 1.5;">
                                 ' . $commentMessageHtml . '
                             </div>
                         </div>
@@ -611,7 +611,7 @@ class CommentDataTable extends DataTable
     /**
      * Format text with interactive inline 'more' / 'less' toggle when exceeding character limit.
      */
-    protected function formatExpandableText(string $text, int $limit = 140, string $colorClass = 'text-dark', string $fontSize = '0.88rem', string $suffixHtml = ''): string
+    protected function formatExpandableText(string $text, int $limit = 140, string $colorClass = 'text-body', string $fontSize = '0.88rem', string $suffixHtml = ''): string
     {
         $text = trim($text);
         if (mb_strlen($text) <= $limit) {

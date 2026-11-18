@@ -257,7 +257,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div>
-                        <h3 class="card-title fw-bold text-dark mb-0">Connected Channels</h3>
+                        <h3 class="card-title fw-bold text-body mb-0">Connected Channels</h3>
                         <div class="text-secondary small">Meta & Social accounts status</div>
                     </div>
                     <a href="{{ route('admin.accounts.index') }}" class="btn btn-sm btn-outline-primary">
@@ -277,7 +277,7 @@
                                         </span>
                                     @endif
                                     <div class="flex-grow-1 text-truncate pe-2">
-                                        <div class="fw-semibold text-dark text-truncate">{{ $acc->name }}</div>
+                                        <div class="fw-semibold text-body text-truncate">{{ $acc->name }}</div>
                                         <div class="text-secondary small">
                                             <span>{{ $acc->account_type == 2 ? 'Instagram' : 'Facebook Page' }}</span>
                                             @if($acc->followers_count)
@@ -297,7 +297,7 @@
                                 <span class="avatar avatar-xl rounded-circle bg-azure-lt text-azure mb-3">
                                     <i class="ti ti-brand-meta fs-1"></i>
                                 </span>
-                                <h4 class="fw-bold text-dark mb-1">No Channels Connected</h4>
+                                <h4 class="fw-bold text-body mb-1">No Channels Connected</h4>
                                 <p class="text-secondary small mb-3">Connect your Facebook Pages or Instagram Business accounts to start syncing posts & automated comments.</p>
                                 <a href="{{ route('admin.accounts.index') }}" class="btn btn-primary btn-sm">
                                     <i class="ti ti-plug me-1"></i>Connect Channel
@@ -317,7 +317,7 @@
             <div class="card">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <div>
-                        <h3 class="card-title fw-bold text-dark mb-0">Recent Published Posts & Activity</h3>
+                        <h3 class="card-title fw-bold text-body mb-0">Recent Published Posts & Activity</h3>
                         <div class="text-secondary small">Latest multi-channel broadcasts and synced interactions</div>
                     </div>
                     <a href="{{ route('admin.posts.index') }}" class="btn btn-sm btn-outline-secondary">
@@ -377,6 +377,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const postSeries = {!! json_encode($postCounts ?? []) !!};
     const commentSeries = {!! json_encode($commentCounts ?? []) !!};
 
+    const isDarkMode = function() {
+        return (document.documentElement.getAttribute('data-bs-theme') === 'dark' || document.body.getAttribute('data-bs-theme') === 'dark');
+    };
+
+    let dark = isDarkMode();
+
     const options = {
         chart: {
             type: "area",
@@ -414,7 +420,7 @@ document.addEventListener("DOMContentLoaded", function () {
         xaxis: {
             categories: categories,
             labels: {
-                style: { colors: '#64748b', fontSize: '12px' }
+                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '12px' }
             },
             axisBorder: { show: false },
             axisTicks: { show: false }
@@ -422,22 +428,32 @@ document.addEventListener("DOMContentLoaded", function () {
         yaxis: {
             tickAmount: 5,
             labels: {
-                style: { colors: '#64748b', fontSize: '12px' }
+                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '12px' }
             }
         },
         grid: {
             strokeDashArray: 3,
-            borderColor: '#f1f5f9',
+            borderColor: dark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9',
             padding: { top: -20, right: 0, left: -4, bottom: -4 }
         },
         legend: { show: false },
-        tooltip: { theme: 'light' }
+        tooltip: { theme: dark ? 'dark' : 'light' }
     };
 
     const chartEl = document.querySelector("#chart-social-activity");
     if (chartEl) {
         const chart = new ApexCharts(chartEl, options);
         chart.render();
+
+        window.addEventListener('themeChanged', function (e) {
+            const nextDark = (e.detail?.theme === 'dark');
+            chart.updateOptions({
+                xaxis: { labels: { style: { colors: nextDark ? '#8896ab' : '#64748b' } } },
+                yaxis: { labels: { style: { colors: nextDark ? '#8896ab' : '#64748b' } } },
+                grid: { borderColor: nextDark ? 'rgba(255, 255, 255, 0.08)' : '#f1f5f9' },
+                tooltip: { theme: nextDark ? 'dark' : 'light' }
+            });
+        });
     }
 });
 </script>

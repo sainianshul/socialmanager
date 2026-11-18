@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             localStorage.setItem('data-bs-theme', targetTheme);
             document.documentElement.setAttribute('data-bs-theme', targetTheme);
             document.body.setAttribute('data-bs-theme', targetTheme);
+            window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: targetTheme } }));
         }
     });
 

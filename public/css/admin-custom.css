@@ -1212,6 +1212,86 @@ body.sidebar-folded .navbar-vertical .navbar-footer .avatar {
     border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
+/* Offcanvas in Dark Mode */
+[data-bs-theme="dark"] .offcanvas {
+    background-color: #111a2d !important;
+    color: #cbd5e1 !important;
+}
+[data-bs-theme="dark"] .offcanvas-header,
+[data-bs-theme="dark"] .offcanvas-footer {
+    background-color: #0e1626 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-bs-theme="dark"] .offcanvas-title {
+    color: #f8fafc !important;
+}
+
+/* SweetAlert2 in Dark Mode */
+[data-bs-theme="dark"] .swal2-popup {
+    background-color: #111a2d !important;
+    color: #cbd5e1 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+[data-bs-theme="dark"] .swal2-title {
+    color: #f8fafc !important;
+}
+[data-bs-theme="dark"] .swal2-html-container {
+    color: #8896ab !important;
+}
+
+/* List Groups in Dark Mode */
+[data-bs-theme="dark"] .list-group-item {
+    background-color: transparent !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #cbd5e1 !important;
+}
+
+/* FullCalendar Global Dark Mode */
+[data-bs-theme="dark"] .fc-theme-standard th {
+    background-color: #0e1626 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #8896ab !important;
+}
+[data-bs-theme="dark"] .fc-theme-standard td,
+[data-bs-theme="dark"] .fc-theme-standard .fc-scrollgrid {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-bs-theme="dark"] .fc-daygrid-day-number {
+    color: #cbd5e1 !important;
+}
+[data-bs-theme="dark"] .fc-day-today {
+    background: rgba(29, 184, 171, 0.12) !important;
+}
+[data-bs-theme="dark"] .fc-toolbar-title {
+    color: #f8fafc !important;
+}
+[data-bs-theme="dark"] .fc-button-primary {
+    background-color: #111a2d !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #cbd5e1 !important;
+}
+[data-bs-theme="dark"] .fc-button-primary:hover {
+    background-color: #162035 !important;
+    color: #ffffff !important;
+}
+[data-bs-theme="dark"] .fc-button-primary:focus,
+[data-bs-theme="dark"] .fc-button-primary:active,
+[data-bs-theme="dark"] .fc-button-primary.fc-button-active {
+    background-color: #1db8ab !important;
+    border-color: #1db8ab !important;
+    color: #ffffff !important;
+}
+[data-bs-theme="dark"] .fc-popover {
+    background: #111a2d !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #cbd5e1 !important;
+}
+[data-bs-theme="dark"] .fc-popover-header {
+    background: #0e1626 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f8fafc !important;
+}
+
 /* Tables & DataTables */
 [data-bs-theme="dark"] .table {
     --tblr-table-bg: transparent;
@@ -1311,6 +1391,37 @@ body.sidebar-folded .navbar-vertical .navbar-footer .avatar {
 [data-bs-theme="dark"] .thread-draft-box {
     background-color: rgba(245, 159, 0, 0.08) !important;
     border-color: rgba(245, 159, 0, 0.3) !important;
+}
+[data-bs-theme="dark"] .thread-draft-inner {
+    background-color: #0e1626 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    color: #f1f5f9 !important;
+}
+
+/* Date & Time Picker Calendar Icons in Dark Mode */
+[data-bs-theme="dark"] input[type="date"]::-webkit-calendar-picker-indicator,
+[data-bs-theme="dark"] input[type="time"]::-webkit-calendar-picker-indicator,
+[data-bs-theme="dark"] input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.85);
+    cursor: pointer;
+}
+
+/* Stat Card Metric Numbers in Dark Mode */
+[data-bs-theme="dark"] .card-sm .h2,
+[data-bs-theme="dark"] .card-sm .h3 {
+    color: #f8fafc !important;
+}
+
+/* Modal Polish in Dark Mode */
+[data-bs-theme="dark"] .modal-title {
+    color: #f8fafc !important;
+}
+[data-bs-theme="dark"] .modal .bg-light-subtle {
+    background-color: #0b1320 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+[data-bs-theme="dark"] .modal .form-hint {
+    color: #8896ab !important;
 }
 
 /* ============================================

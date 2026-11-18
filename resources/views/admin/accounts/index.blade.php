@@ -38,7 +38,7 @@
         <div class="card">
             <div class="card-header d-flex flex-wrap justify-content-between align-items-center gap-2 py-3 px-4">
                 <div class="d-flex align-items-center gap-2">
-                    <h3 class="card-title fw-bold m-0 text-dark">Connected Channels</h3>
+                    <h3 class="card-title fw-bold m-0 text-body">Connected Channels</h3>
                     <span class="badge badge-outline text-secondary fw-semibold">{{ $accounts->total() }}</span>
                 </div>
                 
@@ -73,17 +73,17 @@
                                         @if($account->profile_pic_url)
                                             <span class="avatar avatar-lg rounded-circle border shadow-xs" style="background-image: url('{{ $account->profile_pic_url }}'); width: 48px; height: 48px;"></span>
                                         @else
-                                            <span class="avatar avatar-lg rounded-circle bg-light text-dark fw-bold border shadow-xs" style="width: 48px; height: 48px; font-size: 1.15rem;">
+                                            <span class="avatar avatar-lg rounded-circle bg-body-secondary text-body fw-bold border shadow-xs" style="width: 48px; height: 48px; font-size: 1.15rem;">
                                                 {{ strtoupper(substr($account->name, 0, 1)) }}
                                             </span>
                                         @endif
-                                        <span class="position-absolute bottom-0 end-0 badge rounded-circle bg-white shadow-xs p-1 d-flex align-items-center justify-content-center" style="width: 20px; height: 20px; border: 1.5px solid #ffffff;">
+                                        <span class="position-absolute bottom-0 end-0 badge rounded-circle bg-body shadow-xs p-1 d-flex align-items-center justify-content-center platform-corner-badge" style="width: 20px; height: 20px; border: 1.5px solid var(--tblr-bg-surface, #ffffff);">
                                             <i class="{{ $account->platform_icon }} text-{{ $account->platform_color }}" style="font-size: 0.75rem;"></i>
                                         </span>
                                     </div>
                                     <div class="min-w-0">
                                         <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
-                                            <span class="fw-bold fs-3 text-dark text-truncate">{{ $account->name }}</span>
+                                            <span class="fw-bold fs-3 text-body text-truncate">{{ $account->name }}</span>
                                             <span class="badge badge-outline text-{{ $account->platform_color }} fw-semibold fs-7 py-0.5 px-2">
                                                 {{ $account->account_type_name }}
                                             </span>
@@ -103,7 +103,7 @@
                             <div class="col-6 col-md-3 col-xl-3">
                                 <div class="d-flex flex-column">
                                     <div class="d-flex align-items-baseline gap-1">
-                                        <span class="h3 fw-bold mb-0 text-dark">
+                                        <span class="h3 fw-bold mb-0 text-body">
                                             {{ number_format($account->isYouTube() ? $account->subscriber_count : $account->followers_count) }}
                                         </span>
                                         <span class="text-secondary small">
@@ -218,7 +218,7 @@
                         <div class="avatar avatar-lg rounded-circle bg-light text-secondary mx-auto mb-3">
                             <i class="ti ti-plug-off fs-1"></i>
                         </div>
-                        <h4 class="fw-bold mb-1 text-dark">No Channels Found</h4>
+                        <h4 class="fw-bold mb-1 text-body">No Channels Found</h4>
                         <p class="text-secondary small mb-3">No connected accounts match the selected platform filter.</p>
                         <a href="{{ route('admin.accounts.index') }}" class="btn btn-sm btn-outline-secondary">
                             <i class="ti ti-refresh me-1"></i>View All Channels
@@ -255,7 +255,7 @@
                                     <i class="ti ti-brand-facebook fs-1"></i>
                                 </span>
                                 <div>
-                                    <div class="fw-bold fs-3 text-dark">Facebook Page</div>
+                                    <div class="fw-bold fs-3 text-body">Facebook Page</div>
                                     <div class="text-secondary small">Manage posts, engagement & auto-replies</div>
                                 </div>
                             </div>
@@ -271,7 +271,7 @@
                                     <i class="ti ti-brand-instagram fs-1"></i>
                                 </span>
                                 <div>
-                                    <div class="fw-bold fs-3 text-dark">Instagram Business</div>
+                                    <div class="fw-bold fs-3 text-body">Instagram Business</div>
                                     <div class="text-secondary small">Manage comments, direct messages & engagement</div>
                                 </div>
                             </div>
@@ -287,7 +287,7 @@
                                     <i class="ti ti-brand-youtube fs-1"></i>
                                 </span>
                                 <div>
-                                    <div class="fw-bold fs-3 text-dark">YouTube Channel</div>
+                                    <div class="fw-bold fs-3 text-body">YouTube Channel</div>
                                     <div class="text-secondary small">Manage videos, community comments & video analytics</div>
                                 </div>
                             </div>
@@ -315,7 +315,7 @@
             @csrf
             <div class="offcanvas-header border-bottom py-3 px-4">
                 <div>
-                    <h4 class="offcanvas-title fw-bold mb-0 text-dark" id="settings-offcanvas-label">Channel Automation</h4>
+                    <h4 class="offcanvas-title fw-bold mb-0 text-body" id="settings-offcanvas-label">Channel Automation</h4>
                     <div class="text-secondary small" id="offcanvas-account-name"></div>
                 </div>
                 <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -324,7 +324,7 @@
             <div class="offcanvas-body p-4" style="overflow-y: auto;">
                 {{-- AI Personality Section --}}
                 <div class="mb-4">
-                    <h5 class="fw-bold text-dark mb-3">AI Communication Style</h5>
+                    <h5 class="fw-bold text-body mb-3">AI Communication Style</h5>
                     
                     {{-- Tone Selection --}}
                     <div class="mb-3">
@@ -373,7 +373,7 @@
                     <div class="card-body p-3">
                         <div class="d-flex align-items-center justify-content-between gap-3">
                             <div>
-                                <label for="offcanvas-auto-hide" class="form-check-label fw-semibold text-dark d-block mb-0 cursor-pointer">
+                                <label for="offcanvas-auto-hide" class="form-check-label fw-semibold text-body d-block mb-0 cursor-pointer">
                                     Auto-Hide Abusive Comments
                                     <i class="ti ti-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="Automatically detects hate speech or abusive remarks and hides them immediately from public view"></i>
                                 </label>
@@ -391,7 +391,7 @@
                     <div class="card-body p-3">
                         <div class="d-flex align-items-center justify-content-between gap-3">
                             <div>
-                                <label for="offcanvas-comment-to-dm" class="form-check-label fw-semibold text-dark d-block mb-0 cursor-pointer">
+                                <label for="offcanvas-comment-to-dm" class="form-check-label fw-semibold text-body d-block mb-0 cursor-pointer">
                                     Comment to Direct Message (DM)
                                     <i class="ti ti-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="Sends an automated private direct message to constituents who comment on your posts"></i>
                                 </label>
@@ -405,7 +405,7 @@
                 </div>
             </div>
 
-            <div class="offcanvas-footer border-top p-3 bg-white mt-auto d-flex align-items-center justify-content-between">
+            <div class="offcanvas-footer border-top p-3 bg-body mt-auto d-flex align-items-center justify-content-between">
                 <button type="button" class="btn btn-ghost-secondary px-3" data-bs-dismiss="offcanvas">Cancel</button>
                 <button type="submit" class="btn btn-primary px-4 d-inline-flex align-items-center gap-1">
                     <i class="ti ti-check"></i>Save Settings

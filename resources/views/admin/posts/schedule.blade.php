@@ -134,6 +134,70 @@
         border-color: #e02424;
         box-shadow: 0 2px 4px rgba(224, 36, 36, 0.2);
     }
+
+    /* FullCalendar Dark Theme Overrides */
+    [data-bs-theme="dark"] .fc-theme-standard th {
+        background-color: #0e1626 !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #8896ab !important;
+    }
+    [data-bs-theme="dark"] .fc-theme-standard td,
+    [data-bs-theme="dark"] .fc-theme-standard .fc-scrollgrid {
+        border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+    [data-bs-theme="dark"] .fc-daygrid-day-number {
+        color: #cbd5e1 !important;
+    }
+    [data-bs-theme="dark"] .fc-day-today {
+        background: rgba(29, 184, 171, 0.12) !important;
+    }
+    [data-bs-theme="dark"] .fc-toolbar-title {
+        color: #f8fafc !important;
+    }
+    [data-bs-theme="dark"] .fc-button-primary {
+        background-color: #111a2d !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #cbd5e1 !important;
+    }
+    [data-bs-theme="dark"] .fc-button-primary:hover {
+        background-color: #162035 !important;
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .fc-button-primary:focus,
+    [data-bs-theme="dark"] .fc-button-primary:active,
+    [data-bs-theme="dark"] .fc-button-primary.fc-button-active {
+        background-color: #1db8ab !important;
+        border-color: #1db8ab !important;
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .post-type-pill {
+        background: #111a2d !important;
+        color: #cbd5e1 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    [data-bs-theme="dark"] .post-type-pill:hover {
+        background: #162035 !important;
+        color: #ffffff !important;
+    }
+    [data-bs-theme="dark"] .composer-platform-btn {
+        background: #111a2d !important;
+        color: #cbd5e1 !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    [data-bs-theme="dark"] .composer-platform-btn:hover {
+        background: #162035 !important;
+        border-color: rgba(255, 255, 255, 0.22) !important;
+    }
+    [data-bs-theme="dark"] .fc-popover {
+        background: #111a2d !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        color: #cbd5e1 !important;
+    }
+    [data-bs-theme="dark"] .fc-popover-header {
+        background: #0e1626 !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
+        color: #f8fafc !important;
+    }
 </style>
 @endpush
 
