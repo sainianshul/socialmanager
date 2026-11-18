@@ -147,6 +147,12 @@ class CommentManagementTest extends TestCase
             'ai_reply' => 'Yes, venue is City Community Center.',
         ]);
 
+        Http::fake([
+            'https://graph.facebook.com/v20.0/comment_888/comments' => Http::response([
+                'id' => 'reply_comment_999',
+            ], 200),
+        ]);
+
         $response = $this->actingAs($user)->post(route('admin.comments.approve', $comment->id));
 
         $response->assertRedirect();

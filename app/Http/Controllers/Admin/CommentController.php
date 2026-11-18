@@ -317,24 +317,38 @@ class CommentController extends Controller
     }
 
     /**
-     * Approve and mark an AI draft reply as ready or replied
+     * Approve and publish AI draft reply live to social platform
      */
-    public function approve(Request $request, Comment $comment)
+    public function approve(Request $request, Comment $comment, MetaCommentSyncService $syncService, YouTubeCommentSyncService $ytSyncService)
     {
         $this->authorizeComment($comment);
 
-        $updateData = [
-            'status' => Comment::STATUS_REPLIED,
-            'replied_at' => now(),
-        ];
+        $replyMessage = $request->filled('ai_reply') ? trim($request->input('ai_reply')) : $comment->ai_reply;
 
-        if ($request->filled('ai_reply')) {
-            $updateData['ai_reply'] = trim($request->input('ai_reply'));
+        if (empty($replyMessage)) {
+            $comment->update([
+                'status' => Comment::STATUS_REPLIED,
+                'replied_at' => now(),
+            ]);
+            return redirect()->back()->with('success', 'Comment marked as reviewed & replied.');
         }
 
-        $comment->update($updateData);
+        $account = $comment->account;
+        $platformName = 'Facebook';
 
-        return redirect()->back()->with('success', 'Comment marked as reviewed & replied.');
+        if ($account?->isYouTube()) {
+            $result = $ytSyncService->replyToComment($comment, $replyMessage);
+            $platformName = 'YouTube';
+        } else {
+            $result = $syncService->replyToComment($comment, $replyMessage);
+            $platformName = $account?->isInstagram() ? 'Instagram' : 'Facebook';
+        }
+
+        if (!$result['success']) {
+            return redirect()->back()->with('error', "Could not publish approved reply to {$platformName}: " . $result['message']);
+        }
+
+        return redirect()->back()->with('success', "AI reply successfully approved and published live to {$platformName}!");
     }
 
     /**
