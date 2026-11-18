@@ -36,7 +36,7 @@
         
         {{-- 1. CONNECTED CHANNELS --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
+            <a href="{{ route('admin.accounts.index') }}" class="card card-sm card-link text-decoration-none" title="View Connected Accounts">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -46,7 +46,7 @@
                         </div>
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">CHANNELS</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($channelsCount) }}</div>
+                            <div class="h2 mb-0 fw-bold text-body">{{ number_format($channelsCount) }}</div>
                         </div>
                         <div class="col-auto text-end">
                             <span class="badge bg-{{ $channelsCount > 0 ? 'success' : 'warning' }}-lt small fw-semibold">
@@ -55,12 +55,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         {{-- 2. TOTAL PUBLISHED POSTS --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
+            <a href="{{ route('admin.posts.facebook') }}" class="card card-sm card-link text-decoration-none" title="View Facebook Posts">
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-auto">
@@ -70,7 +70,7 @@
                         </div>
                         <div class="col">
                             <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL POSTS</div>
-                            <div class="h2 mb-0 fw-bold text-dark">{{ number_format($totalPosts) }}</div>
+                            <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalPosts) }}</div>
                         </div>
                         <div class="col-auto text-end">
                             <span class="badge bg-success-lt small fw-semibold">
@@ -79,7 +79,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </a>
         </div>
 
         {{-- 3. SCHEDULED POSTS (QUEUED) --}}
