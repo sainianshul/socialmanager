@@ -790,4 +790,102 @@ class SchedulePostManagementTest extends TestCase
         $this->assertSoftDeleted('scheduled_posts', ['id' => $post->id]);
         Storage::disk('public')->assertMissing($path);
     }
+
+    public function test_schedule_posts_store_multi_facebook_pages(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $fbPage1 = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_multi_1',
+            'name' => 'Main Brand Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $fbPage2 = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_multi_2',
+            'name' => 'Secondary Brand Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $scheduledTime = now()->addDays(3)->format('Y-m-d\TH:i');
+
+        $response = $this->actingAs($user)->post(route('admin.posts.schedule.store'), [
+            'account_ids' => [$fbPage1->id, $fbPage2->id],
+            'platform' => Account::TYPE_FACEBOOK,
+            'post_type' => 'text',
+            'content' => 'Multi-channel broadcast announcement across both pages.',
+            'publish_mode' => 'schedule',
+            'scheduled_at' => $scheduledTime,
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $fbPage1->id,
+            'content' => 'Multi-channel broadcast announcement across both pages.',
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $fbPage2->id,
+            'content' => 'Multi-channel broadcast announcement across both pages.',
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+    }
+
+    public function test_schedule_posts_cross_post_facebook_and_instagram(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $fbPage = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_cross_1',
+            'name' => 'City Council Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $igAccount = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_INSTAGRAM,
+            'meta_account_id' => 'ig_cross_2',
+            'name' => 'City Council IG',
+            'access_token' => 'mock_token',
+        ]);
+
+        Storage::fake('public');
+        $imageFile = UploadedFile::fake()->image('event.jpg', 800, 800);
+
+        $response = $this->actingAs($user)->post(route('admin.posts.schedule.store'), [
+            'account_ids' => [$fbPage->id, $igAccount->id],
+            'platform' => Account::TYPE_FACEBOOK,
+            'post_type' => 'photo',
+            'content' => 'Important civic update cross-posted to Facebook and Instagram.',
+            'media_files' => [$imageFile],
+            'publish_mode' => 'schedule',
+            'scheduled_at' => now()->addDays(2)->format('Y-m-d\TH:i'),
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $fbPage->id,
+            'platform' => Account::TYPE_FACEBOOK,
+            'content' => 'Important civic update cross-posted to Facebook and Instagram.',
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $igAccount->id,
+            'platform' => Account::TYPE_INSTAGRAM,
+            'content' => 'Important civic update cross-posted to Facebook and Instagram.',
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+    }
 }

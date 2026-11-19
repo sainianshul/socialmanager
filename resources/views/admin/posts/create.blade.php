@@ -86,6 +86,7 @@
             @csrf
             <input type="hidden" name="platform" id="selected-platform" value="{{ $initialPlatform }}">
             <input type="hidden" name="post_type" id="selected-post-type" value="{{ old('post_type', 'photo') }}">
+            <input type="hidden" name="account_id" id="composer-account-id-fallback" value="{{ old('account_id', $selectedAccountId) }}">
 
             <div class="card-body p-4">
                 {{-- Platform Selection Buttons --}}
@@ -119,22 +120,84 @@
 
                 {{-- Form Fields Container: Visible ONLY when the selected platform has connected accounts --}}
                 <div id="composer-form-fields">
-                    {{-- Target Account Selector --}}
+                    {{-- Target Account Selector (Multi-select for FB/IG, single for YT) --}}
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label fw-bold text-dark m-0" id="composer-account-label">Select Account</label>
+                            <label class="form-label fw-bold text-dark m-0" id="composer-account-label">Select Facebook Page(s)</label>
                             <a href="{{ route('admin.accounts.index') }}" target="_blank" class="text-secondary small">
                                 <i class="ti ti-plus me-1"></i>Manage Accounts
                             </a>
                         </div>
-                        <select name="account_id" class="form-select" id="composer-account-select" required>
-                            <option value="">-- Choose Account --</option>
-                            @foreach($accounts as $acc)
-                                <option value="{{ $acc->id }}" data-type="{{ $acc->account_type }}" {{ (old('account_id', $selectedAccountId) == $acc->id) ? 'selected' : '' }}>
-                                    [{{ $acc->account_type_name }}] {{ $acc->name }}
-                                </option>
-                            @endforeach
-                        </select>
+
+                        {{-- 1. Facebook Accounts Multi-Select Dropdown --}}
+                        <div id="fb-primary-account-container">
+                            <div class="dropdown custom-multi-select">
+                                <button class="form-select text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" id="fb-primary-dropdown-btn">
+                                    <span class="text-truncate text-dark" id="fb-primary-dropdown-label">-- Select Facebook Page(s) --</span>
+                                    <i class="ti ti-chevron-down text-secondary ms-2"></i>
+                                </button>
+                                <div class="dropdown-menu w-100 p-2 shadow-sm" style="max-height: 250px; overflow-y: auto;">
+                                    <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 border-bottom small">
+                                        <span class="text-muted fw-semibold">Facebook Pages</span>
+                                        <div>
+                                            <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-2" id="fb-select-all">Select all</button>
+                                            <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-secondary" id="fb-clear-all">Clear</button>
+                                        </div>
+                                    </div>
+                                    @foreach($accounts->where('account_type', \App\Models\Account::TYPE_FACEBOOK) as $acc)
+                                        <label class="dropdown-item d-flex align-items-center gap-2 cursor-pointer rounded py-1.5 px-2 mb-0">
+                                            <input type="checkbox" name="account_ids[]" value="{{ $acc->id }}"
+                                                   class="form-check-input m-0 fb-primary-checkbox"
+                                                   data-name="{{ $acc->name }}"
+                                                   {{ (old('account_id', $selectedAccountId) == $acc->id || (is_array(old('account_ids')) && in_array($acc->id, old('account_ids')))) ? 'checked' : '' }}>
+                                            <span class="avatar avatar-xs rounded bg-blue-lt text-blue"><i class="ti ti-brand-facebook"></i></span>
+                                            <span class="small fw-medium text-dark text-truncate">{{ $acc->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- 2. Instagram Accounts Multi-Select Dropdown --}}
+                        <div id="ig-primary-account-container" class="d-none">
+                            <div class="dropdown custom-multi-select">
+                                <button class="form-select text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" id="ig-primary-dropdown-btn">
+                                    <span class="text-truncate text-dark" id="ig-primary-dropdown-label">-- Select Instagram Account(s) --</span>
+                                    <i class="ti ti-chevron-down text-secondary ms-2"></i>
+                                </button>
+                                <div class="dropdown-menu w-100 p-2 shadow-sm" style="max-height: 250px; overflow-y: auto;">
+                                    <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 border-bottom small">
+                                        <span class="text-muted fw-semibold">Instagram Accounts</span>
+                                        <div>
+                                            <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-2" id="ig-select-all">Select all</button>
+                                            <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-secondary" id="ig-clear-all">Clear</button>
+                                        </div>
+                                    </div>
+                                    @foreach($accounts->where('account_type', \App\Models\Account::TYPE_INSTAGRAM) as $acc)
+                                        <label class="dropdown-item d-flex align-items-center gap-2 cursor-pointer rounded py-1.5 px-2 mb-0">
+                                            <input type="checkbox" name="account_ids[]" value="{{ $acc->id }}"
+                                                   class="form-check-input m-0 ig-primary-checkbox"
+                                                   data-name="{{ $acc->name }}"
+                                                   {{ (old('account_id', $selectedAccountId) == $acc->id || (is_array(old('account_ids')) && in_array($acc->id, old('account_ids')))) ? 'checked' : '' }} disabled>
+                                            <span class="avatar avatar-xs rounded bg-pink-lt text-pink"><i class="ti ti-brand-instagram"></i></span>
+                                            <span class="small fw-medium text-dark text-truncate">{{ $acc->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- 3. YouTube Account Dropdown --}}
+                        <div id="yt-primary-account-container" class="d-none">
+                            <select class="form-select" id="composer-yt-account-select">
+                                <option value="">-- Choose YouTube Channel --</option>
+                                @foreach($accounts->where('account_type', \App\Models\Account::TYPE_YOUTUBE) as $acc)
+                                    <option value="{{ $acc->id }}" {{ old('account_id', $selectedAccountId) == $acc->id ? 'selected' : '' }}>
+                                        [{{ $acc->account_type_name }}] {{ $acc->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
 
                     {{-- Meta Post Types (Facebook & Instagram) --}}
@@ -159,9 +222,103 @@
                     </div>
 
                     {{-- Meta Media Upload Area --}}
-                    <div id="meta-media-section" class="mb-4">
+                    <div id="meta-media-section" class="mb-3">
                         <label class="form-label fw-bold text-dark">Media Attachment</label>
                         <input type="file" name="media_files[]" class="form-control" id="composer-media-files" accept="image/*,video/*" multiple>
+                    </div>
+
+                    {{-- Cross-Posting Section (Directly under Media Attachment) --}}
+                    <div id="cross-posting-section" class="mb-4">
+                        {{-- 1. When on Facebook: "Also Post to Instagram" --}}
+                        <div id="cross-post-to-ig-container" class="card card-sm border bg-light-subtle p-3">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <label class="form-check form-switch m-0 d-flex align-items-center cursor-pointer">
+                                    <input class="form-check-input me-2" type="checkbox" id="check-cross-post-to-ig" {{ $igCount === 0 ? 'disabled' : '' }}>
+                                    <span class="form-check-label fw-bold text-dark d-flex align-items-center gap-1.5">
+                                        <i class="ti ti-brand-instagram text-pink fs-2"></i> Also Post to Instagram
+                                    </span>
+                                </label>
+                                @if($igCount === 0)
+                                    <span class="text-secondary small">No connected Instagram accounts (<a href="{{ route('admin.accounts.index') }}" target="_blank">Connect</a>)</span>
+                                @endif
+                            </div>
+
+                            {{-- Instagram Accounts Multi-Select (expands when switch is checked) --}}
+                            <div id="cross-post-ig-accounts-box" class="mt-3 ps-4 d-none">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Select Instagram Account(s)</label>
+                                <div class="dropdown custom-multi-select">
+                                    <button class="form-select text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" id="cross-ig-dropdown-btn">
+                                        <span class="text-truncate text-dark" id="cross-ig-dropdown-label">-- Select Instagram Account(s) --</span>
+                                        <i class="ti ti-chevron-down text-secondary ms-2"></i>
+                                    </button>
+                                    <div class="dropdown-menu w-100 p-2 shadow-sm" style="max-height: 200px; overflow-y: auto;">
+                                        <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 border-bottom small">
+                                            <span class="text-muted fw-semibold">Instagram Accounts</span>
+                                            <div>
+                                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-2" id="cross-ig-select-all">Select all</button>
+                                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-secondary" id="cross-ig-clear-all">Clear</button>
+                                            </div>
+                                        </div>
+                                        @foreach($accounts->where('account_type', \App\Models\Account::TYPE_INSTAGRAM) as $acc)
+                                            <label class="dropdown-item d-flex align-items-center gap-2 cursor-pointer rounded py-1.5 px-2 mb-0">
+                                                <input type="checkbox" name="account_ids[]" value="{{ $acc->id }}"
+                                                       class="form-check-input m-0 cross-ig-checkbox"
+                                                       data-name="{{ $acc->name }}" disabled>
+                                                <span class="avatar avatar-xs rounded bg-pink-lt text-pink"><i class="ti ti-brand-instagram"></i></span>
+                                                <span class="small fw-medium text-dark text-truncate">{{ $acc->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="form-text text-muted small mt-1">
+                                    <i class="ti ti-info-circle me-1"></i>Photos or video attachments are required when cross-posting to Instagram.
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- 2. When on Instagram: "Also Post to Facebook" --}}
+                        <div id="cross-post-to-fb-container" class="card card-sm border bg-light-subtle p-3 d-none">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                <label class="form-check form-switch m-0 d-flex align-items-center cursor-pointer">
+                                    <input class="form-check-input me-2" type="checkbox" id="check-cross-post-to-fb" {{ $fbCount === 0 ? 'disabled' : '' }}>
+                                    <span class="form-check-label fw-bold text-dark d-flex align-items-center gap-1.5">
+                                        <i class="ti ti-brand-facebook text-blue fs-2"></i> Also Post to Facebook
+                                    </span>
+                                </label>
+                                @if($fbCount === 0)
+                                    <span class="text-secondary small">No connected Facebook Pages (<a href="{{ route('admin.accounts.index') }}" target="_blank">Connect</a>)</span>
+                                @endif
+                            </div>
+
+                            {{-- Facebook Accounts Multi-Select (expands when switch is checked) --}}
+                            <div id="cross-post-fb-accounts-box" class="mt-3 ps-4 d-none">
+                                <label class="form-label small fw-semibold text-secondary mb-1">Select Facebook Page(s)</label>
+                                <div class="dropdown custom-multi-select">
+                                    <button class="form-select text-start d-flex justify-content-between align-items-center" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" id="cross-fb-dropdown-btn">
+                                        <span class="text-truncate text-dark" id="cross-fb-dropdown-label">-- Select Facebook Page(s) --</span>
+                                        <i class="ti ti-chevron-down text-secondary ms-2"></i>
+                                    </button>
+                                    <div class="dropdown-menu w-100 p-2 shadow-sm" style="max-height: 200px; overflow-y: auto;">
+                                        <div class="d-flex justify-content-between align-items-center px-2 py-1 mb-1 border-bottom small">
+                                            <span class="text-muted fw-semibold">Facebook Pages</span>
+                                            <div>
+                                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 me-2" id="cross-fb-select-all">Select all</button>
+                                                <button type="button" class="btn btn-link btn-sm text-decoration-none p-0 text-secondary" id="cross-fb-clear-all">Clear</button>
+                                            </div>
+                                        </div>
+                                        @foreach($accounts->where('account_type', \App\Models\Account::TYPE_FACEBOOK) as $acc)
+                                            <label class="dropdown-item d-flex align-items-center gap-2 cursor-pointer rounded py-1.5 px-2 mb-0">
+                                                <input type="checkbox" name="account_ids[]" value="{{ $acc->id }}"
+                                                       class="form-check-input m-0 cross-fb-checkbox"
+                                                       data-name="{{ $acc->name }}" disabled>
+                                                <span class="avatar avatar-xs rounded bg-blue-lt text-blue"><i class="ti ti-brand-facebook"></i></span>
+                                                <span class="small fw-medium text-dark text-truncate">{{ $acc->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {{-- YouTube Dedicated Fields --}}
@@ -202,8 +359,8 @@
                                 <label class="form-label required fw-bold text-dark">Privacy Status</label>
                                 <select name="privacy_status" class="form-select" id="youtube-privacy-status">
                                     <option value="public" {{ old('privacy_status', 'public') == 'public' ? 'selected' : '' }}>Public</option>
-                                    <option value="unlisted" {{ old('privacy_status') == 'unlisted' ? 'selected' : '' }}>Unlisted</option>
-                                    <option value="private" {{ old('privacy_status') == 'private' ? 'selected' : '' }}>Private</option>
+                                    <option value="unlisted" {{ old('privacy_status', 'unlisted') == 'unlisted' ? 'selected' : '' }}>Unlisted</option>
+                                    <option value="private" {{ old('privacy_status', 'private') == 'private' ? 'selected' : '' }}>Private</option>
                                 </select>
                             </div>
                         </div>
@@ -308,6 +465,13 @@
         color: #ffffff;
         border-color: #1db8ab;
     }
+    .custom-multi-select .dropdown-item:hover {
+        background-color: #f1f5f9;
+    }
+    .custom-multi-select .dropdown-item:active {
+        background-color: inherit;
+        color: inherit;
+    }
     [data-bs-theme="dark"] .composer-platform-btn {
         background: #111a2d !important;
         color: #cbd5e1 !important;
@@ -326,6 +490,13 @@
     [data-bs-theme="dark"] .post-type-pill:hover {
         background: #162035 !important;
         color: #f8fafc !important;
+    }
+    [data-bs-theme="dark"] .custom-multi-select .dropdown-menu {
+        background: #111a2d;
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+    [data-bs-theme="dark"] .custom-multi-select .dropdown-item:hover {
+        background-color: #1e293b;
     }
 </style>
 @endpush
@@ -362,6 +533,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let currentPlatform = parseInt($('#selected-platform').val()) || 1;
 
+    // Helper: update dropdown label based on checked checkboxes
+    function updateMultiSelectLabel(checkboxSelector, labelSelector, defaultText, singularName) {
+        let checked = $(checkboxSelector + ':checked');
+        let count = checked.length;
+        if (count === 0) {
+            $(labelSelector).text(defaultText).removeClass('fw-semibold').addClass('text-secondary');
+        } else if (count === 1) {
+            $(labelSelector).text(checked.first().data('name')).removeClass('text-secondary').addClass('fw-semibold');
+        } else if (count <= 3) {
+            let names = [];
+            checked.each(function () { names.push($(this).data('name')); });
+            $(labelSelector).text(count + ' ' + singularName + 's (' + names.join(', ') + ')').removeClass('text-secondary').addClass('fw-semibold');
+        } else {
+            $(labelSelector).text(count + ' ' + singularName + 's selected').removeClass('text-secondary').addClass('fw-semibold');
+        }
+        updateFallbackAndButton();
+    }
+
+    function updateFallbackAndButton() {
+        // Collect first valid account id for single fallback
+        let firstChecked = $('input[name="account_ids[]"]:enabled:checked').first().val();
+        if (currentPlatform === 3) {
+            firstChecked = $('#composer-yt-account-select').val();
+        }
+        $('#composer-account-id-fallback').val(firstChecked || '');
+
+        updateSubmitButton();
+    }
+
+    // Apply platform switch (Facebook / Instagram / YouTube)
     function applyPlatform(platform) {
         currentPlatform = parseInt(platform);
         $('#selected-platform').val(currentPlatform);
@@ -376,64 +577,36 @@ document.addEventListener('DOMContentLoaded', function () {
         const config = platformConfig[currentPlatform] || platformConfig[1];
 
         if (availableCount === 0) {
-            // HIDE form fields and card footer submit button
             $('#composer-form-fields').addClass('d-none');
             $('#composer-card-footer').addClass('d-none');
 
-            // Populate and SHOW empty state
             $('#no-account-title').text(config.emptyTitle);
             $('#no-account-desc').text(config.emptyDesc);
             $('#no-account-btn-text').text(config.connectBtnText);
             $('#no-account-state').removeClass('d-none');
 
-            // Remove required flags so they don't block anything
-            $('#composer-account-select').prop('required', false);
             $('#youtube-title').prop('required', false);
             $('#youtube-video-file').prop('required', false);
             $('#composer-scheduled-at').prop('required', false);
             return;
         }
 
-        // Available count > 0: SHOW form fields and card footer, HIDE empty state
         $('#no-account-state').addClass('d-none');
         $('#composer-form-fields').removeClass('d-none');
         $('#composer-card-footer').removeClass('d-none');
-        $('#composer-account-select').prop('required', true);
 
-        // Filter account selector options
-        let currentSelectedAcc = $('#composer-account-select').val();
-        let selectedStillValid = false;
+        // Platform-specific UI layout
+        if (currentPlatform === 1) { // Facebook
+            $('#composer-account-label').text('Select Facebook Page(s)');
+            $('#fb-primary-account-container').removeClass('d-none');
+            $('.fb-primary-checkbox').prop('disabled', false);
 
-        $('#composer-account-select option').each(function () {
-            let type = parseInt($(this).data('type'));
-            if (!type) return; // Keep the placeholder
+            $('#ig-primary-account-container').addClass('d-none');
+            $('.ig-primary-checkbox').prop('disabled', true);
 
-            if (type === currentPlatform) {
-                $(this).show();
-                if ($(this).val() == currentSelectedAcc) {
-                    selectedStillValid = true;
-                }
-            } else {
-                $(this).hide();
-            }
-        });
+            $('#yt-primary-account-container').addClass('d-none');
 
-        if (!selectedStillValid) {
-            let firstValid = $('#composer-account-select option[data-type="' + currentPlatform + '"]').first().val();
-            $('#composer-account-select').val(firstValid || '');
-        }
-
-        // Toggle UI Sections based on platform
-        if (currentPlatform === 3) { // YouTube
-            $('#meta-post-types-section').addClass('d-none');
-            $('#meta-content-section').addClass('d-none');
-            $('#meta-media-section').addClass('d-none');
-            $('#youtube-fields-section').removeClass('d-none');
-            $('#youtube-title').prop('required', true);
-            $('#youtube-video-file').prop('required', $('#radio-mode-now').is(':checked') || $('#radio-mode-schedule').is(':checked'));
-            $('#composer-media-files').prop('required', false);
-            $('#composer-account-label').text('Select YouTube Channel');
-        } else { // Meta (Facebook / Instagram)
+            // Show Meta sections
             $('#meta-post-types-section').removeClass('d-none');
             $('#meta-content-section').removeClass('d-none');
             $('#meta-media-section').removeClass('d-none');
@@ -441,24 +614,174 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#youtube-title').prop('required', false);
             $('#youtube-video-file').prop('required', false);
 
-            if (currentPlatform === 2) { // Instagram
-                $('#pill-type-text').hide();
-                $('#pill-type-reel').show();
-                if ($('#selected-post-type').val() === 'text') {
-                    $('#selected-post-type').val('photo');
-                    $('.post-type-pill').removeClass('active');
-                    $('.post-type-pill[data-type="photo"]').addClass('active');
-                }
-                $('#composer-account-label').text('Select Instagram Account');
-            } else { // Facebook
-                $('#pill-type-text').show();
-                $('#pill-type-reel').hide();
-                $('#composer-account-label').text('Select Facebook Page');
+            // Cross-posting: Show "Also Post to Instagram", hide "Also Post to Facebook"
+            $('#cross-posting-section').removeClass('d-none');
+            $('#cross-post-to-ig-container').removeClass('d-none');
+            $('#cross-post-to-fb-container').addClass('d-none');
+
+            // Uncheck cross FB
+            $('#check-cross-post-to-fb').prop('checked', false);
+            $('#cross-post-fb-accounts-box').addClass('d-none');
+            $('.cross-fb-checkbox').prop('checked', false).prop('disabled', true);
+
+            // Post type pills
+            $('#pill-type-text').show();
+            $('#pill-type-reel').hide();
+
+            // Auto-check first FB page if none checked
+            if ($('.fb-primary-checkbox:checked').length === 0) {
+                $('.fb-primary-checkbox').first().prop('checked', true);
             }
+            updateMultiSelectLabel('.fb-primary-checkbox', '#fb-primary-dropdown-label', '-- Select Facebook Page(s) --', 'Page');
+
+        } else if (currentPlatform === 2) { // Instagram
+            $('#composer-account-label').text('Select Instagram Account(s)');
+            $('#ig-primary-account-container').removeClass('d-none');
+            $('.ig-primary-checkbox').prop('disabled', false);
+
+            $('#fb-primary-account-container').addClass('d-none');
+            $('.fb-primary-checkbox').prop('disabled', true);
+
+            $('#yt-primary-account-container').addClass('d-none');
+
+            // Show Meta sections
+            $('#meta-post-types-section').removeClass('d-none');
+            $('#meta-content-section').removeClass('d-none');
+            $('#meta-media-section').removeClass('d-none');
+            $('#youtube-fields-section').addClass('d-none');
+            $('#youtube-title').prop('required', false);
+            $('#youtube-video-file').prop('required', false);
+
+            // Cross-posting: Show "Also Post to Facebook", hide "Also Post to Instagram"
+            $('#cross-posting-section').removeClass('d-none');
+            $('#cross-post-to-fb-container').removeClass('d-none');
+            $('#cross-post-to-ig-container').addClass('d-none');
+
+            // Uncheck cross IG
+            $('#check-cross-post-to-ig').prop('checked', false);
+            $('#cross-post-ig-accounts-box').addClass('d-none');
+            $('.cross-ig-checkbox').prop('checked', false).prop('disabled', true);
+
+            // Post type pills: Instagram requires media (no text-only)
+            $('#pill-type-text').hide();
+            $('#pill-type-reel').show();
+            if ($('#selected-post-type').val() === 'text') {
+                $('#selected-post-type').val('photo');
+                $('.post-type-pill').removeClass('active');
+                $('.post-type-pill[data-type="photo"]').addClass('active');
+            }
+
+            // Auto-check first IG account if none checked
+            if ($('.ig-primary-checkbox:checked').length === 0) {
+                $('.ig-primary-checkbox').first().prop('checked', true);
+            }
+            updateMultiSelectLabel('.ig-primary-checkbox', '#ig-primary-dropdown-label', '-- Select Instagram Account(s) --', 'Account');
+
+        } else if (currentPlatform === 3) { // YouTube
+            $('#composer-account-label').text('Select YouTube Channel');
+            $('#yt-primary-account-container').removeClass('d-none');
+            $('#fb-primary-account-container').addClass('d-none');
+            $('#ig-primary-account-container').addClass('d-none');
+            $('.fb-primary-checkbox').prop('disabled', true);
+            $('.ig-primary-checkbox').prop('disabled', true);
+
+            // Hide Meta sections and cross-posting
+            $('#meta-post-types-section').addClass('d-none');
+            $('#meta-content-section').addClass('d-none');
+            $('#meta-media-section').addClass('d-none');
+            $('#cross-posting-section').addClass('d-none');
+
+            // Show YouTube sections
+            $('#youtube-fields-section').removeClass('d-none');
+            $('#youtube-title').prop('required', true);
+            $('#youtube-video-file').prop('required', $('#radio-mode-now').is(':checked') || $('#radio-mode-schedule').is(':checked'));
+            $('#composer-media-files').prop('required', false);
+
+            if (!$('#composer-yt-account-select').val()) {
+                $('#composer-yt-account-select option[value!=""]').first().prop('selected', true);
+            }
+            updateFallbackAndButton();
         }
 
         updateSubmitButton();
     }
+
+    // 1. Primary Facebook Checkboxes change
+    $(document).on('change', '.fb-primary-checkbox', function () {
+        updateMultiSelectLabel('.fb-primary-checkbox', '#fb-primary-dropdown-label', '-- Select Facebook Page(s) --', 'Page');
+    });
+    $('#fb-select-all').on('click', function () {
+        $('.fb-primary-checkbox').prop('checked', true).trigger('change');
+    });
+    $('#fb-clear-all').on('click', function () {
+        $('.fb-primary-checkbox').prop('checked', false).trigger('change');
+    });
+
+    // 2. Primary Instagram Checkboxes change
+    $(document).on('change', '.ig-primary-checkbox', function () {
+        updateMultiSelectLabel('.ig-primary-checkbox', '#ig-primary-dropdown-label', '-- Select Instagram Account(s) --', 'Account');
+    });
+    $('#ig-select-all').on('click', function () {
+        $('.ig-primary-checkbox').prop('checked', true).trigger('change');
+    });
+    $('#ig-clear-all').on('click', function () {
+        $('.ig-primary-checkbox').prop('checked', false).trigger('change');
+    });
+
+    // 3. YouTube Select change
+    $('#composer-yt-account-select').on('change', function () {
+        updateFallbackAndButton();
+    });
+
+    // 4. "Also Post to Instagram" switch toggle (on FB tab)
+    $('#check-cross-post-to-ig').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#cross-post-ig-accounts-box').removeClass('d-none');
+            $('.cross-ig-checkbox').prop('disabled', false);
+            if ($('.cross-ig-checkbox:checked').length === 0) {
+                $('.cross-ig-checkbox').first().prop('checked', true);
+            }
+            updateMultiSelectLabel('.cross-ig-checkbox', '#cross-ig-dropdown-label', '-- Select Instagram Account(s) --', 'Account');
+        } else {
+            $('#cross-post-ig-accounts-box').addClass('d-none');
+            $('.cross-ig-checkbox').prop('checked', false).prop('disabled', true);
+            updateMultiSelectLabel('.cross-ig-checkbox', '#cross-ig-dropdown-label', '-- Select Instagram Account(s) --', 'Account');
+        }
+    });
+    $(document).on('change', '.cross-ig-checkbox', function () {
+        updateMultiSelectLabel('.cross-ig-checkbox', '#cross-ig-dropdown-label', '-- Select Instagram Account(s) --', 'Account');
+    });
+    $('#cross-ig-select-all').on('click', function () {
+        $('.cross-ig-checkbox').prop('checked', true).trigger('change');
+    });
+    $('#cross-ig-clear-all').on('click', function () {
+        $('.cross-ig-checkbox').prop('checked', false).trigger('change');
+    });
+
+    // 5. "Also Post to Facebook" switch toggle (on IG tab)
+    $('#check-cross-post-to-fb').on('change', function () {
+        if ($(this).is(':checked')) {
+            $('#cross-post-fb-accounts-box').removeClass('d-none');
+            $('.cross-fb-checkbox').prop('disabled', false);
+            if ($('.cross-fb-checkbox:checked').length === 0) {
+                $('.cross-fb-checkbox').first().prop('checked', true);
+            }
+            updateMultiSelectLabel('.cross-fb-checkbox', '#cross-fb-dropdown-label', '-- Select Facebook Page(s) --', 'Page');
+        } else {
+            $('#cross-post-fb-accounts-box').addClass('d-none');
+            $('.cross-fb-checkbox').prop('checked', false).prop('disabled', true);
+            updateMultiSelectLabel('.cross-fb-checkbox', '#cross-fb-dropdown-label', '-- Select Facebook Page(s) --', 'Page');
+        }
+    });
+    $(document).on('change', '.cross-fb-checkbox', function () {
+        updateMultiSelectLabel('.cross-fb-checkbox', '#cross-fb-dropdown-label', '-- Select Facebook Page(s) --', 'Page');
+    });
+    $('#cross-fb-select-all').on('click', function () {
+        $('.cross-fb-checkbox').prop('checked', true).trigger('change');
+    });
+    $('#cross-fb-clear-all').on('click', function () {
+        $('.cross-fb-checkbox').prop('checked', false).trigger('change');
+    });
 
     // Platform button click handler
     $('.composer-platform-btn').on('click', function () {
@@ -494,16 +817,59 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateSubmitButton() {
         let mode = $('input[name="publish_mode"]:checked').val();
-        let platformName = currentPlatform === 3 ? 'YouTube Video' : (currentPlatform === 2 ? 'Instagram Post' : 'Facebook Post');
+        let totalCount = $('input[name="account_ids[]"]:enabled:checked').length;
+        if (currentPlatform === 3) {
+            totalCount = $('#composer-yt-account-select').val() ? 1 : 0;
+        }
+
+        let targetText = totalCount > 1 ? totalCount + ' Accounts' : (currentPlatform === 3 ? 'YouTube Video' : 'Post');
 
         if (mode === 'now') {
-            $('#btn-submit-post').html('<i class="ti ti-send me-1.5"></i>Publish ' + platformName + ' Now');
+            $('#btn-submit-post').html('<i class="ti ti-send me-1.5"></i>Publish to ' + targetText + ' Now');
         } else if (mode === 'draft') {
-            $('#btn-submit-post').html('<i class="ti ti-file-pencil me-1.5"></i>Save Draft');
+            $('#btn-submit-post').html('<i class="ti ti-file-pencil me-1.5"></i>Save Draft (' + targetText + ')');
         } else {
-            $('#btn-submit-post').html('<i class="ti ti-calendar-check me-1.5"></i>Schedule ' + platformName);
+            $('#btn-submit-post').html('<i class="ti ti-calendar-check me-1.5"></i>Schedule for ' + targetText);
         }
     }
+
+    // Form Submission Validation
+    $('#form-create-post').on('submit', function (e) {
+        if (currentPlatform === 3) {
+            if (!$('#composer-yt-account-select').val()) {
+                e.preventDefault();
+                alert('Please select a YouTube channel.');
+                return false;
+            }
+            // Populate fallback
+            $('#composer-account-id-fallback').val($('#composer-yt-account-select').val());
+        } else {
+            let selectedCount = $('input[name="account_ids[]"]:enabled:checked').length;
+            if (selectedCount === 0) {
+                e.preventDefault();
+                alert('Please select at least one account to post to.');
+                return false;
+            }
+
+            // If Instagram is involved, verify media unless draft
+            let hasInstagram = false;
+            if (currentPlatform === 2) hasInstagram = true;
+            if ($('#check-cross-post-to-ig').is(':checked') && $('.cross-ig-checkbox:checked').length > 0) {
+                hasInstagram = true;
+            }
+
+            let mode = $('input[name="publish_mode"]:checked').val();
+            if (hasInstagram && mode !== 'draft') {
+                let mediaInput = document.getElementById('composer-media-files');
+                if (!mediaInput || !mediaInput.files || mediaInput.files.length === 0) {
+                    e.preventDefault();
+                    alert('Instagram requires at least one photo or video attachment.');
+                    $('#composer-media-files').focus();
+                    return false;
+                }
+            }
+        }
+    });
 
     // Live character counters
     $('#composer-content').on('input', function () {
