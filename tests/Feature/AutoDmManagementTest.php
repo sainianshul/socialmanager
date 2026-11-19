@@ -26,9 +26,9 @@ class AutoDmManagementTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.auto-dm.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Auto DM (Comment-to-Inbox)');
+        $response->assertSee('Auto DM Rules');
         $response->assertSee('No Auto DM Rules Found');
-        $response->assertSee('Create Auto DM Rule');
+        $response->assertSee('Create Rule');
     }
 
     public function test_auto_dm_index_renders_rules_belonging_to_user(): void
@@ -78,6 +78,52 @@ class AutoDmManagementTest extends TestCase
         $response->assertSee('User Ebook Campaign');
         $response->assertSee('User FB Page');
         $response->assertDontSee('Secret Other Rule');
+    }
+
+    public function test_user_can_view_create_page(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => '111222',
+            'name' => 'User FB Page',
+            'access_token' => 'token1',
+        ]);
+
+        $response = $this->actingAs($user)->get(route('admin.auto-dm.create'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Create Auto DM Rule');
+        $response->assertSee('User FB Page');
+    }
+
+    public function test_user_can_view_edit_page(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => '111222',
+            'name' => 'User FB Page',
+            'access_token' => 'token1',
+        ]);
+
+        $rule = AutoDmRule::create([
+            'user_id' => $user->id,
+            'account_id' => $account->id,
+            'name' => 'My Existing Rule',
+            'keywords' => ['price', 'cost'],
+            'match_type' => 'contains',
+            'dm_message' => 'Price is $50',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('admin.auto-dm.edit', $rule->id));
+
+        $response->assertStatus(200);
+        $response->assertSee('Edit Auto DM Rule');
+        $response->assertSee('My Existing Rule');
     }
 
     public function test_user_can_create_auto_dm_rule_for_all_posts(): void

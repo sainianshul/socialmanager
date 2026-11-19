@@ -57,22 +57,29 @@ class AutoDmController extends Controller
 
         $rules = $rulesQuery->paginate(15)->withQueryString();
 
-        // Summary stats
-        $statsQuery = AutoDmRule::query();
-        if (!$user->isAdmin()) {
-            $statsQuery->where('user_id', $user->id);
-        }
-        $totalRules = (clone $statsQuery)->count();
-        $activeRules = (clone $statsQuery)->where('is_active', true)->count();
-        $totalTriggered = (clone $statsQuery)->sum('trigger_count');
+        return view('admin.auto_dm.index', compact('rules', 'accounts'));
+    }
 
-        return view('admin.auto_dm.index', compact(
-            'rules',
-            'accounts',
-            'totalRules',
-            'activeRules',
-            'totalTriggered'
-        ));
+    /**
+     * Show form to create a new Auto DM rule
+     */
+    public function create(Request $request)
+    {
+        $user = auth()->user();
+
+        $accountsQuery = Account::whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM])->orderBy('name');
+        if (!$user->isAdmin()) {
+            $accountsQuery->where('user_id', $user->id);
+        }
+        $accounts = $accountsQuery->get();
+
+        $selectedAccountId = (int) $request->get('account_id', old('account_id', $accounts->first()?->id));
+        $posts = collect();
+        if ($selectedAccountId) {
+            $posts = Post::where('account_id', $selectedAccountId)->latest('published_at')->limit(50)->get();
+        }
+
+        return view('admin.auto_dm.create', compact('accounts', 'selectedAccountId', 'posts'));
     }
 
     /**
@@ -134,27 +141,40 @@ class AutoDmController extends Controller
     }
 
     /**
-     * Return rule details for edit modal
+     * Show form to edit an existing Auto DM rule (or return JSON if requested)
      */
-    public function edit(AutoDmRule $autoDmRule)
+    public function edit(Request $request, AutoDmRule $autoDmRule)
     {
         $this->authorizeRule($autoDmRule);
 
-        return response()->json([
-            'success' => true,
-            'rule' => [
-                'id' => $autoDmRule->id,
-                'name' => $autoDmRule->name,
-                'account_id' => $autoDmRule->account_id,
-                'post_id' => $autoDmRule->post_id,
-                'target_type' => $autoDmRule->post_id ? 'specific' : 'all',
-                'keywords_string' => is_array($autoDmRule->keywords) ? implode(', ', $autoDmRule->keywords) : '',
-                'match_type' => $autoDmRule->match_type,
-                'dm_message' => $autoDmRule->dm_message,
-                'public_reply' => $autoDmRule->public_reply ?? '',
-                'is_active' => (bool) $autoDmRule->is_active,
-            ]
-        ]);
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'rule' => [
+                    'id' => $autoDmRule->id,
+                    'name' => $autoDmRule->name,
+                    'account_id' => $autoDmRule->account_id,
+                    'post_id' => $autoDmRule->post_id,
+                    'target_type' => $autoDmRule->post_id ? 'specific' : 'all',
+                    'keywords_string' => is_array($autoDmRule->keywords) ? implode(', ', $autoDmRule->keywords) : '',
+                    'match_type' => $autoDmRule->match_type,
+                    'dm_message' => $autoDmRule->dm_message,
+                    'public_reply' => $autoDmRule->public_reply ?? '',
+                    'is_active' => (bool) $autoDmRule->is_active,
+                ]
+            ]);
+        }
+
+        $user = auth()->user();
+        $accountsQuery = Account::whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM])->orderBy('name');
+        if (!$user->isAdmin()) {
+            $accountsQuery->where('user_id', $user->id);
+        }
+        $accounts = $accountsQuery->get();
+
+        $posts = Post::where('account_id', $autoDmRule->account_id)->latest('published_at')->limit(50)->get();
+
+        return view('admin.auto_dm.edit', compact('autoDmRule', 'accounts', 'posts'));
     }
 
     /**
