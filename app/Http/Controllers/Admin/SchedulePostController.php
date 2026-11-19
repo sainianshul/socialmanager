@@ -198,13 +198,38 @@ class SchedulePostController extends Controller
 
             $thumbnail = $post->thumbnail_path ? Storage::url($post->thumbnail_path) : $post->first_media_url;
 
+            // Status-driven colors for high contrast and readability
+            $eventBgColor = match ($post->status) {
+                ScheduledPost::STATUS_PUBLISHED  => '#ecfdf5',
+                ScheduledPost::STATUS_FAILED     => '#fef2f2',
+                ScheduledPost::STATUS_PUBLISHING => '#fffbeb',
+                ScheduledPost::STATUS_DRAFT      => '#f8fafc',
+                default                          => '#eff6ff', // Scheduled
+            };
+
+            $eventBorderColor = match ($post->status) {
+                ScheduledPost::STATUS_PUBLISHED  => '#86efac',
+                ScheduledPost::STATUS_FAILED     => '#fca5a5',
+                ScheduledPost::STATUS_PUBLISHING => '#fde68a',
+                ScheduledPost::STATUS_DRAFT      => '#cbd5e1',
+                default                          => '#93c5fd', // Scheduled
+            };
+
+            $eventTextColor = match ($post->status) {
+                ScheduledPost::STATUS_PUBLISHED  => '#064e3b', // Rich Dark Green
+                ScheduledPost::STATUS_FAILED     => '#7f1d1d', // Deep Dark Red
+                ScheduledPost::STATUS_PUBLISHING => '#92400e', // Dark Amber
+                ScheduledPost::STATUS_DRAFT      => '#475569', // Dark Slate
+                default                          => '#0f2d59', // Deep Dark Blue (Scheduled)
+            };
+
             return [
                 'id'              => (string) $post->id,
                 'title'           => $title,
                 'start'           => $post->scheduled_at->toIso8601String(),
                 'backgroundColor' => $platformColor,
                 'borderColor'     => $platformColor,
-                'textColor'       => '#ffffff',
+                'textColor'       => $eventTextColor,
                 'extendedProps'   => [
                     'account_name'    => $account->name,
                     'account_type'    => $account->account_type_name,

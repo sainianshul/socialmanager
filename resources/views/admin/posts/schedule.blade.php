@@ -53,31 +53,46 @@
         filter: brightness(1.02);
     }
 
-    /* Status-based Calendar Event Styling */
+    /* Status-based Calendar Event Styling (High Contrast & Legibility) */
     .fc-event-published {
         background-color: #ecfdf5 !important;
-        border-color: #a7f3d0 !important;
-        color: #065f46 !important;
+        border-color: #86efac !important;
+        color: #064e3b !important;
+    }
+    .fc-event-published .fc-event-custom,
+    .fc-event-published .fc-event-title-text,
+    .fc-event-published .fc-event-time-text {
+        color: #064e3b !important;
     }
     .fc-event-published:hover {
         background-color: #d1fae5 !important;
-        border-color: #6ee7b7 !important;
+        border-color: #34d399 !important;
     }
 
     .fc-event-scheduled {
         background-color: #eff6ff !important;
-        border-color: #bfdbfe !important;
-        color: #1e40af !important;
+        border-color: #93c5fd !important;
+        color: #0f2d59 !important;
+    }
+    .fc-event-scheduled .fc-event-custom,
+    .fc-event-scheduled .fc-event-title-text,
+    .fc-event-scheduled .fc-event-time-text {
+        color: #0f2d59 !important;
     }
     .fc-event-scheduled:hover {
         background-color: #dbeafe !important;
-        border-color: #93c5fd !important;
+        border-color: #60a5fa !important;
     }
 
     .fc-event-failed {
         background-color: #fef2f2 !important;
-        border-color: #fecaca !important;
-        color: #991b1b !important;
+        border-color: #fca5a5 !important;
+        color: #7f1d1d !important;
+    }
+    .fc-event-failed .fc-event-custom,
+    .fc-event-failed .fc-event-title-text,
+    .fc-event-failed .fc-event-time-text {
+        color: #7f1d1d !important;
     }
     .fc-event-failed:hover {
         background-color: #fee2e2 !important;
@@ -908,40 +923,53 @@
                         statusTitle = 'Draft';
                     }
 
+                    // Determine text color based on status for maximum contrast
+                    let textColor = '#0f2d59'; // Deep Dark Navy (Scheduled)
+                    if (status === 3) {
+                        textColor = '#064e3b'; // Rich Dark Green (Published / Uploaded)
+                    } else if (status === 4) {
+                        textColor = '#7f1d1d'; // Deep Dark Red (Failed)
+                    } else if (status === 2) {
+                        textColor = '#92400e'; // Dark Amber (Publishing)
+                    } else if (status === 0) {
+                        textColor = '#334155'; // Dark Slate (Draft)
+                    }
+
                     let container = document.createElement('div');
                     container.className = 'fc-event-custom d-flex align-items-center w-100 text-truncate px-1 py-0.5';
                     container.style.cursor = 'pointer';
-                    container.style.fontSize = '0.76rem';
+                    container.style.fontSize = '0.78rem';
                     container.style.fontWeight = '500';
 
                     // 1. Platform Icon in its official brand color
                     let icon = document.createElement('i');
                     icon.className = platformIcon + ' me-1 flex-shrink-0';
-                    icon.style.color = platformColor;
-                    icon.style.fontSize = '0.9rem';
+                    icon.style.setProperty('color', platformColor, 'important');
+                    icon.style.fontSize = '0.92rem';
                     container.appendChild(icon);
 
                     // 2. Scheduled Time
                     if (time) {
                         let timeEl = document.createElement('span');
-                        timeEl.className = 'fw-bold me-1 flex-shrink-0 font-monospace';
+                        timeEl.className = 'fc-event-time-text fw-bold me-1 flex-shrink-0 font-monospace';
                         timeEl.style.fontSize = '0.72rem';
-                        timeEl.style.opacity = '0.85';
+                        timeEl.style.setProperty('color', textColor, 'important');
                         timeEl.innerText = time;
                         container.appendChild(timeEl);
                     }
 
                     // 3. Title text
                     let textEl = document.createElement('span');
-                    textEl.className = 'text-truncate flex-grow-1';
+                    textEl.className = 'fc-event-title-text text-truncate flex-grow-1 fw-semibold';
+                    textEl.style.setProperty('color', textColor, 'important');
                     textEl.innerText = title;
                     container.appendChild(textEl);
 
                     // 4. Status Indicator icon
                     let sIcon = document.createElement('i');
                     sIcon.className = statusIcon + ' ms-1 flex-shrink-0';
-                    sIcon.style.color = statusColor;
-                    sIcon.style.fontSize = '0.8rem';
+                    sIcon.style.setProperty('color', statusColor, 'important');
+                    sIcon.style.fontSize = '0.82rem';
                     sIcon.title = statusTitle;
                     container.appendChild(sIcon);
 
