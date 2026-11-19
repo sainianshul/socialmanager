@@ -4,7 +4,9 @@ namespace App\Jobs;
 
 use App\Contracts\AIServiceInterface;
 use App\Models\Account;
+use App\Models\AutoDmRule;
 use App\Models\Comment;
+use App\Services\MetaMessagingService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -131,12 +133,35 @@ class ProcessCommentJob implements ShouldQueue
             $status = Comment::STATUS_PENDING_REVIEW;
         }
 
+        // 3.5 Auto DM Trigger (Comment-to-DM Automation for Facebook & Instagram)
+        $autoDmTriggered = false;
+        if (!$shouldHide && empty($repliedAt) && $account && ($account->isFacebook() || $account->isInstagram())) {
+            $matchedRule = $this->findMatchingAutoDmRule($account, $comment);
+            if ($matchedRule) {
+                try {
+                    $messagingService = app(MetaMessagingService::class);
+                    $dmResult = $messagingService->sendAutoDm($matchedRule, $comment);
+                    if ($dmResult['success']) {
+                        $autoDmTriggered = true;
+                        $repliedAt = now();
+                        if (!empty($dmResult['public_reply_sent'])) {
+                            $status = Comment::STATUS_REPLIED;
+                            $aiReply = $matchedRule->public_reply;
+                        }
+                        Log::info("ProcessCommentJob: Auto DM delivered to commenter for comment #{$comment->id} via rule #{$matchedRule->id} [{$matchedRule->name}]");
+                    }
+                } catch (\Throwable $dmEx) {
+                    Log::warning("ProcessCommentJob: Auto DM dispatch error for comment #{$comment->id}: " . $dmEx->getMessage());
+                }
+            }
+        }
+
         // Mode 2: Auto comment & Auto approved -> Publish live immediately to social platform
         $alreadyReplied = ($status === Comment::STATUS_REPLIED || !empty($comment->meta_reply_id));
         // Safety: Only auto-reply live to fresh comments (within last 48 hours) to prevent replying to months/years-old comments
         $isFreshComment = empty($comment->commented_at) || $comment->commented_at->greaterThanOrEqualTo(now()->subDays(2));
 
-        if ($autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN && !$alreadyReplied && $isFreshComment) {
+        if (!$autoDmTriggered && $autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN && !$alreadyReplied && $isFreshComment) {
             try {
                 $publishSuccess = false;
                 if ($account->isYouTube()) {
@@ -329,5 +354,44 @@ class ProcessCommentJob implements ShouldQueue
             'inquiry'      => "{$nameGreeting}Thank you for reaching out. For complete details and official guidance on this topic, please visit our official website or DM our support team.",
             default        => "{$nameGreeting}Thank you for sharing your perspective with us. We appreciate your valuable feedback!",
         };
+    }
+
+    /**
+     * Find the highest priority active AutoDmRule that matches this comment
+     */
+    protected function findMatchingAutoDmRule(Account $account, Comment $comment): ?AutoDmRule
+    {
+        $message = trim((string) $comment->message);
+        if ($message === '') {
+            return null;
+        }
+
+        // Defensive: Do not send Auto DM if comment is from page/channel itself
+        if ($comment->commenter_meta_id && (
+            $comment->commenter_meta_id === (string) $account->meta_account_id ||
+            $comment->commenter_meta_id === (string) $account->instagram_business_account_id
+        )) {
+            return null;
+        }
+
+        // Fetch active rules for this account, prioritizing specific post rules over global rules
+        $rules = AutoDmRule::active()
+            ->where('account_id', $account->id)
+            ->where(function ($q) use ($comment) {
+                $q->whereNull('post_id');
+                if (!empty($comment->post_id)) {
+                    $q->orWhere('post_id', $comment->post_id);
+                }
+            })
+            ->orderByRaw('post_id IS NULL ASC')
+            ->get();
+
+        foreach ($rules as $rule) {
+            if ($rule->matchesText($message)) {
+                return $rule;
+            }
+        }
+
+        return null;
     }
 }
