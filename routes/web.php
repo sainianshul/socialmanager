@@ -57,6 +57,12 @@ Route::prefix('admin')->group(function () {
             // Auto DM (Comment-to-Inbox Automation)
             Route::prefix('auto-dm')->name('auto-dm.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\AutoDmController::class, 'index'])->name('index');
+                Route::post('/', [\App\Http\Controllers\Admin\AutoDmController::class, 'store'])->name('store');
+                Route::get('{autoDmRule}/edit', [\App\Http\Controllers\Admin\AutoDmController::class, 'edit'])->name('edit');
+                Route::put('{autoDmRule}', [\App\Http\Controllers\Admin\AutoDmController::class, 'update'])->name('update');
+                Route::post('{autoDmRule}/toggle', [\App\Http\Controllers\Admin\AutoDmController::class, 'toggle'])->name('toggle');
+                Route::delete('{autoDmRule}', [\App\Http\Controllers\Admin\AutoDmController::class, 'destroy'])->name('destroy');
+                Route::get('accounts/{account}/posts', [\App\Http\Controllers\Admin\AutoDmController::class, 'getPosts'])->name('account-posts');
             });
 
             // Constituent Comments & AI Moderation
