@@ -132,8 +132,9 @@
                             <th class="w-1">Ticket ID</th>
                             @if(auth()->user()->isAdmin())
                                 <th>User</th>
+                                <th>Email</th>
                             @endif
-                            <th>Subject &amp; Description</th>
+                            <th>Title</th>
                             <th>Category</th>
                             <th>Priority</th>
                             <th>Status</th>
@@ -270,22 +271,32 @@
 
                     @if(auth()->user()->isAdmin())
                         <div class="border-top pt-3 mt-3">
-                            <div class="row g-2 align-items-center mb-2.5">
-                                <label class="col-sm-3 col-form-label text-secondary small fw-medium" for="vt-admin-status-select" style="max-width: 130px;">Change Status :</label>
-                                <div class="col-sm-9">
-                                    <select id="vt-admin-status-select" class="form-select form-select-sm">
-                                        <option value="open">Open</option>
-                                        <option value="in_progress">In Progress</option>
-                                        <option value="resolved">Resolved</option>
-                                        <option value="closed">Closed</option>
-                                    </select>
+                            <div class="mb-3">
+                                <label class="form-label text-secondary small fw-medium mb-1.5">Change Status :</label>
+                                <div class="form-selectgroup form-selectgroup-pills">
+                                    <label class="form-selectgroup-item">
+                                        <input type="radio" name="vt_status_radio" value="open" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label"><i class="ti ti-circle-filled text-primary me-1 fs-6"></i>Open</span>
+                                    </label>
+                                    <label class="form-selectgroup-item">
+                                        <input type="radio" name="vt_status_radio" value="in_progress" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label"><i class="ti ti-circle-filled text-warning me-1 fs-6"></i>In Progress</span>
+                                    </label>
+                                    <label class="form-selectgroup-item">
+                                        <input type="radio" name="vt_status_radio" value="resolved" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label"><i class="ti ti-circle-filled text-success me-1 fs-6"></i>Resolved</span>
+                                    </label>
+                                    <label class="form-selectgroup-item">
+                                        <input type="radio" name="vt_status_radio" value="closed" class="form-selectgroup-input">
+                                        <span class="form-selectgroup-label"><i class="ti ti-circle-filled text-secondary me-1 fs-6"></i>Closed</span>
+                                    </label>
                                 </div>
+                                <input type="hidden" id="vt-admin-status-select" value="open">
                             </div>
-                            <div class="row g-2 align-items-start">
-                                <label class="col-sm-3 col-form-label text-secondary small fw-medium pt-1" for="vt-admin-notes-input" style="max-width: 130px;">Resolution Note :</label>
-                                <div class="col-sm-9">
-                                    <textarea id="vt-admin-notes-input" class="form-control" rows="3" placeholder="Enter resolution details or reply to user..."></textarea>
-                                </div>
+
+                            <div class="mb-0">
+                                <label class="form-label text-secondary small fw-medium mb-1" for="vt-admin-notes-input">Resolution Note <span class="text-muted fw-normal">(optional)</span> :</label>
+                                <textarea id="vt-admin-notes-input" class="form-control" rows="3" placeholder="Enter resolution details or reply to user..."></textarea>
                             </div>
                         </div>
                     @else
@@ -339,7 +350,8 @@
                 columns: [
                     { data: 'ticket_number', name: 'ticket_number', className: 'text-nowrap' },
                     @if(auth()->user()->isAdmin())
-                    { data: 'user', name: 'user.name' },
+                    { data: 'user', name: 'user.name', className: 'text-nowrap' },
+                    { data: 'email', name: 'user.email', className: 'text-nowrap' },
                     @endif
                     { data: 'title', name: 'title' },
                     { data: 'category', name: 'category', className: 'text-nowrap' },
@@ -348,7 +360,7 @@
                     { data: 'created_at', name: 'created_at', className: 'text-nowrap' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end text-nowrap' },
                 ],
-                order: [[ {{ auth()->user()->isAdmin() ? 6 : 5 }}, 'desc']],
+                order: [[ {{ auth()->user()->isAdmin() ? 7 : 5 }}, 'desc']],
                 pageLength: 15,
                 lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]],
                 dom: '<"top">rt<"d-flex align-items-center justify-content-between p-3 flex-wrap gap-2"li<"ms-auto"p>><"clear">',
@@ -500,8 +512,10 @@
 
                 // Admin Controls vs Regular User view
                 @if(auth()->user()->isAdmin())
+                    let currentStatus = statusVal || 'open';
+                    $('input[name="vt_status_radio"][value="' + currentStatus + '"]').prop('checked', true);
+                    $('#vt-admin-status-select').val(currentStatus);
                     $('#vt-admin-notes-input').val(notes);
-                    $('#vt-admin-status-select').val(statusVal || 'open');
                 @else
                     if (notes && notes.trim() !== '') {
                         $('#vt-admin-notes').text(notes);
@@ -516,6 +530,11 @@
             });
 
             @if(auth()->user()->isAdmin())
+                // Status radio selection change
+                $(document).on('change', 'input[name="vt_status_radio"]', function () {
+                    $('#vt-admin-status-select').val($(this).val());
+                });
+
                 // Admin Status Update
                 $('#btn-update-ticket-status').on('click', function () {
                     if (!activeTicketId) return;

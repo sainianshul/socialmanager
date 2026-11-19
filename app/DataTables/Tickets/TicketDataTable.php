@@ -29,23 +29,18 @@ class TicketDataTable extends DataTable
                 if (!$ticket->user) {
                     return '<span class="text-secondary">—</span>';
                 }
-                return '
-                    <div>
-                        <div class="fw-semibold text-body small">' . e($ticket->user->name) . '</div>
-                        <div class="text-secondary fs-7">' . e($ticket->user->email) . '</div>
-                    </div>
-                ';
+                return '<span class="fw-semibold text-body">' . e($ticket->user->name) . '</span>';
+            })
+
+            ->addColumn('email', function (Ticket $ticket) {
+                if (!$ticket->user || !$ticket->user->email) {
+                    return '<span class="text-secondary">—</span>';
+                }
+                return '<span class="text-secondary small">' . e($ticket->user->email) . '</span>';
             })
 
             ->editColumn('title', function (Ticket $ticket) {
-                $title = e($ticket->title);
-                $desc = e(Str::limit($ticket->description, 60));
-                return '
-                    <div>
-                        <div class="fw-semibold text-body">' . $title . '</div>
-                        <div class="text-secondary small text-truncate" style="max-width: 300px;">' . $desc . '</div>
-                    </div>
-                ';
+                return '<span class="fw-semibold text-body">' . e($ticket->title) . '</span>';
             })
 
             ->addColumn('category', function (Ticket $ticket) {
@@ -93,6 +88,7 @@ class TicketDataTable extends DataTable
             ->rawColumns([
                 'ticket_number',
                 'user',
+                'email',
                 'title',
                 'category',
                 'priority',
