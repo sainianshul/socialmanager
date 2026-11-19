@@ -265,5 +265,13 @@ class Account extends Model
     {
         return $this->hasMany(ScheduledPost::class);
     }
+
+    /**
+     * Auto DM rules for this account
+     */
+    public function autoDmRules(): HasMany
+    {
+        return $this->hasMany(AutoDmRule::class);
+    }
 }
 

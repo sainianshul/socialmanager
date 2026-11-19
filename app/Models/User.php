@@ -184,6 +184,11 @@ class User extends Authenticatable
         return $this->hasMany(Account::class);
     }
 
+    public function autoDmRules(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AutoDmRule::class);
+    }
+
     // ─── API Response ────────────────────────
 
     public function toApiResponse(): array

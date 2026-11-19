@@ -63,6 +63,14 @@ class Post extends Model
     }
 
     /**
+     * Auto DM rules targeting this specific post
+     */
+    public function autoDmRules(): HasMany
+    {
+        return $this->hasMany(AutoDmRule::class);
+    }
+
+    /**
      * Display title for YouTube videos or post message fallback
      */
     public function getDisplayTitleAttribute(): string
