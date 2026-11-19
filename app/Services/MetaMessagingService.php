@@ -1,0 +1,277 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Account;
+use App\Models\AutoDmRule;
+use App\Models\Comment;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+
+class MetaMessagingService
+{
+    private string $graphApiVersion;
+
+    public function __construct(string $version = 'v20.0')
+    {
+        $this->graphApiVersion = $version;
+    }
+
+    /**
+     * Execute an Auto DM rule for a matching comment:
+     * 1. Sends private message to commenter's inbox (Messenger / Instagram Direct).
+     * 2. If rule has public_reply configured, publishes public reply on the comment.
+     * 3. Records trigger on the rule and updates comment.
+     *
+     * @param AutoDmRule $rule
+     * @param Comment $comment
+     * @return array [
+     *     'success' => bool,
+     *     'message' => string,
+     *     'dm_sent' => bool,
+     *     'dm_id' => ?string,
+     *     'public_reply_sent' => bool,
+     *     'public_reply_id' => ?string
+     * ]
+     */
+    public function sendAutoDm(AutoDmRule $rule, Comment $comment): array
+    {
+        $account = $rule->account ?? $comment->account;
+
+        if (!$account || empty($account->access_token)) {
+            Log::warning("Auto DM: Account {$account?->id} has no valid access token.");
+            return [
+                'success' => false,
+                'message' => 'No active access token for this social channel.',
+                'dm_sent' => false,
+                'public_reply_sent' => false,
+            ];
+        }
+
+        $commentId = $comment->effective_comment_id ?: $comment->meta_comment_id;
+        if (empty($commentId)) {
+            return [
+                'success' => false,
+                'message' => 'Comment has no valid external Meta ID.',
+                'dm_sent' => false,
+                'public_reply_sent' => false,
+            ];
+        }
+
+        // 1. Send the Private Direct Message (DM)
+        $dmResult = $this->sendPrivateReply($account, $commentId, $rule->dm_message);
+
+        // 2. Optionally publish Public Comment Reply if configured
+        $publicReplyResult = ['success' => false, 'reply_id' => null];
+        if (!empty($rule->public_reply)) {
+            $publicReplyResult = $this->sendPublicReply($account, $commentId, $rule->public_reply);
+        }
+
+        // 3. If DM succeeded, record trigger on rule and update comment status
+        if ($dmResult['success']) {
+            $rule->recordTrigger();
+
+            $updateData = [
+                'replied_at' => now(),
+            ];
+
+            if ($publicReplyResult['success']) {
+                $updateData['status'] = Comment::STATUS_REPLIED;
+                $updateData['ai_reply'] = $rule->public_reply;
+                $updateData['meta_reply_id'] = $publicReplyResult['reply_id'];
+            }
+
+            $comment->update($updateData);
+
+            Log::info("Auto DM rule [{$rule->name}] triggered successfully for comment #{$comment->id}");
+
+            return [
+                'success' => true,
+                'message' => 'Auto DM delivered successfully.',
+                'dm_sent' => true,
+                'dm_id' => $dmResult['message_id'] ?? null,
+                'public_reply_sent' => $publicReplyResult['success'],
+                'public_reply_id' => $publicReplyResult['reply_id'] ?? null,
+            ];
+        }
+
+        return [
+            'success' => false,
+            'message' => $dmResult['message'] ?? 'Failed to send private direct message.',
+            'dm_sent' => false,
+            'public_reply_sent' => $publicReplyResult['success'],
+        ];
+    }
+
+    /**
+     * Send a private reply to a Facebook or Instagram comment
+     *
+     * @param Account $account
+     * @param string $commentId
+     * @param string $message
+     * @return array ['success' => bool, 'message' => string, 'message_id' => ?string]
+     */
+    public function sendPrivateReply(Account $account, string $commentId, string $message): array
+    {
+        if (empty($account->access_token)) {
+            return ['success' => false, 'message' => 'Missing access token for account.'];
+        }
+
+        if ($account->isInstagram()) {
+            return $this->sendInstagramPrivateReply($account, $commentId, $message);
+        }
+
+        return $this->sendFacebookPrivateReply($account, $commentId, $message);
+    }
+
+    /**
+     * Facebook Page private reply to comment
+     * Endpoint: POST https://graph.facebook.com/{version}/{comment_id}/private_replies
+     */
+    protected function sendFacebookPrivateReply(Account $account, string $commentId, string $message): array
+    {
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$commentId}/private_replies";
+
+        try {
+            $response = Http::timeout(20)->post($url, [
+                'message' => $message,
+                'access_token' => $account->access_token,
+            ])->json();
+
+            if (isset($response['error'])) {
+                $errorMsg = $response['error']['message'] ?? 'Meta API error sending private reply.';
+                $errorCode = $response['error']['code'] ?? null;
+                $errorSubcode = $response['error']['error_subcode'] ?? null;
+
+                Log::warning("Facebook Private Reply error [{$errorCode}/{$errorSubcode}]: {$errorMsg}", [
+                    'comment_id' => $commentId,
+                    'account_id' => $account->id,
+                ]);
+
+                // Code 10900: A private reply has already been sent to this comment
+                if ($errorCode == 10900 || str_contains($errorMsg, 'private reply was already sent')) {
+                    return [
+                        'success' => false,
+                        'already_sent' => true,
+                        'message' => 'A private reply was already sent to this comment.',
+                    ];
+                }
+
+                return ['success' => false, 'message' => $errorMsg];
+            }
+
+            $messageId = (string) ($response['id'] ?? null);
+
+            return [
+                'success' => true,
+                'message' => 'Facebook private reply sent successfully.',
+                'message_id' => $messageId,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Facebook private reply exception: {$e->getMessage()}");
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Instagram Business private reply to comment
+     * Primary: POST https://graph.facebook.com/{version}/{ig_user_id}/messages with recipient: {"comment_id": "..."}
+     * Fallback: POST https://graph.facebook.com/{version}/{comment_id}/private_replies
+     */
+    protected function sendInstagramPrivateReply(Account $account, string $commentId, string $message): array
+    {
+        $igId = $account->instagram_business_account_id ?? $account->meta_account_id;
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$igId}/messages";
+
+        try {
+            $response = Http::timeout(20)->post($url, [
+                'recipient' => [
+                    'comment_id' => $commentId,
+                ],
+                'message' => [
+                    'text' => $message,
+                ],
+                'access_token' => $account->access_token,
+            ])->json();
+
+            if (isset($response['error'])) {
+                // Try fallback endpoint: POST /{comment_id}/private_replies
+                $fallbackUrl = "https://graph.facebook.com/{$this->graphApiVersion}/{$commentId}/private_replies";
+                $fallbackResp = Http::timeout(20)->post($fallbackUrl, [
+                    'message' => $message,
+                    'access_token' => $account->access_token,
+                ])->json();
+
+                if (!isset($fallbackResp['error'])) {
+                    return [
+                        'success' => true,
+                        'message' => 'Instagram private reply sent successfully via fallback.',
+                        'message_id' => (string) ($fallbackResp['id'] ?? null),
+                    ];
+                }
+
+                $errorMsg = $response['error']['message'] ?? 'Instagram API error sending private message.';
+                Log::warning("Instagram Private Reply error: {$errorMsg}", [
+                    'comment_id' => $commentId,
+                    'ig_id' => $igId,
+                    'response' => $response,
+                ]);
+
+                return ['success' => false, 'message' => $errorMsg];
+            }
+
+            $messageId = (string) ($response['message_id'] ?? ($response['id'] ?? null));
+
+            return [
+                'success' => true,
+                'message' => 'Instagram private reply sent successfully.',
+                'message_id' => $messageId,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Instagram private reply exception: {$e->getMessage()}");
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+
+    /**
+     * Send a public reply to a comment on Meta (Facebook Page or Instagram)
+     *
+     * @param Account $account
+     * @param string $commentId
+     * @param string $replyMessage
+     * @return array ['success' => bool, 'message' => string, 'reply_id' => ?string]
+     */
+    public function sendPublicReply(Account $account, string $commentId, string $replyMessage): array
+    {
+        if (empty($account->access_token)) {
+            return ['success' => false, 'message' => 'Missing access token for account.'];
+        }
+
+        $endpoint = $account->isInstagram() ? 'replies' : 'comments';
+        $url = "https://graph.facebook.com/{$this->graphApiVersion}/{$commentId}/{$endpoint}";
+
+        try {
+            $response = Http::timeout(20)->post($url, [
+                'message' => $replyMessage,
+                'access_token' => $account->access_token,
+            ])->json();
+
+            if (isset($response['error'])) {
+                $msg = $response['error']['message'] ?? 'Meta Graph API public reply error.';
+                Log::warning("Public reply failed for comment {$commentId}: {$msg}");
+                return ['success' => false, 'message' => $msg];
+            }
+
+            $replyId = (string) ($response['id'] ?? null);
+
+            return [
+                'success' => true,
+                'message' => 'Public comment reply posted successfully.',
+                'reply_id' => $replyId,
+            ];
+        } catch (\Throwable $e) {
+            Log::error("Public reply exception: {$e->getMessage()}");
+            return ['success' => false, 'message' => $e->getMessage()];
+        }
+    }
+}
