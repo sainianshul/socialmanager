@@ -36,17 +36,65 @@
     }
     .fc-event {
         cursor: pointer;
-        border-radius: 4px;
-        padding: 2px 5px;
-        margin-bottom: 2px;
-        font-size: 0.75rem;
-        font-weight: 500;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.06);
-        transition: transform 0.1s ease;
+        border-radius: 6px !important;
+        padding: 2px 5px !important;
+        margin-top: 2px !important;
+        margin-bottom: 3px !important;
+        font-size: 0.76rem !important;
+        font-weight: 500 !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+        transition: transform 0.12s ease, box-shadow 0.12s ease;
+        border-width: 1px !important;
+        border-style: solid !important;
     }
     .fc-event:hover {
         transform: translateY(-1px);
-        filter: brightness(1.05);
+        box-shadow: 0 3px 6px rgba(0,0,0,0.08) !important;
+        filter: brightness(1.02);
+    }
+
+    /* Status-based Calendar Event Styling */
+    .fc-event-published {
+        background-color: #ecfdf5 !important;
+        border-color: #a7f3d0 !important;
+        color: #065f46 !important;
+    }
+    .fc-event-published:hover {
+        background-color: #d1fae5 !important;
+        border-color: #6ee7b7 !important;
+    }
+
+    .fc-event-scheduled {
+        background-color: #eff6ff !important;
+        border-color: #bfdbfe !important;
+        color: #1e40af !important;
+    }
+    .fc-event-scheduled:hover {
+        background-color: #dbeafe !important;
+        border-color: #93c5fd !important;
+    }
+
+    .fc-event-failed {
+        background-color: #fef2f2 !important;
+        border-color: #fecaca !important;
+        color: #991b1b !important;
+    }
+    .fc-event-failed:hover {
+        background-color: #fee2e2 !important;
+        border-color: #f87171 !important;
+    }
+
+    .fc-event-publishing {
+        background-color: #fffbeb !important;
+        border-color: #fde68a !important;
+        color: #92400e !important;
+    }
+
+    .fc-event-draft {
+        background-color: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        border-style: dashed !important;
+        color: #475569 !important;
     }
     .fc-toolbar {
         margin-bottom: 1.25rem !important;
@@ -340,7 +388,14 @@
         {{-- 1. Full Monthly Calendar View --}}
         <div class="card">
             <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <h3 class="card-title m-0">Monthly Publishing Schedule</h3>
+                <div class="d-flex align-items-center gap-3 flex-wrap">
+                    <h3 class="card-title m-0">Monthly Publishing Schedule</h3>
+                    <div class="d-flex align-items-center gap-2 small">
+                        <span class="badge badge-outline text-success py-0.5 px-2"><i class="ti ti-check me-1"></i>Published</span>
+                        <span class="badge badge-outline text-azure py-0.5 px-2"><i class="ti ti-clock me-1"></i>Scheduled</span>
+                        <span class="badge badge-outline text-danger py-0.5 px-2"><i class="ti ti-alert-triangle me-1"></i>Failed</span>
+                    </div>
+                </div>
                 <div class="d-flex align-items-center gap-2 ms-auto">
                     <form method="GET" action="{{ route('admin.posts.schedule') }}" class="d-flex align-items-center gap-2 m-0">
                         <input type="hidden" name="view" value="calendar">
@@ -783,6 +838,7 @@
         if (calendarEl) {
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
+                eventDisplay: 'block',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -801,36 +857,93 @@
                         platform: '{{ $selectedPlatform }}'
                     }
                 },
+                eventClassNames: function(arg) {
+                    let status = parseInt(arg.event.extendedProps.status);
+                    if (status === 3) return ['fc-event-published'];
+                    if (status === 1) return ['fc-event-scheduled'];
+                    if (status === 4) return ['fc-event-failed'];
+                    if (status === 2) return ['fc-event-publishing'];
+                    return ['fc-event-draft'];
+                },
                 dateClick: function(info) {
                     window.location.href = "{{ route('admin.posts.create') }}?date=" + info.dateStr + "T10:00";
                 },
                 eventContent: function(arg) {
                     let props = arg.event.extendedProps;
-                    let iconClass = props.platform_icon || 'ti ti-share';
+                    let platform = parseInt(props.platform) || 1;
+                    let status = parseInt(props.status);
                     let title = arg.event.title;
                     let time = arg.timeText;
 
+                    // Platform Brand Icons & Specific Colors
+                    let platformIcon = 'ti ti-brand-facebook';
+                    let platformColor = '#1877f2'; // Facebook Blue
+                    if (platform === 2) {
+                        platformIcon = 'ti ti-brand-instagram';
+                        platformColor = '#d62976'; // Instagram Pink
+                    } else if (platform === 3) {
+                        platformIcon = 'ti ti-brand-youtube';
+                        platformColor = '#e02424'; // YouTube Red
+                    }
+
+                    // Status Indicator
+                    let statusIcon = 'ti ti-clock';
+                    let statusColor = '#0284c7';
+                    let statusTitle = 'Scheduled';
+                    if (status === 3) {
+                        statusIcon = 'ti ti-check';
+                        statusColor = '#16a34a';
+                        statusTitle = 'Uploaded / Published';
+                    } else if (status === 4) {
+                        statusIcon = 'ti ti-alert-triangle';
+                        statusColor = '#dc2626';
+                        statusTitle = 'Failed';
+                    } else if (status === 2) {
+                        statusIcon = 'ti ti-loader';
+                        statusColor = '#d97706';
+                        statusTitle = 'Publishing...';
+                    } else if (status === 0) {
+                        statusIcon = 'ti ti-file-pencil';
+                        statusColor = '#64748b';
+                        statusTitle = 'Draft';
+                    }
+
                     let container = document.createElement('div');
-                    container.className = 'fc-event-custom d-flex align-items-center gap-1 text-truncate px-1 py-0.5';
+                    container.className = 'fc-event-custom d-flex align-items-center w-100 text-truncate px-1 py-0.5';
                     container.style.cursor = 'pointer';
-                    container.style.fontSize = '0.78rem';
+                    container.style.fontSize = '0.76rem';
                     container.style.fontWeight = '500';
 
+                    // 1. Platform Icon in its official brand color
                     let icon = document.createElement('i');
-                    icon.className = iconClass + ' me-1 flex-shrink-0';
+                    icon.className = platformIcon + ' me-1 flex-shrink-0';
+                    icon.style.color = platformColor;
+                    icon.style.fontSize = '0.9rem';
                     container.appendChild(icon);
 
+                    // 2. Scheduled Time
                     if (time) {
                         let timeEl = document.createElement('span');
-                        timeEl.className = 'fw-bold me-1 flex-shrink-0';
+                        timeEl.className = 'fw-bold me-1 flex-shrink-0 font-monospace';
+                        timeEl.style.fontSize = '0.72rem';
+                        timeEl.style.opacity = '0.85';
                         timeEl.innerText = time;
                         container.appendChild(timeEl);
                     }
 
+                    // 3. Title text
                     let textEl = document.createElement('span');
-                    textEl.className = 'text-truncate';
+                    textEl.className = 'text-truncate flex-grow-1';
                     textEl.innerText = title;
                     container.appendChild(textEl);
+
+                    // 4. Status Indicator icon
+                    let sIcon = document.createElement('i');
+                    sIcon.className = statusIcon + ' ms-1 flex-shrink-0';
+                    sIcon.style.color = statusColor;
+                    sIcon.style.fontSize = '0.8rem';
+                    sIcon.title = statusTitle;
+                    container.appendChild(sIcon);
 
                     return { domNodes: [container] };
                 },
