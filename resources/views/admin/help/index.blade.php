@@ -227,147 +227,80 @@
     {{-- MODAL: VIEW TICKET DETAILS                                    --}}
     {{-- ───────────────────────────────────────────────────────────── --}}
     <div class="modal modal-blur fade" id="view-ticket-modal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 600px;" role="document">
             <div class="modal-content">
-                {{-- Modal Header --}}
+                {{-- Modal Header: Ticket #ID --}}
                 <div class="modal-header">
-                    <div class="d-flex flex-column gap-1 w-100 pe-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge badge-outline text-secondary font-monospace" id="vt-number">#TCK</span>
-                            <span class="badge badge-outline" id="vt-status-badge">Open</span>
-                            <span class="badge badge-outline" id="vt-priority-badge">Medium</span>
-                        </div>
-                        <h3 class="modal-title fw-bold text-body mb-0 mt-1" id="vt-title">Ticket Subject</h3>
-                    </div>
+                    <h3 class="modal-title fw-bold">Ticket <span class="text-primary font-monospace" id="vt-number">#TCK-XXXX</span></h3>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
-                {{-- Modal Body: 2-Column Enterprise Layout --}}
-                <div class="modal-body p-4">
-                    <div class="row g-4">
-
-                        {{-- Left Column: Description & Response Thread --}}
-                        <div class="col-lg-8 col-md-7">
-
-                            {{-- Ticket Description Card --}}
-                            <div class="card mb-3 shadow-none border">
-                                <div class="card-header bg-body-tertiary py-2 px-3 d-flex align-items-center justify-content-between">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="avatar avatar-xs rounded-circle bg-primary-lt text-primary fw-bold" id="vt-user-avatar">U</span>
-                                        <div>
-                                            <span class="fw-semibold text-body small" id="vt-user-name">User</span>
-                                            <span class="text-secondary fs-7 ms-1" id="vt-user-email"></span>
-                                        </div>
-                                    </div>
-                                    <span class="text-secondary fs-7" id="vt-created-at">—</span>
-                                </div>
-                                <div class="card-body p-3">
-                                    <div class="text-body" id="vt-description" style="white-space: pre-wrap; line-height: 1.6; min-height: 48px;">—</div>
-                                </div>
-                            </div>
-
+                {{-- Modal Body: Clean Key-Value Structure --}}
+                <div class="modal-body">
+                    <table class="table table-sm table-borderless mb-0">
+                        <tbody>
                             @if(auth()->user()->isAdmin())
-                                {{-- Admin Resolution Note Composer --}}
-                                <div class="card shadow-none border">
-                                    <div class="card-header bg-body-tertiary py-2 px-3">
-                                        <span class="fw-semibold text-body small d-flex align-items-center gap-1.5">
-                                            <i class="ti ti-message-dots text-primary"></i>
-                                            Resolution Note / Reply
-                                        </span>
-                                    </div>
-                                    <div class="card-body p-3">
-                                        <textarea id="vt-admin-notes-input" class="form-control" rows="3"
-                                            placeholder="Write a resolution note or update for the user..."></textarea>
-                                        <div class="form-text text-secondary fs-7 mt-1.5">
-                                            This note will be visible to the user on their ticket.
-                                        </div>
-                                    </div>
-                                </div>
-                            @else
-                                {{-- Regular User: Support Response (if available) --}}
-                                <div id="vt-resolution-box" class="card shadow-none border border-success-subtle d-none">
-                                    <div class="card-header bg-success-lt py-2 px-3">
-                                        <span class="fw-semibold text-success small d-flex align-items-center gap-1.5">
-                                            <i class="ti ti-shield-check"></i>
-                                            Support Team Response
-                                        </span>
-                                    </div>
-                                    <div class="card-body p-3">
-                                        <div class="text-body" id="vt-admin-notes" style="white-space: pre-wrap; line-height: 1.6;">—</div>
-                                    </div>
-                                </div>
-
-                                <div id="vt-pending-box" class="text-secondary small fst-italic px-1">
-                                    <i class="ti ti-clock me-1"></i>Our support team is currently reviewing your ticket.
-                                </div>
+                            <tr>
+                                <th class="text-secondary fw-medium small ps-0 py-1.5 align-middle" style="width: 130px;">Submitted by :</th>
+                                <td class="text-body fw-semibold py-1.5" id="vt-user-info">—</td>
+                            </tr>
                             @endif
+                            <tr>
+                                <th class="text-secondary fw-medium small ps-0 py-1.5 align-middle" style="width: 130px;">Submitted At :</th>
+                                <td class="text-body py-1.5" id="vt-created-at">—</td>
+                            </tr>
+                            <tr>
+                                <th class="text-secondary fw-medium small ps-0 py-1.5 align-middle" style="width: 130px;">Status :</th>
+                                <td class="py-1.5">
+                                    <span class="badge badge-outline" id="vt-status-badge">Open</span>
+                                    <span class="badge badge-outline ms-1" id="vt-priority-badge">Medium</span>
+                                    <span class="badge badge-outline text-secondary ms-1" id="vt-category-badge">Category</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="text-secondary fw-medium small ps-0 py-1.5 align-middle" style="width: 130px;">Title :</th>
+                                <td class="text-body fw-semibold py-1.5" id="vt-title">—</td>
+                            </tr>
+                            <tr>
+                                <th class="text-secondary fw-medium small ps-0 py-2 align-top" style="width: 130px;">Description :</th>
+                                <td class="text-body py-2" id="vt-description" style="white-space: pre-wrap; line-height: 1.6;">—</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                        </div>
-
-                        {{-- Right Column: Attributes & Metadata Sidebar --}}
-                        <div class="col-lg-4 col-md-5 border-start ps-lg-4 ps-md-3">
-
-                            {{-- Status --}}
-                            <div class="mb-3">
-                                <label class="form-label text-secondary small fw-medium text-uppercase mb-1" style="letter-spacing: 0.04em;">Status</label>
-                                @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->isAdmin())
+                        <div class="border-top pt-3 mt-3">
+                            <div class="row g-2 align-items-center mb-2.5">
+                                <label class="col-sm-3 col-form-label text-secondary small fw-medium" for="vt-admin-status-select" style="max-width: 130px;">Change Status :</label>
+                                <div class="col-sm-9">
                                     <select id="vt-admin-status-select" class="form-select form-select-sm">
                                         <option value="open">Open</option>
                                         <option value="in_progress">In Progress</option>
                                         <option value="resolved">Resolved</option>
                                         <option value="closed">Closed</option>
                                     </select>
-                                @else
-                                    <div id="vt-status-display">
-                                        <span class="badge badge-outline" id="vt-user-status-badge">Open</span>
-                                    </div>
-                                @endif
-                            </div>
-
-                            {{-- Priority --}}
-                            <div class="mb-3">
-                                <label class="form-label text-secondary small fw-medium text-uppercase mb-1" style="letter-spacing: 0.04em;">Priority</label>
-                                <div>
-                                    <span class="badge badge-outline" id="vt-sidebar-priority-badge">Medium</span>
                                 </div>
                             </div>
-
-                            {{-- Category --}}
-                            <div class="mb-3">
-                                <label class="form-label text-secondary small fw-medium text-uppercase mb-1" style="letter-spacing: 0.04em;">Category</label>
-                                <div>
-                                    <span class="badge badge-outline text-secondary" id="vt-category-badge">General</span>
+                            <div class="row g-2 align-items-start">
+                                <label class="col-sm-3 col-form-label text-secondary small fw-medium pt-1" for="vt-admin-notes-input" style="max-width: 130px;">Resolution Note :</label>
+                                <div class="col-sm-9">
+                                    <textarea id="vt-admin-notes-input" class="form-control" rows="3" placeholder="Enter resolution details or reply to user..."></textarea>
                                 </div>
                             </div>
-
-                            @if(auth()->user()->isAdmin())
-                                {{-- Requester Info --}}
-                                <div class="mb-3">
-                                    <label class="form-label text-secondary small fw-medium text-uppercase mb-1" style="letter-spacing: 0.04em;">Requester</label>
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="avatar avatar-xs rounded-circle bg-primary-lt text-primary fw-bold" id="vt-sidebar-user-avatar">U</span>
-                                        <div class="text-truncate">
-                                            <div class="fw-semibold text-body small text-truncate" id="vt-sidebar-user-name">User</div>
-                                            <div class="text-secondary fs-7 text-truncate" id="vt-sidebar-user-email">email</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- Created Date --}}
-                            <div>
-                                <label class="form-label text-secondary small fw-medium text-uppercase mb-1" style="letter-spacing: 0.04em;">Created</label>
-                                <div class="text-body small" id="vt-sidebar-created">—</div>
-                            </div>
-
                         </div>
-
-                    </div>
+                    @else
+                        <div id="vt-resolution-box" class="d-none border-top pt-3 mt-3">
+                            <div class="d-flex gap-2">
+                                <div class="text-secondary small fw-medium" style="width: 130px; min-width: 130px;">Support Reply :</div>
+                                <div class="text-body small" id="vt-admin-notes" style="white-space: pre-wrap; line-height: 1.6;">—</div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Modal Footer --}}
                 <div class="modal-footer d-flex justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-link link-secondary me-auto text-decoration-none" data-bs-dismiss="modal">Close</button>
                     @if(auth()->user()->isAdmin())
                         <button type="button" class="btn btn-primary d-inline-flex align-items-center" id="btn-update-ticket-status">
                             <i class="ti ti-check me-1.5"></i>Save Changes
@@ -550,26 +483,20 @@
                 let userInitial = userName.trim().charAt(0).toUpperCase() || 'U';
                 let notes = $btn.data('notes') || '';
 
-                $('#vt-number').text('#' + ticketNumber);
+                $('#vt-number').text(ticketNumber.startsWith('#') ? ticketNumber : '#' + ticketNumber);
+                $('#vt-user-info').text(userEmail ? userName + ' (' + userEmail + ')' : userName);
+                $('#vt-created-at').text(created);
                 $('#vt-title').text(title);
                 $('#vt-description').text(description);
-                $('#vt-created-at').text(created);
-                $('#vt-sidebar-created').text(created);
 
                 // Badges
-                $('#vt-status-badge, #vt-user-status-badge').text(statusName)
+                $('#vt-status-badge').text(statusName)
                     .attr('class', 'badge badge-outline text-' + statusColor);
 
-                $('#vt-priority-badge, #vt-sidebar-priority-badge').text(priorityName)
+                $('#vt-priority-badge').text(priorityName)
                     .attr('class', 'badge badge-outline text-' + priorityColor);
 
                 $('#vt-category-badge').text(categoryName);
-
-                // User details
-                $('#vt-user-avatar, #vt-sidebar-user-avatar').text(userInitial);
-                $('#vt-user-name, #vt-sidebar-user-name').text(userName);
-                $('#vt-user-email').text(userEmail ? '(' + userEmail + ')' : '');
-                $('#vt-sidebar-user-email').text(userEmail);
 
                 // Admin Controls vs Regular User view
                 @if(auth()->user()->isAdmin())
@@ -579,10 +506,8 @@
                     if (notes && notes.trim() !== '') {
                         $('#vt-admin-notes').text(notes);
                         $('#vt-resolution-box').removeClass('d-none');
-                        $('#vt-pending-box').addClass('d-none');
                     } else {
                         $('#vt-resolution-box').addClass('d-none');
-                        $('#vt-pending-box').removeClass('d-none');
                     }
                 @endif
 
