@@ -40,14 +40,7 @@ class SchedulePostController extends Controller
 
         $prefillDate = $request->filled('date') ? $request->get('date') : now()->addHours(2)->format('Y-m-d\TH:i');
 
-        $selectedAccountIds = [];
-        if ($request->filled('account_ids')) {
-            $selectedAccountIds = array_map('intval', (array) $request->get('account_ids'));
-        } elseif ($selectedAccountId) {
-            $selectedAccountIds = [$selectedAccountId];
-        }
-
-        return view('admin.posts.create', compact('accounts', 'selectedAccountId', 'selectedAccountIds', 'selectedPlatform', 'prefillDate'));
+        return view('admin.posts.create', compact('accounts', 'selectedAccountId', 'selectedPlatform', 'prefillDate'));
     }
 
     /**
@@ -246,45 +239,20 @@ class SchedulePostController extends Controller
         MetaPublishingService $publishingService,
         YouTubePublishingService $youtubePublishingService
     ) {
-        $accountIds = $request->input('account_ids', []);
-        if (!is_array($accountIds)) {
-            $accountIds = $accountIds ? [(int) $accountIds] : [];
-        }
-
-        if (empty($accountIds) && $request->filled('account_id')) {
-            $accountIds = [(int) $request->input('account_id')];
-        }
-
-        $accountIds = array_values(array_unique(array_filter(array_map('intval', $accountIds))));
-
-        if (empty($accountIds)) {
-            return redirect()->back()->with('error', 'Please select at least one social channel account.')->withInput();
+        $accountId = $request->input('account_id');
+        if (!$accountId) {
+            return redirect()->back()->with('error', 'Please select a social channel account.')->withInput();
         }
 
         $user = auth()->user();
-        $accounts = Account::whereIn('id', $accountIds)->get();
+        $account = Account::findOrFail($accountId);
 
-        if ($accounts->isEmpty()) {
-            return redirect()->back()->with('error', 'Selected account(s) not found.')->withInput();
+        if (!$user->isAdmin() && $account->user_id !== $user->id) {
+            abort(403, 'Unauthorized channel selection.');
         }
 
-        if (!$user->isAdmin()) {
-            foreach ($accounts as $account) {
-                if ($account->user_id !== $user->id) {
-                    abort(403, 'Unauthorized channel selection.');
-                }
-            }
-        }
-
-        $accountPlatforms = $accounts->pluck('account_type')->map(fn($t) => (int) $t)->unique()->toArray();
-        $inputPlatform = $request->filled('platform') ? (int) $request->input('platform') : null;
-
-        $isYouTube = false;
-        if (count($accountPlatforms) === 1 && $accountPlatforms[0] === Account::TYPE_YOUTUBE) {
-            $isYouTube = true;
-        } elseif ($inputPlatform === Account::TYPE_YOUTUBE && in_array(Account::TYPE_YOUTUBE, $accountPlatforms)) {
-            $isYouTube = true;
-        }
+        // Determine platform: from input, or fallback to account's native platform
+        $platform = (int) ($request->input('platform') ?: $account->account_type);
 
         $publishMode = $request->input('publish_mode', 'schedule');
         if (!in_array($publishMode, ['now', 'schedule', 'draft'])) {
@@ -300,8 +268,9 @@ class SchedulePostController extends Controller
         $content = '';
         $postType = 'photo';
 
-        if ($isYouTube) {
+        if ($platform === Account::TYPE_YOUTUBE) {
             $validated = $request->validate([
+                'account_id'     => 'required|exists:accounts,id',
                 'title'          => 'required|string|max:100',
                 'description'    => 'nullable|string|max:5000',
                 'video_file'     => 'nullable|file|mimes:mp4,mov,webm,avi,mkv|max:102400',
@@ -340,8 +309,9 @@ class SchedulePostController extends Controller
             $content = $description ?: $title;
             $postType = ScheduledPost::TYPE_VIDEO;
             $privacyStatus = $validated['privacy_status'];
-        } elseif (count($accountPlatforms) === 1 && $accountPlatforms[0] === Account::TYPE_INSTAGRAM) {
+        } elseif ($platform === Account::TYPE_INSTAGRAM) {
             $validated = $request->validate([
+                'account_id'    => 'required|exists:accounts,id',
                 'post_type'     => 'required|in:photo,video,reel,carousel',
                 'content'       => 'nullable|string|max:2200',
                 'media_files'   => 'nullable|array',
@@ -367,9 +337,10 @@ class SchedulePostController extends Controller
             $postType = $validated['post_type'];
             $content = $validated['content'] ?? '';
         } else {
-            // Facebook or cross-platform Meta
+            // Facebook
             $validated = $request->validate([
-                'post_type'     => 'nullable|in:text,photo,video,reel,carousel',
+                'account_id'    => 'required|exists:accounts,id',
+                'post_type'     => 'required|in:text,photo,video,reel,carousel',
                 'content'       => 'nullable|string|max:5000',
                 'media_files'   => 'nullable|array',
                 'media_files.*' => 'file|mimes:jpeg,jpg,png,webp,mp4,mov|max:51200',
@@ -377,15 +348,7 @@ class SchedulePostController extends Controller
                 'scheduled_at'  => 'nullable|date',
             ]);
 
-            $postType = $validated['post_type'] ?? 'photo';
-
-            if (in_array(Account::TYPE_INSTAGRAM, $accountPlatforms) && $publishMode !== 'draft' && !$request->hasFile('media_files')) {
-                return redirect()->back()
-                    ->withErrors(['media_files' => 'At least one photo or video file is required because one or more Instagram accounts are selected.'])
-                    ->withInput();
-            }
-
-            if ($publishMode !== 'draft' && $postType === 'text' && empty(trim($validated['content'] ?? ''))) {
+            if ($publishMode !== 'draft' && $validated['post_type'] === 'text' && empty(trim($validated['content'] ?? ''))) {
                 return redirect()->back()
                     ->withErrors(['content' => 'Post message cannot be empty for text posts.'])
                     ->withInput();
@@ -399,6 +362,7 @@ class SchedulePostController extends Controller
                 }
             }
 
+            $postType = $validated['post_type'];
             $content = $validated['content'] ?? '';
         }
 
@@ -416,80 +380,42 @@ class SchedulePostController extends Controller
             $status = ScheduledPost::STATUS_DRAFT;
         }
 
-        $createdPosts = [];
-        foreach ($accounts as $account) {
-            $accountPlatform = (int) $account->account_type;
-            $accountPostType = $postType;
+        $scheduledPost = ScheduledPost::create([
+            'user_id'        => $user->id,
+            'account_id'     => $account->id,
+            'platform'       => $platform,
+            'post_type'      => $postType,
+            'title'          => $title,
+            'description'    => $description,
+            'content'        => $content,
+            'media_urls'     => $mediaUrls,
+            'thumbnail_path' => $thumbnailPath,
+            'tags'           => $tags,
+            'privacy_status' => $privacyStatus,
+            'scheduled_at'   => $scheduledAt,
+            'status'         => $status,
+        ]);
 
-            if ($accountPlatform === Account::TYPE_INSTAGRAM && $accountPostType === 'text') {
-                $accountPostType = 'photo';
-            }
-            if ($accountPlatform === Account::TYPE_YOUTUBE) {
-                $accountPostType = ScheduledPost::TYPE_VIDEO;
-            }
-
-            $scheduledPost = ScheduledPost::create([
-                'user_id'        => $user->id,
-                'account_id'     => $account->id,
-                'platform'       => $accountPlatform,
-                'post_type'      => $accountPostType,
-                'title'          => $title,
-                'description'    => $description,
-                'content'        => $content,
-                'media_urls'     => $mediaUrls,
-                'thumbnail_path' => $thumbnailPath,
-                'tags'           => $tags,
-                'privacy_status' => $privacyStatus,
-                'scheduled_at'   => $scheduledAt,
-                'status'         => $status,
-            ]);
-
-            $createdPosts[] = $scheduledPost;
-        }
-
-        // If Publish Now chosen, dispatch immediately to each account
+        // If Publish Now chosen, dispatch immediately
         if ($publishMode === 'now') {
-            $successfulAccounts = [];
-            $failedAccounts = [];
-
-            foreach ($createdPosts as $post) {
-                if ($post->platform === Account::TYPE_YOUTUBE) {
-                    $result = $youtubePublishingService->publish($post);
-                } else {
-                    $result = $publishingService->publish($post);
-                }
-
-                if ($result['success']) {
-                    $successfulAccounts[] = $post->account->name;
-                } else {
-                    $failedAccounts[] = $post->account->name . ' (' . ($result['message'] ?? 'Publish failed') . ')';
-                }
+            if ($platform === Account::TYPE_YOUTUBE) {
+                $result = $youtubePublishingService->publish($scheduledPost);
+            } else {
+                $result = $publishingService->publish($scheduledPost);
             }
 
-            if (empty($failedAccounts)) {
-                $successMsg = count($createdPosts) === 1
-                    ? 'Post published live to ' . $createdPosts[0]->account->name . ' successfully!'
-                    : 'Post published live to all ' . count($createdPosts) . ' accounts successfully!';
-
-                return redirect()->route('admin.posts.schedule')->with('success', $successMsg);
-            } elseif (empty($successfulAccounts)) {
+            if ($result['success']) {
                 return redirect()->route('admin.posts.schedule')
-                    ->with('warning', 'Post saved, but publishing failed: ' . implode(', ', $failedAccounts));
+                    ->with('success', 'Post published live to ' . $account->name . ' successfully!');
             } else {
                 return redirect()->route('admin.posts.schedule')
-                    ->with('warning', 'Published to ' . implode(', ', $successfulAccounts) . ', but failed on: ' . implode(', ', $failedAccounts));
+                    ->with('warning', 'Post saved, but publishing service returned an error: ' . $result['message']);
             }
         }
 
-        if (count($createdPosts) === 1) {
-            $msg = $status === ScheduledPost::STATUS_DRAFT
-                ? 'Post saved as draft.'
-                : 'Post successfully scheduled for ' . $scheduledAt->format('d M Y, h:i A');
-        } else {
-            $msg = $status === ScheduledPost::STATUS_DRAFT
-                ? count($createdPosts) . ' posts saved as draft.'
-                : 'Post successfully scheduled across ' . count($createdPosts) . ' accounts for ' . $scheduledAt->format('d M Y, h:i A');
-        }
+        $msg = $status === ScheduledPost::STATUS_DRAFT
+            ? 'Post saved as draft.'
+            : 'Post successfully scheduled for ' . $scheduledAt->format('d M Y, h:i A');
 
         return redirect()->route('admin.posts.schedule')->with('success', $msg);
     }
