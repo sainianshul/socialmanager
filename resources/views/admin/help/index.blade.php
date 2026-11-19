@@ -126,7 +126,7 @@
 
             {{-- Table --}}
             <div id="tickets-table-wrapper" class="table-responsive d-none">
-                <table id="tickets-table" class="table table-vcenter table-hover w-100">
+                <table id="tickets-table" class="table table-vcenter w-100">
                     <thead>
                         <tr>
                             <th class="w-1">Ticket ID</th>
@@ -326,6 +326,25 @@
 
 @push('datatables_css')
     @include('admin.layouts.partials._datatable-cdn-css')
+    <style>
+        #tickets-table,
+        #tickets-table tbody,
+        #tickets-table tbody tr,
+        #tickets-table tbody td,
+        #tickets-table.table > :not(caption) > * > * {
+            background-color: transparent !important;
+            background: transparent !important;
+            --tblr-table-hover-bg: transparent !important;
+            --tblr-table-accent-bg: transparent !important;
+            --bs-table-hover-bg: transparent !important;
+            --bs-table-accent-bg: transparent !important;
+        }
+        #tickets-table tbody tr:hover,
+        #tickets-table tbody tr:hover td {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+    </style>
 @endpush
 
 @push('datatables_js')
