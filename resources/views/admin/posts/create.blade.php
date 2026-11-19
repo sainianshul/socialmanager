@@ -201,14 +201,17 @@
                     </div>
 
                     {{-- Meta Post Types (Facebook & Instagram) --}}
+                    @php
+                        $selectedPostType = old('post_type', 'photo');
+                    @endphp
                     <div id="meta-post-types-section" class="mb-4">
                         <label class="form-label fw-bold text-dark mb-2">Post Type</label>
                         <div class="d-flex flex-wrap gap-2" id="post-type-pills-container">
-                            <span class="post-type-pill {{ old('post_type') == 'text' ? 'active' : '' }}" data-type="text" id="pill-type-text"><i class="ti ti-typography"></i> Text</span>
-                            <span class="post-type-pill {{ old('post_type', 'photo') == 'photo' ? 'active' : '' }}" data-type="photo"><i class="ti ti-photo"></i> Photo</span>
-                            <span class="post-type-pill {{ old('post_type', 'carousel') == 'carousel' ? 'active' : '' }}" data-type="carousel"><i class="ti ti-photo-circle"></i> Carousel</span>
-                            <span class="post-type-pill {{ old('post_type', 'video') == 'video' ? 'active' : '' }}" data-type="video"><i class="ti ti-video"></i> Video</span>
-                            <span class="post-type-pill {{ old('post_type', 'reel') == 'reel' ? 'active' : '' }}" data-type="reel" id="pill-type-reel"><i class="ti ti-player-play"></i> Reel</span>
+                            <span class="post-type-pill {{ $selectedPostType === 'text' ? 'active' : '' }}" data-type="text" id="pill-type-text"><i class="ti ti-typography"></i> Text</span>
+                            <span class="post-type-pill {{ $selectedPostType === 'photo' ? 'active' : '' }}" data-type="photo"><i class="ti ti-photo"></i> Photo</span>
+                            <span class="post-type-pill {{ $selectedPostType === 'carousel' ? 'active' : '' }}" data-type="carousel"><i class="ti ti-photo-circle"></i> Carousel</span>
+                            <span class="post-type-pill {{ $selectedPostType === 'video' ? 'active' : '' }}" data-type="video"><i class="ti ti-video"></i> Video</span>
+                            <span class="post-type-pill {{ $selectedPostType === 'reel' ? 'active' : '' }}" data-type="reel" id="pill-type-reel"><i class="ti ti-player-play"></i> Reel</span>
                         </div>
                     </div>
 
@@ -562,6 +565,31 @@ document.addEventListener('DOMContentLoaded', function () {
         updateSubmitButton();
     }
 
+    // Apply Post Type (Text, Photo, Carousel, Video, Reel)
+    function applyPostType(type) {
+        type = type || 'photo';
+        $('#selected-post-type').val(type);
+        $('.post-type-pill').removeClass('active');
+        $('.post-type-pill[data-type="' + type + '"]').addClass('active');
+
+        if (currentPlatform === 1) { // Facebook
+            if (type === 'text') {
+                // If text post on FB: hide media attachment & hide cross-post to Instagram
+                $('#meta-media-section').addClass('d-none');
+                $('#cross-post-to-ig-container').addClass('d-none');
+                if ($('#check-cross-post-to-ig').is(':checked')) {
+                    $('#check-cross-post-to-ig').prop('checked', false).trigger('change');
+                }
+            } else {
+                // Photo, Carousel, Video, Reel
+                $('#meta-media-section').removeClass('d-none');
+                $('#cross-post-to-ig-container').removeClass('d-none');
+            }
+        } else if (currentPlatform === 2) { // Instagram
+            $('#meta-media-section').removeClass('d-none');
+        }
+    }
+
     // Apply platform switch (Facebook / Instagram / YouTube)
     function applyPlatform(platform) {
         currentPlatform = parseInt(platform);
@@ -627,6 +655,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Post type pills
             $('#pill-type-text').show();
             $('#pill-type-reel').hide();
+            let currentFbType = $('#selected-post-type').val() || 'photo';
+            applyPostType(currentFbType);
 
             // Auto-check first FB page if none checked
             if ($('.fb-primary-checkbox:checked').length === 0) {
@@ -665,11 +695,11 @@ document.addEventListener('DOMContentLoaded', function () {
             // Post type pills: Instagram requires media (no text-only)
             $('#pill-type-text').hide();
             $('#pill-type-reel').show();
-            if ($('#selected-post-type').val() === 'text') {
-                $('#selected-post-type').val('photo');
-                $('.post-type-pill').removeClass('active');
-                $('.post-type-pill[data-type="photo"]').addClass('active');
+            let currentIgType = $('#selected-post-type').val();
+            if (currentIgType === 'text') {
+                currentIgType = 'photo';
             }
+            applyPostType(currentIgType || 'photo');
 
             // Auto-check first IG account if none checked
             if ($('.ig-primary-checkbox:checked').length === 0) {
@@ -790,9 +820,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Post type pills click handler
     $('.post-type-pill').on('click', function () {
-        $('.post-type-pill').removeClass('active');
-        $(this).addClass('active');
-        $('#selected-post-type').val($(this).data('type'));
+        applyPostType($(this).data('type'));
     });
 
     // Publish Mode Handler (Schedule, Now, Draft)
