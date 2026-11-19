@@ -9,6 +9,7 @@ use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
 class MetaWebhookController extends Controller
@@ -26,12 +27,21 @@ class MetaWebhookController extends Controller
             $token = $request->query('hub_verify_token', $request->query('hub.verify_token'));
             $challenge = $request->query('hub_challenge', $request->query('hub.challenge'));
 
-            if ($mode === 'subscribe' && $token === $verifyToken) {
-                Log::info('Meta webhook verification handshake successful.');
+            $isVerified = ($mode === 'subscribe' && $token === $verifyToken);
+
+            $this->logWebhook($isVerified ? 'info' : 'warning', 'Meta Webhook Handshake Request (GET)', [
+                'ip'           => $request->ip(),
+                'user_agent'   => $request->userAgent(),
+                'hub_mode'     => $mode,
+                'hub_token'    => $token,
+                'hub_challenge'=> $challenge,
+                'verified'     => $isVerified,
+            ]);
+
+            if ($isVerified) {
                 return response($challenge, 200)->header('Content-Type', 'text/plain');
             }
 
-            Log::warning('Meta webhook handshake failed. Invalid verify token provided.');
             return response('Forbidden', 403);
         }
 
@@ -39,7 +49,16 @@ class MetaWebhookController extends Controller
         $payload = $request->all();
         $object = $payload['object'] ?? null;
 
+        $this->logWebhook('info', 'Meta Webhook Event Received (POST)', [
+            'ip'            => $request->ip(),
+            'user_agent'    => $request->userAgent(),
+            'object'        => $object,
+            'entries_count' => isset($payload['entry']) ? count($payload['entry']) : 0,
+            'payload'       => $payload,
+        ]);
+
         if (!in_array($object, ['page', 'instagram'])) {
+            $this->logWebhook('info', "Meta Webhook: Ignored unsupported object type [{$object}]");
             return response('EVENT_RECEIVED', 200);
         }
 
@@ -57,9 +76,11 @@ class MetaWebhookController extends Controller
                 ->first();
 
             if (!$account) {
-                Log::info("Webhook received for untracked account ID: {$metaPageId}");
+                $this->logWebhook('warning', "Meta Webhook: Untracked account ID [{$metaPageId}]. Not connected in Socialmanager.");
                 continue;
             }
+
+            $this->logWebhook('info', "Meta Webhook: Matched Account [{$account->name}] (ID: {$account->id}, Platform: {$account->account_type_name})");
 
             $changes = $entry['changes'] ?? [];
             foreach ($changes as $change) {
@@ -83,7 +104,7 @@ class MetaWebhookController extends Controller
     }
 
     /**
-     * Parse and persist incoming comment, then dispatch AI moderation
+     * Parse and persist incoming comment, then dispatch AI moderation and Auto DM
      */
     protected function handleIncomingComment(Account $account, array $val): void
     {
@@ -137,10 +158,69 @@ class MetaWebhookController extends Controller
 
         $comment->save();
 
-        // Dispatch AI processing job asynchronously
+        // Dispatch AI processing & Auto DM job asynchronously
         ProcessCommentJob::dispatch($comment);
 
-        Log::info("Webhook processed comment {$metaCommentId} on account {$account->name}. Job dispatched.");
+        $this->logWebhook('info', "Meta Webhook Comment Processed: #{$metaCommentId} by [{$commenterName}] on account [{$account->name}]", [
+            'comment_id'   => $comment->id,
+            'meta_id'      => $metaCommentId,
+            'commenter'    => $commenterName,
+            'message'      => $message,
+            'account'      => $account->name,
+            'post_id'      => $post?->id,
+            'is_new'       => $isNew,
+        ]);
+    }
+
+    /**
+     * Dedicated Webhook Log helper
+     */
+    protected function logWebhook(string $level, string $message, array $context = []): void
+    {
+        try {
+            Log::channel('webhook')->{$level}($message, $context);
+        } catch (\Throwable $e) {
+            Log::{$level}("[Webhook] " . $message, $context);
+        }
+    }
+
+    /**
+     * Admin Webhook Logs Viewer (For interactive testing & inspection)
+     */
+    public function viewLogs(Request $request)
+    {
+        $logPath = storage_path('logs/webhook.log');
+        $rawLogs = '';
+        $fileSize = '0 KB';
+        $lastModified = 'Never';
+
+        if (File::exists($logPath)) {
+            $fileSize = round(File::size($logPath) / 1024, 2) . ' KB';
+            $lastModified = Carbon::createFromTimestamp(File::lastModified($logPath))->diffForHumans();
+
+            // Read last 250 lines
+            $fileLines = file($logPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            if ($fileLines !== false) {
+                $lastLines = array_slice($fileLines, -250);
+                $rawLogs = implode("\n", $lastLines);
+            }
+        }
+
+        return view('admin.webhooks.logs', compact('rawLogs', 'fileSize', 'lastModified', 'logPath'));
+    }
+
+    /**
+     * Clear Webhook Logs
+     */
+    public function clearLogs()
+    {
+        $logPath = storage_path('logs/webhook.log');
+        if (File::exists($logPath)) {
+            File::put($logPath, '');
+        }
+
+        return redirect()->back()->with('success', 'Webhook log file cleared successfully.');
     }
 }
+
 

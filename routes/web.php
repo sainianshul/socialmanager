@@ -66,6 +66,12 @@ Route::prefix('admin')->group(function () {
                 Route::get('accounts/{account}/posts', [\App\Http\Controllers\Admin\AutoDmController::class, 'getPosts'])->name('account-posts');
             });
 
+            // Webhook Testing & Activity Logs
+            Route::prefix('webhook-logs')->name('webhook-logs.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\MetaWebhookController::class, 'viewLogs'])->name('index');
+                Route::post('/clear', [\App\Http\Controllers\MetaWebhookController::class, 'clearLogs'])->name('clear');
+            });
+
             // Constituent Comments & AI Moderation
             Route::prefix('comments')->name('comments.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\CommentController::class, 'index'])->name('index');

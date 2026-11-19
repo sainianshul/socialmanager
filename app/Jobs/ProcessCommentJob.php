@@ -148,9 +148,25 @@ class ProcessCommentJob implements ShouldQueue
                             $status = Comment::STATUS_REPLIED;
                             $aiReply = $matchedRule->public_reply;
                         }
+
+                        try {
+                            Log::channel('webhook')->info("Auto DM Executed: Delivered to commenter for comment #{$comment->id}", [
+                                'rule_id'           => $matchedRule->id,
+                                'rule_name'         => $matchedRule->name,
+                                'account'           => $account->name,
+                                'commenter'         => $comment->commenter_name,
+                                'dm_sent'           => $dmResult['dm_sent'] ?? true,
+                                'public_reply_sent' => $dmResult['public_reply_sent'] ?? false,
+                            ]);
+                        } catch (\Throwable $logEx) {}
+
                         Log::info("ProcessCommentJob: Auto DM delivered to commenter for comment #{$comment->id} via rule #{$matchedRule->id} [{$matchedRule->name}]");
                     }
                 } catch (\Throwable $dmEx) {
+                    try {
+                        Log::channel('webhook')->warning("Auto DM Failed: Comment #{$comment->id} - " . $dmEx->getMessage());
+                    } catch (\Throwable $logEx) {}
+
                     Log::warning("ProcessCommentJob: Auto DM dispatch error for comment #{$comment->id}: " . $dmEx->getMessage());
                 }
             }

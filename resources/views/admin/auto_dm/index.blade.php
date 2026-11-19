@@ -10,7 +10,10 @@
             <div class="col">
                 <h2 class="page-title text-body">Auto DM Rules</h2>
             </div>
-            <div class="col-auto">
+            <div class="col-auto d-flex align-items-center gap-2">
+                <a href="{{ route('admin.webhook-logs.index') }}" class="btn btn-outline-secondary d-inline-flex align-items-center" title="Inspect incoming webhook events and test live">
+                    <i class="ti ti-terminal-2 me-1.5 fs-3"></i>Webhook Logs
+                </a>
                 <a href="{{ route('admin.auto-dm.create') }}" class="btn btn-primary d-inline-flex align-items-center">
                     <i class="ti ti-plus me-1.5 fs-3"></i>Create Rule
                 </a>
