@@ -32,7 +32,7 @@
                         </div>
                     </div>
 
-                    {{-- Channel Filter & Status Filter (No separate Filter button, auto-submits on change) --}}
+                    {{-- Channel Filter & Status Filter (Auto-submits on change, no filter button) --}}
                     <div class="col-12 col-md-7 d-flex justify-content-md-end align-items-center gap-2 flex-wrap">
                         <select name="account_id" class="form-select" style="width: auto; min-width: 170px;" onchange="this.form.submit()">
                             <option value="">All Accounts ({{ $accounts->count() }})</option>
@@ -88,84 +88,85 @@
                 <table class="table table-vcenter card-table table-hover">
                     <thead>
                         <tr>
-                            <th style="min-width: 200px;">Rule & Account</th>
-                            <th style="min-width: 150px;">Target Post</th>
-                            <th style="min-width: 180px;">Keywords</th>
-                            <th style="min-width: 240px;">DM Message</th>
-                            <th style="width: 110px;" class="text-center">Sent</th>
-                            <th style="width: 90px;" class="text-center">Status</th>
-                            <th style="width: 100px;" class="text-end">Actions</th>
+                            <th style="min-width: 180px;">Rule Name</th>
+                            <th style="min-width: 180px;">Account</th>
+                            <th style="min-width: 130px;">Target</th>
+                            <th style="min-width: 150px;">Keywords</th>
+                            <th style="width: 80px;" class="text-center">Sent</th>
+                            <th style="width: 80px;" class="text-center">Status</th>
+                            <th style="width: 110px;" class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($rules as $rule)
+                            @php
+                                $ruleData = [
+                                    'id' => $rule->id,
+                                    'name' => $rule->name,
+                                    'platform' => $rule->account->isFacebook() ? 'Facebook' : 'Instagram',
+                                    'account_name' => $rule->account->name,
+                                    'target_type' => $rule->post_id ? 'Specific Post' : 'All Posts',
+                                    'post_title' => $rule->post ? ($rule->post->message ? Str::limit($rule->post->message, 120) : 'Post #' . $rule->post->id) : null,
+                                    'keywords' => $rule->keywords ?? [],
+                                    'match_type' => $rule->match_type === 'exact' ? 'Exact Match' : 'Contains Keyword',
+                                    'dm_message' => $rule->dm_message,
+                                    'public_reply' => $rule->public_reply,
+                                    'trigger_count' => $rule->trigger_count,
+                                    'last_triggered' => $rule->last_triggered_at ? $rule->last_triggered_at->diffForHumans() : 'Never',
+                                    'is_active' => (bool) $rule->is_active,
+                                    'edit_url' => route('admin.auto-dm.edit', $rule->id),
+                                ];
+                            @endphp
                             <tr id="rule-row-{{ $rule->id }}">
-                                {{-- 1. Rule Name & Account --}}
+                                {{-- 1. Rule Name (Single Line) --}}
                                 <td>
-                                    <div class="fw-bold text-dark mb-0.5">{{ $rule->name }}</div>
-                                    <div class="d-flex align-items-center gap-1.5 small text-secondary">
+                                    <span class="fw-semibold text-dark">{{ $rule->name }}</span>
+                                </td>
+
+                                {{-- 2. Account (Single Line) --}}
+                                <td>
+                                    <div class="d-inline-flex align-items-center">
                                         @if($rule->account->isFacebook())
-                                            <span class="badge bg-blue-lt text-blue py-0.5 px-1.5"><i class="ti ti-brand-facebook me-1"></i>Facebook</span>
+                                            <span class="badge bg-blue-lt text-blue py-0.5 px-1.5 me-1.5"><i class="ti ti-brand-facebook me-1"></i>FB</span>
                                         @elseif($rule->account->isInstagram())
-                                            <span class="badge bg-pink-lt text-pink py-0.5 px-1.5"><i class="ti ti-brand-instagram me-1"></i>Instagram</span>
+                                            <span class="badge bg-pink-lt text-pink py-0.5 px-1.5 me-1.5"><i class="ti ti-brand-instagram me-1"></i>IG</span>
                                         @endif
-                                        <span class="text-truncate" style="max-width: 150px;">{{ $rule->account->name }}</span>
+                                        <span class="text-secondary text-truncate" style="max-width: 140px;">{{ $rule->account->name }}</span>
                                     </div>
                                 </td>
 
-                                {{-- 2. Target Scope (All Posts vs Specific Post) --}}
+                                {{-- 3. Target Post (Single Line) --}}
                                 <td>
                                     @if($rule->post_id && $rule->post)
-                                        <span class="badge bg-secondary-lt text-dark d-inline-flex align-items-center gap-1 py-1 px-2" title="{{ $rule->post->message ?? 'Specific Post' }}">
-                                            <i class="ti ti-file-text fs-3 text-secondary"></i>
-                                            <span class="text-truncate" style="max-width: 130px;">
-                                                {{ Str::limit($rule->post->message ?? 'Post #' . $rule->post_id, 22) }}
-                                            </span>
+                                        <span class="badge bg-secondary-lt text-dark" title="{{ $rule->post->message ?? 'Specific Post' }}">
+                                            <i class="ti ti-file-text me-1"></i>Specific Post
                                         </span>
                                     @else
-                                        <span class="badge bg-azure-lt text-azure d-inline-flex align-items-center gap-1 py-1 px-2">
-                                            <i class="ti ti-world fs-3"></i> All Posts
+                                        <span class="badge bg-azure-lt text-azure">
+                                            <i class="ti ti-world me-1"></i>All Posts
                                         </span>
                                     @endif
                                 </td>
 
-                                {{-- 3. Keywords & Match Type --}}
+                                {{-- 4. Keywords (Single Line) --}}
                                 <td>
-                                    <div class="d-flex flex-wrap gap-1 mb-1">
+                                    <div class="d-flex flex-wrap gap-1">
                                         @if(is_array($rule->keywords))
                                             @foreach($rule->keywords as $kw)
                                                 <span class="badge bg-blue-lt text-blue font-monospace px-1.5 py-0.5">{{ $kw }}</span>
                                             @endforeach
                                         @endif
                                     </div>
-                                    <div class="small text-muted fs-7">
-                                        {{ $rule->match_type === 'exact' ? 'Exact match' : 'Contains keyword' }}
-                                    </div>
                                 </td>
 
-                                {{-- 4. DM Preview & Public Reply --}}
-                                <td>
-                                    <div class="text-dark small mb-1" style="max-width: 280px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;" title="{{ $rule->dm_message }}">
-                                        {{ $rule->dm_message }}
-                                    </div>
-                                    @if($rule->public_reply)
-                                        <div class="text-secondary fs-7 text-truncate" style="max-width: 280px;" title="{{ $rule->public_reply }}">
-                                            <i class="ti ti-corner-down-right text-muted me-1"></i>Reply: <em>"{{ $rule->public_reply }}"</em>
-                                        </div>
-                                    @endif
-                                </td>
-
-                                {{-- 5. Trigger Count & Last Triggered --}}
+                                {{-- 5. Trigger Count (Single Line) --}}
                                 <td class="text-center">
-                                    <span class="badge bg-success-lt text-success fs-4 fw-bold px-2 py-0.5 mb-0.5">
+                                    <span class="badge bg-success-lt text-success fw-bold px-2 py-0.5">
                                         {{ number_format($rule->trigger_count) }}
                                     </span>
-                                    <div class="small text-muted fs-7">
-                                        {{ $rule->last_triggered_at ? $rule->last_triggered_at->diffForHumans() : 'Never' }}
-                                    </div>
                                 </td>
 
-                                {{-- 6. Status Toggle Switch --}}
+                                {{-- 6. Status Toggle Switch (Single Line, no text below) --}}
                                 <td class="text-center">
                                     <label class="form-check form-switch m-0 d-inline-block cursor-pointer">
                                         <input class="form-check-input rule-status-toggle" type="checkbox"
@@ -173,14 +174,16 @@
                                                {{ $rule->is_active ? 'checked' : '' }}
                                                title="Toggle Active / Paused">
                                     </label>
-                                    <div class="small fs-7 text-muted" id="rule-status-label-{{ $rule->id }}">
-                                        {{ $rule->is_active ? 'Active' : 'Paused' }}
-                                    </div>
                                 </td>
 
-                                {{-- 7. Actions (Dedicated Edit Page & Delete) --}}
+                                {{-- 7. Actions (View Modal, Edit Page, Delete Modal) --}}
                                 <td class="text-end">
                                     <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-icon btn-ghost-secondary border btn-view-rule"
+                                                data-rule='@json($ruleData)'
+                                                title="View Details">
+                                            <i class="ti ti-eye fs-3"></i>
+                                        </button>
                                         <a href="{{ route('admin.auto-dm.edit', $rule->id) }}" class="btn btn-sm btn-icon btn-ghost-secondary border" title="Edit Rule">
                                             <i class="ti ti-pencil fs-3"></i>
                                         </a>
@@ -204,6 +207,70 @@
                 </div>
             @endif
         @endif
+    </div>
+
+    {{-- MODAL: View Rule Details --}}
+    <div class="modal modal-blur fade" id="view-rule-modal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content shadow">
+                <div class="modal-header py-3 px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="avatar avatar-sm rounded bg-purple-lt text-purple">
+                            <i class="ti ti-message-chatbot fs-2"></i>
+                        </span>
+                        <h5 class="modal-title fw-bold" id="view-modal-title">Rule Details</h5>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    {{-- Key Info Table --}}
+                    <div class="table-responsive mb-3">
+                        <table class="table table-sm table-borderless m-0">
+                            <tbody>
+                                <tr>
+                                    <td class="text-secondary fw-medium py-1 px-0" style="width: 130px;">Account:</td>
+                                    <td class="py-1 px-0" id="view-account-val"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary fw-medium py-1 px-0">Target Post:</td>
+                                    <td class="py-1 px-0" id="view-target-val"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary fw-medium py-1 px-0">Keywords:</td>
+                                    <td class="py-1 px-0" id="view-keywords-val"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary fw-medium py-1 px-0">Match Type:</td>
+                                    <td class="py-1 px-0 text-dark fw-medium" id="view-match-val"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary fw-medium py-1 px-0">Executions:</td>
+                                    <td class="py-1 px-0" id="view-executions-val"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {{-- DM Message Block --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-dark mb-1 small">Direct Message (DM)</label>
+                        <div class="p-3 rounded-2 border bg-light-subtle text-dark small" id="view-dm-val" style="white-space: pre-wrap; word-break: break-word;"></div>
+                    </div>
+
+                    {{-- Public Reply Block --}}
+                    <div id="view-reply-container" class="mb-2">
+                        <label class="form-label fw-bold text-dark mb-1 small">Public Reply</label>
+                        <div class="p-2.5 rounded-2 border bg-light-subtle text-dark small" id="view-reply-val"></div>
+                    </div>
+                </div>
+                <div class="modal-footer py-2.5 px-4 bg-light-subtle d-flex justify-content-between">
+                    <a href="#" id="view-modal-edit-btn" class="btn btn-primary">
+                        <i class="ti ti-pencil me-1"></i>Edit Rule
+                    </a>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- MODAL: Delete Rule Confirmation --}}
@@ -243,11 +310,59 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
-    // Status Toggle Switch
+    // 1. View Details Modal Handler
+    $(document).on('click', '.btn-view-rule', function () {
+        const data = $(this).data('rule');
+        if (!data) return;
+
+        $('#view-modal-title').text(data.name);
+
+        const badgeClass = data.platform === 'Facebook' ? 'bg-blue-lt text-blue' : 'bg-pink-lt text-pink';
+        const icon = data.platform === 'Facebook' ? 'ti ti-brand-facebook' : 'ti ti-brand-instagram';
+        $('#view-account-val').html(`
+            <span class="badge ${badgeClass} me-1"><i class="${icon} me-1"></i>${data.platform}</span>
+            <span class="text-dark fw-medium">${data.account_name}</span>
+        `);
+
+        if (data.post_title) {
+            $('#view-target-val').html(`<span class="badge bg-secondary-lt text-dark">${data.post_title}</span>`);
+        } else {
+            $('#view-target-val').html(`<span class="badge bg-azure-lt text-azure"><i class="ti ti-world me-1"></i>All Posts</span>`);
+        }
+
+        let kwHtml = '';
+        if (data.keywords && data.keywords.length > 0) {
+            data.keywords.forEach(function (k) {
+                kwHtml += `<span class="badge bg-blue-lt text-blue font-monospace me-1 mb-1">${k}</span>`;
+            });
+        }
+        $('#view-keywords-val').html(kwHtml || '<span class="text-muted">None</span>');
+
+        $('#view-match-val').text(data.match_type);
+
+        $('#view-executions-val').html(`
+            <span class="badge bg-success-lt text-success fw-bold me-1">${data.trigger_count} sent</span>
+            <span class="text-muted small">Last: ${data.last_triggered}</span>
+        `);
+
+        $('#view-dm-val').text(data.dm_message);
+
+        if (data.public_reply) {
+            $('#view-reply-container').show();
+            $('#view-reply-val').text(data.public_reply);
+        } else {
+            $('#view-reply-container').hide();
+        }
+
+        $('#view-modal-edit-btn').attr('href', data.edit_url);
+
+        $('#view-rule-modal').modal('show');
+    });
+
+    // 2. Status Toggle Switch
     $(document).on('change', '.rule-status-toggle', function () {
         const checkbox = $(this);
         const ruleId = checkbox.data('id');
-        const labelEl = $('#rule-status-label-' + ruleId);
 
         $.ajax({
             url: "/admin/auto-dm/" + ruleId + "/toggle",
@@ -258,7 +373,6 @@ $(document).ready(function () {
             dataType: "json",
             success: function (res) {
                 if (res.success) {
-                    labelEl.text(res.is_active ? 'Active' : 'Paused');
                     showToast(res.message, 'success');
                 } else {
                     checkbox.prop('checked', !checkbox.is(':checked'));
@@ -272,7 +386,7 @@ $(document).ready(function () {
         });
     });
 
-    // Delete Confirmation Modal
+    // 3. Delete Confirmation Modal
     $(document).on('click', '.btn-delete-rule', function () {
         const ruleId = $(this).data('id');
         const ruleName = $(this).data('name');
