@@ -91,10 +91,10 @@
                             <th style="min-width: 180px;">Rule Name</th>
                             <th style="min-width: 180px;">Account</th>
                             <th style="min-width: 130px;">Target</th>
-                            <th style="min-width: 150px;">Keywords</th>
-                            <th style="width: 80px;" class="text-center">Sent</th>
-                            <th style="width: 80px;" class="text-center">Status</th>
-                            <th style="width: 110px;" class="text-end">Actions</th>
+                            <th style="min-width: 160px;">Keywords</th>
+                            <th style="width: 90px;" class="text-center">Sent</th>
+                            <th style="width: 100px;" class="text-center">Status</th>
+                            <th style="width: 120px;" class="text-end">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -123,72 +123,79 @@
                                     <span class="fw-semibold text-dark">{{ $rule->name }}</span>
                                 </td>
 
-                                {{-- 2. Account (Single Line) --}}
+                                {{-- 2. Account (Transparent Outline Badge + Name) --}}
                                 <td>
                                     <div class="d-inline-flex align-items-center">
                                         @if($rule->account->isFacebook())
-                                            <span class="badge bg-blue-lt text-blue py-0.5 px-1.5 me-1.5"><i class="ti ti-brand-facebook me-1"></i>FB</span>
+                                            <span class="badge badge-outline text-primary me-1.5"><i class="ti ti-brand-facebook me-1"></i>Facebook</span>
                                         @elseif($rule->account->isInstagram())
-                                            <span class="badge bg-pink-lt text-pink py-0.5 px-1.5 me-1.5"><i class="ti ti-brand-instagram me-1"></i>IG</span>
+                                            <span class="badge badge-outline text-pink me-1.5"><i class="ti ti-brand-instagram me-1"></i>Instagram</span>
                                         @endif
-                                        <span class="text-secondary text-truncate" style="max-width: 140px;">{{ $rule->account->name }}</span>
+                                        <span class="text-secondary text-truncate" style="max-width: 130px;">{{ $rule->account->name }}</span>
                                     </div>
                                 </td>
 
-                                {{-- 3. Target Post (Single Line) --}}
+                                {{-- 3. Target Post (Transparent Outline Badge) --}}
                                 <td>
                                     @if($rule->post_id && $rule->post)
-                                        <span class="badge bg-secondary-lt text-dark" title="{{ $rule->post->message ?? 'Specific Post' }}">
+                                        <span class="badge badge-outline text-secondary" title="{{ $rule->post->message ?? 'Specific Post' }}">
                                             <i class="ti ti-file-text me-1"></i>Specific Post
                                         </span>
                                     @else
-                                        <span class="badge bg-azure-lt text-azure">
+                                        <span class="badge badge-outline text-azure">
                                             <i class="ti ti-world me-1"></i>All Posts
                                         </span>
                                     @endif
                                 </td>
 
-                                {{-- 4. Keywords (Single Line) --}}
+                                {{-- 4. Keywords (Transparent Outline Badges) --}}
                                 <td>
                                     <div class="d-flex flex-wrap gap-1">
                                         @if(is_array($rule->keywords))
                                             @foreach($rule->keywords as $kw)
-                                                <span class="badge bg-blue-lt text-blue font-monospace px-1.5 py-0.5">{{ $kw }}</span>
+                                                <span class="badge badge-outline text-blue font-monospace">{{ $kw }}</span>
                                             @endforeach
                                         @endif
                                     </div>
                                 </td>
 
-                                {{-- 5. Trigger Count (Single Line) --}}
+                                {{-- 5. Trigger Count (Transparent Outline Badge) --}}
                                 <td class="text-center">
-                                    <span class="badge bg-success-lt text-success fw-bold px-2 py-0.5">
-                                        {{ number_format($rule->trigger_count) }}
+                                    <span class="badge badge-outline text-success fw-bold">
+                                        <i class="ti ti-send me-1"></i>{{ number_format($rule->trigger_count) }}
                                     </span>
                                 </td>
 
-                                {{-- 6. Status Toggle Switch (Single Line, no text below) --}}
+                                {{-- 6. Status (Transparent Outline Badge - Clickable like User Table) --}}
                                 <td class="text-center">
-                                    <label class="form-check form-switch m-0 d-inline-block cursor-pointer">
-                                        <input class="form-check-input rule-status-toggle" type="checkbox"
-                                               data-id="{{ $rule->id }}"
-                                               {{ $rule->is_active ? 'checked' : '' }}
-                                               title="Toggle Active / Paused">
-                                    </label>
+                                    <a href="javascript:void(0)"
+                                       class="badge badge-outline text-{{ $rule->is_active ? 'success' : 'secondary' }} rule-status-btn text-decoration-none"
+                                       id="rule-status-badge-{{ $rule->id }}"
+                                       data-id="{{ $rule->id }}"
+                                       title="Click to toggle status">
+                                        <i class="ti ti-{{ $rule->is_active ? 'circle-check' : 'player-pause' }} me-1" id="rule-status-icon-{{ $rule->id }}"></i>
+                                        <span id="rule-status-text-{{ $rule->id }}">{{ $rule->is_active ? 'Active' : 'Paused' }}</span>
+                                    </a>
                                 </td>
 
-                                {{-- 7. Actions (View Modal, Edit Page, Delete Modal) --}}
+                                {{-- 7. Actions (Clean user-style outlined icon buttons) --}}
                                 <td class="text-end">
-                                    <div class="btn-group">
-                                        <button type="button" class="btn btn-sm btn-icon btn-ghost-secondary border btn-view-rule"
+                                    <div class="d-flex gap-1 justify-content-end">
+                                        <button type="button" class="btn btn-icon btn-sm btn-outline-primary btn-view-rule"
                                                 data-rule='@json($ruleData)'
                                                 title="View Details">
-                                            <i class="ti ti-eye fs-3"></i>
+                                            <i class="ti ti-eye"></i>
                                         </button>
-                                        <a href="{{ route('admin.auto-dm.edit', $rule->id) }}" class="btn btn-sm btn-icon btn-ghost-secondary border" title="Edit Rule">
-                                            <i class="ti ti-pencil fs-3"></i>
+                                        <a href="{{ route('admin.auto-dm.edit', $rule->id) }}"
+                                           class="btn btn-icon btn-sm btn-outline-warning"
+                                           title="Edit Rule">
+                                            <i class="ti ti-pencil"></i>
                                         </a>
-                                        <button type="button" class="btn btn-sm btn-icon btn-ghost-danger border btn-delete-rule" data-id="{{ $rule->id }}" data-name="{{ $rule->name }}" title="Delete Rule">
-                                            <i class="ti ti-trash fs-3"></i>
+                                        <button type="button" class="btn btn-icon btn-sm btn-outline-danger btn-delete-rule"
+                                                data-id="{{ $rule->id }}"
+                                                data-name="{{ $rule->name }}"
+                                                title="Delete Rule">
+                                            <i class="ti ti-trash"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -242,6 +249,10 @@
                                 <tr>
                                     <td class="text-secondary fw-medium py-1 px-0">Match Type:</td>
                                     <td class="py-1 px-0 text-dark fw-medium" id="view-match-val"></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-secondary fw-medium py-1 px-0">Status:</td>
+                                    <td class="py-1 px-0" id="view-status-val"></td>
                                 </tr>
                                 <tr>
                                     <td class="text-secondary fw-medium py-1 px-0">Executions:</td>
@@ -317,31 +328,36 @@ $(document).ready(function () {
 
         $('#view-modal-title').text(data.name);
 
-        const badgeClass = data.platform === 'Facebook' ? 'bg-blue-lt text-blue' : 'bg-pink-lt text-pink';
+        const badgeColor = data.platform === 'Facebook' ? 'primary' : 'pink';
         const icon = data.platform === 'Facebook' ? 'ti ti-brand-facebook' : 'ti ti-brand-instagram';
         $('#view-account-val').html(`
-            <span class="badge ${badgeClass} me-1"><i class="${icon} me-1"></i>${data.platform}</span>
+            <span class="badge badge-outline text-${badgeColor} me-1"><i class="${icon} me-1"></i>${data.platform}</span>
             <span class="text-dark fw-medium">${data.account_name}</span>
         `);
 
         if (data.post_title) {
-            $('#view-target-val').html(`<span class="badge bg-secondary-lt text-dark">${data.post_title}</span>`);
+            $('#view-target-val').html(`<span class="badge badge-outline text-secondary"><i class="ti ti-file-text me-1"></i>${data.post_title}</span>`);
         } else {
-            $('#view-target-val').html(`<span class="badge bg-azure-lt text-azure"><i class="ti ti-world me-1"></i>All Posts</span>`);
+            $('#view-target-val').html(`<span class="badge badge-outline text-azure"><i class="ti ti-world me-1"></i>All Posts</span>`);
         }
 
         let kwHtml = '';
         if (data.keywords && data.keywords.length > 0) {
             data.keywords.forEach(function (k) {
-                kwHtml += `<span class="badge bg-blue-lt text-blue font-monospace me-1 mb-1">${k}</span>`;
+                kwHtml += `<span class="badge badge-outline text-blue font-monospace me-1 mb-1">${k}</span>`;
             });
         }
         $('#view-keywords-val').html(kwHtml || '<span class="text-muted">None</span>');
 
         $('#view-match-val').text(data.match_type);
 
+        const statusColor = data.is_active ? 'success' : 'secondary';
+        const statusIcon = data.is_active ? 'circle-check' : 'player-pause';
+        const statusLabel = data.is_active ? 'Active' : 'Paused';
+        $('#view-status-val').html(`<span class="badge badge-outline text-${statusColor}"><i class="ti ti-${statusIcon} me-1"></i>${statusLabel}</span>`);
+
         $('#view-executions-val').html(`
-            <span class="badge bg-success-lt text-success fw-bold me-1">${data.trigger_count} sent</span>
+            <span class="badge badge-outline text-success fw-bold me-1"><i class="ti ti-send me-1"></i>${data.trigger_count} sent</span>
             <span class="text-muted small">Last: ${data.last_triggered}</span>
         `);
 
@@ -359,10 +375,13 @@ $(document).ready(function () {
         $('#view-rule-modal').modal('show');
     });
 
-    // 2. Status Toggle Switch
-    $(document).on('change', '.rule-status-toggle', function () {
-        const checkbox = $(this);
-        const ruleId = checkbox.data('id');
+    // 2. Status Badge Toggle Handler (User-table style)
+    $(document).on('click', '.rule-status-btn', function (e) {
+        e.preventDefault();
+        const btn = $(this);
+        const ruleId = btn.data('id');
+        const iconEl = $('#rule-status-icon-' + ruleId);
+        const textEl = $('#rule-status-text-' + ruleId);
 
         $.ajax({
             url: "/admin/auto-dm/" + ruleId + "/toggle",
@@ -373,14 +392,21 @@ $(document).ready(function () {
             dataType: "json",
             success: function (res) {
                 if (res.success) {
+                    if (res.is_active) {
+                        btn.removeClass('text-secondary').addClass('text-success');
+                        iconEl.removeClass('ti-player-pause').addClass('ti-circle-check');
+                        textEl.text('Active');
+                    } else {
+                        btn.removeClass('text-success').addClass('text-secondary');
+                        iconEl.removeClass('ti-circle-check').addClass('ti-player-pause');
+                        textEl.text('Paused');
+                    }
                     showToast(res.message, 'success');
                 } else {
-                    checkbox.prop('checked', !checkbox.is(':checked'));
                     showToast('Failed to update status.', 'error');
                 }
             },
             error: function () {
-                checkbox.prop('checked', !checkbox.is(':checked'));
                 showToast('Server error while toggling rule.', 'error');
             }
         });
