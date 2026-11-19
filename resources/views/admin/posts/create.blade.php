@@ -15,6 +15,7 @@
     $fbCount = $accounts->where('account_type', \App\Models\Account::TYPE_FACEBOOK)->count();
     $igCount = $accounts->where('account_type', \App\Models\Account::TYPE_INSTAGRAM)->count();
     $ytCount = $accounts->where('account_type', \App\Models\Account::TYPE_YOUTUBE)->count();
+    $totalCount = $accounts->count();
 
     $accountCounts = [
         1 => $fbCount,
@@ -42,6 +43,7 @@
         <div class="row align-items-center">
             <div class="col">
                 <h2 class="page-title">Create Post</h2>
+                <div class="text-secondary small mt-1">Compose, schedule, or publish posts across one or multiple connected accounts.</div>
             </div>
             <div class="col-auto">
                 <a href="{{ route('admin.posts.schedule') }}" class="btn btn-outline-secondary">
@@ -86,55 +88,106 @@
             @csrf
             <input type="hidden" name="platform" id="selected-platform" value="{{ $initialPlatform }}">
             <input type="hidden" name="post_type" id="selected-post-type" value="{{ old('post_type', 'photo') }}">
+            <input type="hidden" name="account_id" id="composer-account-id-fallback" value="{{ old('account_id', $selectedAccountId) }}">
 
             <div class="card-body p-4">
-                {{-- Platform Selection Buttons --}}
+                {{-- Platform Selection Filter Buttons --}}
                 <div class="mb-4">
                     <label class="form-label fw-bold text-dark mb-2">Target Platform</label>
                     <div class="d-flex gap-2 flex-wrap" id="platform-btn-group">
+                        <button type="button" class="btn composer-platform-btn platform-all" data-platform="all" data-name="All Channels">
+                            <i class="ti ti-layout-grid fs-2 me-1.5"></i>All Channels ({{ $totalCount }})
+                        </button>
                         <button type="button" class="btn composer-platform-btn platform-fb {{ $initialPlatform === 1 ? 'active' : '' }}" data-platform="1" data-name="Facebook">
-                            <i class="ti ti-brand-facebook fs-2 me-1.5"></i>Facebook
+                            <i class="ti ti-brand-facebook fs-2 me-1.5"></i>Facebook ({{ $fbCount }})
                         </button>
                         <button type="button" class="btn composer-platform-btn platform-ig {{ $initialPlatform === 2 ? 'active' : '' }}" data-platform="2" data-name="Instagram">
-                            <i class="ti ti-brand-instagram fs-2 me-1.5"></i>Instagram
+                            <i class="ti ti-brand-instagram fs-2 me-1.5"></i>Instagram ({{ $igCount }})
                         </button>
                         <button type="button" class="btn composer-platform-btn platform-yt {{ $initialPlatform === 3 ? 'active' : '' }}" data-platform="3" data-name="YouTube">
-                            <i class="ti ti-brand-youtube fs-2 me-1.5"></i>YouTube
+                            <i class="ti ti-brand-youtube fs-2 me-1.5"></i>YouTube ({{ $ytCount }})
                         </button>
                     </div>
                 </div>
 
                 {{-- Empty State: Displayed when the selected platform has NO connected accounts --}}
                 <div id="no-account-state" class="p-4 p-md-5 my-3 text-center rounded-3 border border-dashed bg-light-subtle d-none">
-                    <h3 class="fw-bold text-dark mb-2" id="no-account-title">Please Connect Your Facebook Account</h3>
+                    <h3 class="fw-bold text-dark mb-2" id="no-account-title">Please Connect Your Account</h3>
                     <p class="text-secondary mx-auto mb-3 small" style="max-width: 480px;" id="no-account-desc">
-                        Please connect your Facebook Page to create or schedule posts.
+                        Please connect your social media channel to create or schedule posts.
                     </p>
                     <div class="d-flex justify-content-center">
                         <a href="{{ route('admin.accounts.index') }}" class="btn btn-primary px-4" id="no-account-connect-btn">
-                            <i class="ti ti-plug me-1.5"></i><span id="no-account-btn-text">Connect Facebook Account</span>
+                            <i class="ti ti-plug me-1.5"></i><span id="no-account-btn-text">Connect Account</span>
                         </a>
                     </div>
                 </div>
 
                 {{-- Form Fields Container: Visible ONLY when the selected platform has connected accounts --}}
                 <div id="composer-form-fields">
-                    {{-- Target Account Selector --}}
+                    {{-- Target Accounts Multi-Selection Grid --}}
                     <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <label class="form-label fw-bold text-dark m-0" id="composer-account-label">Select Account</label>
-                            <a href="{{ route('admin.accounts.index') }}" target="_blank" class="text-secondary small">
-                                <i class="ti ti-plus me-1"></i>Manage Accounts
-                            </a>
+                        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+                            <div class="d-flex align-items-center gap-2">
+                                <label class="form-label fw-bold text-dark m-0" id="composer-account-label">Select Target Account(s)</label>
+                                <span class="badge bg-primary-lt" id="selected-accounts-count-badge">0 selected</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary" id="btn-select-all-accounts">
+                                    <i class="ti ti-check-all me-1"></i>Select All
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-clear-all-accounts">
+                                    <i class="ti ti-x me-1"></i>Clear
+                                </button>
+                                <a href="{{ route('admin.accounts.index') }}" target="_blank" class="btn btn-sm btn-ghost-secondary text-secondary">
+                                    <i class="ti ti-plus me-1"></i>Manage Accounts
+                                </a>
+                            </div>
                         </div>
-                        <select name="account_id" class="form-select" id="composer-account-select" required>
-                            <option value="">-- Choose Account --</option>
+
+                        {{-- Multi-Account Interactive Cards Grid --}}
+                        <div class="row g-2" id="accounts-grid-container">
                             @foreach($accounts as $acc)
-                                <option value="{{ $acc->id }}" data-type="{{ $acc->account_type }}" {{ (old('account_id', $selectedAccountId) == $acc->id) ? 'selected' : '' }}>
-                                    [{{ $acc->account_type_name }}] {{ $acc->name }}
-                                </option>
+                                @php
+                                    $isFb = $acc->account_type === \App\Models\Account::TYPE_FACEBOOK;
+                                    $isIg = $acc->account_type === \App\Models\Account::TYPE_INSTAGRAM;
+                                    $isYt = $acc->account_type === \App\Models\Account::TYPE_YOUTUBE;
+                                    $isSelected = (old('account_id', $selectedAccountId) == $acc->id) ||
+                                                  (isset($selectedAccountIds) && in_array($acc->id, $selectedAccountIds)) ||
+                                                  (is_array(old('account_ids')) && in_array($acc->id, old('account_ids')));
+                                @endphp
+                                <div class="col-sm-6 col-lg-4 account-card-col" data-platform="{{ $acc->account_type }}">
+                                    <div class="account-select-card card card-sm h-100 p-2 cursor-pointer transition-all border {{ $isSelected ? 'border-primary bg-primary-lt selected' : '' }}"
+                                         data-account-id="{{ $acc->id }}"
+                                         data-platform="{{ $acc->account_type }}"
+                                         style="cursor: pointer; user-select: none;">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="form-check m-0">
+                                                <input type="checkbox" name="account_ids[]" value="{{ $acc->id }}"
+                                                       class="form-check-input account-checkbox cursor-pointer"
+                                                       data-platform="{{ $acc->account_type }}"
+                                                       data-name="{{ $acc->name }}"
+                                                       id="acc-check-{{ $acc->id }}"
+                                                       {{ $isSelected ? 'checked' : '' }}>
+                                            </div>
+                                            @if($isFb)
+                                                <span class="avatar avatar-sm rounded bg-blue text-white"><i class="ti ti-brand-facebook"></i></span>
+                                            @elseif($isIg)
+                                                <span class="avatar avatar-sm rounded bg-pink text-white"><i class="ti ti-brand-instagram"></i></span>
+                                            @elseif($isYt)
+                                                <span class="avatar avatar-sm rounded bg-red text-white"><i class="ti ti-brand-youtube"></i></span>
+                                            @else
+                                                <span class="avatar avatar-sm rounded bg-secondary text-white"><i class="ti ti-social"></i></span>
+                                            @endif
+                                            <div class="text-truncate flex-fill">
+                                                <div class="fw-semibold text-truncate small text-dark" title="{{ $acc->name }}">{{ $acc->name }}</div>
+                                                <div class="text-secondary text-truncate" style="font-size: 0.72rem;">{{ $acc->account_type_name }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
-                        </select>
+                        </div>
                     </div>
 
                     {{-- Meta Post Types (Facebook & Instagram) --}}
@@ -202,8 +255,8 @@
                                 <label class="form-label required fw-bold text-dark">Privacy Status</label>
                                 <select name="privacy_status" class="form-select" id="youtube-privacy-status">
                                     <option value="public" {{ old('privacy_status', 'public') == 'public' ? 'selected' : '' }}>Public</option>
-                                    <option value="unlisted" {{ old('privacy_status') == 'unlisted' ? 'selected' : '' }}>Unlisted</option>
-                                    <option value="private" {{ old('privacy_status') == 'private' ? 'selected' : '' }}>Private</option>
+                                    <option value="unlisted" {{ old('privacy_status', 'unlisted') == 'unlisted' ? 'selected' : '' }}>Unlisted</option>
+                                    <option value="private" {{ old('privacy_status', 'private') == 'private' ? 'selected' : '' }}>Private</option>
                                 </select>
                             </div>
                         </div>
@@ -268,6 +321,12 @@
         background: #f8fafc;
         color: #0f172a;
     }
+    .composer-platform-btn.platform-all.active {
+        background-color: #206bc4 !important;
+        color: #ffffff !important;
+        border-color: #206bc4 !important;
+        box-shadow: 0 2px 6px rgba(32, 107, 196, 0.25);
+    }
     .composer-platform-btn.platform-fb.active {
         background-color: #1877f2 !important;
         color: #ffffff !important;
@@ -286,6 +345,23 @@
         border-color: #e02424 !important;
         box-shadow: 0 2px 6px rgba(224, 36, 36, 0.25);
     }
+
+    .account-select-card {
+        border: 1.5px solid rgba(4, 32, 69, 0.12);
+        border-radius: 8px;
+        background: #ffffff;
+        transition: all 0.15s ease-in-out;
+    }
+    .account-select-card:hover {
+        border-color: #206bc4;
+        background-color: #f8fafc;
+    }
+    .account-select-card.selected {
+        border-color: #206bc4 !important;
+        background-color: rgba(32, 107, 196, 0.08) !important;
+        box-shadow: 0 1px 4px rgba(32, 107, 196, 0.18);
+    }
+
     .post-type-pill {
         cursor: pointer;
         border: 1px solid rgba(4, 32, 69, 0.12);
@@ -308,6 +384,7 @@
         color: #ffffff;
         border-color: #1db8ab;
     }
+
     [data-bs-theme="dark"] .composer-platform-btn {
         background: #111a2d !important;
         color: #cbd5e1 !important;
@@ -317,6 +394,18 @@
         background: #162035 !important;
         border-color: rgba(255, 255, 255, 0.22) !important;
         color: #f8fafc !important;
+    }
+    [data-bs-theme="dark"] .account-select-card {
+        background: #111a2d;
+        border-color: rgba(255, 255, 255, 0.12);
+    }
+    [data-bs-theme="dark"] .account-select-card:hover {
+        background: #162035;
+        border-color: #3b82f6;
+    }
+    [data-bs-theme="dark"] .account-select-card.selected {
+        background-color: rgba(59, 130, 246, 0.15) !important;
+        border-color: #3b82f6 !important;
     }
     [data-bs-theme="dark"] .post-type-pill {
         background: #111a2d !important;
@@ -333,13 +422,21 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const totalAccounts = {{ $totalCount }};
     const accountCounts = {
+        'all': {{ $totalCount }},
         1: {{ $accountCounts[1] }},
         2: {{ $accountCounts[2] }},
         3: {{ $accountCounts[3] }}
     };
 
     const platformConfig = {
+        'all': {
+            name: 'All Channels',
+            emptyTitle: 'No Connected Social Accounts',
+            emptyDesc: 'Please connect at least one social media account to start creating posts.',
+            connectBtnText: 'Connect an Account'
+        },
         1: {
             name: 'Facebook',
             emptyTitle: 'Please Connect Your Facebook Account',
@@ -360,19 +457,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
 
-    let currentPlatform = parseInt($('#selected-platform').val()) || 1;
+    let currentPlatform = '{{ $initialPlatform }}';
 
     function applyPlatform(platform) {
-        currentPlatform = parseInt(platform);
-        $('#selected-platform').val(currentPlatform);
+        currentPlatform = platform;
+        $('#selected-platform').val(platform === 'all' ? 1 : platform);
 
         // Update button active states
         $('.composer-platform-btn').removeClass('active');
-        if (currentPlatform === 1) $('.platform-fb').addClass('active');
-        else if (currentPlatform === 2) $('.platform-ig').addClass('active');
-        else if (currentPlatform === 3) $('.platform-yt').addClass('active');
+        if (currentPlatform === 'all') $('.platform-all').addClass('active');
+        else if (currentPlatform == 1) $('.platform-fb').addClass('active');
+        else if (currentPlatform == 2) $('.platform-ig').addClass('active');
+        else if (currentPlatform == 3) $('.platform-yt').addClass('active');
 
-        const availableCount = accountCounts[currentPlatform] || 0;
+        const availableCount = accountCounts[currentPlatform] !== undefined ? accountCounts[currentPlatform] : 0;
         const config = platformConfig[currentPlatform] || platformConfig[1];
 
         if (availableCount === 0) {
@@ -387,7 +485,6 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#no-account-state').removeClass('d-none');
 
             // Remove required flags so they don't block anything
-            $('#composer-account-select').prop('required', false);
             $('#youtube-title').prop('required', false);
             $('#youtube-video-file').prop('required', false);
             $('#composer-scheduled-at').prop('required', false);
@@ -398,33 +495,38 @@ document.addEventListener('DOMContentLoaded', function () {
         $('#no-account-state').addClass('d-none');
         $('#composer-form-fields').removeClass('d-none');
         $('#composer-card-footer').removeClass('d-none');
-        $('#composer-account-select').prop('required', true);
 
-        // Filter account selector options
-        let currentSelectedAcc = $('#composer-account-select').val();
-        let selectedStillValid = false;
-
-        $('#composer-account-select option').each(function () {
-            let type = parseInt($(this).data('type'));
-            if (!type) return; // Keep the placeholder
-
-            if (type === currentPlatform) {
-                $(this).show();
-                if ($(this).val() == currentSelectedAcc) {
-                    selectedStillValid = true;
+        // Filter account cards based on platform tab
+        if (currentPlatform === 'all') {
+            $('.account-card-col').show();
+            $('#composer-account-label').text('Select Target Account(s)');
+        } else {
+            $('.account-card-col').each(function () {
+                let p = $(this).data('platform');
+                if (p == currentPlatform) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
                 }
-            } else {
-                $(this).hide();
-            }
-        });
+            });
 
-        if (!selectedStillValid) {
-            let firstValid = $('#composer-account-select option[data-type="' + currentPlatform + '"]').first().val();
-            $('#composer-account-select').val(firstValid || '');
+            if (currentPlatform == 1) $('#composer-account-label').text('Select Facebook Page(s)');
+            else if (currentPlatform == 2) $('#composer-account-label').text('Select Instagram Account(s)');
+            else if (currentPlatform == 3) $('#composer-account-label').text('Select YouTube Channel(s)');
+
+            // If switching to a specific platform and no visible card is checked, auto-check first visible card
+            let checkedOnPlatform = $('.account-checkbox[data-platform="' + currentPlatform + '"]:checked').length;
+            if (checkedOnPlatform === 0) {
+                let firstCard = $('.account-card-col[data-platform="' + currentPlatform + '"]').first();
+                if (firstCard.length) {
+                    firstCard.find('.account-checkbox').prop('checked', true);
+                    firstCard.find('.account-select-card').addClass('selected border-primary bg-primary-lt');
+                }
+            }
         }
 
         // Toggle UI Sections based on platform
-        if (currentPlatform === 3) { // YouTube
+        if (currentPlatform == 3) { // YouTube
             $('#meta-post-types-section').addClass('d-none');
             $('#meta-content-section').addClass('d-none');
             $('#meta-media-section').addClass('d-none');
@@ -432,8 +534,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#youtube-title').prop('required', true);
             $('#youtube-video-file').prop('required', $('#radio-mode-now').is(':checked') || $('#radio-mode-schedule').is(':checked'));
             $('#composer-media-files').prop('required', false);
-            $('#composer-account-label').text('Select YouTube Channel');
-        } else { // Meta (Facebook / Instagram)
+        } else { // Meta (Facebook / Instagram / All)
             $('#meta-post-types-section').removeClass('d-none');
             $('#meta-content-section').removeClass('d-none');
             $('#meta-media-section').removeClass('d-none');
@@ -441,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#youtube-title').prop('required', false);
             $('#youtube-video-file').prop('required', false);
 
-            if (currentPlatform === 2) { // Instagram
+            if (currentPlatform == 2) { // Instagram
                 $('#pill-type-text').hide();
                 $('#pill-type-reel').show();
                 if ($('#selected-post-type').val() === 'text') {
@@ -449,12 +550,82 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('.post-type-pill').removeClass('active');
                     $('.post-type-pill[data-type="photo"]').addClass('active');
                 }
-                $('#composer-account-label').text('Select Instagram Account');
-            } else { // Facebook
+            } else {
                 $('#pill-type-text').show();
                 $('#pill-type-reel').hide();
-                $('#composer-account-label').text('Select Facebook Page');
             }
+        }
+
+        updateAccountSelectionState();
+    }
+
+    // Interactive card click handler (clicking anywhere on card toggles checkbox)
+    $(document).on('click', '.account-select-card', function (e) {
+        if ($(e.target).is('input[type="checkbox"]')) {
+            let isChecked = $(e.target).is(':checked');
+            $(this).toggleClass('selected border-primary bg-primary-lt', isChecked);
+            updateAccountSelectionState();
+            return;
+        }
+
+        let cb = $(this).find('.account-checkbox');
+        let willCheck = !cb.is(':checked');
+        cb.prop('checked', willCheck).trigger('change');
+        $(this).toggleClass('selected border-primary bg-primary-lt', willCheck);
+        updateAccountSelectionState();
+    });
+
+    $(document).on('change', '.account-checkbox', function () {
+        let card = $(this).closest('.account-select-card');
+        card.toggleClass('selected border-primary bg-primary-lt', $(this).is(':checked'));
+        updateAccountSelectionState();
+    });
+
+    // "Select All" button click handler
+    $('#btn-select-all-accounts').on('click', function () {
+        $('.account-card-col:visible').find('.account-checkbox').prop('checked', true);
+        $('.account-card-col:visible').find('.account-select-card').addClass('selected border-primary bg-primary-lt');
+        updateAccountSelectionState();
+    });
+
+    // "Clear" button click handler
+    $('#btn-clear-all-accounts').on('click', function () {
+        $('.account-card-col:visible').find('.account-checkbox').prop('checked', false);
+        $('.account-card-col:visible').find('.account-select-card').removeClass('selected border-primary bg-primary-lt');
+        updateAccountSelectionState();
+    });
+
+    // Update selection count badge and fallback
+    function updateAccountSelectionState() {
+        let checkedBoxes = $('.account-checkbox:checked');
+        let count = checkedBoxes.length;
+
+        if (count === 0) {
+            $('#selected-accounts-count-badge').text('0 selected')
+                .removeClass('bg-primary-lt text-primary').addClass('bg-secondary-lt text-secondary');
+            $('#composer-account-id-fallback').val('');
+        } else {
+            let txt = count === 1 ? '1 account selected' : count + ' accounts selected';
+            $('#selected-accounts-count-badge').text(txt)
+                .removeClass('bg-secondary-lt text-secondary').addClass('bg-primary-lt text-primary');
+            $('#composer-account-id-fallback').val(checkedBoxes.first().val());
+        }
+
+        // If any Instagram account is selected, text-only is disabled
+        let hasInstagram = false;
+        checkedBoxes.each(function () {
+            if (parseInt($(this).data('platform')) === 2) hasInstagram = true;
+        });
+
+        if (hasInstagram) {
+            $('#pill-type-text').hide();
+            if ($('#selected-post-type').val() === 'text') {
+                $('#selected-post-type').val('photo');
+                $('.post-type-pill').removeClass('active');
+                $('.post-type-pill[data-type="photo"]').addClass('active');
+            }
+        } else if (currentPlatform != 2) {
+            $('#pill-type-text').show();
         }
 
         updateSubmitButton();
@@ -477,7 +648,8 @@ document.addEventListener('DOMContentLoaded', function () {
         let mode = $(this).val();
         if (mode === 'schedule') {
             $('#schedule-datetime-container').show();
-            if (accountCounts[currentPlatform] > 0) {
+            let count = accountCounts[currentPlatform] !== undefined ? accountCounts[currentPlatform] : 0;
+            if (count > 0) {
                 $('#composer-scheduled-at').prop('required', true);
             }
         } else {
@@ -485,7 +657,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#composer-scheduled-at').prop('required', false);
         }
 
-        if (currentPlatform === 3 && accountCounts[currentPlatform] > 0) {
+        if (currentPlatform == 3) {
             $('#youtube-video-file').prop('required', mode !== 'draft');
         }
 
@@ -494,16 +666,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateSubmitButton() {
         let mode = $('input[name="publish_mode"]:checked').val();
-        let platformName = currentPlatform === 3 ? 'YouTube Video' : (currentPlatform === 2 ? 'Instagram Post' : 'Facebook Post');
+        let count = $('.account-checkbox:checked').length;
+        let targetText = count > 1 ? count + ' Accounts' : (currentPlatform == 3 ? 'YouTube Video' : 'Post');
 
         if (mode === 'now') {
-            $('#btn-submit-post').html('<i class="ti ti-send me-1.5"></i>Publish ' + platformName + ' Now');
+            $('#btn-submit-post').html('<i class="ti ti-send me-1.5"></i>Publish to ' + targetText + ' Now');
         } else if (mode === 'draft') {
-            $('#btn-submit-post').html('<i class="ti ti-file-pencil me-1.5"></i>Save Draft');
+            $('#btn-submit-post').html('<i class="ti ti-file-pencil me-1.5"></i>Save Draft (' + targetText + ')');
         } else {
-            $('#btn-submit-post').html('<i class="ti ti-calendar-check me-1.5"></i>Schedule ' + platformName);
+            $('#btn-submit-post').html('<i class="ti ti-calendar-check me-1.5"></i>Schedule for ' + targetText);
         }
     }
+
+    // Form submission validation (ensures at least 1 account is checked)
+    $('#form-create-post').on('submit', function (e) {
+        let count = $('.account-checkbox:checked').length;
+        if (count === 0) {
+            e.preventDefault();
+            alert('Please select at least one social media account to post to.');
+            $('html, body').animate({
+                scrollTop: $('#accounts-grid-container').offset().top - 100
+            }, 300);
+            return false;
+        }
+    });
 
     // Live character counters
     $('#composer-content').on('input', function () {
@@ -517,6 +703,15 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#youtube-description').on('input', function () {
         $('#yt-desc-counter').text($(this).val().length + ' / 5000');
     });
+
+    // Initial check: if no account is selected, select the first visible card
+    if ($('.account-checkbox:checked').length === 0) {
+        let firstCard = $('.account-card-col[data-platform="' + currentPlatform + '"]').first();
+        if (firstCard.length) {
+            firstCard.find('.account-checkbox').prop('checked', true);
+            firstCard.find('.account-select-card').addClass('selected border-primary bg-primary-lt');
+        }
+    }
 
     // Initial run
     applyPlatform(currentPlatform);

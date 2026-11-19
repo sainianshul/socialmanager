@@ -790,4 +790,101 @@ class SchedulePostManagementTest extends TestCase
         $this->assertSoftDeleted('scheduled_posts', ['id' => $post->id]);
         Storage::disk('public')->assertMissing($path);
     }
+
+    public function test_schedule_posts_store_multi_account_creates_multiple_scheduled_posts(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $fbPage1 = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_multi_1',
+            'name' => 'Main Brand Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $fbPage2 = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_multi_2',
+            'name' => 'Secondary Brand Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $scheduledTime = now()->addDays(3)->format('Y-m-d\TH:i');
+
+        $response = $this->actingAs($user)->post(route('admin.posts.schedule.store'), [
+            'account_ids' => [$fbPage1->id, $fbPage2->id],
+            'post_type' => 'text',
+            'content' => 'Multi-channel broadcast announcement across both pages.',
+            'publish_mode' => 'schedule',
+            'scheduled_at' => $scheduledTime,
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $fbPage1->id,
+            'content' => 'Multi-channel broadcast announcement across both pages.',
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $fbPage2->id,
+            'content' => 'Multi-channel broadcast announcement across both pages.',
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+    }
+
+    public function test_schedule_posts_store_multi_account_publish_now_publishes_all(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $fbPage = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_live_multi_1',
+            'name' => 'Live Page 1',
+            'access_token' => 'mock_token',
+        ]);
+
+        $igPage = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_INSTAGRAM,
+            'meta_account_id' => 'ig_live_multi_2',
+            'name' => 'Live IG Account',
+            'access_token' => 'mock_token',
+        ]);
+
+        Http::fake([
+            'https://graph.facebook.com/v20.0/fb_live_multi_1/photos' => Http::response(['id' => 'fb_published_multi_1'], 200),
+            'https://graph.facebook.com/v20.0/ig_live_multi_2/media' => Http::response(['id' => 'creation_id_123'], 200),
+            'https://graph.facebook.com/v20.0/ig_live_multi_2/media_publish' => Http::response(['id' => 'ig_published_multi_2'], 200),
+        ]);
+
+        Storage::fake('public');
+        $imageFile = UploadedFile::fake()->image('broadcast.jpg', 800, 800);
+
+        $response = $this->actingAs($user)->post(route('admin.posts.schedule.store'), [
+            'account_ids' => [$fbPage->id, $igPage->id],
+            'post_type' => 'photo',
+            'content' => 'Live multi-channel image post to FB & IG!',
+            'media_files' => [$imageFile],
+            'publish_mode' => 'now',
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $fbPage->id,
+            'status' => ScheduledPost::STATUS_PUBLISHED,
+        ]);
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id' => $igPage->id,
+            'status' => ScheduledPost::STATUS_PUBLISHED,
+        ]);
+    }
 }
