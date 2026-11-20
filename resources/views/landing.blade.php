@@ -361,67 +361,87 @@
         }
 
         /* ===================================================================== */
-        /* APPLE-STYLE CORE CAPABILITIES SECTION (SPLIT WITH IMAGE)              */
+        /* APPLE-STYLE BENTO GRID: WHY SOCIALMANAGER                             */
         /* ===================================================================== */
         .apple-features-section {
-            padding: 100px 0;
-            background: #ffffff;
+            padding: 95px 0;
+            background: #fcfdfe;
             border-top: 1px solid rgba(15, 23, 42, 0.05);
             border-bottom: 1px solid rgba(15, 23, 42, 0.05);
         }
-        .apple-feature-item {
+        .apple-bento-card {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 20px;
+            padding: 30px 26px;
+            height: 100%;
             display: flex;
-            align-items: flex-start;
-            gap: 16px;
-            margin-bottom: 24px;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(0, 0, 0, 0.02);
+            position: relative;
         }
-        .apple-feature-item:last-child {
-            margin-bottom: 0;
+        .apple-bento-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(29, 184, 171, 0.45);
+            box-shadow: 0 20px 40px -12px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(0, 0, 0, 0.03);
         }
-        .apple-feature-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(12, 166, 120, 0.08);
-            color: #0ca678;
+        .apple-bento-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            flex-shrink: 0;
-            border: 1px solid rgba(12, 166, 120, 0.15);
+            justify-content: space-between;
+            margin-bottom: 18px;
         }
-        .apple-feature-title {
-            font-size: 1.05rem;
+        .apple-bento-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            background: rgba(29, 184, 171, 0.08);
+            color: #10857b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            border: 1px solid rgba(29, 184, 171, 0.22);
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .apple-bento-card:hover .apple-bento-icon {
+            transform: scale(1.05);
+            background: rgba(29, 184, 171, 0.14);
+        }
+        .apple-bento-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #f8fafc;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+        }
+        .apple-bento-title {
+            font-size: 1.15rem;
             font-weight: 700;
             color: #0f172a;
-            margin-bottom: 4px;
-            letter-spacing: -0.015em;
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+            line-height: 1.35;
         }
-        .apple-feature-desc {
+        .apple-bento-desc {
             font-size: 0.92rem;
             color: #64748b;
-            line-height: 1.55;
-            margin: 0;
+            line-height: 1.6;
+            margin-bottom: 20px;
         }
-        .apple-media-frame {
-            background: #ffffff;
-            border: 1px solid rgba(15, 23, 42, 0.08);
-            border-radius: 24px;
-            box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.08);
-            overflow: hidden;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        .apple-media-frame:hover {
-            box-shadow: 0 30px 70px -15px rgba(15, 23, 42, 0.12);
-            border-color: rgba(15, 23, 42, 0.14);
-        }
-        .apple-media-image {
-            width: 100%;
-            height: auto;
-            display: block;
-            object-fit: cover;
+        .apple-bento-widget {
+            background: #f8fafc;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 12px;
+            padding: 11px 14px;
+            font-size: 0.825rem;
+            font-weight: 500;
         }
 
         /* ===================================================================== */
@@ -822,111 +842,176 @@
 
     <!-- ========================================================================= -->
     <!-- ========================================================================= -->
-    <!-- STEP 2: WHY SOCIALMANAGER (APPLE-STYLE MINIMAL SPLIT & ILLUSTRATION)     -->
+    <!-- STEP 2: WHY SOCIALMANAGER (APPLE-STYLE MINIMAL BENTO GRID SHOWCASE)      -->
     <!-- ========================================================================= -->
     <section id="features" class="apple-features-section">
         <div class="container-xl">
-            <div class="row align-items-center g-5">
-                <!-- Left Column: Crisp Core Capabilities -->
-                <div class="col-12 col-lg-6">
-                    <h2 class="apple-section-headline mb-3">
-                        Why SocialManager?
-                    </h2>
-                    <p class="apple-section-subhead mb-4">
-                        Everything you need to broadcast, automate, and safeguard your brand across every channel.
-                    </p>
+            <!-- Section Header -->
+            <div class="text-center mb-5" style="max-width: 760px; margin-left: auto; margin-right: auto;">
+                <span class="apple-section-eyebrow mb-2 d-inline-block">ENGINEERED FOR SCALE</span>
+                <h2 class="apple-section-headline mb-3">Why SocialManager?</h2>
+                <p class="apple-section-subhead">
+                    Everything you need to broadcast across channels, moderate thousands of follower inquiries, and safeguard brand integrity around the clock.
+                </p>
+            </div>
 
-                    <!-- Feature 1: Multi-Platform 1-Click Publishing -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-layers-intersect"></i>
-                        </div>
+            <!-- Apple Bento Grid (6 Refined Capability Cards) -->
+            <div class="row g-4">
+                <!-- Card 1: Multi-Platform 1-Click Publishing -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="apple-bento-card">
                         <div>
-                            <h4 class="apple-feature-title">Multi-Platform &amp; Multi-Account 1-Click Publishing</h4>
-                            <p class="apple-feature-desc">
-                                Broadcast across Facebook Pages, Instagram, and YouTube in a single click.
+                            <div class="apple-bento-header">
+                                <div class="apple-bento-icon">
+                                    <i class="ti ti-layers-intersect"></i>
+                                </div>
+                                <span class="apple-bento-badge">1-Click Broadcast</span>
+                            </div>
+                            <h3 class="apple-bento-title">Multi-Platform &amp; Multi-Account</h3>
+                            <p class="apple-bento-desc">
+                                Broadcast rich media, reels, and video content across Facebook Pages, Instagram Professional, and YouTube simultaneously in a single click.
                             </p>
                         </div>
-                    </div>
-
-                    <!-- Feature 2: Content Scheduler -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-calendar-event"></i>
-                        </div>
-                        <div>
-                            <h4 class="apple-feature-title">Unified Multi-Platform Content Scheduler</h4>
-                            <p class="apple-feature-desc">
-                                Automated queue management for posts, reels, and videos with zero manual effort.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 3: Troll Shield -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-shield-lock"></i>
-                        </div>
-                        <div>
-                            <h4 class="apple-feature-title">24/7 Anti-Troll &amp; Abuse Shield</h4>
-                            <p class="apple-feature-desc">
-                                Real-time AI toxicity classification that silently auto-hides hate speech and spam.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 4: Auto DM -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-mail-forward"></i>
-                        </div>
-                        <div>
-                            <h4 class="apple-feature-title">Automated Comment-to-DM Engine</h4>
-                            <p class="apple-feature-desc">
-                                Convert audience comments into private direct messages in under 0.8s.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 5: Sentiment Analytics -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-chart-dots"></i>
-                        </div>
-                        <div>
-                            <h4 class="apple-feature-title">Live Sentiment Intelligence &amp; Analytics</h4>
-                            <p class="apple-feature-desc">
-                                Real-time categorization of audience feedback into positive pulse and grievances.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 6: Top User Tracking & Personas -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-users"></i>
-                        </div>
-                        <div>
-                            <h4 class="apple-feature-title">Top User Tracking &amp; Adaptive AI Personas</h4>
-                            <p class="apple-feature-desc">
-                                Automatic contributor ranking with customizable communication tones.
-                            </p>
+                        <div class="apple-bento-widget d-flex align-items-center justify-content-between text-muted">
+                            <div class="d-flex align-items-center gap-1.5">
+                                <span class="badge bg-blue-lt border border-blue-subtle px-2 py-0.5 small"><i class="ti ti-brand-facebook me-1"></i>FB</span>
+                                <span class="badge bg-pink-lt border border-pink-subtle px-2 py-0.5 small"><i class="ti ti-brand-instagram me-1"></i>IG</span>
+                                <span class="badge bg-red-lt border border-red-subtle px-2 py-0.5 small"><i class="ti ti-brand-youtube me-1"></i>YT</span>
+                            </div>
+                            <span class="text-teal fw-semibold small d-flex align-items-center gap-1">
+                                <i class="ti ti-check"></i>Synced
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Sleek Modern SaaS Floating Illustration -->
-                <div class="col-12 col-lg-6">
-                    <div class="apple-media-frame border-0 shadow-lg p-2 bg-white">
-                        <picture>
-                            <source srcset="{{ asset('images/social-media-influencer-design-concept-illustration_7087-1335.avif') }}" type="image/avif">
-                            <source srcset="{{ asset('images/social-media-influencer.webp') }}" type="image/webp">
-                            <img src="{{ asset('images/social-media-influencer.png') }}" 
-                                 alt="Why SocialManager - Social Media Operations Suite" 
-                                 class="apple-media-image rounded-4 img-fluid" 
-                                 width="626" height="626"
-                                 loading="lazy">
-                        </picture>
+                <!-- Card 2: Unified Content Scheduler -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="apple-bento-card">
+                        <div>
+                            <div class="apple-bento-header">
+                                <div class="apple-bento-icon">
+                                    <i class="ti ti-calendar-event"></i>
+                                </div>
+                                <span class="apple-bento-badge">Auto-Queue</span>
+                            </div>
+                            <h3 class="apple-bento-title">Unified Multi-Platform Content Scheduler</h3>
+                            <p class="apple-bento-desc">
+                                Automated queue management for posts, reels, and videos. Delivers content at peak engagement hours with zero human intervention.
+                            </p>
+                        </div>
+                        <div class="apple-bento-widget d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2 text-dark small fw-medium">
+                                <i class="ti ti-clock-play text-teal"></i>
+                                <span>Next: Today, 04:30 PM</span>
+                            </div>
+                            <span class="badge bg-teal-lt border border-teal-subtle">Queued</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: 24/7 Anti-Troll & Abuse Shield -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="apple-bento-card">
+                        <div>
+                            <div class="apple-bento-header">
+                                <div class="apple-bento-icon">
+                                    <i class="ti ti-shield-lock"></i>
+                                </div>
+                                <span class="apple-bento-badge">Real-Time</span>
+                            </div>
+                            <h3 class="apple-bento-title">24/7 Anti-Troll &amp; Toxicity Shield</h3>
+                            <p class="apple-bento-desc">
+                                Autonomous AI toxicity guardrails silently detect and auto-hide abusive comments, political slurs, and spam bots before they go public.
+                            </p>
+                        </div>
+                        <div class="apple-bento-widget d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2 small">
+                                <i class="ti ti-shield-check text-teal"></i>
+                                <span class="text-dark fw-medium">Troll Auto-Hidden</span>
+                            </div>
+                            <span class="badge bg-success-lt border border-success-subtle">Protected</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Automated Comment-to-DM Engine -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="apple-bento-card">
+                        <div>
+                            <div class="apple-bento-header">
+                                <div class="apple-bento-icon">
+                                    <i class="ti ti-mail-forward"></i>
+                                </div>
+                                <span class="apple-bento-badge">&lt; 0.8s Latency</span>
+                            </div>
+                            <h3 class="apple-bento-title">Automated Comment-to-DM Engine</h3>
+                            <p class="apple-bento-desc">
+                                Convert audience comments into qualified leads. Dispatches verified private DMs with 24-hour frequency capping to prevent spam flags.
+                            </p>
+                        </div>
+                        <div class="apple-bento-widget d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2 small">
+                                <span class="text-muted">Trigger: "Link"</span>
+                                <i class="ti ti-arrow-right text-teal"></i>
+                                <span class="text-dark fw-semibold">Instant DM Sent</span>
+                            </div>
+                            <span class="badge bg-teal-lt">0.8s</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 5: Live Sentiment Intelligence & Analytics -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="apple-bento-card">
+                        <div>
+                            <div class="apple-bento-header">
+                                <div class="apple-bento-icon">
+                                    <i class="ti ti-chart-dots"></i>
+                                </div>
+                                <span class="apple-bento-badge">Sentiment Pulse</span>
+                            </div>
+                            <h3 class="apple-bento-title">Live Sentiment Intelligence &amp; Analytics</h3>
+                            <p class="apple-bento-desc">
+                                Real-time sentiment classification sorts thousands of constituent comments into appreciation, inquiries, and grievances with transparent ratio tracking.
+                            </p>
+                        </div>
+                        <div class="apple-bento-widget">
+                            <div class="d-flex justify-content-between align-items-center small mb-1.5">
+                                <span class="fw-semibold text-dark">Constituent Pulse</span>
+                                <span class="text-teal fw-bold">71.4% Positive</span>
+                            </div>
+                            <div class="progress progress-sm" style="height: 5px;">
+                                <div class="progress-bar bg-teal" style="width: 71.4%"></div>
+                                <div class="progress-bar bg-blue" style="width: 14.3%"></div>
+                                <div class="progress-bar bg-warning" style="width: 14.3%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 6: Top User Tracking & Adaptive AI Personas -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="apple-bento-card">
+                        <div>
+                            <div class="apple-bento-header">
+                                <div class="apple-bento-icon">
+                                    <i class="ti ti-users"></i>
+                                </div>
+                                <span class="apple-bento-badge">Adaptive Voice</span>
+                            </div>
+                            <h3 class="apple-bento-title">Top User Tracking &amp; Adaptive AI Personas</h3>
+                            <p class="apple-bento-desc">
+                                Automatically recognize loyal constituents and VIP followers while tailoring AI responses in your designated tone across Hindi &amp; Hinglish.
+                            </p>
+                        </div>
+                        <div class="apple-bento-widget d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2 small">
+                                <i class="ti ti-sparkles text-teal"></i>
+                                <span class="text-dark fw-medium">Humble &amp; Respectful</span>
+                            </div>
+                            <span class="badge bg-secondary-lt">Hindi + Hinglish</span>
+                        </div>
                     </div>
                 </div>
             </div>
