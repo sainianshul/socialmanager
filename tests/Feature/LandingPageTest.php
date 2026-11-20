@@ -23,6 +23,13 @@ class LandingPageTest extends TestCase
         $response->assertSee('YouTube Channels');
         $response->assertSee('Unified Multi-Platform Content Scheduler');
         $response->assertSee('Adaptive AI Personas');
+        $response->assertSee('Up and Running in Under 5 Minutes');
+        $response->assertSee('Connect Your Accounts');
+        $response->assertSee('Operate on Full Autopilot');
+        $response->assertSee('See SocialManager in Action');
+        $response->assertSee('AI Comment Threading');
+        $response->assertSee('Comment-to-DM Flow');
+        $response->assertSee('Anti-Troll Shield');
     }
 
     public function test_authenticated_user_redirects_to_dashboard(): void

@@ -688,7 +688,321 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- PLACEHOLDER FOR STEP 3 (How It Works & Live Workflows)                     -->
+    <!-- STEP 3: HOW IT WORKS (3 CLEAR STEPS)                                      -->
+    <!-- ========================================================================= -->
+    <section id="how-it-works" class="py-6 bg-white border-top border-bottom">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-route me-1"></i>Simple 3-Step Setup</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Up and Running in Under 5 Minutes</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    No complex server setups or API keys required. Authenticate your accounts and let our background automation handle engagement.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Step 01 -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border p-4 shadow-none position-relative" style="border-radius: 12px; background: #fafbfc;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
+                                01
+                            </span>
+                            <span class="badge badge-outline text-teal"><i class="ti ti-shield-check me-1"></i>OAuth 2.0</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Connect Your Accounts</h4>
+                        <p class="text-muted small mb-3">
+                            Link your Facebook Page, Instagram Professional account, and YouTube channel in 1 click using official platform dialogs.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-0">
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Zero password storage</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>AES-256 encrypted access tokens</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Automatic 24/7 token renewal</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 02 -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border p-4 shadow-none position-relative" style="border-radius: 12px; background: #fafbfc;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
+                                02
+                            </span>
+                            <span class="badge badge-teal-soft"><i class="ti ti-adjustments me-1"></i>Custom Tone</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Configure AI Tone & Rules</h4>
+                        <p class="text-muted small mb-3">
+                            Choose your preferred AI communication voice and specify keywords for automated private direct messaging.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-0">
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Choose Humble, Patriotic, or Formal voice</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Set Comment-to-DM keyword triggers</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Turn on 24/7 Anti-Troll Shield</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 03 -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border p-4 shadow-none position-relative" style="border-radius: 12px; background: #fafbfc;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
+                                03
+                            </span>
+                            <span class="badge badge-outline text-success"><i class="ti ti-bolt me-1"></i>Live Automation</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Operate on Full Autopilot</h4>
+                        <p class="text-muted small mb-3">
+                            Scheduled posts publish automatically on time. Incoming comments are answered in seconds, and private DMs convert leads 24/7.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-0">
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Real-time Meta Webhook ingestion (&lt; 1s)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Every-minute publishing scheduler</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Live sentiment reporting on your dashboard</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- INTERACTIVE WORKFLOW PREVIEWS (TABS)                          -->
+            <!-- ============================================================= -->
+            <div class="card border mt-5 p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                <div class="text-center mb-4">
+                    <span class="badge badge-teal-soft mb-1.5"><i class="ti ti-eye me-1"></i>Interactive Simulation</span>
+                    <h3 class="fw-bold text-dark mb-1">See SocialManager in Action</h3>
+                    <p class="text-muted small">Explore how our background daemons handle real community interactions across different scenarios.</p>
+                </div>
+
+                <!-- Tabler Navigation Tabs -->
+                <ul class="nav nav-tabs nav-fill mb-4" data-bs-toggle="tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-ai-reply" class="nav-link active fw-semibold" data-bs-toggle="tab" aria-selected="true" role="tab">
+                            <i class="ti ti-messages text-teal me-1.5 fs-2"></i>
+                            <span>AI Comment Threading</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-auto-dm" class="nav-link fw-semibold" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="ti ti-mail-forward text-primary me-1.5 fs-2"></i>
+                            <span>Comment-to-DM Flow</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-troll-shield" class="nav-link fw-semibold" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="ti ti-shield-lock text-danger me-1.5 fs-2"></i>
+                            <span>Anti-Troll Shield</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Contents -->
+                <div class="tab-content">
+                    <!-- Tab 1: AI Comment Threading -->
+                    <div class="tab-pane active show" id="tab-ai-reply" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-5">
+                                <span class="badge bg-teal-lt text-teal mb-2"><i class="ti ti-brain me-1"></i>Contextual Intelligence</span>
+                                <h4 class="fw-bold text-dark mb-2">Natural Multilingual Replies Without Human Fatigue</h4>
+                                <p class="text-muted small mb-3">
+                                    When constituents or fans comment on YouTube or Facebook, the Gemini AI engine analyzes the tone, detects grievances or compliments, and drafts a tailored, human-like response in under 5 seconds.
+                                </p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-clock me-1"></i>Response Time: ~3.8s</span>
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-world me-1"></i>Hindi + Hinglish</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-7">
+                                <div class="p-3.5 rounded-2 bg-light border">
+                                    <!-- Incoming Comment -->
+                                    <div class="p-3 rounded-2 bg-white border mb-2.5">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-azure text-white">MK</span>
+                                                <span class="fw-semibold small text-dark">Manoj Kumar</span>
+                                                <span class="badge bg-danger-lt text-danger fs-8"><i class="ti ti-brand-youtube me-1"></i>YouTube</span>
+                                            </div>
+                                            <span class="text-muted fs-8">Incoming Comment</span>
+                                        </div>
+                                        <div class="small text-dark">
+                                            "Sir hamare ward me road reconstruction ka kaam kab tak start hoga? Traffic bohot badh gaya hai."
+                                        </div>
+                                    </div>
+
+                                    <!-- AI Detection Pipeline -->
+                                    <div class="d-flex align-items-center gap-2 mb-2.5 px-2">
+                                        <i class="ti ti-arrow-down text-teal"></i>
+                                        <span class="badge badge-teal-soft fs-8">Sentiment: Public Inquiry / Civic Grievance (Score: 0.94)</span>
+                                        <span class="badge badge-outline text-secondary fs-8">Tone: Humble & Respectful</span>
+                                    </div>
+
+                                    <!-- Live Published Thread Reply -->
+                                    <div class="p-3 rounded-2 bg-white border-start border-teal border-3 ms-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-teal text-white"><i class="ti ti-check"></i></span>
+                                                <span class="fw-semibold small text-dark">Official Channel Reply</span>
+                                                <span class="badge bg-teal-lt text-teal fs-8">Auto-Approved Live</span>
+                                            </div>
+                                            <span class="text-muted fs-8">Published in 3.8s</span>
+                                        </div>
+                                        <div class="small text-dark">
+                                            "Manoj ji, namaskar. Ward me road reconstruction ka tender pass ho chuka hai aur next week se physical road work shuru ho raha hai. Aapki suvidha hamari prathmikta hai."
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Comment-to-DM Lead Capture -->
+                    <div class="tab-pane" id="tab-auto-dm" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-5">
+                                <span class="badge bg-primary-lt text-primary mb-2"><i class="ti ti-mail-forward me-1"></i>Lead Generation</span>
+                                <h4 class="fw-bold text-dark mb-2">Automated Conversion from Public Comments to Private DMs</h4>
+                                <p class="text-muted small mb-3">
+                                    Set keyword rules for specific campaign posts or channel-wide. When a follower asks for a link, brochure, or support, our Meta integration sends a private message to their Instagram Direct or Messenger inbox immediately.
+                                </p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-bolt text-teal me-1"></i>Webhook Latency: &lt; 800ms</span>
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-brand-instagram text-pink me-1"></i>Instagram Direct</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-7">
+                                <div class="p-3.5 rounded-2 bg-light border">
+                                    <!-- Public Post Interaction -->
+                                    <div class="p-3 rounded-2 bg-white border mb-2.5">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-pink text-white">PK</span>
+                                                <span class="fw-semibold small text-dark">Priya Kapoor</span>
+                                                <span class="badge bg-pink-lt text-pink fs-8"><i class="ti ti-brand-instagram me-1"></i>Instagram Post</span>
+                                            </div>
+                                            <span class="badge bg-light text-secondary border fs-8">Public Comment</span>
+                                        </div>
+                                        <div class="small text-dark">
+                                            "Interested in joining the youth volunteer campaign. How do I register?"
+                                        </div>
+                                    </div>
+
+                                    <!-- Automated Rule Trigger -->
+                                    <div class="d-flex align-items-center gap-2 mb-2.5 px-2">
+                                        <i class="ti ti-arrow-down text-primary"></i>
+                                        <span class="badge badge-outline text-primary fs-8">Keyword Matched: "register"</span>
+                                        <span class="badge bg-teal-lt text-teal fs-8">Auto DM Dispatched</span>
+                                    </div>
+
+                                    <!-- Private Instagram DM Window -->
+                                    <div class="p-3 rounded-2 bg-white border border-primary border-opacity-25 ms-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="ti ti-brand-instagram text-pink fs-3"></i>
+                                                <span class="fw-semibold small text-dark">Private Instagram Direct Message</span>
+                                            </div>
+                                            <span class="badge bg-teal-lt text-teal fs-8">Delivered to Inbox</span>
+                                        </div>
+                                        <div class="small text-dark mb-1">
+                                            "Hi Priya! Thank you for your enthusiasm to join our team. Here is your direct volunteer registration form link: <code>https://campaign.portal/register</code>. We look forward to working with you!"
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Silent Anti-Troll Shield -->
+                    <div class="tab-pane" id="tab-troll-shield" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-5">
+                                <span class="badge bg-danger-lt text-danger mb-2"><i class="ti ti-shield-x me-1"></i>Brand Safety</span>
+                                <h4 class="fw-bold text-dark mb-2">Zero-Latency Brand & Political Protection</h4>
+                                <p class="text-muted small mb-3">
+                                    Coordinated troll attacks and abusive comments can damage public reputation. Our toxicity filter silently auto-hides abusive comments using official platform APIs before other citizens or followers ever notice them.
+                                </p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-eye-off text-danger me-1"></i>Silently Hidden</span>
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-check text-teal me-1"></i>Community Safe</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-7">
+                                <div class="p-3.5 rounded-2 bg-light border">
+                                    <!-- Incoming Troll Comment -->
+                                    <div class="p-3 rounded-2 bg-white border mb-2.5">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-secondary text-white">TR</span>
+                                                <span class="fw-semibold small text-dark">Anonymous Troll User</span>
+                                                <span class="badge bg-primary-lt text-primary fs-8"><i class="ti ti-brand-facebook me-1"></i>Facebook Page</span>
+                                            </div>
+                                            <span class="text-muted fs-8">Incoming Comment</span>
+                                        </div>
+                                        <div class="small text-muted fst-italic">
+                                            "[Abusive defamatory statement and unparliamentary language attacking campaign]"
+                                        </div>
+                                    </div>
+
+                                    <!-- AI Detection Pipeline -->
+                                    <div class="d-flex align-items-center gap-2 mb-2.5 px-2">
+                                        <i class="ti ti-shield-alert text-danger"></i>
+                                        <span class="badge bg-danger-lt text-danger fs-8">Toxicity Score: 0.98 (Severe Abuse)</span>
+                                        <span class="badge badge-teal-soft fs-8">Auto-Hide Executed</span>
+                                    </div>
+
+                                    <!-- Action Result Card -->
+                                    <div class="p-3 rounded-2 bg-white border-start border-danger border-3 ms-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="ti ti-eye-off text-danger fs-3"></i>
+                                                <span class="fw-semibold small text-dark">Hidden on Facebook & YouTube</span>
+                                            </div>
+                                            <span class="badge bg-secondary-lt text-secondary fs-8">Public Thread Clean</span>
+                                        </div>
+                                        <div class="small text-muted">
+                                            Comment marked as <code>rejected</code> on YouTube and <code>is_hidden = true</code> on Meta Graph API. The troll is unaware their comment has been hidden, completely defusing engagement bait.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
     <!-- PLACEHOLDER FOR STEP 4 (Pricing Plans & Security Guarantees)               -->
     <!-- PLACEHOLDER FOR STEP 5 (Client FAQs, CTA & Legal Compliant Footer)        -->
     <!-- ========================================================================= -->
