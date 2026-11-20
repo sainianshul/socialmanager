@@ -46,6 +46,15 @@ class MetaWebhookController extends Controller
         }
 
         // 2. Incoming Event Notification (POST)
+        if (!$this->validateSignature($request)) {
+            $this->logWebhook('warning', 'Meta Webhook Rejected: Invalid or missing X-Hub-Signature-256', [
+                'ip'         => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'signature'  => $request->header('X-Hub-Signature-256'),
+            ]);
+            return response('Unauthorized: Invalid Signature', 401);
+        }
+
         $payload = $request->all();
         $object = $payload['object'] ?? null;
 
@@ -182,6 +191,34 @@ class MetaWebhookController extends Controller
         } catch (\Throwable $e) {
             Log::{$level}("[Webhook] " . $message, $context);
         }
+    }
+
+    /**
+     * Validate Meta X-Hub-Signature-256 HMAC cryptographic signature
+     */
+    protected function validateSignature(Request $request): bool
+    {
+        $appSecret = config('services.facebook.client_secret') ?: env('FACEBOOK_APP_KEY');
+        if (empty($appSecret)) {
+            Log::warning('Meta Webhook: Missing FACEBOOK_APP_KEY in config, signature check skipped.');
+            return true;
+        }
+
+        $signatureHeader = $request->header('X-Hub-Signature-256') ?: $request->header('x-hub-signature-256');
+
+        // Allow test environments or local manual curl to omit signature if desired
+        if (empty($signatureHeader) && (app()->environment('testing') || (app()->isLocal() && config('app.debug')))) {
+            return true;
+        }
+
+        if (empty($signatureHeader)) {
+            return false;
+        }
+
+        $rawBody = $request->getContent();
+        $expectedSignature = 'sha256=' . hash_hmac('sha256', $rawBody, $appSecret);
+
+        return hash_equals($expectedSignature, $signatureHeader);
     }
 
     /**

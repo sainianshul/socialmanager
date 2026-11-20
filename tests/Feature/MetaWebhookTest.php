@@ -136,5 +136,33 @@ class MetaWebhookTest extends TestCase
         $this->assertFalse($result['is_abusive']);
         $this->assertStringContainsString('Ramesh ji', $result['ai_reply']);
     }
+
+    public function test_meta_webhook_post_rejects_invalid_hmac_signature(): void
+    {
+        $payload = ['object' => 'page', 'entry' => []];
+
+        $response = $this->withHeaders([
+            'X-Hub-Signature-256' => 'sha256=invalid_spoofed_signature_hash',
+        ])->postJson('/webhook/meta', $payload);
+
+        $response->assertStatus(401);
+    }
+
+    public function test_meta_webhook_post_accepts_valid_hmac_signature(): void
+    {
+        $payload = ['object' => 'page', 'entry' => []];
+        $json = json_encode($payload);
+        $secret = config('services.facebook.client_secret');
+        $validSignature = 'sha256=' . hash_hmac('sha256', $json, $secret);
+
+        $response = $this->withHeaders([
+            'X-Hub-Signature-256' => $validSignature,
+        ])->call('POST', '/webhook/meta', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], $json);
+
+        $response->assertStatus(200);
+        $this->assertEquals('EVENT_RECEIVED', $response->getContent());
+    }
 }
 
