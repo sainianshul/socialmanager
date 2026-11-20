@@ -438,7 +438,256 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- PLACEHOLDER FOR STEP 2 (Platform Ribbon & Core Feature Bento Grid)        -->
+    <!-- STEP 2: CERTIFIED PLATFORMS RIBBON                                        -->
+    <!-- ========================================================================= -->
+    <section id="platforms" class="py-5 bg-white border-top border-bottom">
+        <div class="container-xl">
+            <div class="text-center mb-4">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-api-app me-1"></i>Official Integrations</span>
+                <h3 class="fw-bold text-dark mb-1">Directly Connected to Official Platform APIs</h3>
+                <p class="text-muted small">No web scrapers, no unofficial bots. 100% compliant with platform developer terms.</p>
+            </div>
+
+            <div class="row g-3 justify-content-center">
+                <!-- Facebook Platform Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px;">
+                        <div class="d-flex align-items-center gap-3 mb-2.5">
+                            <span class="avatar avatar-md rounded-2" style="background: rgba(24, 119, 242, 0.08); color: #1877f2;">
+                                <i class="ti ti-brand-facebook fs-1"></i>
+                            </span>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">Facebook Pages</h4>
+                                <span class="badge badge-outline text-primary fs-8">Graph API v20.0</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Permanent Page tokens with real-time Webhook feed subscription. Publish posts, sync comments, and dispatch Messenger replies.</p>
+                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Photos & Videos</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Auto Moderation</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Instant DMs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instagram Platform Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px;">
+                        <div class="d-flex align-items-center gap-3 mb-2.5">
+                            <span class="avatar avatar-md rounded-2" style="background: rgba(214, 41, 118, 0.08); color: #d62976;">
+                                <i class="ti ti-brand-instagram fs-1"></i>
+                            </span>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">Instagram Professional</h4>
+                                <span class="badge badge-outline text-pink fs-8">Business & Creator</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Linked Instagram account automation. Schedule Carousels & Reels, track public interactions, and send private Direct Messages.</p>
+                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Reels Publishing</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Comment-to-DM</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Direct Messaging</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YouTube Platform Card -->
+                <div class="col-12 col-md-4">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px;">
+                        <div class="d-flex align-items-center gap-3 mb-2.5">
+                            <span class="avatar avatar-md rounded-2" style="background: rgba(224, 36, 36, 0.08); color: #e02424;">
+                                <i class="ti ti-brand-youtube fs-1"></i>
+                            </span>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">YouTube Channels</h4>
+                                <span class="badge badge-outline text-danger fs-8">Data API v3</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Resumable video & Shorts publishing with automated 24/7 background token renewal. Public comment threading and auto-hiding.</p>
+                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Shorts & Videos</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Auto-Renew Token</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Troll Shield</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 2: CORE FEATURES BENTO GRID                                          -->
+    <!-- ========================================================================= -->
+    <section id="features" class="py-6" style="background-color: #fafbfc;">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-layers-linked me-1"></i>Core Capabilities</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Engineered for High-Stakes Social Operations</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    Every tool required to publish rich media, engage thousands of citizens and followers, and protect brand reputation around the clock.
+                </p>
+            </div>
+
+            <!-- Bento Box Grid -->
+            <div class="row g-3">
+                <!-- Bento Card 1: Content Publishing & Drag-Drop Calendar (7 Columns) -->
+                <div class="col-12 col-lg-7">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-calendar-event fs-1"></i>
+                            </span>
+                            <span class="badge badge-outline text-teal">1-Minute Background Daemon</span>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-2">Unified Multi-Platform Content Scheduler</h3>
+                        <p class="text-muted mb-4">
+                            Compose your message once, upload your image or video, and schedule it across Facebook, Instagram, and YouTube. Our automated server daemon executes scheduled publishes every 60 seconds with zero manual intervention.
+                        </p>
+
+                        <!-- Inner Feature Showcase Mockup -->
+                        <div class="p-3 rounded-2 bg-light border">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="small fw-semibold text-secondary">Active Calendar Slots</span>
+                                <span class="small text-teal"><i class="ti ti-clock me-1"></i>Queue Running</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="p-2 rounded-2 bg-white border d-flex align-items-center gap-2">
+                                        <i class="ti ti-video text-danger"></i>
+                                        <div class="text-truncate">
+                                            <div class="fw-semibold small text-truncate">Weekly Address Video</div>
+                                            <div class="text-muted fs-8">YouTube • 1080p Resumable</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded-2 bg-white border d-flex align-items-center gap-2">
+                                        <i class="ti ti-device-mobile text-pink"></i>
+                                        <div class="text-truncate">
+                                            <div class="fw-semibold small text-truncate">Highlights Reel</div>
+                                            <div class="text-muted fs-8">Instagram • 9:16 Vertical</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 2: Contextual Multi-AI Personas (5 Columns) -->
+                <div class="col-12 col-lg-5">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-brain fs-1"></i>
+                            </span>
+                            <span class="badge badge-teal-soft">Gemini, OpenAI, Qwen</span>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-2">Adaptive AI Personas</h3>
+                        <p class="text-muted mb-3">
+                            Customize the response voice for each channel. AI analyzes sentiment and drafts authentic replies in your selected voice.
+                        </p>
+
+                        <!-- Tone Selector Chips Preview -->
+                        <div class="p-3 rounded-2 bg-light border">
+                            <span class="small text-secondary fw-semibold d-block mb-2">Configurable Tones:</span>
+                            <div class="d-flex flex-wrap gap-1 mb-2.5">
+                                <span class="badge bg-white text-teal border border-teal fs-8"><i class="ti ti-check me-1"></i>Humble & Respectful</span>
+                                <span class="badge bg-white text-secondary border fs-8">Patriotic & Inspiring</span>
+                                <span class="badge bg-white text-secondary border fs-8">Assertive & Firm</span>
+                                <span class="badge bg-white text-secondary border fs-8">Formal & Official</span>
+                            </div>
+                            <span class="small text-secondary fw-semibold d-block mb-1.5">Languages Supported:</span>
+                            <div class="d-flex gap-1">
+                                <span class="badge bg-teal-lt text-teal fs-8">Hindi + Hinglish</span>
+                                <span class="badge bg-secondary-lt text-secondary fs-8">Pure Hindi</span>
+                                <span class="badge bg-secondary-lt text-secondary fs-8">English</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 3: Instant Comment-to-DM Engine (4 Columns) -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-mail-forward fs-1"></i>
+                            </span>
+                            <span class="badge badge-outline text-primary">Private Replies API</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Automated Comment-to-DM</h4>
+                        <p class="text-muted small mb-3">
+                            Convert public interactions into private inquiries. When a user comments specific keywords on Instagram or Facebook, send an instant DM with the link, details, or registration form.
+                        </p>
+                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
+                                <span>Rule Trigger Mode</span>
+                                <span class="text-teal fw-semibold">Contains Keyword</span>
+                            </div>
+                            <div class="small fw-semibold text-dark">
+                                Keywords: <code>link</code>, <code>apply</code>, <code>scheme</code>, <code>help</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 4: 24/7 Anti-Troll Shield (4 Columns) -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-shield-lock fs-1"></i>
+                            </span>
+                            <span class="badge badge-outline text-danger">Zero Human Delay</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">24/7 Anti-Troll & Abuse Shield</h4>
+                        <p class="text-muted small mb-3">
+                            Our AI toxicity classification scans incoming comments for abusive language, hate speech, and troll attacks, automatically hiding them from public view before they cause brand harm.
+                        </p>
+                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
+                                <span>Action Taken</span>
+                                <span class="badge bg-danger-lt text-danger fs-8">Auto-Hidden</span>
+                            </div>
+                            <div class="small text-muted text-truncate">
+                                Abusive comment hidden on Facebook & YouTube
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 5: Real-Time Political Sentiment War Room (4 Columns) -->
+                <div class="col-12 col-md-12 col-lg-4">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-chart-dots-3 fs-1"></i>
+                            </span>
+                            <span class="badge badge-teal-soft">Sentiment War Room</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Live Sentiment Intelligence</h4>
+                        <p class="text-muted small mb-3">
+                            Know exactly what your constituents and customers think. Real-time categorization of comments into Positive, Grievances, and Complaints with interactive trend graphs.
+                        </p>
+                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between small mb-1.5">
+                                <span class="fw-semibold text-dark">Constituent Sentiment</span>
+                                <span class="text-teal fw-bold">84% Positive</span>
+                            </div>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-teal" style="width: 84%"></div>
+                                <div class="progress-bar bg-warning" style="width: 12%"></div>
+                                <div class="progress-bar bg-danger" style="width: 4%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
     <!-- PLACEHOLDER FOR STEP 3 (How It Works & Live Workflows)                     -->
     <!-- PLACEHOLDER FOR STEP 4 (Pricing Plans & Security Guarantees)               -->
     <!-- PLACEHOLDER FOR STEP 5 (Client FAQs, CTA & Legal Compliant Footer)        -->

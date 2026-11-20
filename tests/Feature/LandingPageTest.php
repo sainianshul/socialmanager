@@ -18,6 +18,11 @@ class LandingPageTest extends TestCase
         $response->assertSee('Publishing Schedule Calendar');
         $response->assertSee('Live AI Comment Moderation');
         $response->assertSee('Auto DM Dispatched');
+        $response->assertSee('Facebook Pages');
+        $response->assertSee('Instagram Professional');
+        $response->assertSee('YouTube Channels');
+        $response->assertSee('Unified Multi-Platform Content Scheduler');
+        $response->assertSee('Adaptive AI Personas');
     }
 
     public function test_authenticated_user_redirects_to_dashboard(): void
