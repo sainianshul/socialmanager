@@ -33,6 +33,15 @@ class AccountController extends Controller
 
         $accounts = $query->paginate(12)->withQueryString();
 
+        // Proactively renew YouTube accounts whose access tokens expired while offline
+        foreach ($accounts as $acc) {
+            if ($acc->isYouTube() && !empty($acc->google_refresh_token)) {
+                if ($acc->token_expires_at === null || $acc->token_expires_at->isPast()) {
+                    app(\App\Services\AccountTokenRefreshService::class)->refreshYouTubeToken($acc);
+                }
+            }
+        }
+
         // Calculate summary stats
         $statsQuery = Account::query();
         if (!$user->isAdmin()) {

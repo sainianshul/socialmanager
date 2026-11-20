@@ -133,6 +133,10 @@
                                         <span class="badge badge-outline text-danger d-inline-flex align-items-center gap-1 py-0.5 px-2 fs-7" title="Connection token expired. Re-authenticate to resume syncing.">
                                             <i class="ti ti-alert-circle"></i>Token Expired
                                         </span>
+                                    @elseif($account->hasAutoRenewingToken())
+                                        <span class="badge badge-outline text-success d-inline-flex align-items-center gap-1 py-0.5 px-2 fs-7" title="Auto-renewing 24/7 via Google OAuth refresh token">
+                                            <i class="ti ti-refresh"></i>Auto-Renewing
+                                        </span>
                                     @elseif($account->isTokenExpiringSoon())
                                         <span class="badge badge-outline text-warning d-inline-flex align-items-center gap-1 py-0.5 px-2 fs-7" title="Token expires soon. Please re-authenticate.">
                                             <i class="ti ti-clock-pause"></i>Expires in {{ max(1, (int)$account->token_expires_at->diffInDays(now())) }}d

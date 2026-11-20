@@ -16,3 +16,7 @@ Schedule::command('sync:youtube-comments --queue-ai')->everyTenMinutes()->withou
 
 // 3. Automatically sync latest YouTube videos and analytics (every hour)
 Schedule::command('sync:youtube-videos')->hourly()->withoutOverlapping();
+
+// 4. Proactively refresh expiring OAuth access tokens (YouTube/Google every 30 minutes)
+Schedule::command('accounts:refresh-tokens')->everyThirtyMinutes()->withoutOverlapping();
+

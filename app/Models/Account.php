@@ -208,10 +208,24 @@ class Account extends Model
     }
 
     /**
-     * Check if access token is expired
+     * Check if account has an auto-renewing refresh token (e.g. YouTube via Google OAuth)
+     */
+    public function hasAutoRenewingToken(): bool
+    {
+        return $this->isYouTube() && !empty($this->google_refresh_token);
+    }
+
+    /**
+     * Check if access token is expired.
+     * Note: YouTube accounts with a valid google_refresh_token auto-renew automatically,
+     * so they are not permanently expired unless the refresh token is missing.
      */
     public function isTokenExpired(): bool
     {
+        if ($this->hasAutoRenewingToken()) {
+            return false;
+        }
+
         return $this->token_expires_at !== null && $this->token_expires_at->isPast();
     }
 
@@ -220,6 +234,10 @@ class Account extends Model
      */
     public function isTokenExpiringSoon(int $days = 7): bool
     {
+        if ($this->hasAutoRenewingToken()) {
+            return false;
+        }
+
         return $this->token_expires_at !== null 
             && !$this->isTokenExpired() 
             && $this->token_expires_at <= now()->addDays($days);
@@ -232,6 +250,10 @@ class Account extends Model
     {
         if ($this->isTokenExpired()) {
             return '<span class="badge badge-outline text-danger"><i class="ti ti-alert-triangle me-1"></i>Token Expired</span>';
+        }
+
+        if ($this->hasAutoRenewingToken()) {
+            return '<span class="badge badge-outline text-success"><i class="ti ti-refresh me-1"></i>Auto-Renewing</span>';
         }
 
         if ($this->isTokenExpiringSoon()) {

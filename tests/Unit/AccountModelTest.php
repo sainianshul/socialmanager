@@ -72,6 +72,17 @@ class AccountModelTest extends TestCase
         ]);
         $this->assertTrue($expiredAccount->isTokenExpired());
         $this->assertStringContainsString('Token Expired', $expiredAccount->token_status_badge);
+
+        // YouTube with refresh token should show Auto-Renewing instead of expired
+        $youtubeAccount = new Account([
+            'account_type' => Account::TYPE_YOUTUBE,
+            'google_refresh_token' => 'sample_refresh_token_123',
+            'token_expires_at' => now()->subHour(),
+        ]);
+        $this->assertTrue($youtubeAccount->hasAutoRenewingToken());
+        $this->assertFalse($youtubeAccount->isTokenExpired());
+        $this->assertFalse($youtubeAccount->isTokenExpiringSoon(7));
+        $this->assertStringContainsString('Auto-Renewing', $youtubeAccount->token_status_badge);
     }
 }
 

@@ -127,6 +127,14 @@ class YouTubeAuthController extends Controller
                 $subsCount = (int) ($statistics['subscriberCount'] ?? 0);
                 $videoCount = (int) ($statistics['videoCount'] ?? 0);
 
+                $existingAccount = Account::where('user_id', $userId)
+                    ->where('account_type', Account::TYPE_YOUTUBE)
+                    ->where('youtube_channel_id', $channelId)
+                    ->first();
+
+                // Preserve existing refresh token if Google did not supply a new one on this round
+                $finalRefreshToken = $refreshToken ?: ($existingAccount?->google_refresh_token ?? null);
+
                 Account::updateOrCreate(
                     [
                         'user_id'            => $userId,
@@ -142,7 +150,7 @@ class YouTubeAuthController extends Controller
                         'video_count'          => $videoCount,
                         'followers_count'      => $subsCount,
                         'access_token'         => $accessToken,
-                        'google_refresh_token' => $refreshToken,
+                        'google_refresh_token' => $finalRefreshToken,
                         'token_expires_at'     => now()->addSeconds($expiresIn),
                         'is_active'            => true,
                         'last_synced_at'       => now(),
