@@ -159,32 +159,25 @@
             line-height: 1;
         }
 
-        /* Center Nav Pill Island */
-        .nav-capsule-island {
-            background: rgba(241, 245, 249, 0.75);
-            border: 1px solid rgba(226, 232, 240, 0.9);
-            border-radius: 50px;
-            padding: 4px 6px;
+        /* Desktop Clean Navigation Links (Minimal, No Grey Background) */
+        .landing-nav-links {
             display: inline-flex;
             align-items: center;
-            gap: 2px;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+            gap: 2.25rem;
+            margin: 0;
+            padding: 0;
         }
-        .nav-capsule-link {
-            font-size: 0.9rem;
+        .landing-nav-link {
+            font-size: 0.95rem;
             font-weight: 600;
-            color: #475569;
-            padding: 6px 16px;
-            border-radius: 50px;
+            color: #1e293b;
             text-decoration: none;
-            transition: all 0.2s ease;
-            display: inline-block;
+            padding: 4px 0;
+            transition: color 0.18s ease;
+            letter-spacing: -0.01em;
         }
-        .nav-capsule-link:hover {
-            color: #0ca678;
-            background: #ffffff;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
-            transform: translateY(-1px);
+        .landing-nav-link:hover {
+            color: #1db8ab;
         }
 
         /* Nav Action Buttons */
@@ -676,13 +669,13 @@
                     <span class="fw-bold text-dark fs-3 mb-0">SocialManager</span>
                 </a>
 
-                <!-- Desktop Navigation Capsule Island -->
+                <!-- Desktop Clean Navigation Links (No Grey Background) -->
                 <nav class="d-none d-lg-flex align-items-center">
-                    <div class="nav-capsule-island">
-                        <a href="#features" class="nav-capsule-link">Why SocialManager</a>
-                        <a href="#platforms" class="nav-capsule-link">Platforms</a>
-                        <a href="#how-it-works" class="nav-capsule-link">How It Works</a>
-                        <a href="#faq" class="nav-capsule-link">FAQ</a>
+                    <div class="landing-nav-links">
+                        <a href="#features" class="landing-nav-link">Why SocialManager</a>
+                        <a href="#platforms" class="landing-nav-link">Platforms</a>
+                        <a href="#how-it-works" class="landing-nav-link">How It Works</a>
+                        <a href="#faq" class="landing-nav-link">FAQ</a>
                     </div>
                 </nav>
 
@@ -925,10 +918,15 @@
                 <!-- Right Column: Sleek Modern SaaS Floating Illustration -->
                 <div class="col-12 col-lg-6">
                     <div class="apple-media-frame border-0 shadow-lg p-2 bg-white">
-                        <img src="{{ asset('images/social-media-command.svg') }}" 
-                             alt="Why SocialManager - Connected Social Suite" 
-                             class="apple-media-image rounded-4" 
-                             loading="lazy">
+                        <picture>
+                            <source srcset="{{ asset('images/social-media-influencer-design-concept-illustration_7087-1335.avif') }}" type="image/avif">
+                            <source srcset="{{ asset('images/social-media-influencer.webp') }}" type="image/webp">
+                            <img src="{{ asset('images/social-media-influencer.png') }}" 
+                                 alt="Why SocialManager - Social Media Operations Suite" 
+                                 class="apple-media-image rounded-4 img-fluid" 
+                                 width="626" height="626"
+                                 loading="lazy">
+                        </picture>
                     </div>
                 </div>
             </div>
