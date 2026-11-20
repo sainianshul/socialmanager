@@ -92,29 +92,110 @@
             color: #0d8a80 !important;
         }
 
-        /* Sticky Glass Navbar */
+        /* =========================================================
+           HIGH-END FLOATING GLASS NAVBAR
+        ========================================================= */
         .landing-navbar {
             position: sticky;
             top: 0;
-            z-index: 1030;
-            background: rgba(255, 255, 255, 0.92);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
+            z-index: 1040;
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
             border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 0.85rem 0;
         }
-        .nav-link-custom {
+
+        /* Brand Logo Mark */
+        .brand-logo-mark {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #0ca678 0%, #12b886 50%, #20c997 100%);
+            color: #ffffff;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 18px rgba(12, 166, 120, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .brand-logo:hover .brand-logo-mark {
+            transform: scale(1.05) rotate(-2deg);
+            box-shadow: 0 8px 22px rgba(12, 166, 120, 0.45);
+        }
+        .brand-logo-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 800;
+            font-size: 1.35rem;
+            color: #0f172a;
+            letter-spacing: -0.03em;
+            line-height: 1;
+        }
+
+        /* Center Nav Pill Island */
+        .nav-capsule-island {
+            background: rgba(241, 245, 249, 0.75);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            border-radius: 50px;
+            padding: 4px 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+        }
+        .nav-capsule-link {
+            font-size: 0.9rem;
+            font-weight: 600;
             color: #475569;
-            font-weight: 550;
-            font-size: 0.92rem;
-            padding: 0.5rem 0.9rem;
-            border-radius: 6px;
-            transition: all 0.15s ease;
+            padding: 6px 16px;
+            border-radius: 50px;
             text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-block;
         }
-        .nav-link-custom:hover {
-            color: #1db8ab;
-            background-color: rgba(29, 184, 171, 0.05);
+        .nav-capsule-link:hover {
+            color: #0ca678;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+            transform: translateY(-1px);
+        }
+
+        /* Nav Action Buttons */
+        .btn-nav-signin {
+            color: #334155;
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 8px 18px;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .btn-nav-signin:hover {
+            color: #0ca678;
+            background: rgba(12, 166, 120, 0.06);
+        }
+        .btn-nav-cta {
+            background: linear-gradient(135deg, #0ca678 0%, #099268 100%);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.92rem;
+            padding: 9px 22px;
+            border-radius: 50px;
+            border: none;
+            box-shadow: 0 4px 16px rgba(12, 166, 120, 0.35);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-nav-cta:hover {
+            background: linear-gradient(135deg, #099268 0%, #087f5b 100%);
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(12, 166, 120, 0.45);
         }
 
         /* Hero Styling */
@@ -448,39 +529,67 @@
     <!-- ========================================================================= -->
     <header class="landing-navbar">
         <div class="container-xl">
-            <div class="d-flex align-items-center justify-content-between py-2.5">
+            <div class="d-flex align-items-center justify-content-between">
                 <!-- Brand Logo -->
-                <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 text-decoration-none">
-                    <span class="avatar avatar-sm rounded-2 bg-teal-lt text-teal">
-                        <i class="ti ti-brand-campaignmonitor fs-2"></i>
+                <a href="{{ url('/') }}" class="brand-logo d-flex align-items-center gap-2.5 text-decoration-none">
+                    <span class="brand-logo-mark">
+                        <i class="ti ti-brand-campaignmonitor fs-2 text-white"></i>
                     </span>
-                    <span class="fw-bold fs-3 text-dark">Social<span class="text-teal">Manager</span></span>
-                    <span class="badge badge-teal-soft ms-1">v2.4</span>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="brand-logo-title">Social<span class="text-teal-gradient">Manager</span></span>
+                        <span class="badge badge-teal-soft">v2.4</span>
+                    </div>
                 </a>
 
-                <!-- Desktop Navigation Links -->
-                <nav class="d-none d-lg-flex align-items-center gap-1">
-                    <a href="#features" class="nav-link-custom">Features</a>
-                    <a href="#platforms" class="nav-link-custom">Platforms</a>
-                    <a href="#how-it-works" class="nav-link-custom">How It Works</a>
-                    <a href="#pricing" class="nav-link-custom">Pricing</a>
-                    <a href="#faq" class="nav-link-custom">FAQ</a>
+                <!-- Desktop Navigation Capsule Island -->
+                <nav class="d-none d-lg-flex align-items-center">
+                    <div class="nav-capsule-island">
+                        <a href="#features" class="nav-capsule-link">Features</a>
+                        <a href="#platforms" class="nav-capsule-link">Platforms</a>
+                        <a href="#how-it-works" class="nav-capsule-link">How It Works</a>
+                        <a href="#pricing" class="nav-capsule-link">Pricing</a>
+                        <a href="#faq" class="nav-capsule-link">FAQ</a>
+                    </div>
                 </nav>
 
-                <!-- Auth Buttons -->
+                <!-- Auth / Action Buttons -->
                 <div class="d-flex align-items-center gap-2">
                     @auth
-                        <a href="{{ route('admin.dashboard') }}" class="btn btn-teal btn-sm px-3">
-                            <i class="ti ti-layout-dashboard me-1"></i>Open Dashboard
+                        <a href="{{ route('admin.dashboard') }}" class="btn-nav-cta">
+                            <i class="ti ti-layout-dashboard"></i>Open Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="btn btn-ghost-secondary btn-sm px-3 d-none d-sm-inline-block">
+                        <a href="{{ route('login') }}" class="btn-nav-signin d-none d-sm-inline-flex">
                             Sign In
                         </a>
-                        <a href="{{ route('login') }}" class="btn btn-teal btn-sm px-3.5">
-                            <i class="ti ti-arrow-right me-1"></i>Get Started Free
+                        <a href="{{ route('login') }}" class="btn-nav-cta">
+                            <span>Get Started Free</span>
+                            <i class="ti ti-arrow-right"></i>
                         </a>
                     @endauth
+
+                    <!-- Mobile Menu Toggle Button -->
+                    <button class="btn btn-icon btn-ghost-secondary rounded-circle d-lg-none ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNavCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="ti ti-menu-2 fs-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Navigation Dropdown -->
+            <div class="collapse d-lg-none mt-3 pt-3 border-top" id="mobileNavCollapse">
+                <div class="d-flex flex-column gap-2 pb-2">
+                    <a href="#features" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">Features</a>
+                    <a href="#platforms" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">Platforms</a>
+                    <a href="#how-it-works" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">How It Works</a>
+                    <a href="#pricing" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">Pricing</a>
+                    <a href="#faq" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">FAQ</a>
+                    <hr class="my-2 border-secondary border-opacity-25">
+                    @guest
+                        <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 py-2 fw-semibold mb-2">Sign In</a>
+                        <a href="{{ route('login') }}" class="btn btn-teal w-100 py-2 fw-semibold">Get Started Free</a>
+                    @else
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-teal w-100 py-2 fw-semibold">Open Dashboard</a>
+                    @endguest
                 </div>
             </div>
         </div>
