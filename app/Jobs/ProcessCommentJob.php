@@ -13,6 +13,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Redis;
 
 class ProcessCommentJob implements ShouldQueue
 {
@@ -29,7 +31,7 @@ class ProcessCommentJob implements ShouldQueue
     }
 
     /**
-     * Execute the job.
+     * Execute the job with account-level rate throttling to protect Meta & YouTube API quotas.
      */
     public function handle(): void
     {
@@ -49,6 +51,68 @@ class ProcessCommentJob implements ShouldQueue
             return;
         }
 
+        // Apply account-level throttling (25 API requests / 60 seconds per account)
+        // Prevents Meta OAuthException: (#32) Page request limit reached during viral post spikes
+        if ($account) {
+            $this->executeThrottled($account, function () use ($comment, $account) {
+                $this->processComment($comment, $account);
+            });
+            return;
+        }
+
+        $this->processComment($comment, null);
+    }
+
+    /**
+     * Account-level rate limiter to prevent Meta Graph API & YouTube Data API throttling during viral spikes.
+     */
+    protected function executeThrottled(Account $account, callable $callback): void
+    {
+        $throttleKey = 'meta_api_rate_' . $account->id;
+
+        // 1. Try Redis throttling if Redis queue connection is active
+        try {
+            if (config('queue.default') === 'redis' && class_exists(Redis::class)) {
+                Redis::throttle($throttleKey)
+                    ->allow(25)
+                    ->every(60)
+                    ->then(function () use ($callback) {
+                        $callback();
+                    }, function () {
+                        Log::info("ProcessCommentJob: Account #{$this->comment->account_id} rate limit reached (Redis throttle), releasing job back to queue with 30s delay.");
+                        if ($this->job) {
+                            $this->release(30);
+                        }
+                    });
+                return;
+            }
+        } catch (\Throwable $redisEx) {
+            Log::debug("ProcessCommentJob: Redis throttle unavailable, falling back to RateLimiter: " . $redisEx->getMessage());
+        }
+
+        // 2. Resilient fallback using Laravel RateLimiter (works in database/sync queue and test environments)
+        $executed = RateLimiter::attempt(
+            $throttleKey,
+            25,
+            function () use ($callback) {
+                $callback();
+            },
+            60
+        );
+
+        if (!$executed) {
+            Log::info("ProcessCommentJob: Account #{$this->comment->account_id} rate limit reached (RateLimiter), releasing job back to queue with 30s delay.");
+            if ($this->job) {
+                $this->release(30);
+            }
+        }
+    }
+
+    /**
+     * Core comment moderation, AI analysis, and auto-reply dispatch
+     */
+    protected function processComment(Comment $comment, ?Account $account): void
+    {
         $post = $comment->post;
         $rawText = trim($comment->message ?? '');
         $text = strtolower($rawText);
@@ -195,8 +259,19 @@ class ProcessCommentJob implements ShouldQueue
                     $repliedAt = now();
                     Log::info("ProcessCommentJob: Auto-approved live reply published to comment #{$comment->id}");
                 } else {
+                    $errorMsg = $publishRes['message'] ?? 'Unknown publishing error';
+
+                    // Detect Meta API rate limit (#32 Page request limit, #4 Application request limit, #17 User request limit)
+                    if (str_contains($errorMsg, '(#32)') || str_contains($errorMsg, '(#4)') || str_contains($errorMsg, 'request limit reached')) {
+                        Log::warning("ProcessCommentJob: Meta rate limit hit (#32) for account #{$account->id}. Backing off for 60s.");
+                        if ($this->job) {
+                            $this->release(60);
+                            return;
+                        }
+                    }
+
                     Log::warning("ProcessCommentJob: Auto-reply publish failed for comment #{$comment->id}, kept in pending review", [
-                        'message' => $publishRes['message'] ?? 'Unknown publishing error'
+                        'message' => $errorMsg
                     ]);
                 }
             } catch (\Throwable $e) {

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\AutoDmRecipient;
 use App\Models\AutoDmRule;
 use App\Models\Comment;
 use Illuminate\Support\Facades\Http;
@@ -58,6 +59,21 @@ class MetaMessagingService
             ];
         }
 
+        $commenterId = $comment->commenter_meta_id ?: $comment->commenter_name;
+
+        // Frequency Capping: Maximum 1 Auto-DM per recipient per account within 24 hours
+        // Protects against Instagram & Facebook spam blocks caused by repeated DMs to the same user
+        if (!empty($commenterId) && AutoDmRecipient::isCapped($account->id, (string) $commenterId, 24)) {
+            Log::info("Auto DM Frequency Cap: Skipped DM to commenter [{$commenterId}] on account #{$account->id} (already sent within 24 hours).");
+            return [
+                'success'           => false,
+                'message'           => 'Frequency capped: Auto-DM already sent to this user within the last 24 hours.',
+                'dm_sent'           => false,
+                'frequency_capped'  => true,
+                'public_reply_sent' => false,
+            ];
+        }
+
         // 1. Send the Private Direct Message (DM)
         $dmResult = $this->sendPrivateReply($account, $commentId, $rule->dm_message);
 
@@ -67,8 +83,12 @@ class MetaMessagingService
             $publicReplyResult = $this->sendPublicReply($account, $commentId, $rule->public_reply);
         }
 
-        // 3. If DM succeeded, record trigger on rule and update comment status
+        // 3. If DM succeeded, record trigger on rule, track frequency cap, and update comment status
         if ($dmResult['success']) {
+            if (!empty($commenterId)) {
+                AutoDmRecipient::recordDispatch($account->id, (string) $commenterId);
+            }
+
             $rule->recordTrigger();
 
             $updateData = [
