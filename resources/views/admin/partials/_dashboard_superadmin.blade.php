@@ -19,24 +19,24 @@
 </div>
 
 {{-- Top Row: Core Platform Stats (4 Cards) --}}
-<div class="row row-deck row-cards mb-3">
+<div class="row row-deck row-cards mb-3 dashboard-stat-grid">
 
     {{-- 1. TOTAL USERS --}}
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
         <a href="{{ route('admin.users.index') }}" class="card card-sm card-link text-decoration-none" title="Manage Users">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary">
                             <i class="ti ti-users fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL USERS</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalUsers) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">TOTAL USERS</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($totalUsers) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-primary-lt small fw-semibold">
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-primary-lt small fw-semibold stat-badge">
                             +{{ $newUsersThisMonth }} this mo
                         </span>
                     </div>
@@ -46,21 +46,21 @@
     </div>
 
     {{-- 2. AI REPLIES --}}
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                             <i class="ti ti-robot fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">AI REPLIES</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalAiReplies) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">AI REPLIES</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($totalAiReplies) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-teal-lt small fw-semibold">
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-teal-lt small fw-semibold stat-badge">
                             +{{ $aiRepliesThisMonth }} this mo
                         </span>
                     </div>
@@ -70,21 +70,21 @@
     </div>
 
     {{-- 3. TOTAL POSTS --}}
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-success-lt text-success">
                             <i class="ti ti-article fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL POSTS</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalPosts) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">TOTAL POSTS</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($totalPosts) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-success-lt small fw-semibold">
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-success-lt small fw-semibold stat-badge">
                             +{{ $postsThisMonth }} this mo
                         </span>
                     </div>
@@ -94,21 +94,21 @@
     </div>
 
     {{-- 4. TOTAL COMMENTS --}}
-    <div class="col-sm-6 col-lg-3">
+    <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-indigo-lt text-indigo">
                             <i class="ti ti-messages fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL COMMENTS</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalComments) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">TOTAL COMMENTS</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($totalComments) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-indigo-lt small fw-semibold">
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-indigo-lt small fw-semibold stat-badge">
                             +{{ $commentsThisMonth }} this mo
                         </span>
                     </div>
@@ -120,24 +120,24 @@
 </div>
 
 {{-- Second Row: Connected Accounts by Platform (3 Cards) --}}
-<div class="row row-deck row-cards mb-3">
+<div class="row row-deck row-cards mb-3 dashboard-stat-grid">
 
     {{-- 1. TOTAL FB ACCOUNTS CONNECTED --}}
-    <div class="col-md-4">
+    <div class="col-6 col-md-4">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-primary-lt text-facebook">
                             <i class="ti ti-brand-facebook fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">FACEBOOK CONNECTED</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($fbAccountsCount) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">FACEBOOK CONNECTED</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($fbAccountsCount) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-primary-lt small fw-semibold">Facebook Pages</span>
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-primary-lt small fw-semibold stat-badge">Facebook Pages</span>
                     </div>
                 </div>
             </div>
@@ -145,21 +145,21 @@
     </div>
 
     {{-- 2. TOTAL INSTA CONNECTED --}}
-    <div class="col-md-4">
+    <div class="col-6 col-md-4">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-pink-lt text-pink">
                             <i class="ti ti-brand-instagram fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">INSTAGRAM CONNECTED</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($igAccountsCount) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">INSTAGRAM CONNECTED</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($igAccountsCount) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-pink-lt small fw-semibold">Instagram Business</span>
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-pink-lt small fw-semibold stat-badge">Instagram Business</span>
                     </div>
                 </div>
             </div>
@@ -167,21 +167,21 @@
     </div>
 
     {{-- 3. TOTAL YOUTUBE CONNECTED --}}
-    <div class="col-md-4">
+    <div class="col-12 col-md-4">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-auto">
+                <div class="row align-items-center stat-row">
+                    <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-danger-lt text-danger">
                             <i class="ti ti-brand-youtube fs-2"></i>
                         </span>
                     </div>
-                    <div class="col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">YOUTUBE CONNECTED</div>
-                        <div class="h2 mb-0 fw-bold text-body">{{ number_format($ytAccountsCount) }}</div>
+                    <div class="col stat-content-col">
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">YOUTUBE CONNECTED</div>
+                        <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($ytAccountsCount) }}</div>
                     </div>
-                    <div class="col-auto text-end">
-                        <span class="badge bg-danger-lt small fw-semibold">YouTube Channels</span>
+                    <div class="col-auto text-end stat-badge-col">
+                        <span class="badge bg-danger-lt small fw-semibold stat-badge">YouTube Channels</span>
                     </div>
                 </div>
             </div>

@@ -697,6 +697,74 @@ body,
         font-size: 0.6875rem;
     }
 
+    /* --- Dashboard Stat Grid (Compact 2x4 on Mobile) --- */
+    .dashboard-stat-grid {
+        margin-left: -4px !important;
+        margin-right: -4px !important;
+    }
+    .dashboard-stat-grid > [class*="col-"] {
+        padding-left: 4px !important;
+        padding-right: 4px !important;
+        margin-bottom: 8px !important;
+    }
+    .dashboard-stat-grid .card {
+        border-radius: 12px !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+    }
+    .dashboard-stat-grid .card-body {
+        padding: 0.7rem 0.65rem !important;
+    }
+    .dashboard-stat-grid .stat-row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        row-gap: 0.35rem !important;
+    }
+    .dashboard-stat-grid .stat-icon-col {
+        order: 1 !important;
+        flex: 0 0 auto !important;
+    }
+    .dashboard-stat-grid .stat-badge-col {
+        order: 2 !important;
+        flex: 0 0 auto !important;
+        margin-left: auto !important;
+    }
+    .dashboard-stat-grid .stat-content-col {
+        order: 3 !important;
+        width: 100% !important;
+        flex: 0 0 100% !important;
+        margin-top: 0.2rem !important;
+    }
+    .dashboard-stat-grid .avatar.avatar-md {
+        width: 32px !important;
+        height: 32px !important;
+        border-radius: 8px !important;
+    }
+    .dashboard-stat-grid .avatar.avatar-md i {
+        font-size: 1.15rem !important;
+    }
+    .dashboard-stat-grid .stat-label {
+        font-size: 0.65rem !important;
+        letter-spacing: 0.04em !important;
+        color: var(--tblr-secondary, #64748b) !important;
+        margin-bottom: 2px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    .dashboard-stat-grid .stat-value {
+        font-size: 1.35rem !important;
+        font-weight: 700 !important;
+        line-height: 1.15 !important;
+        color: var(--tblr-body-color, #1e293b) !important;
+    }
+    .dashboard-stat-grid .stat-badge {
+        font-size: 0.62rem !important;
+        padding: 0.15rem 0.4rem !important;
+        font-weight: 600 !important;
+        border-radius: 6px !important;
+    }
+
     /* Page header buttons: full width */
     .page-header .col-auto .btn {
         display: block;
