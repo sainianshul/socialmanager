@@ -928,37 +928,78 @@
             box-shadow: 0 4px 12px rgba(12, 166, 120, 0.35);
         }
 
-        /* Accordion Custom Styling */
-        .accordion-custom .accordion-item {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px !important;
-            margin-bottom: 14px;
+        /* ===================================================================== */
+        /* APPLE-STYLE MINIMALIST FAQ ACCORDION                                  */
+        /* ===================================================================== */
+        .apple-faq-section {
+            padding: 95px 0;
             background: #ffffff;
-            overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s ease;
+            border-top: 1px solid rgba(15, 23, 42, 0.05);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.05);
         }
-        .accordion-custom .accordion-item:hover {
-            border-color: #cbd5e1;
+        .apple-faq-container {
+            max-width: 820px;
+            margin: 0 auto;
         }
-        .accordion-custom .accordion-button {
-            font-weight: 650;
-            font-size: 1.05rem;
+        .apple-faq-item {
+            border-bottom: 1px solid #eef2f6;
+            padding: 0;
+            background: transparent;
+            transition: border-color 0.2s ease;
+        }
+        .apple-faq-item:first-child {
+            border-top: 1px solid #eef2f6;
+        }
+        .apple-faq-button {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            text-align: left;
+            background: transparent;
+            border: none;
+            padding: 26px 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: -0.015em;
             color: #0f172a;
-            background: #ffffff;
-            padding: 1.25rem 1.45rem;
+            cursor: pointer;
+            transition: color 0.2s ease;
             box-shadow: none !important;
         }
-        .accordion-custom .accordion-button:not(.collapsed) {
-            color: #0d8a80;
-            background-color: rgba(29, 184, 171, 0.04);
-            border-bottom: 1px solid #e2e8f0;
+        .apple-faq-button:hover {
+            color: #0ca678;
         }
-        .accordion-custom .accordion-body {
-            padding: 1.35rem 1.45rem;
-            color: #475569;
-            font-size: 0.96rem;
+        .apple-faq-button:focus {
+            outline: none;
+            box-shadow: none;
+        }
+        .apple-faq-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748b;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+            margin-left: 20px;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, color 0.3s ease;
+        }
+        .apple-faq-button:not(.collapsed) .apple-faq-icon {
+            transform: rotate(45deg);
+            background: rgba(12, 166, 120, 0.1);
+            color: #0ca678;
+        }
+        .apple-faq-body {
+            padding: 0 0 28px 0;
+            font-size: 1rem;
             line-height: 1.75;
+            color: #64748b;
+            max-width: 760px;
+            font-weight: 400;
         }
 
         /* Pre-Footer CTA Card */
@@ -2108,133 +2149,101 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 5: FREQUENTLY ASKED QUESTIONS (ACCORDION)                            -->
+    <!-- STEP 5: FREQUENTLY ASKED QUESTIONS (APPLE-STYLE MINIMAL)                  -->
     <!-- ========================================================================= -->
-    <section id="faq" class="py-6 border-bottom bg-white">
+    <section id="faq" class="apple-faq-section">
         <div class="container-xl">
             <!-- Section Header -->
-            <div class="text-center mb-5">
-                <span class="badge badge-teal-soft px-3 py-1.5 rounded-pill mb-2">
-                    <i class="ti ti-help-circle me-1"></i>Frequently Asked Questions
-                </span>
-                <h2 class="display-6 fw-bold text-dark mb-2">
-                    Everything You Need to Know
-                </h2>
-                <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">
-                    Direct technical clarity regarding Meta & Google API safety, rate limits, comment triggers, and data encryption.
-                </p>
+            <div class="text-center mb-5" style="max-width: 680px; margin-left: auto; margin-right: auto;">
+                <span class="apple-section-eyebrow mb-2 d-inline-block">Frequently Asked Questions</span>
+                <h2 class="apple-section-headline mb-3">Everything you need to know.</h2>
+                <p class="apple-section-subhead">Clear answers regarding official platform safety, comment-to-DM triggers, and encryption.</p>
             </div>
 
-            <!-- Accordion Wrapper -->
-            <div class="row justify-content-center">
-                <div class="col-12 col-lg-9">
-                    <div class="accordion accordion-custom" id="faqAccordion">
-                        
-                        <!-- FAQ 1 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading1">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-shield-check text-teal fs-2"></i>
-                                        Can my Facebook, Instagram, or YouTube account get banned or restricted?
-                                    </span>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    No. Unlike unofficial scraping bots or browser automation scripts that risk account bans, SocialManager interacts exclusively through officially certified Meta Graph API (v22.0) and Google Cloud YouTube Data API (v3) protocols. Every comment response and scheduled post adheres strictly to platform rate-limiting and messaging policies. Your accounts remain 100% compliant and secure within enterprise developer boundaries.
-                                </div>
-                            </div>
+            <!-- Apple-Style Accordion Wrapper -->
+            <div class="apple-faq-container" id="faqAccordion">
+                
+                <!-- FAQ 1 -->
+                <div class="apple-faq-item">
+                    <button class="apple-faq-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                        <span>Can my Facebook, Instagram, or YouTube account get banned or restricted?</span>
+                        <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
+                    </button>
+                    <div id="faqCollapse1" class="collapse show" data-bs-parent="#faqAccordion">
+                        <div class="apple-faq-body">
+                            No. Unlike unofficial scraping bots or browser automation extensions that risk account flags, SocialManager communicates exclusively through certified Meta Graph API and Google Cloud YouTube Data API protocols. Every automated comment response and scheduled post strictly complies with platform rate-limiting and developer terms.
                         </div>
-
-                        <!-- FAQ 2 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading2">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-message-share text-teal fs-2"></i>
-                                        How does the Comment-to-DM lead capture trigger work on Instagram and Facebook?
-                                    </span>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    When a follower leaves a comment on your posts or reels, Meta's Realtime Webhooks immediately push the payload to our secure server in under 300 milliseconds. SocialManager evaluates the comment against your configured trigger keywords (such as PRICE, LINK, or DEMO) or natural language intent. The engine instantly posts a polite public reply confirming receipt while simultaneously dispatching a personalized private Direct Message (DM) to their inbox containing the relevant link, brochure, or checkout page.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 3 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading3">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-brand-youtube text-teal fs-2"></i>
-                                        How does YouTube comment automation work without exceeding Google API quotas?
-                                    </span>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    YouTube's Data API provides a default allocation of 10,000 units per day per Google Cloud project. Since YouTube comments operate on an optimized 10-minute cron check rather than streaming webhooks, polling your channel consumes only 1 unit per cycle (144 units per 24 hours). Posting an AI reply uses 50 units. The built-in rate-limiter and duplicate reply detector ensure your project never approaches or exceeds Google's quota limits.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 4 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading4">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-user-check text-teal fs-2"></i>
-                                        Can I customize the AI's personality, tone, and brand safety guidelines?
-                                    </span>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Yes. SocialManager features a dedicated AI Personas manager where you define exact brand voice guidelines, industry vocabulary, predefined knowledge base answers, and negative-sentiment escalation rules. You can also specify banned keywords and competitor filters so the AI never generates off-brand or risky statements.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 5 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading5">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-lock text-teal fs-2"></i>
-                                        How are social tokens and sensitive client credentials protected?
-                                    </span>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    All platform OAuth tokens are encrypted at rest using AES-256-CBC cipher with application-level key derivation via Laravel's native Crypt layer. Decrypted tokens are strictly excluded from JSON serializations, front-end payloads, and log files. Webhooks are validated using HMAC SHA-256 signatures, and we never access, request, or store your personal social media passwords.
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- FAQ 6 -->
-                        <div class="accordion-item">
-                            <h3 class="accordion-header" id="faqHeading6">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
-                                    <span class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-toggle-right text-teal fs-2"></i>
-                                        Can I review AI-generated responses before they get published?
-                                    </span>
-                                </button>
-                            </h3>
-                            <div id="faqCollapse6" class="accordion-collapse collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
-                                <div class="accordion-body">
-                                    Yes. SocialManager offers two operational modes. You can set it to Full Autopilot for immediate, hands-free 24/7 engagement, or switch to Review Queue mode where AI drafts replies and stages them for one-click human approval by your social media team.
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
+
+                <!-- FAQ 2 -->
+                <div class="apple-faq-item">
+                    <button class="apple-faq-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                        <span>How does the Comment-to-DM lead capture trigger work on Instagram and Facebook?</span>
+                        <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
+                    </button>
+                    <div id="faqCollapse2" class="collapse" data-bs-parent="#faqAccordion">
+                        <div class="apple-faq-body">
+                            When a follower comments on your posts or Reels with your configured trigger keywords (like "link", "pricing", or "details"), Meta sends an instant webhook event. SocialManager immediately publishes an authentic public reply confirming delivery while simultaneously dispatching a personalized private Direct Message (DM) to their inbox.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="apple-faq-item">
+                    <button class="apple-faq-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                        <span>How does YouTube comment automation work without exceeding Google API quotas?</span>
+                        <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
+                    </button>
+                    <div id="faqCollapse3" class="collapse" data-bs-parent="#faqAccordion">
+                        <div class="apple-faq-body">
+                            YouTube's Data API provides a standard allocation of 10,000 units per day. Our intelligent polling daemon operates on an optimized schedule consuming only 144 units every 24 hours. Built-in rate limiting and deduplication ensure your account stays safely within official Google Cloud quota limits at all times.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="apple-faq-item">
+                    <button class="apple-faq-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                        <span>Can I customize the AI's personality, tone, and brand safety guidelines?</span>
+                        <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
+                    </button>
+                    <div id="faqCollapse4" class="collapse" data-bs-parent="#faqAccordion">
+                        <div class="apple-faq-body">
+                            Yes. You can select pre-built voices such as Humble & Respectful, Patriotic & Inspiring, or Formal & Official, or define your own tailored brand voice prompt. You can also specify negative-sentiment escalation rules, competitor name filters, and prohibited vocabulary.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="apple-faq-item">
+                    <button class="apple-faq-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                        <span>How are social tokens and sensitive client credentials protected?</span>
+                        <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
+                    </button>
+                    <div id="faqCollapse5" class="collapse" data-bs-parent="#faqAccordion">
+                        <div class="apple-faq-body">
+                            All platform OAuth access tokens are encrypted at rest using AES-256 encryption. We never request, store, or have access to your personal social media passwords. Platform authentication is executed strictly through official single sign-on dialogs hosted by Meta and Google.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 6 -->
+                <div class="apple-faq-item">
+                    <button class="apple-faq-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                        <span>Can I review AI-generated responses before they get published?</span>
+                        <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
+                    </button>
+                    <div id="faqCollapse6" class="collapse" data-bs-parent="#faqAccordion">
+                        <div class="apple-faq-body">
+                            Yes. SocialManager supports two engagement modes: Full Autopilot for automatic hands-free 24/7 engagement, or Human Approval Mode where AI responses are held in a review queue for one-click approval before publication.
+                        </div>
+                    </div>
+                </div>
+
             </div>
+        </div>
+    </section>
         </div>
     </section>
 
