@@ -25,11 +25,54 @@
     <style>
         body {
             font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
-            background-color: #f8fafc;
+            background-color: #fafbfc !important;
+            color: #1e293b;
+        }
+        .login-card {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.85) !important;
+            border-radius: 20px !important;
+            box-shadow: 0 16px 36px -8px rgba(29, 184, 171, 0.08), 0 4px 14px -2px rgba(15, 23, 42, 0.03) !important;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        .login-card:hover {
+            box-shadow: 0 22px 48px -8px rgba(29, 184, 171, 0.12), 0 6px 18px -2px rgba(15, 23, 42, 0.05) !important;
+        }
+        .brand-logo-circle {
+            width: 44px;
+            height: 44px;
+            background-color: #1db8ab !important;
+            color: #ffffff;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(29, 184, 171, 0.32);
+            transition: transform 0.2s ease;
+        }
+        .brand-logo-circle:hover {
+            transform: scale(1.05);
+        }
+        .form-control:focus {
+            border-color: #1db8ab !important;
+            box-shadow: 0 0 0 3px rgba(29, 184, 171, 0.15) !important;
+        }
+        .btn-primary {
+            background-color: #1db8ab !important;
+            border-color: #1db8ab !important;
+            box-shadow: 0 4px 14px rgba(29, 184, 171, 0.28) !important;
+            border-radius: 8px !important;
+            transition: all 0.2s ease !important;
+        }
+        .btn-primary:hover {
+            background-color: #17a397 !important;
+            border-color: #17a397 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(29, 184, 171, 0.38) !important;
         }
     </style>
 </head>
-<body class="d-flex flex-column bg-white">
+<body class="d-flex flex-column">
     <script>
         var mode = localStorage.getItem('data-bs-theme') || 'light';
         document.body.setAttribute('data-bs-theme', mode);
@@ -40,8 +83,8 @@
 
             <div class="text-center mb-4">
                 <a href="{{ url('/') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none">
-                    <div class="text-white rounded-circle d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px; background-color: #0f172a !important;">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <div class="brand-logo-circle">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 3v18" />
                             <path d="M3 12h18" />
                             <path d="M5.636 5.636l12.728 12.728" />
@@ -52,7 +95,7 @@
                 </a>
             </div>
 
-            <div class="card card-md border shadow-sm rounded-3">
+            <div class="card card-md login-card">
                 <div class="card-body p-4 p-md-5">
                     <h2 class="h2 text-center fw-bold text-dark mb-1">Login to your account</h2>
                     <p class="text-center text-secondary small mb-4">Enter your credentials to access the dashboard</p>
