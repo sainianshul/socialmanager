@@ -913,4 +913,107 @@ class SchedulePostController extends Controller
             . "Drop your questions and valuable feedback in the comments section below.\n\n"
             . "{$tagStr}";
     }
+
+    /**
+     * Generate engaging AI social captions and trending hashtags.
+     */
+    public function generateAiCaption(Request $request)
+    {
+        $request->validate([
+            'topic'    => 'required|string|min:2|max:500',
+            'platform' => 'nullable|string|in:facebook,instagram,youtube,all',
+            'tone'     => 'nullable|string|max:50',
+            'language' => 'nullable|string|max:50',
+        ]);
+
+        $topic = trim($request->input('topic'));
+        $options = [
+            'platform' => $request->input('platform', 'all'),
+            'tone'     => $request->input('tone', 'engaging'),
+            'language' => $request->input('language', 'English'),
+        ];
+
+        try {
+            $aiService = app(\App\Contracts\AIServiceInterface::class);
+            $result = null;
+
+            if ($aiService->isConfigured()) {
+                $result = $aiService->generateSocialCaption($topic, $options);
+            }
+
+            if (empty($result) || empty($result['caption'])) {
+                $result = $this->generateFallbackCaption($topic, $options);
+            }
+
+            return response()->json([
+                'success'    => true,
+                'hook'       => $result['hook'] ?? '',
+                'caption'    => $result['caption'] ?? '',
+                'cta'        => $result['call_to_action'] ?? '',
+                'hashtags'   => $result['hashtags'] ?? [],
+                'variations' => $result['variations'] ?? [],
+                'full_text'  => $result['full_text'] ?? '',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('AI Caption Generation error: ' . $e->getMessage());
+            $fallback = $this->generateFallbackCaption($topic, $options);
+
+            return response()->json([
+                'success'    => true,
+                'hook'       => $fallback['hook'],
+                'caption'    => $fallback['caption'],
+                'cta'        => $fallback['call_to_action'],
+                'hashtags'   => $fallback['hashtags'],
+                'variations' => $fallback['variations'],
+                'full_text'  => $fallback['full_text'],
+            ]);
+        }
+    }
+
+    /**
+     * Rule-based intelligent fallback social caption and hashtags generator.
+     */
+    protected function generateFallbackCaption(string $topic, array $options = []): array
+    {
+        $platform = strtolower($options['platform'] ?? 'all');
+        $tone = strtolower($options['tone'] ?? 'engaging');
+        $cleanTopic = trim($topic);
+
+        // Extract key words for hashtag generation
+        $words = preg_split('/[\s,\.\?!;:\-]+/', strtolower($cleanTopic), -1, PREG_SPLIT_NO_EMPTY);
+        $stopWords = ['the', 'is', 'at', 'which', 'on', 'and', 'a', 'an', 'in', 'to', 'for', 'with', 'of', 'from', 'our', 'new', 'this', 'that', 'all', 'we', 'are', 'you', 'your'];
+        $keywords = array_filter($words, fn($w) => strlen($w) > 3 && !in_array($w, $stopWords));
+        $keywordTags = array_map(fn($w) => '#' . ucfirst($w), array_slice(array_unique($keywords), 0, 5));
+
+        $defaultTags = ['#SocialManager', '#Updates', '#Growth', '#Trending', '#ContentCreator', '#Community'];
+        $mergedHashtags = array_values(array_unique(array_merge($keywordTags, $defaultTags)));
+        $hashtagsString = implode(' ', $mergedHashtags);
+
+        $hook = "Excited to share this with everyone: {$cleanTopic}!";
+        $caption = "{$hook}\n\nWe are always working to bring you the best experience, and this is another step forward. Whether you are following along or just getting started, we would love to have you with us on this journey.\n\nDrop a comment below with your thoughts or questions!";
+
+        $variations = [
+            [
+                'title' => 'Engaging Story',
+                'text'  => "{$hook}\n\nEvery milestone is an opportunity to connect and grow together. We couldn't have achieved this without our incredible community.\n\nWhat are your thoughts on this? Let us know below!",
+            ],
+            [
+                'title' => 'Short & Punchy',
+                'text'  => "{$cleanTopic}.\n\nBig things are happening. Stay tuned for what's coming next!",
+            ],
+            [
+                'title' => 'Community Question',
+                'text'  => "What do you think about {$cleanTopic}?\n\nWe'd love to hear your honest feedback. Join the conversation in the comments below!",
+            ],
+        ];
+
+        return [
+            'hook'           => $hook,
+            'caption'        => $caption,
+            'call_to_action' => 'Drop a comment below with your thoughts!',
+            'hashtags'       => $mergedHashtags,
+            'variations'     => $variations,
+            'full_text'      => $caption . "\n\n" . $hashtagsString,
+        ];
+    }
 }

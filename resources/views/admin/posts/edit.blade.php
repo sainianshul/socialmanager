@@ -251,10 +251,20 @@
 
                     {{-- Caption / Content --}}
                     <div class="mb-4">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
+                        <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
                             <label class="form-label fw-bold text-dark m-0">Caption</label>
-                            <span class="text-secondary small" id="caption-counter">{{ strlen(old('content', $scheduledPost->content ?? '')) }} / {{ $platform === 2 ? '2200' : '5000' }}</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-2 shadow-xs" id="btn-toggle-ai-caption" title="Generate AI Captions & Viral Hashtags">
+                                    <i class="ti ti-sparkles text-primary"></i>
+                                    <span class="fw-semibold">AI Caption & Hashtags</span>
+                                </button>
+                                <span class="text-secondary small" id="caption-counter">{{ strlen(old('content', $scheduledPost->content ?? '')) }} / {{ $platform === 2 ? '2200' : '5000' }}</span>
+                            </div>
                         </div>
+
+                        {{-- AI Caption & Hashtag Studio Partial --}}
+                        @include('admin.posts.partials._ai_caption_studio')
+
                         <textarea name="content" id="composer-content" class="form-control" rows="5" placeholder="Write caption or message...">{{ old('content', $scheduledPost->content) }}</textarea>
                     </div>
 
@@ -505,5 +515,6 @@ document.addEventListener('DOMContentLoaded', function () {
     $('input[name="publish_mode"]:checked').trigger('change');
 });
 </script>
+@include('admin.posts.partials._ai_caption_script')
 @endpush
 

@@ -52,5 +52,21 @@ interface AIServiceInterface
      * @return string|null
      */
     public function generateVideoDescription(string $title, array $options = []): ?string;
+
+    /**
+     * Generate creative AI social captions and trending hashtags.
+     *
+     * @param string $topic
+     * @param array $options ['platform' => 'instagram'|'facebook'|'all', 'tone' => string, 'language' => string]
+     * @return array|null [
+     *     'hook' => string,
+     *     'caption' => string,
+     *     'call_to_action' => string,
+     *     'hashtags' => array,
+     *     'variations' => array,
+     *     'full_text' => string,
+     * ]
+     */
+    public function generateSocialCaption(string $topic, array $options = []): ?array;
 }
 

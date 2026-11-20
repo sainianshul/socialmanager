@@ -246,4 +246,114 @@ EOT;
             return null;
         }
     }
+
+    /**
+     * Generate creative AI social captions and trending hashtags.
+     */
+    public function generateSocialCaption(string $topic, array $options = []): ?array
+    {
+        if (!$this->isConfigured()) {
+            return null;
+        }
+
+        $platform = strtolower($options['platform'] ?? 'all');
+        $tone = $options['tone'] ?? 'engaging';
+        $language = $options['language'] ?? 'English';
+        $cleanTopic = PromptSecurityGuard::sanitizeInput($topic);
+
+        $systemPrompt = <<<EOT
+You are an expert Social Media Copywriter, Growth Hacker, and Viral Content Strategist for Instagram, Facebook, and LinkedIn.
+Generate an engaging, viral-ready social media caption, alternative variations, and high-ranking hashtags based on the provided topic.
+
+TARGET PLATFORM: {$platform}
+TONE OF VOICE: {$tone}
+PREFERRED LANGUAGE: {$language}
+
+INSTRUCTIONS:
+1. Hook: Write an eye-catching, curiosity-inducing first line that immediately stops the user from scrolling.
+2. Caption Body: Write clean, engaging paragraphs with natural line breaks. Incorporate relevant emojis naturally to guide the eye.
+3. Call To Action (CTA): Conclude with an interactive question or directive (e.g. "Share your thoughts below", "Double tap if this resonates!").
+4. Provide Three Distinct Variations:
+   - "Engaging Story": Narrative-driven, relatable, and high emotional resonance.
+   - "Short & Punchy": 2-3 bold sentences, concise and memorable.
+   - "Community Question": Starts directly with an engaging question to maximize comment engagement.
+5. Hashtags: Provide 8 to 12 relevant, trending, and niche hashtags. Each MUST begin with '#'.
+6. Full Text: Combine the primary caption with the hashtags separated by two blank lines.
+
+You MUST respond strictly with a valid JSON object matching this schema:
+{
+  "hook": "...",
+  "caption": "...",
+  "call_to_action": "...",
+  "hashtags": ["#Tag1", "#Tag2", "#Tag3"],
+  "variations": [
+    { "title": "Engaging Story", "text": "..." },
+    { "title": "Short & Punchy", "text": "..." },
+    { "title": "Community Question", "text": "..." }
+  ],
+  "full_text": "..."
+}
+EOT;
+
+        try {
+            $endpoint = rtrim($this->baseUrl, '/') . '/chat/completions';
+
+            $response = Http::timeout(25)
+                ->withToken($this->apiKey)
+                ->post($endpoint, [
+                    'model' => $this->model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => "Generate social media caption and hashtags for topic: \"{$cleanTopic}\""],
+                    ],
+                    'temperature' => 0.7,
+                ]);
+
+            if (!$response->successful()) {
+                Log::warning("{$this->providerName} generateSocialCaption failed with status " . $response->status());
+                return null;
+            }
+
+            $responseData = $response->json();
+            $content = $responseData['choices'][0]['message']['content'] ?? '';
+            $content = trim($content);
+
+            if (str_starts_with($content, '```json')) {
+                $content = substr($content, 7);
+            } elseif (str_starts_with($content, '```')) {
+                $content = substr($content, 3);
+            }
+            if (str_ends_with($content, '```')) {
+                $content = substr($content, 0, -3);
+            }
+
+            $parsed = json_decode(trim($content), true);
+            if (!is_array($parsed) || empty($parsed['caption'])) {
+                Log::warning("{$this->providerName} generateSocialCaption could not parse valid JSON: " . $content);
+                return null;
+            }
+
+            $hashtags = [];
+            if (!empty($parsed['hashtags']) && is_array($parsed['hashtags'])) {
+                foreach ($parsed['hashtags'] as $tag) {
+                    $tagStr = trim((string) $tag);
+                    if (!empty($tagStr)) {
+                        $hashtags[] = str_starts_with($tagStr, '#') ? $tagStr : '#' . $tagStr;
+                    }
+                }
+            }
+
+            return [
+                'hook'           => (string) ($parsed['hook'] ?? ''),
+                'caption'        => (string) ($parsed['caption'] ?? ''),
+                'call_to_action' => (string) ($parsed['call_to_action'] ?? ''),
+                'hashtags'       => $hashtags,
+                'variations'     => is_array($parsed['variations'] ?? null) ? array_values($parsed['variations']) : [],
+                'full_text'      => (string) ($parsed['full_text'] ?? ($parsed['caption'] . "\n\n" . implode(' ', $hashtags))),
+            ];
+        } catch (\Throwable $e) {
+            Log::warning("{$this->providerName} generateSocialCaption exception: " . $e->getMessage());
+            return null;
+        }
+    }
 }
