@@ -75,9 +75,9 @@ class SuperAdminDashboardTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
         $response->assertStatus(200);
-        // Admin should see All Users, Add User, but NOT Politics Analyses in sidebar
+        // Admin should see All Users, Add User, but NOT Sentiment Analytics in sidebar
         $response->assertSee('All Users</span>', false);
-        $response->assertDontSee('Politics Analyses</span>', false);
+        $response->assertDontSee('Sentiment Analytics</span>', false);
     }
 
     public function test_sidebar_shows_politics_analyses_for_regular_user(): void
@@ -87,8 +87,8 @@ class SuperAdminDashboardTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.dashboard'));
 
         $response->assertStatus(200);
-        // Regular user should see Politics Analyses in sidebar
-        $response->assertSee('Politics Analyses</span>', false);
+        // Regular user should see Sentiment Analytics in sidebar
+        $response->assertSee('Sentiment Analytics</span>', false);
         // Regular user should NOT see All Users in sidebar
         $response->assertDontSee('All Users</span>', false);
     }

@@ -1,158 +1,129 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Politics Analyses & Constituent Intelligence')
+@section('title', 'Sentiment Analytics - SocialManager')
 
 @section('content')
 
     {{-- Clean Page Header --}}
-    <div class="page-header d-print-none mb-3">
+    <div class="page-header d-print-none mb-4">
         <div class="row align-items-center">
             <div class="col">
-                <div class="page-pretitle text-secondary">Political Pulse & Public Intelligence</div>
-                <h2 class="page-title text-body">Politics Analyses</h2>
+                <div class="page-pretitle text-secondary">Audience Sentiment & Engagement Intelligence</div>
+                <h2 class="page-title text-dark fw-bold">Sentiment Analytics</h2>
             </div>
-            <div class="col-auto d-flex align-items-center gap-2 flex-wrap">
-                {{-- Platform Filter Buttons --}}
-                <div class="btn-group" role="group">
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['platform' => 'all'])) }}"
-                        class="btn btn-sm {{ $selectedPlatform === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                        All Channels
-                    </a>
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['platform' => 'facebook'])) }}"
-                        class="btn btn-sm {{ $selectedPlatform === 'facebook' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                        <i class="ti ti-brand-facebook text-facebook me-1"></i>Facebook
-                    </a>
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['platform' => 'instagram'])) }}"
-                        class="btn btn-sm {{ $selectedPlatform === 'instagram' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                        <i class="ti ti-brand-instagram text-pink me-1"></i>Instagram
-                    </a>
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['platform' => 'youtube'])) }}"
-                        class="btn btn-sm {{ $selectedPlatform === 'youtube' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                        <i class="ti ti-brand-youtube text-danger me-1"></i>YouTube
-                    </a>
-                </div>
+            <div class="col-auto">
+                <form action="{{ route('admin.analytics.index') }}" method="GET" class="d-flex align-items-center gap-2">
+                    {{-- Channel Filter (Normal Select) --}}
+                    <div style="min-width: 150px;">
+                        <select name="platform" class="form-select form-select-sm shadow-none" onchange="this.form.submit()">
+                            <option value="all" {{ $selectedPlatform === 'all' ? 'selected' : '' }}>All Channels</option>
+                            <option value="facebook" {{ $selectedPlatform === 'facebook' ? 'selected' : '' }}>Facebook</option>
+                            <option value="instagram" {{ $selectedPlatform === 'instagram' ? 'selected' : '' }}>Instagram</option>
+                            <option value="youtube" {{ $selectedPlatform === 'youtube' ? 'selected' : '' }}>YouTube</option>
+                        </select>
+                    </div>
 
-                {{-- Time Range Filter Buttons --}}
-                <div class="btn-group" role="group">
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['range' => '7d'])) }}"
-                        class="btn btn-sm {{ $timeRange === '7d' ? 'btn-dark' : 'btn-outline-secondary' }}">7D</a>
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['range' => '30d'])) }}"
-                        class="btn btn-sm {{ $timeRange === '30d' ? 'btn-dark' : 'btn-outline-secondary' }}">30D</a>
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['range' => '90d'])) }}"
-                        class="btn btn-sm {{ $timeRange === '90d' ? 'btn-dark' : 'btn-outline-secondary' }}">90D</a>
-                    <a href="{{ route('admin.analytics.index', array_merge(request()->query(), ['range' => 'all'])) }}"
-                        class="btn btn-sm {{ $timeRange === 'all' ? 'btn-dark' : 'btn-outline-secondary' }}">All Time</a>
-                </div>
+                    {{-- Time Range Filter (Normal Select) --}}
+                    <div style="min-width: 140px;">
+                        <select name="range" class="form-select form-select-sm shadow-none" onchange="this.form.submit()">
+                            <option value="7d" {{ $timeRange === '7d' ? 'selected' : '' }}>Last 7 Days</option>
+                            <option value="30d" {{ $timeRange === '30d' ? 'selected' : '' }}>Last 30 Days</option>
+                            <option value="90d" {{ $timeRange === '90d' ? 'selected' : '' }}>Last 90 Days</option>
+                            <option value="all" {{ $timeRange === 'all' ? 'selected' : '' }}>All Time</option>
+                        </select>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-    {{-- Top Row: 4 High-Impact Political KPI Cards --}}
-    <div class="row row-deck row-cards mb-3">
+    {{-- Top Row: 4 High-Impact Sentiment KPI Cards --}}
+    <div class="row row-deck row-cards mb-4">
 
-        {{-- 1. Political Favourability --}}
+        {{-- 1. Sentiment Favourability --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-success-lt text-success">
-                                <i class="ti ti-thumb-up fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">FAVOURABILITY</div>
-                            <div class="h2 mb-0 fw-bold text-body">{{ $favorRatio }}%</div>
-                            <div class="text-secondary small mt-0.5">
-                                {{ number_format($favorCount) }} pro • {{ number_format($againstCount) }} critical
-                            </div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-{{ $favorRatio >= 50 ? 'success' : 'warning' }}-lt small fw-semibold">
-                                {{ $favorRatio >= 50 ? 'Positive' : 'Cautious' }}
-                            </span>
-                        </div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">FAVOURABILITY</span>
+                        <span class="badge bg-{{ $favorRatio >= 50 ? 'success' : 'warning' }}-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
+                            <i class="ti ti-thumb-up me-1"></i>{{ $favorRatio >= 50 ? 'Positive' : 'Cautious' }}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2">
+                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ $favorRatio }}%</div>
+                    </div>
+                    <div class="text-secondary small d-flex align-items-center gap-1.5">
+                        <span class="badge bg-success p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
+                        <span>{{ number_format($favorCount) }} pro</span>
+                        <span class="text-muted">&bull;</span>
+                        <span>{{ number_format($againstCount) }} critical</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 2. Constituent Grievances (Complaints) --}}
+        {{-- 2. Grievances (Complaints) --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-warning-lt text-warning">
-                                <i class="ti ti-alert-triangle fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">GRIEVANCES</div>
-                            <div class="h2 mb-0 fw-bold text-body">{{ number_format($complaintCount) }}</div>
-                            <div class="text-secondary small mt-0.5">
-                                {{ number_format($trollsCount) }} trolls auto-filtered
-                            </div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-warning-lt small fw-semibold">
-                                <i class="ti ti-flag me-0.5"></i>Actionable
-                            </span>
-                        </div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">GRIEVANCES</span>
+                        <span class="badge bg-warning-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
+                            <i class="ti ti-alert-triangle me-1"></i>Actionable
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2">
+                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($complaintCount) }}</div>
+                        @if($totalComments > 0)
+                            <span class="text-secondary small fw-medium">({{ round(($complaintCount / $totalComments) * 100, 1) }}%)</span>
+                        @endif
+                    </div>
+                    <div class="text-secondary small d-flex align-items-center gap-1.5">
+                        <span class="badge bg-warning p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
+                        <span>{{ number_format($trollsCount) }} trolls auto-filtered</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 3. Public Interactions (Comments & Response Rate) --}}
+        {{-- 3. Total Comments --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary">
-                                <i class="ti ti-messages fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL COMMENTS</div>
-                            <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalComments) }}</div>
-                            <div class="text-secondary small mt-0.5">
-                                Response Rate: {{ $responseRate }}%
-                            </div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-primary-lt small fw-semibold">
-                                {{ number_format($repliedCount) }} Replied
-                            </span>
-                        </div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">TOTAL COMMENTS</span>
+                        <span class="badge bg-primary-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
+                            <i class="ti ti-messages me-1"></i>{{ number_format($repliedCount) }} Replied
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2">
+                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($totalComments) }}</div>
+                    </div>
+                    <div class="text-secondary small d-flex align-items-center gap-1.5">
+                        <span class="badge bg-primary p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
+                        <span>Response Rate: <strong class="text-dark">{{ $responseRate }}%</strong></span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 4. Total Constituent Reach --}}
+        {{-- 4. Total Audience --}}
         <div class="col-sm-6 col-lg-3">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="avatar avatar-md rounded-2 bg-azure-lt text-azure">
-                                <i class="ti ti-users fs-2"></i>
-                            </span>
-                        </div>
-                        <div class="col">
-                            <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">TOTAL AUDIENCE</div>
-                            <div class="h2 mb-0 fw-bold text-body">{{ number_format($totalAudience) }}</div>
-                            <div class="text-secondary small mt-0.5">
-                                {{ number_format($totalPosts) }} broadcasts published
-                            </div>
-                        </div>
-                        <div class="col-auto text-end">
-                            <span class="badge bg-azure-lt small fw-semibold">
-                                +{{ number_format($totalLikes + $totalShares) }} Reacts
-                            </span>
-                        </div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">TOTAL AUDIENCE</span>
+                        <span class="badge bg-azure-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
+                            <i class="ti ti-users me-1"></i>Reach
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2">
+                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($totalAudience) }}</div>
+                    </div>
+                    <div class="text-secondary small d-flex align-items-center gap-1.5">
+                        <span class="badge bg-azure p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
+                        <span>{{ number_format($totalPosts) }} broadcasts published</span>
                     </div>
                 </div>
             </div>
@@ -161,24 +132,24 @@
     </div>
 
     {{-- Row 2: Charts (Daily Sentiment Timeline & Sentiment Donut) --}}
-    <div class="row row-deck row-cards mb-3">
+    <div class="row row-deck row-cards mb-4">
 
         {{-- Left: Daily Sentiment Timeline Chart --}}
         <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <div>
-                        <h3 class="card-title fw-bold text-body mb-0">Constituent Sentiment Timeline</h3>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-header border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div class="d-flex flex-column">
+                        <h3 class="card-title fw-bold text-dark mb-1">Constituent Sentiment Timeline</h3>
                         <div class="text-secondary small">Daily trend of positive feedback, criticism & citizen complaints</div>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                         <div class="d-flex align-items-center gap-1">
                             <span class="badge bg-success p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
-                            <span class="text-secondary small">Pro / Positive</span>
+                            <span class="text-secondary small">Positive</span>
                         </div>
                         <div class="d-flex align-items-center gap-1">
                             <span class="badge bg-danger p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
-                            <span class="text-secondary small">Critical / Against</span>
+                            <span class="text-secondary small">Critical</span>
                         </div>
                         <div class="d-flex align-items-center gap-1">
                             <span class="badge bg-warning p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
@@ -194,10 +165,12 @@
 
         {{-- Right: Sentiment Breakdown Donut --}}
         <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title fw-bold text-body mb-0">Public Sentiment Pulse</h3>
-                    <div class="text-secondary small">Overall constituent tone breakdown</div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-header border-bottom py-3">
+                    <div class="d-flex flex-column">
+                        <h3 class="card-title fw-bold text-dark mb-1">Public Sentiment Pulse</h3>
+                        <div class="text-secondary small">Overall constituent tone breakdown</div>
+                    </div>
                 </div>
                 <div class="card-body d-flex flex-column justify-content-center">
                     <div id="chart-sentiment-donut" style="min-height: 240px;"></div>
@@ -221,18 +194,20 @@
 
     </div>
 
-    {{-- Row 3: Citizen Grievances / Category Breakdown & Platform Matrix --}}
-    <div class="row row-deck row-cards mb-3">
+    {{-- Row 3: Interaction Category Breakdown & Platform Matrix --}}
+    <div class="row row-deck row-cards mb-4">
 
         {{-- Left: Interaction Category Breakdown --}}
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title fw-bold text-body mb-0">Constituent Interaction Breakdown</h3>
-                    <div class="text-secondary small">Categorized by intent from citizen comments</div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-header border-bottom py-3">
+                    <div class="d-flex flex-column">
+                        <h3 class="card-title fw-bold text-dark mb-1">Constituent Interaction Breakdown</h3>
+                        <div class="text-secondary small">Categorized by intent from citizen comments</div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="d-flex flex-column gap-3">
+                <div class="card-body p-3.5">
+                    <div class="d-flex flex-column gap-3.5">
                         @php
                             $maxCount = max(1, max($categoryBreakdown));
                             $categoryColors = [
@@ -250,14 +225,14 @@
                                 $color = $categoryColors[$catName] ?? 'secondary';
                             @endphp
                             <div>
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <span class="fw-medium text-body small">{{ $catName }}</span>
+                                <div class="d-flex justify-content-between align-items-center mb-1.5">
+                                    <span class="fw-semibold text-dark small">{{ $catName }}</span>
                                     <span class="text-secondary small">
-                                        <strong class="text-body">{{ number_format($count) }}</strong> ({{ $percent }}%)
+                                        <strong class="text-dark">{{ number_format($count) }}</strong> <span class="text-muted">({{ $percent }}%)</span>
                                     </span>
                                 </div>
-                                <div class="progress progress-sm">
-                                    <div class="progress-bar bg-{{ $color }}" style="width: {{ $barWidth }}%"></div>
+                                <div class="progress" style="height: 6px; border-radius: 999px; background: #f1f5f9;">
+                                    <div class="progress-bar bg-{{ $color }}" style="width: {{ $barWidth }}%; border-radius: 999px;"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -268,51 +243,61 @@
 
         {{-- Right: Platform Performance Comparison Matrix --}}
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title fw-bold text-body mb-0">Platform Channel Matrix</h3>
-                    <div class="text-secondary small">Constituent reach and sentiment across platforms</div>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-header border-bottom py-3">
+                    <div class="d-flex flex-column">
+                        <h3 class="card-title fw-bold text-dark mb-1">Platform Channel Matrix</h3>
+                        <div class="text-secondary small">Constituent reach and sentiment across platforms</div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-vcenter card-table">
+                        <table class="table table-vcenter card-table table-hover">
                             <thead>
                                 <tr>
-                                    <th>Channel</th>
-                                    <th>Followers</th>
-                                    <th>Comments</th>
-                                    <th>Positive %</th>
+                                    <th class="text-uppercase fs-7 text-secondary fw-semibold">Channel</th>
+                                    <th class="text-uppercase fs-7 text-secondary fw-semibold">Followers</th>
+                                    <th class="text-uppercase fs-7 text-secondary fw-semibold">Comments</th>
+                                    <th class="text-uppercase fs-7 text-secondary fw-semibold" style="min-width: 140px;">Positive %</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse($platformBreakdown as $pName => $pData)
                                     @php
                                         $iconClass = match($pName) {
-                                            'Facebook' => 'ti ti-brand-facebook text-facebook',
+                                            'Facebook' => 'ti ti-brand-facebook text-primary',
                                             'Instagram' => 'ti ti-brand-instagram text-pink',
                                             'YouTube' => 'ti ti-brand-youtube text-danger',
                                             default => 'ti ti-device-desktop',
+                                        };
+                                        $bgClass = match($pName) {
+                                            'Facebook' => 'bg-primary-lt',
+                                            'Instagram' => 'bg-pink-lt',
+                                            'YouTube' => 'bg-danger-lt',
+                                            default => 'bg-secondary-lt',
                                         };
                                     @endphp
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
-                                                <i class="{{ $iconClass }} fs-2"></i>
-                                                <span class="fw-semibold text-body">{{ $pName }}</span>
+                                                <span class="avatar avatar-xs rounded-2 {{ $bgClass }}">
+                                                    <i class="{{ $iconClass }} fs-3"></i>
+                                                </span>
+                                                <span class="fw-semibold text-dark">{{ $pName }}</span>
                                             </div>
                                         </td>
                                         <td>
-                                            <span class="fw-medium text-body">{{ number_format($pData['audience']) }}</span>
+                                            <span class="fw-semibold text-dark">{{ number_format($pData['audience']) }}</span>
                                         </td>
                                         <td>
-                                            <span class="fw-medium text-body">{{ number_format($pData['comments']) }}</span>
+                                            <span class="fw-semibold text-dark">{{ number_format($pData['comments']) }}</span>
                                         </td>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
-                                                <div class="progress progress-xs flex-grow-1" style="min-width: 60px;">
-                                                    <div class="progress-bar bg-success" style="width: {{ $pData['positive_rate'] }}%"></div>
+                                                <div class="progress flex-grow-1" style="height: 6px; border-radius: 999px; background: #f1f5f9; min-width: 60px;">
+                                                    <div class="progress-bar bg-success" style="width: {{ $pData['positive_rate'] }}%; border-radius: 999px;"></div>
                                                 </div>
-                                                <span class="text-secondary small">{{ $pData['positive_rate'] }}%</span>
+                                                <span class="text-dark fw-bold small" style="min-width: 40px; text-align: right;">{{ $pData['positive_rate'] }}%</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -335,10 +320,10 @@
 
         {{-- Left: Top Performing Statements / Posts --}}
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <div>
-                        <h3 class="card-title fw-bold text-body mb-0">Top Engaging Public Statements</h3>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-header border-bottom py-3">
+                    <div class="d-flex flex-column">
+                        <h3 class="card-title fw-bold text-dark mb-1">Top Engaging Public Statements</h3>
                         <div class="text-secondary small">Broadcasts that generated the highest constituent interaction</div>
                     </div>
                 </div>
@@ -350,7 +335,7 @@
                                 $postText = !empty($tp->message) ? $tp->message : (!empty($tp->title) ? $tp->title : 'Media Post');
                                 $pIcon = $tp->account?->isYouTube() ? 'ti ti-brand-youtube text-danger' : ($tp->account?->isInstagram() ? 'ti ti-brand-instagram text-pink' : 'ti ti-brand-facebook text-primary');
                             @endphp
-                            <div class="list-group-item px-3 py-2.5">
+                            <div class="list-group-item px-3.5 py-2.5">
                                 <div class="d-flex align-items-center">
                                     @if($thumb)
                                         <span class="avatar avatar-md rounded-2 me-3 flex-shrink-0" style="background-image: url('{{ $thumb }}'); background-size: cover;"></span>
@@ -360,7 +345,7 @@
                                         </span>
                                     @endif
                                     <div class="flex-grow-1 text-truncate pe-2">
-                                        <div class="fw-semibold text-body text-truncate small" title="{{ e($postText) }}">
+                                        <div class="fw-semibold text-dark text-truncate small" title="{{ e($postText) }}">
                                             {{ Str::limit($postText, 55) }}
                                         </div>
                                         <div class="text-secondary fs-7 mt-0.5">
@@ -390,10 +375,10 @@
 
         {{-- Right: Most Active Constituents (Frequent Commenters) --}}
         <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <div>
-                        <h3 class="card-title fw-bold text-body mb-0">Key Active Constituents</h3>
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-header border-bottom py-3">
+                    <div class="d-flex flex-column">
+                        <h3 class="card-title fw-bold text-dark mb-1">Key Active Constituents</h3>
                         <div class="text-secondary small">Frequent citizen participants in public discussions</div>
                     </div>
                 </div>
@@ -404,17 +389,17 @@
                                 $initial = strtoupper(substr($tc->commenter_name, 0, 1));
                                 $isPositiveLean = ($tc->positive_count >= $tc->critical_count);
                             @endphp
-                            <div class="list-group-item px-3 py-2.5">
+                            <div class="list-group-item px-3.5 py-2.5">
                                 <div class="d-flex align-items-center">
                                     @if($tc->commenter_photo_url)
                                         <span class="avatar avatar-md rounded-circle me-3 flex-shrink-0" style="background-image: url('{{ $tc->commenter_photo_url }}')"></span>
                                     @else
-                                        <span class="avatar avatar-md rounded-circle bg-body-secondary text-body fw-bold border me-3 flex-shrink-0">
+                                        <span class="avatar avatar-md rounded-circle bg-body-secondary text-dark fw-bold border me-3 flex-shrink-0">
                                             {{ $initial }}
                                         </span>
                                     @endif
                                     <div class="flex-grow-1 text-truncate pe-2">
-                                        <div class="fw-semibold text-body text-truncate small">{{ $tc->commenter_name }}</div>
+                                        <div class="fw-semibold text-dark text-truncate small">{{ $tc->commenter_name }}</div>
                                         <div class="text-secondary fs-7 mt-0.5">
                                             <span>{{ number_format($tc->total_comments) }} contributions</span>
                                         </div>

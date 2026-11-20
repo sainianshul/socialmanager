@@ -77,11 +77,11 @@
                 </li>
                 @if(auth()->check() && !auth()->user()->isAdmin())
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" href="{{ route('admin.analytics.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Politics Analyses">
+                        <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" href="{{ route('admin.analytics.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Sentiment Analytics">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
                                 <i class="ti ti-chart-dots fs-2"></i>
                             </span>
-                            <span class="nav-link-title">Politics Analyses</span>
+                            <span class="nav-link-title">Sentiment Analytics</span>
                         </a>
                     </li>
                 @endif

@@ -77,7 +77,7 @@ class AnalyticsManagementTest extends TestCase
 
         $response->assertOk();
         $response->assertViewIs('admin.analytics.index');
-        $response->assertSee('Politics Analyses');
+        $response->assertSee('Sentiment Analytics');
         $response->assertSee('FAVOURABILITY');
         $response->assertSee('GRIEVANCES');
         $response->assertSee('TOTAL COMMENTS');
