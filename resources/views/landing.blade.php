@@ -665,12 +665,8 @@
                             <i class="ti ti-layout-dashboard"></i>Open Dashboard
                         </a>
                     @else
-                        <a href="{{ route('login') }}" class="btn-nav-signin d-none d-sm-inline-flex">
+                        <a href="{{ route('login') }}" class="btn-nav-signin">
                             Sign In
-                        </a>
-                        <a href="{{ route('login') }}" class="btn-nav-cta">
-                            <span>Get Started Free</span>
-                            <i class="ti ti-arrow-right"></i>
                         </a>
                     @endauth
 
@@ -690,8 +686,7 @@
                     <a href="#faq" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">FAQ</a>
                     <hr class="my-2 border-secondary border-opacity-25">
                     @guest
-                        <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 py-2 fw-semibold mb-2">Sign In</a>
-                        <a href="{{ route('login') }}" class="btn btn-teal w-100 py-2 fw-semibold">Get Started Free</a>
+                        <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 py-2 fw-semibold">Sign In</a>
                     @else
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-teal w-100 py-2 fw-semibold">Open Dashboard</a>
                     @endguest
@@ -716,13 +711,10 @@
                 Automate multi-platform publishing, 24/7 contextual AI comment replies, and instant private DM lead capture across Facebook, Instagram, and YouTube.
             </p>
 
-            <!-- CTA Buttons -->
-            <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+            <!-- CTA Button -->
+            <div class="d-flex align-items-center justify-content-center mb-4">
                 <a href="{{ route('login') }}" class="btn btn-teal btn-lg px-4 py-2.5">
-                    <i class="ti ti-bolt me-1.5"></i>Start Free Trial
-                </a>
-                <a href="#features" class="btn btn-outline-secondary btn-lg px-4 py-2.5">
-                    <i class="ti ti-player-play me-1.5"></i>Live Platform Preview
+                    <i class="ti ti-bolt me-1.5"></i>Start Free
                 </a>
             </div>
 
@@ -750,7 +742,6 @@
     <section id="platforms" class="apple-platforms-section">
         <div class="container-xl">
             <div class="text-center mb-5" style="max-width: 680px; margin-left: auto; margin-right: auto;">
-                <span class="apple-section-eyebrow mb-2 d-inline-block">OFFICIAL ECOSYSTEM</span>
                 <h2 class="apple-section-headline mb-3">Directly connected to official platform APIs.</h2>
                 <p class="apple-section-subhead">Zero scrapers. Full enterprise compliance across Meta and Google Cloud.</p>
             </div>
@@ -805,19 +796,19 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 2: WHY SOCIALMANAGER (APPLE-STYLE SPLIT WITH SOCIAL MEDIA VISUAL)    -->
+    <!-- ========================================================================= -->
+    <!-- STEP 2: WHY SOCIALMANAGER (APPLE-STYLE MINIMAL SPLIT & ILLUSTRATION)     -->
     <!-- ========================================================================= -->
     <section id="features" class="apple-features-section">
         <div class="container-xl">
             <div class="row align-items-center g-5">
-                <!-- Left Column: Copy & Core Highlights -->
+                <!-- Left Column: Crisp Core Capabilities -->
                 <div class="col-12 col-lg-6">
-                    <span class="apple-section-eyebrow mb-2 d-inline-block">THE ALL-IN-ONE ADVANTAGE</span>
                     <h2 class="apple-section-headline mb-3">
                         Why SocialManager?
                     </h2>
                     <p class="apple-section-subhead mb-4">
-                        Everything creators, public figures, and brands need to automate publishing, protect public reputation, and turn audience comments into conversions.
+                        Everything you need to broadcast, automate, and safeguard your brand across every channel.
                     </p>
 
                     <!-- Feature 1: Multi-Platform 1-Click Publishing -->
@@ -828,7 +819,7 @@
                         <div>
                             <h4 class="apple-feature-title">Multi-Platform &amp; Multi-Account 1-Click Publishing</h4>
                             <p class="apple-feature-desc">
-                                Compose once and broadcast across Facebook Pages, Instagram Professional, and YouTube Channels simultaneously in a single click.
+                                Broadcast across Facebook Pages, Instagram, and YouTube in a single click.
                             </p>
                         </div>
                     </div>
@@ -841,7 +832,7 @@
                         <div>
                             <h4 class="apple-feature-title">Unified Multi-Platform Content Scheduler</h4>
                             <p class="apple-feature-desc">
-                                Schedule posts, reels, and video queues weeks in advance with background server daemons executing every publish with zero manual effort.
+                                Automated queue management for posts, reels, and videos with zero manual effort.
                             </p>
                         </div>
                     </div>
@@ -854,7 +845,7 @@
                         <div>
                             <h4 class="apple-feature-title">24/7 Anti-Troll &amp; Abuse Shield</h4>
                             <p class="apple-feature-desc">
-                                24/7 Anti-Troll Shield toxicity classification silently auto-hides hate speech, defamatory language, and coordinated troll attacks.
+                                Real-time AI toxicity classification that silently auto-hides hate speech and spam.
                             </p>
                         </div>
                     </div>
@@ -867,7 +858,7 @@
                         <div>
                             <h4 class="apple-feature-title">Automated Comment-to-DM Engine</h4>
                             <p class="apple-feature-desc">
-                                Automatically dispatch private direct messages in under 0.8s when followers comment targeted keywords on posts and reels.
+                                Convert audience comments into private direct messages in under 0.8s.
                             </p>
                         </div>
                     </div>
@@ -880,66 +871,38 @@
                         <div>
                             <h4 class="apple-feature-title">Live Sentiment Intelligence &amp; Analytics</h4>
                             <p class="apple-feature-desc">
-                                Real-time public sentiment categorization, tracking audience feedback into positive pulse, inquiries, and actionable grievances.
+                                Real-time categorization of audience feedback into positive pulse and grievances.
                             </p>
                         </div>
                     </div>
 
-                    <!-- Feature 6: Top User Tracking -->
+                    <!-- Feature 6: Top User Tracking & Personas -->
                     <div class="apple-feature-item">
                         <div class="apple-feature-icon">
                             <i class="ti ti-users"></i>
                         </div>
                         <div>
-                            <h4 class="apple-feature-title">Top User &amp; Community Contributor Tracking</h4>
+                            <h4 class="apple-feature-title">Top User Tracking &amp; Adaptive AI Personas</h4>
                             <p class="apple-feature-desc">
-                                Identify your most active community supporters, frequent commenters, and top advocates across all connected channels.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Feature 7: Adaptive AI Personas -->
-                    <div class="apple-feature-item">
-                        <div class="apple-feature-icon">
-                            <i class="ti ti-robot"></i>
-                        </div>
-                        <div>
-                            <h4 class="apple-feature-title">Adaptive AI Personas</h4>
-                            <p class="apple-feature-desc">
-                                Customize your preferred communication voice (Humble, Patriotic, Firm) for authentic, human-like comment replies 24/7.
+                                Automatic contributor ranking with customizable communication tones.
                             </p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Right Column: Product Image Frame -->
+                <!-- Right Column: Sleek Modern SaaS Floating Illustration -->
                 <div class="col-12 col-lg-6">
-                    <div class="apple-media-frame">
-                        <!-- macOS Minimal Window Chrome Header -->
-                        <div class="d-flex align-items-center justify-content-between px-3 py-2.5 border-bottom bg-white">
-                            <div class="d-flex align-items-center gap-1.5">
-                                <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background: #ff5f56;"></span>
-                                <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background: #ffbd2e;"></span>
-                                <span class="rounded-circle d-inline-block" style="width: 10px; height: 10px; background: #27c93f;"></span>
-                            </div>
-                            <span class="fs-8 text-muted font-monospace">socialmanager-connected-suite.png</span>
-                            <span class="badge bg-teal-lt text-teal fs-8 py-0.5 px-2">Ecosystem Live</span>
-                        </div>
-
-                        <!-- Product Screenshot Artwork Container -->
-                        <div class="p-2 bg-light text-center">
-                            <img src="{{ asset('images/social-media-command.svg') }}" 
-                                 alt="Why SocialManager - Connected Social Suite" 
-                                 class="apple-media-image rounded-3" 
-                                 loading="lazy">
-                        </div>
+                    <div class="apple-media-frame border-0 shadow-lg p-2 bg-white">
+                        <img src="{{ asset('images/social-media-command.svg') }}" 
+                             alt="Why SocialManager - Connected Social Suite" 
+                             class="apple-media-image rounded-4" 
+                             loading="lazy">
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ========================================================================= -->
     <!-- STEP 3: HOW IT WORKS (APPLE-STYLE MINIMAL 3 STEPS)                       -->
     <!-- ========================================================================= -->
     <section id="how-it-works" class="apple-process-section">
