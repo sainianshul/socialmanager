@@ -21,6 +21,7 @@ class LandingPageTest extends TestCase
         $response->assertSee('Facebook Pages');
         $response->assertSee('Instagram Professional');
         $response->assertSee('YouTube Channels');
+        $response->assertSee('Why SocialManager');
         $response->assertSee('Unified Multi-Platform Content Scheduler');
         $response->assertSee('Adaptive AI Personas');
         $response->assertSee('Automated Comment-to-DM');
