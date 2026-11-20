@@ -146,7 +146,7 @@
 
         currentVariations.forEach(function (v, idx) {
             let activeClass = idx === activeVariationIndex ? 'active btn-primary text-white' : 'btn-outline-primary';
-            let btnHtml = '<button type="button" class="btn btn-xs ' + activeClass + ' ai-var-btn" data-index="' + idx + '">' + (v.title || ('Option ' + (idx + 1))) + '</button>';
+            let btnHtml = '<button type="button" class="btn btn-xs ' + activeClass + ' flex-shrink-0 ai-var-btn" data-index="' + idx + '">' + (v.title || ('Option ' + (idx + 1))) + '</button>';
             $wrap.append(btnHtml);
         });
     }

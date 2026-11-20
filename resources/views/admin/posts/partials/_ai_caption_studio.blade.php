@@ -21,15 +21,15 @@
             <label class="form-label fw-bold text-dark small mb-1">What is this post about?</label>
             <textarea id="ai-studio-topic" class="form-control form-control-sm" rows="2" placeholder="e.g. Launching our new summer collection with 30% discount this weekend, or 5 quick daily habits for peak productivity..."></textarea>
             
-            {{-- Quick Idea Preset Pills --}}
-            <div class="d-flex align-items-center gap-1.5 flex-wrap mt-2" id="ai-preset-pills">
-                <span class="text-secondary fs-8 me-1 fw-medium">Presets:</span>
-                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow ai-preset-btn" data-preset="Product Launch announcement with early bird special discount">Launch</button>
-                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow ai-preset-btn" data-preset="5 actionable tips and tricks that help you save time">Tips & Advice</button>
-                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow ai-preset-btn" data-preset="Behind the scenes look at our team workspace and daily hustle">Behind The Scenes</button>
-                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow ai-preset-btn" data-preset="Festival greetings and best wishes to our wonderful community">Festival Greeting</button>
-                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow ai-preset-btn" data-preset="Limited-time weekend promotional flash sale 40% off">Special Offer</button>
-                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow ai-preset-btn" data-preset="Ask the community: What is your #1 goal this month?">Ask Community</button>
+            {{-- Quick Idea Preset Pills (Horizontally Scrollable on Mobile) --}}
+            <div class="d-flex align-items-center gap-1.5 overflow-x-auto pb-1 mt-2 flex-nowrap" id="ai-preset-pills" style="scrollbar-width: none;">
+                <span class="text-secondary fs-8 me-1 fw-medium flex-shrink-0">Presets:</span>
+                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow flex-shrink-0 ai-preset-btn" data-preset="Product Launch announcement with early bird special discount">Launch</button>
+                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow flex-shrink-0 ai-preset-btn" data-preset="5 actionable tips and tricks that help you save time">Tips & Advice</button>
+                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow flex-shrink-0 ai-preset-btn" data-preset="Behind the scenes look at our team workspace and daily hustle">Behind The Scenes</button>
+                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow flex-shrink-0 ai-preset-btn" data-preset="Festival greetings and best wishes to our wonderful community">Festival Greeting</button>
+                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow flex-shrink-0 ai-preset-btn" data-preset="Limited-time weekend promotional flash sale 40% off">Special Offer</button>
+                <button type="button" class="badge bg-white text-secondary border cursor-pointer hover-shadow flex-shrink-0 ai-preset-btn" data-preset="Ask the community: What is your #1 goal this month?">Ask Community</button>
             </div>
         </div>
 
@@ -79,15 +79,15 @@
 
         {{-- Results Area (Appears after generation) --}}
         <div id="ai-studio-results" class="mt-3.5 pt-3 border-top border-primary-subtle d-none">
-            {{-- Variation Selector Tabs --}}
+            {{-- Variation Selector Tabs (Scrollable on Mobile) --}}
             <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-                <div class="d-flex align-items-center gap-1.5" id="ai-variation-pills">
-                    <span class="text-secondary fs-8 fw-semibold me-1">Options:</span>
-                    <button type="button" class="btn btn-xs btn-outline-primary active ai-var-btn" data-index="0" id="ai-var-btn-0">Option 1: Hook & Story</button>
-                    <button type="button" class="btn btn-xs btn-outline-primary ai-var-btn" data-index="1" id="ai-var-btn-1">Option 2: Short & Punchy</button>
-                    <button type="button" class="btn btn-xs btn-outline-primary ai-var-btn" data-index="2" id="ai-var-btn-2">Option 3: Community Question</button>
+                <div class="d-flex align-items-center gap-1.5 overflow-x-auto flex-nowrap pb-1" id="ai-variation-pills" style="scrollbar-width: none; max-width: 100%;">
+                    <span class="text-secondary fs-8 fw-semibold me-1 flex-shrink-0">Options:</span>
+                    <button type="button" class="btn btn-xs btn-outline-primary active flex-shrink-0 ai-var-btn" data-index="0" id="ai-var-btn-0">Option 1: Hook & Story</button>
+                    <button type="button" class="btn btn-xs btn-outline-primary flex-shrink-0 ai-var-btn" data-index="1" id="ai-var-btn-1">Option 2: Short & Punchy</button>
+                    <button type="button" class="btn btn-xs btn-outline-primary flex-shrink-0 ai-var-btn" data-index="2" id="ai-var-btn-2">Option 3: Community Question</button>
                 </div>
-                <button type="button" class="btn btn-xs btn-ghost-secondary d-inline-flex align-items-center gap-1" id="btn-rerun-ai-studio" title="Re-generate fresh variations">
+                <button type="button" class="btn btn-xs btn-ghost-secondary flex-shrink-0 d-inline-flex align-items-center gap-1" id="btn-rerun-ai-studio" title="Re-generate fresh variations">
                     <i class="ti ti-refresh"></i>Regenerate
                 </button>
             </div>
