@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fafc"/>
+      <stop offset="100%" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1db8ab"/>
+      <stop offset="100%" stop-color="#0ca678"/>
+    </linearGradient>
+    <filter id="softShadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.06"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="560" fill="url(#bgGrad)" rx="16"/>
+
+  <!-- Top Metrics Bar -->
+  <g transform="translate(30, 30)">
+    <!-- Card 1 -->
+    <rect width="225" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#softShadow)"/>
+    <text x="20" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748b" letter-spacing="0.5">CONNECTED CHANNELS</text>
+    <text x="20" y="65" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="800" fill="#0f172a">3 Channels</text>
+    <circle cx="195" cy="45" r="14" fill="#ecfdf5"/>
+    <path d="M190 45 l3 3 l7 -7" stroke="#0ca678" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Card 2 -->
+    <rect x="255" width="225" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#softShadow)"/>
+    <text x="275" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748b" letter-spacing="0.5">AI COMMENTS HANDLED</text>
+    <text x="275" y="65" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="800" fill="#0f172a">1,420</text>
+    <rect x="410" y="22" width="55" height="20" rx="10" fill="#ecfdf5"/>
+    <text x="437" y="36" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#0ca678" text-anchor="middle">98.4%</text>
+
+    <!-- Card 3 -->
+    <rect x="510" width="230" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#softShadow)"/>
+    <text x="530" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="600" fill="#64748b" letter-spacing="0.5">AUTO DMS DISPATCHED</text>
+    <text x="530" y="65" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="800" fill="#0ca678">312</text>
+    <rect x="670" y="22" width="55" height="20" rx="10" fill="#f0fdf4"/>
+    <text x="697" y="36" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#16a34a" text-anchor="middle">&lt; 0.8s</text>
+  </g>
+
+  <!-- Left: Content Calendar Panel -->
+  <g transform="translate(30, 145)">
+    <rect width="355" height="380" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#softShadow)"/>
+    <text x="24" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Publishing Schedule Calendar</text>
+    <rect x="290" y="22" width="45" height="22" rx="6" fill="#f1f5f9"/>
+    <text x="312" y="37" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#475569" text-anchor="middle">Today</text>
+
+    <!-- Schedule Item 1 -->
+    <g transform="translate(20, 65)">
+      <rect width="315" height="65" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <rect width="4" height="65" rx="2" fill="#e02424"/>
+      <circle cx="30" cy="32" r="14" fill="#fee2e2"/>
+      <polygon points="27,27 35,32 27,37" fill="#dc2626"/>
+      <text x="55" y="28" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Union Budget Analysis</text>
+      <text x="55" y="47" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#64748b">YouTube &bull; 1080p Resumable</text>
+      <rect x="235" y="22" width="68" height="22" rx="11" fill="#ecfdf5"/>
+      <text x="269" y="37" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" fill="#0ca678" text-anchor="middle">Published</text>
+    </g>
+
+    <!-- Schedule Item 2 -->
+    <g transform="translate(20, 145)">
+      <rect width="315" height="65" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <rect width="4" height="65" rx="2" fill="#d62976"/>
+      <circle cx="30" cy="32" r="14" fill="#fce7f3"/>
+      <rect x="23" y="25" width="14" height="14" rx="4" fill="none" stroke="#db2777" stroke-width="2"/>
+      <circle cx="30" cy="32" r="3" fill="#db2777"/>
+      <text x="55" y="28" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Key Infrastructure Updates</text>
+      <text x="55" y="47" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#64748b">Instagram &bull; 9:16 Reel</text>
+      <rect x="235" y="22" width="68" height="22" rx="11" fill="#e0e7ff"/>
+      <text x="269" y="37" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" fill="#4338ca" text-anchor="middle">04:30 PM</text>
+    </g>
+
+    <!-- Schedule Item 3 -->
+    <g transform="translate(20, 225)">
+      <rect width="315" height="65" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <rect width="4" height="65" rx="2" fill="#1877f2"/>
+      <circle cx="30" cy="32" r="14" fill="#dbeafe"/>
+      <text x="30" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="800" fill="#1d4ed8" text-anchor="middle">f</text>
+      <text x="55" y="28" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="13" font-weight="700" fill="#0f172a">Public Grievance Camp</text>
+      <text x="55" y="47" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#64748b">Facebook &bull; Photo Carousel</text>
+      <rect x="235" y="22" width="68" height="22" rx="11" fill="#e0e7ff"/>
+      <text x="269" y="37" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" fill="#4338ca" text-anchor="middle">07:00 PM</text>
+    </g>
+
+    <!-- Schedule Status Indicator -->
+    <g transform="translate(20, 315)">
+      <rect width="315" height="42" rx="8" fill="#ecfdf5" stroke="#a7f3d0" stroke-width="1"/>
+      <circle cx="35" cy="21" r="5" fill="#0ca678"/>
+      <text x="50" y="25" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="600" fill="#065f46">Auto Daemon executing every 60 seconds</text>
+    </g>
+  </g>
+
+  <!-- Right: Live AI Moderation & Auto DM Stream -->
+  <g transform="translate(410, 145)">
+    <rect width="360" height="380" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1" filter="url(#softShadow)"/>
+    <text x="24" y="38" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="15" font-weight="700" fill="#0f172a">Live AI Moderation &amp; Auto DM</text>
+    <rect x="280" y="22" width="65" height="22" rx="11" fill="#ecfdf5"/>
+    <circle cx="292" cy="33" r="3" fill="#0ca678"/>
+    <text x="317" y="37" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" fill="#0ca678" text-anchor="middle">Live Stream</text>
+
+    <!-- Inbound Comment Bubble -->
+    <g transform="translate(20, 65)">
+      <rect width="320" height="75" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <circle cx="28" cy="25" r="12" fill="#0284c7"/>
+      <text x="28" y="29" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle">RS</text>
+      <text x="48" y="26" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" font-weight="700" fill="#0f172a">Ramesh Sharma</text>
+      <text x="145" y="26" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#db2777">&bull; Instagram</text>
+      <text x="20" y="55" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="12" fill="#334155">"Sir please send me the scheme application link."</text>
+    </g>
+
+    <!-- AI Response Bubble -->
+    <g transform="translate(35, 155)">
+      <rect width="305" height="95" rx="12" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
+      <rect width="4" height="95" rx="2" fill="#0ca678"/>
+      <circle cx="24" cy="24" r="10" fill="#0ca678"/>
+      <path d="M20 24 l3 3 l6 -6" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <text x="42" y="27" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="800" fill="#0ca678" letter-spacing="0.5">AI PUBLIC REPLY (HUMBLE &amp; RESPECTFUL)</text>
+      <text x="24" y="52" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#1e293b">"Ramesh ji, yojna ka official link aapke private DM</text>
+      <text x="24" y="68" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" fill="#1e293b">me bhej diya gaya hai. Kripya inbox check karein."</text>
+      <text x="24" y="86" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" font-weight="600" fill="#059669">Published automatically in 3.2s</text>
+    </g>
+
+    <!-- Auto-DM Dispatch Shimmer -->
+    <g transform="translate(20, 270)">
+      <rect width="320" height="50" rx="10" fill="url(#tealGrad)"/>
+      <circle cx="28" cy="25" r="12" fill="#ffffff" fill-opacity="0.2"/>
+      <path d="M23 25 l4 4 l8 -8" stroke="#ffffff" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <text x="50" y="25" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="700" fill="#ffffff">Instant Comment-to-DM Triggered</text>
+      <text x="50" y="40" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="10" fill="#e6fffa">Direct Message delivered to @ramesh_sharma inbox</text>
+    </g>
+
+    <!-- Anti-Troll Shield Badge -->
+    <g transform="translate(20, 332)">
+      <rect width="320" height="32" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+      <path d="M30 16 l-4 2 v4 c0 3 4 5 4 5 s4 -2 4 -5 v-4 z" fill="#0ca678"/>
+      <text x="42" y="20" font-family="-apple-system, BlinkMacSystemFont, sans-serif" font-size="11" font-weight="600" fill="#475569">24/7 Anti-Troll &amp; Toxicity Filter Active</text>
+    </g>
+  </g>
+</svg>
