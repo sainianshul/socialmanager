@@ -195,14 +195,14 @@
     <div class="col-12">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-                    <div>
+                <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2 chart-header-row">
+                    <div class="chart-title-wrap">
                         <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">30-DAY SYSTEM THROUGHPUT & AI AUTOMATION</div>
                         <div class="d-flex align-items-baseline gap-2 mt-1">
-                            <span class="h2 fw-bold text-body mb-0">Platform Processing Trends</span>
+                            <span class="h2 fw-bold text-body mb-0 chart-title-headline">Platform Processing Trends</span>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 chart-legend-wrap">
                         <div class="d-flex align-items-center gap-1.5">
                             <span class="badge bg-azure p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
                             <span class="text-secondary small">Comments Ingested</span>

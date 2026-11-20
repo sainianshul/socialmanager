@@ -53,16 +53,20 @@ document.addEventListener("DOMContentLoaded", function () {
         colors: ["#0284c7", "#1db8ab", "#6366f1"],
         xaxis: {
             categories: categories,
+            tickAmount: window.innerWidth < 768 ? 5 : 12,
             labels: {
-                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '12px' }
+                rotate: -35,
+                rotateAlways: false,
+                hideOverlappingLabels: true,
+                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '11px' }
             },
             axisBorder: { show: false },
             axisTicks: { show: false }
         },
         yaxis: {
-            tickAmount: 5,
+            tickAmount: 4,
             labels: {
-                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '12px' }
+                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '11px' }
             }
         },
         grid: {
@@ -71,7 +75,35 @@ document.addEventListener("DOMContentLoaded", function () {
             padding: { top: -20, right: 0, left: -4, bottom: -4 }
         },
         legend: { show: false },
-        tooltip: { theme: dark ? 'dark' : 'light' }
+        tooltip: {
+            theme: dark ? 'dark' : 'light',
+            shared: true,
+            intersect: false,
+        },
+        responsive: [
+            {
+                breakpoint: 768,
+                options: {
+                    chart: {
+                        height: 240,
+                    },
+                    xaxis: {
+                        tickAmount: 5,
+                        labels: {
+                            rotate: -30,
+                            hideOverlappingLabels: true,
+                            style: { fontSize: '10px' }
+                        }
+                    },
+                    yaxis: {
+                        tickAmount: 3,
+                        labels: {
+                            style: { fontSize: '10px' }
+                        }
+                    }
+                }
+            }
+        ]
     };
 
     const chartEl = document.querySelector("#chart-superadmin-activity");

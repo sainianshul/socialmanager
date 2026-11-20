@@ -661,6 +661,42 @@ body,
     .datagrid {
         grid-template-columns: 1fr !important;
     }
+
+    /* --- Step 3: Chart & Channel Cards Mobile (< 768px) --- */
+    .chart-header-row {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 0.65rem !important;
+    }
+    .chart-title-headline {
+        font-size: 1.35rem !important;
+    }
+    .chart-legend-wrap {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        gap: 1rem !important;
+        padding-top: 0.35rem !important;
+        border-top: 1px dashed var(--tblr-border-color, #ebedf2) !important;
+    }
+    .channel-list-item {
+        padding: 0.75rem 0.85rem !important;
+    }
+    .channel-avatar {
+        width: 36px !important;
+        height: 36px !important;
+        margin-right: 0.65rem !important;
+        flex-shrink: 0 !important;
+    }
+    .channel-name {
+        font-size: 0.85rem !important;
+    }
+    .channel-sub {
+        font-size: 0.72rem !important;
+    }
+    .channel-status-badge {
+        font-size: 0.65rem !important;
+        padding: 0.2rem 0.45rem !important;
+    }
 }
 
 /* --- Dashboard Stat Grid (Desktop & Shared) --- */
@@ -788,6 +824,10 @@ body,
         padding: 0.15rem 0.4rem !important;
         font-weight: 600 !important;
         border-radius: 6px !important;
+    }
+
+    .chart-title-headline {
+        font-size: 1.15rem !important;
     }
 
     /* Page header buttons: full width */

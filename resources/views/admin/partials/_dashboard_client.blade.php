@@ -215,14 +215,14 @@
     <div class="col-lg-7">
         <div class="card">
             <div class="card-body">
-                <div class="d-flex align-items-center justify-content-between mb-3">
-                    <div>
+                <div class="d-flex align-items-center justify-content-between mb-3 chart-header-row">
+                    <div class="chart-title-wrap">
                         <div class="text-uppercase text-secondary fw-semibold fs-7" style="letter-spacing: 0.05em;">30-DAY PUBLISHING & COMMENT ACTIVITY</div>
                         <div class="d-flex align-items-baseline gap-2 mt-1">
-                            <span class="h1 fw-bold text-dark mb-0">{{ number_format($totalPosts) }} Posts &bull; {{ number_format($totalComments) }} Comments</span>
+                            <span class="h1 fw-bold text-dark mb-0 chart-title-headline">{{ number_format($totalPosts) }} Posts &bull; {{ number_format($totalComments) }} Comments</span>
                         </div>
                     </div>
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 chart-legend-wrap">
                         <div class="d-flex align-items-center gap-1">
                             <span class="badge bg-primary p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
                             <span class="text-secondary small">Posts</span>
@@ -246,25 +246,25 @@
                     <h3 class="card-title fw-bold text-body mb-0">Connected Channels</h3>
                     <div class="text-secondary small">Meta & Social accounts status</div>
                 </div>
-                <a href="{{ route('admin.accounts.index') }}" class="btn btn-sm btn-outline-primary">
+                <a href="{{ route('admin.accounts.index') }}" class="btn btn-sm btn-outline-primary flex-shrink-0">
                     <i class="ti ti-plus me-1"></i>Manage
                 </a>
             </div>
             <div class="card-body p-0">
-                <div class="list-group list-group-flush">
+                <div class="list-group list-group-flush channel-list-group">
                     @forelse($accounts as $acc)
-                        <div class="list-group-item px-3 py-3">
+                        <div class="list-group-item px-3 py-3 channel-list-item">
                             <div class="d-flex align-items-center">
                                 @if($acc->profile_pic_url)
-                                    <span class="avatar avatar-md rounded-circle me-3" style="background-image: url('{{ $acc->profile_pic_url }}')"></span>
+                                    <span class="avatar avatar-md rounded-circle me-3 channel-avatar" style="background-image: url('{{ $acc->profile_pic_url }}')"></span>
                                 @else
-                                    <span class="avatar avatar-md rounded-circle bg-primary-lt text-primary me-3">
+                                    <span class="avatar avatar-md rounded-circle bg-primary-lt text-primary me-3 channel-avatar">
                                         <i class="ti {{ $acc->account_type == 2 ? 'ti-brand-instagram' : 'ti-brand-facebook' }} fs-2"></i>
                                     </span>
                                 @endif
                                 <div class="flex-grow-1 text-truncate pe-2">
-                                    <div class="fw-semibold text-body text-truncate">{{ $acc->name }}</div>
-                                    <div class="text-secondary small">
+                                    <div class="fw-semibold text-body text-truncate channel-name">{{ $acc->name }}</div>
+                                    <div class="text-secondary small channel-sub">
                                         <span>{{ $acc->account_type == 2 ? 'Instagram' : 'Facebook Page' }}</span>
                                         @if($acc->followers_count)
                                             • {{ number_format($acc->followers_count) }} followers
@@ -272,7 +272,7 @@
                                     </div>
                                 </div>
                                 <div class="text-end flex-shrink-0">
-                                    <span class="badge bg-{{ $acc->is_active ? 'success' : 'secondary' }}-lt">
+                                    <span class="badge bg-{{ $acc->is_active ? 'success' : 'secondary' }}-lt channel-status-badge">
                                         {{ $acc->is_active ? 'Active' : 'Paused' }}
                                     </span>
                                 </div>
