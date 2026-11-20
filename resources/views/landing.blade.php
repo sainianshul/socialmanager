@@ -768,32 +768,112 @@
             box-shadow: 0 20px 40px -8px rgba(12, 166, 120, 0.14), 0 0 0 1px rgba(12, 166, 120, 0.2);
         }
 
-        /* Process Steps */
-        .process-card {
+        /* ===================================================================== */
+        /* APPLE-STYLE HOW IT WORKS PROCESS SECTION                              */
+        /* ===================================================================== */
+        .apple-process-section {
+            padding: 95px 0;
+            background: #fafafc;
+            border-top: 1px solid rgba(15, 23, 42, 0.05);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        }
+        .apple-step-card {
             background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            border-radius: 18px;
-            padding: 2rem;
-            position: relative;
+            border: 1px solid rgba(15, 23, 42, 0.07);
+            border-radius: 24px;
+            padding: 40px 32px;
             height: 100%;
-            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
-            transition: all 0.28s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
-        .process-card:hover {
+        .apple-step-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(12, 166, 120, 0.35);
-            box-shadow: 0 18px 36px -8px rgba(12, 166, 120, 0.12);
+            border-color: rgba(15, 23, 42, 0.14);
+            box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.08);
         }
-        .step-number-badge {
-            font-size: 0.85rem;
+        .apple-step-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .apple-step-number {
+            font-size: 0.78rem;
             font-weight: 800;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             color: #0ca678;
             background: rgba(12, 166, 120, 0.1);
             padding: 4px 12px;
             border-radius: 999px;
             display: inline-block;
-            margin-bottom: 1rem;
+        }
+        .apple-step-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.45rem;
+            background: #f8fafc;
+            color: #0f172a;
+            transition: all 0.3s ease;
+        }
+        .apple-step-card:hover .apple-step-icon {
+            transform: scale(1.08);
+            background: rgba(12, 166, 120, 0.1);
+            color: #0ca678;
+        }
+        .apple-step-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #0f172a;
+            margin: 0 0 12px 0;
+        }
+        .apple-step-desc {
+            font-size: 0.96rem;
+            line-height: 1.65;
+            color: #64748b;
+            margin: 0 0 32px 0;
+            font-weight: 400;
+        }
+        .apple-step-meta {
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+        .apple-step-pill {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 0.01em;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .apple-step-pill::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        .apple-step-time {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #0ca678;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
         }
 
         /* Security Cards */
@@ -1502,109 +1582,73 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 3: HOW IT WORKS (3 CLEAR STEPS)                                      -->
+    <!-- STEP 3: HOW IT WORKS (APPLE-STYLE MINIMAL 3 STEPS)                       -->
     <!-- ========================================================================= -->
-    <section id="how-it-works" class="py-6 bg-white border-top border-bottom">
+    <section id="how-it-works" class="apple-process-section">
         <div class="container-xl">
-            <div class="text-center mb-5">
-                <span class="badge badge-teal-soft mb-2"><i class="ti ti-route me-1"></i>Simple 3-Step Setup</span>
-                <h2 class="fw-bold text-dark mb-2 display-6">Up and Running in Under 5 Minutes</h2>
-                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
-                    No complex server setups or API keys required. Authenticate your accounts and let our background automation handle engagement.
-                </p>
+            <div class="text-center mb-5" style="max-width: 680px; margin-left: auto; margin-right: auto;">
+                <span class="apple-section-eyebrow mb-2 d-inline-block">SIMPLE ONBOARDING</span>
+                <h2 class="apple-section-headline mb-3">Up and Running in Under 5 Minutes</h2>
+                <p class="apple-section-subhead">No complex server setups or API keys required. Authenticate your accounts and let our background automation handle engagement.</p>
             </div>
 
-            <div class="row g-4">
+            <div class="row g-4 justify-content-center">
                 <!-- Step 01 -->
                 <div class="col-12 col-md-4">
-                    <div class="process-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
-                                01
-                            </span>
-                            <span class="badge badge-outline text-teal"><i class="ti ti-shield-check me-1"></i>OAuth 2.0</span>
+                    <div class="apple-step-card">
+                        <div class="apple-step-header">
+                            <span class="apple-step-number">Step 01</span>
+                            <div class="apple-step-icon">
+                                <i class="ti ti-plug-connected"></i>
+                            </div>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">Connect Your Accounts</h4>
-                        <p class="text-muted small mb-3">
-                            Link your Facebook Page, Instagram Professional account, and YouTube channel in 1 click using official platform dialogs.
-                        </p>
-                        <ul class="list-unstyled small text-secondary mb-0 mt-auto">
-                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Zero password storage</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>AES-256 encrypted access tokens</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Automatic 24/7 token renewal</span>
-                            </li>
-                        </ul>
+                        <h3 class="apple-step-title">Connect Your Accounts</h3>
+                        <p class="apple-step-desc">Link your Facebook Page, Instagram Professional account, and YouTube channel in 1 click using official OAuth 2.0 single sign-on.</p>
+                        <div class="apple-step-meta">
+                            <span class="apple-step-pill">1-Click OAuth 2.0</span>
+                            <span class="apple-step-time"><i class="ti ti-clock"></i>&lt; 60 sec</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Step 02 -->
                 <div class="col-12 col-md-4">
-                    <div class="process-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
-                                02
-                            </span>
-                            <span class="badge badge-teal-soft"><i class="ti ti-adjustments me-1"></i>Custom Tone</span>
+                    <div class="apple-step-card">
+                        <div class="apple-step-header">
+                            <span class="apple-step-number">Step 02</span>
+                            <div class="apple-step-icon">
+                                <i class="ti ti-adjustments-horizontal"></i>
+                            </div>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">Configure AI Tone & Rules</h4>
-                        <p class="text-muted small mb-3">
-                            Choose your preferred AI communication voice and specify keywords for automated private direct messaging.
-                        </p>
-                        <ul class="list-unstyled small text-secondary mb-0 mt-auto">
-                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Choose Humble, Patriotic, or Formal voice</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Set Comment-to-DM keyword triggers</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Turn on 24/7 Anti-Troll Shield</span>
-                            </li>
-                        </ul>
+                        <h3 class="apple-step-title">Configure AI Tone & Rules</h3>
+                        <p class="apple-step-desc">Select your preferred AI communication voice, define Comment-to-DM keyword triggers, and activate 24/7 Anti-Troll Shield.</p>
+                        <div class="apple-step-meta">
+                            <span class="apple-step-pill">Custom Persona</span>
+                            <span class="apple-step-time"><i class="ti ti-clock"></i>2 mins</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Step 03 -->
                 <div class="col-12 col-md-4">
-                    <div class="process-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
-                                03
-                            </span>
-                            <span class="badge badge-outline text-success"><i class="ti ti-bolt me-1"></i>Live Automation</span>
+                    <div class="apple-step-card">
+                        <div class="apple-step-header">
+                            <span class="apple-step-number">Step 03</span>
+                            <div class="apple-step-icon">
+                                <i class="ti ti-rocket"></i>
+                            </div>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">Operate on Full Autopilot</h4>
-                        <p class="text-muted small mb-3">
-                            Scheduled posts publish automatically on time. Incoming comments are answered in seconds, and private DMs convert leads 24/7.
-                        </p>
-                        <ul class="list-unstyled small text-secondary mb-0">
-                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Real-time Meta Webhook ingestion (&lt; 1s)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Every-minute publishing scheduler</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-1.5">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Live sentiment reporting on your dashboard</span>
-                            </li>
-                        </ul>
+                        <h3 class="apple-step-title">Operate on Full Autopilot</h3>
+                        <p class="apple-step-desc">Scheduled posts publish automatically on time. Incoming comments are answered in seconds, and private DMs convert leads 24/7.</p>
+                        <div class="apple-step-meta">
+                            <span class="apple-step-pill">24/7 Automation</span>
+                            <span class="apple-step-time"><i class="ti ti-circle-check"></i>Always Live</span>
+                        </div>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
             <!-- ============================================================= -->
             <!-- INTERACTIVE WORKFLOW PREVIEWS (TABS)                          -->
