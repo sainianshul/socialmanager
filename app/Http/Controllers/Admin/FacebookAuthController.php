@@ -33,8 +33,8 @@ class FacebookAuthController extends Controller
 
     public function __construct()
     {
-        $this->appId = (string) (config('services.facebook.client_id') ?: env('FACEBOOK_APP_ID', '1658585039195864'));
-        $this->appSecret = (string) (config('services.facebook.client_secret') ?: env('FACEBOOK_APP_KEY', '7b1b257899645bf98e0bdf3c6e6cb916'));
+        $this->appId = (string) (config('services.facebook.client_id') ?: env('FACEBOOK_APP_ID'));
+        $this->appSecret = (string) (config('services.facebook.client_secret') ?: env('FACEBOOK_APP_KEY'));
         $this->redirectUri = url('/auth/facebook/callback');
     }
 

@@ -48,9 +48,9 @@ return [
     ],
 
     'facebook' => [
-        'client_id' => env('FACEBOOK_APP_ID', '1658585039195864'),
-        'client_secret' => env('FACEBOOK_APP_KEY', '7b1b257899645bf98e0bdf3c6e6cb916'),
-        'webhook_verify_token' => env('META_VERIFY_TOKEN', 'warroom_secret_token_123'),
+        'client_id' => env('FACEBOOK_APP_ID'),
+        'client_secret' => env('FACEBOOK_APP_KEY'),
+        'webhook_verify_token' => env('META_VERIFY_TOKEN'),
     ],
 
     'instagram' => [

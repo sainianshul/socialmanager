@@ -21,7 +21,7 @@ class MetaWebhookController extends Controller
     {
         // 1. Meta Webhook Verification Challenge (GET)
         if ($request->isMethod('get')) {
-            $verifyToken = config('services.facebook.webhook_verify_token', 'warroom_secret_token_123');
+            $verifyToken = config('services.facebook.webhook_verify_token');
 
             $mode = $request->query('hub_mode', $request->query('hub.mode'));
             $token = $request->query('hub_verify_token', $request->query('hub.verify_token'));

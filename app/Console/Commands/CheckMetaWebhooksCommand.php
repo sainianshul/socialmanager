@@ -37,7 +37,7 @@ class CheckMetaWebhooksCommand extends Command
                 'object'       => 'page',
                 'callback_url' => 'https://socialmanager.rezel.online/webhook/meta',
                 'fields'       => 'feed,mention,messages,ratings',
-                'verify_token' => config('services.facebook.webhook_verify_token', 'warroom_secret_token_123'),
+                'verify_token' => config('services.facebook.webhook_verify_token'),
                 'access_token' => $appToken,
             ])->json();
             $this->line("Page Subscription Refresh Result: " . json_encode($pageSubRes));

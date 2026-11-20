@@ -55,12 +55,12 @@
                 <div class="card-body p-3">
                     <div class="d-flex align-items-center justify-content-between mb-1">
                         <span class="text-secondary small fw-medium">Verify Token</span>
-                        <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm" onclick="copyToClipboard('warroom_secret_token_123', 'Verify Token copied!')" title="Copy Token">
+                        <button type="button" class="btn btn-ghost-secondary btn-icon btn-sm" onclick="copyToClipboard('{{ config('services.facebook.webhook_verify_token') }}', 'Verify Token copied!')" title="Copy Token">
                             <i class="ti ti-copy"></i>
                         </button>
                     </div>
                     <div class="font-monospace text-dark fw-bold small">
-                        warroom_secret_token_123
+                        {{ config('services.facebook.webhook_verify_token') }}
                     </div>
                 </div>
             </div>
