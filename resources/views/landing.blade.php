@@ -1,721 +1,1782 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hopewell &mdash; Give Hope, Change Lives</title>
-<meta name="description" content="Hopewell is a transparent, donor-first charity connecting givers directly to verified causes worldwide.">
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>SocialManager - AI-Powered Social Media Management & Auto Engagement</title>
+    <meta name="description" content="Enterprise social media publishing, smart AI community moderation, and automated Comment-to-DM for Facebook, Instagram, and YouTube."/>
+    
+    <!-- Tabler Core CSS (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <!-- Tabler Icons Webfont -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --brand-teal: #1db8ab;
+            --brand-teal-hover: #17a397;
+            --brand-teal-dark: #10857b;
+            --brand-teal-light: rgba(29, 184, 171, 0.08);
+            --brand-teal-border: rgba(29, 184, 171, 0.25);
+            --navy-dark: #0f172a;
+            --navy-surface: #1e293b;
+            --slate-body: #334155;
+            --slate-muted: #64748b;
+            --slate-border: #e2e8f0;
+            --slate-bg: #f8fafc;
+        }
 
-<!-- Google Fonts -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #fafbfc;
+            color: #1e293b;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
 
-<!-- Bootstrap -->
-<link href="{{ asset('hopewell/assets/bootstrap.min.css') }}" rel="stylesheet">
-<!-- Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-<!-- AOS -->
-<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-<link href="{{ asset('hopewell/assets/style.css') }}" rel="stylesheet" />
-<link rel="icon" type="image/x-icon" href="{{ asset('hopewell/assets/hand-heart.png') }}">
+        /* Modern Gradient Accents */
+        .text-teal-gradient {
+            background: linear-gradient(135deg, #1db8ab 0%, #0ca678 50%, #20c997 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
+        /* Buttons & Badges */
+        .btn-teal {
+            background-color: #1db8ab;
+            border-color: #1db8ab;
+            color: #ffffff;
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(29, 184, 171, 0.28);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-teal:hover, .btn-teal:focus {
+            background-color: #17a397;
+            border-color: #17a397;
+            color: #ffffff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(29, 184, 171, 0.38);
+        }
+        .btn-outline-teal {
+            color: #1db8ab;
+            border-color: #1db8ab;
+            background: transparent;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-teal:hover {
+            background-color: rgba(29, 184, 171, 0.08);
+            color: #10857b;
+            border-color: #10857b;
+        }
+        .badge-teal-soft {
+            background-color: rgba(29, 184, 171, 0.08);
+            color: #0d8a80;
+            border: 1px solid rgba(29, 184, 171, 0.25);
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .bg-teal-lt {
+            background-color: rgba(29, 184, 171, 0.08) !important;
+            color: #0d8a80 !important;
+        }
+        .text-teal {
+            color: #0d8a80 !important;
+        }
 
+        /* Sticky Glass Navbar */
+        .landing-navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+            transition: all 0.25s ease;
+        }
+        .nav-link-custom {
+            color: #475569;
+            font-weight: 550;
+            font-size: 0.92rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            text-decoration: none;
+        }
+        .nav-link-custom:hover {
+            color: #1db8ab;
+            background-color: rgba(29, 184, 171, 0.05);
+        }
 
+        /* Hero Styling */
+        .hero-section {
+            padding: 90px 0 70px 0;
+            background: radial-gradient(circle at 50% 0%, rgba(29, 184, 171, 0.09) 0%, rgba(250, 251, 252, 0) 70%),
+                        linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            position: relative;
+        }
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -0.035em;
+            color: #0f172a;
+        }
+        .hero-subtitle {
+            font-size: 1.22rem;
+            line-height: 1.7;
+            color: #475569;
+            max-width: 740px;
+            margin: 0 auto;
+            font-weight: 450;
+        }
 
+        /* Dashboard UI Mockup Frame */
+        .browser-mockup {
+            background: #ffffff;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 25px 65px -15px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04);
+            overflow: hidden;
+            margin-top: 45px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .browser-header {
+            background: #f1f5f9;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+        }
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 7px;
+        }
+        .dot-red { background-color: #ef4444; }
+        .dot-yellow { background-color: #f59e0b; }
+        .dot-green { background-color: #10b981; }
+        .browser-url-bar {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 5px 14px;
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-left: 14px;
+            width: 340px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        /* Mockup Internal UI */
+        .mockup-body {
+            background: #f8fafc;
+            padding: 28px;
+        }
+        .mock-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+        .mock-event-pill {
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            margin-bottom: 9px;
+        }
+        .mock-event-published {
+            background-color: #ecfdf5;
+            border: 1px solid #86efac;
+            color: #064e3b;
+        }
+        .mock-event-scheduled {
+            background-color: #eff6ff;
+            border: 1px solid #93c5fd;
+            color: #0f2d59;
+        }
+        .brand-icon-fb { color: #1877f2; }
+        .brand-icon-ig { color: #d62976; }
+        .brand-icon-yt { color: #e02424; }
+
+        /* Platform Ribbon Cards */
+        .platform-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+        .platform-card:hover {
+            transform: translateY(-3px);
+            border-color: #cbd5e1;
+            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Bento Grid Cards */
+        .bento-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1.75rem;
+            height: 100%;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(29, 184, 171, 0.4);
+            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Process Steps */
+        .process-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 2rem;
+            position: relative;
+            height: 100%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.25s ease;
+        }
+        .process-card:hover {
+            transform: translateY(-3px);
+            border-color: #cbd5e1;
+            box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.07);
+        }
+        .step-number-badge {
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #1db8ab;
+            background: rgba(29, 184, 171, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        /* Security Cards */
+        .security-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1.75rem;
+            height: 100%;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .security-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(29, 184, 171, 0.4);
+            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.07);
+        }
+
+        /* Pricing Cards */
+        .pricing-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2.25rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            height: 100%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 36px -10px rgba(15, 23, 42, 0.09);
+        }
+        .pricing-card-featured {
+            border: 2px solid #1db8ab !important;
+            box-shadow: 0 16px 36px -8px rgba(29, 184, 171, 0.22) !important;
+            background: linear-gradient(180deg, rgba(29, 184, 171, 0.02) 0%, #ffffff 100%);
+        }
+        .pricing-badge-popular {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1db8ab;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 14px;
+            border-radius: 999px;
+            box-shadow: 0 4px 10px rgba(29, 184, 171, 0.3);
+        }
+
+        /* Accordion Custom Styling */
+        .accordion-custom .accordion-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px !important;
+            margin-bottom: 14px;
+            background: #ffffff;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+        .accordion-custom .accordion-item:hover {
+            border-color: #cbd5e1;
+        }
+        .accordion-custom .accordion-button {
+            font-weight: 650;
+            font-size: 1.05rem;
+            color: #0f172a;
+            background: #ffffff;
+            padding: 1.25rem 1.45rem;
+            box-shadow: none !important;
+        }
+        .accordion-custom .accordion-button:not(.collapsed) {
+            color: #0d8a80;
+            background-color: rgba(29, 184, 171, 0.04);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .accordion-custom .accordion-body {
+            padding: 1.35rem 1.45rem;
+            color: #475569;
+            font-size: 0.96rem;
+            line-height: 1.75;
+        }
+
+        /* Pre-Footer CTA Card */
+        .cta-banner-card {
+            background: linear-gradient(135deg, #0b1320 0%, #111a2d 65%, #064e3b 100%);
+            border: 1px solid rgba(29, 184, 171, 0.35);
+            border-radius: 18px;
+            box-shadow: 0 25px 50px -15px rgba(11, 19, 32, 0.45);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-banner-card::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(29, 184, 171, 0.25) 0%, rgba(29, 184, 171, 0) 70%);
+            pointer-events: none;
+        }
+
+        /* Modern 4-Column Footer */
+        .landing-footer {
+            background: #0b1320;
+            color: #94a3b8;
+            border-top: 1px solid #1e293b;
+        }
+        .landing-footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .landing-footer a:hover {
+            color: #2dd4bf;
+        }
+        .footer-heading {
+            color: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 1.25rem;
+        }
+        .footer-link-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+        .footer-link-list li {
+            margin-bottom: 0.8rem;
+            font-size: 0.92rem;
+        }
+        .footer-link-list li a {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .status-indicator-live {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: livePulse 2s infinite;
+        }
+        @keyframes livePulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @media (max-width: 991px) {
+            .hero-title { font-size: 2.35rem; }
+            .hero-subtitle { font-size: 1.05rem; }
+            .browser-url-bar { display: none; }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ============================================
-     PRELOADER
-============================================ -->
-<div id="preloader" aria-hidden="true">
-  <div class="preload-ring"><i class="bi bi-heart-fill preload-heart"></i></div>
-  <div class="preload-text">LOADING HOPE&hellip;</div>
-</div>
+    <!-- ========================================================================= -->
+    <!-- STEP 1: STICKY NAVBAR                                                     -->
+    <!-- ========================================================================= -->
+    <header class="landing-navbar">
+        <div class="container-xl">
+            <div class="d-flex align-items-center justify-content-between py-2.5">
+                <!-- Brand Logo -->
+                <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+                    <span class="avatar avatar-sm rounded-2 bg-teal-lt text-teal">
+                        <i class="ti ti-brand-campaignmonitor fs-2"></i>
+                    </span>
+                    <span class="fw-bold fs-3 text-dark">Social<span class="text-teal">Manager</span></span>
+                    <span class="badge badge-teal-soft ms-1">v2.4</span>
+                </a>
 
-<!-- ============================================
-     NAVBAR
-============================================ -->
-<nav class="navbar navbar-expand-lg navbar-hw" id="mainNav">
-  <div class="container">
-    <a class="hw-logo" href="#home">
-      <span class="hw-logo-mark"><i class="bi bi-heart-fill"></i></span>
-      Hope<span class="dot">well</span>
-    </a>
-    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-label="Toggle navigation">
-      <i class="bi bi-list fs-2"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav nav-hw mx-auto mt-3 mt-lg-0">
-        <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
-        <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
-        <li class="nav-item"><a class="nav-link" href="#causes">Causes</a></li>
-        <li class="nav-item"><a class="nav-link" href="#volunteers">Volunteers</a></li>
-        <li class="nav-item"><a class="nav-link" href="#testimonials">Testimonials</a></li>
-        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
-      </ul>
-      <a href="#causes" class="btn-hw-primary d-none d-lg-inline-flex">Donate Now <i class="bi bi-arrow-right"></i></a>
-    </div>
-  </div>
-</nav>
+                <!-- Desktop Navigation Links -->
+                <nav class="d-none d-lg-flex align-items-center gap-1">
+                    <a href="#features" class="nav-link-custom">Features</a>
+                    <a href="#platforms" class="nav-link-custom">Platforms</a>
+                    <a href="#how-it-works" class="nav-link-custom">How It Works</a>
+                    <a href="#pricing" class="nav-link-custom">Pricing</a>
+                    <a href="#faq" class="nav-link-custom">FAQ</a>
+                </nav>
 
-<!-- ============================================
-     HERO
-============================================ -->
-<header class="hero" id="home">
-  <div class="hero-glow"></div>
-  <span class="blob blob-1"></span>
-  <span class="blob blob-2"></span>
-  <span class="blob blob-3"></span>
-  <div class="container position-relative">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6" data-aos="fade-right">
-        <span class="eyebrow"><i class="bi bi-stars"></i> 128,400+ Lives Touched This Year</span>
-        <h1 class="hero-title mt-4">A small gift becomes <span class="accent-underline">someone's<svg viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M2 10 Q 50 2 100 8 T 198 6" stroke="#F59E0B" stroke-width="5" fill="none" stroke-linecap="round"/></svg></span> whole tomorrow.</h1>
-        <p class="hero-lead mt-4">Hopewell connects everyday donors directly with verified, on-the-ground causes &mdash; meals, schooling, clean water, medical care &mdash; with full transparency on where every rupee goes.</p>
-        <div class="d-flex flex-wrap gap-3 mt-4">
-          <a href="#causes" class="btn-hw-primary" id="heroDonateBtn">Donate Now <i class="bi bi-arrow-right"></i></a>
-          <a href="#" class="btn-hw-outline" data-bs-toggle="modal" data-bs-target="#storyModal"><i class="bi bi-play-circle"></i> Watch Story</a>
-        </div>
-        <div class="d-flex align-items-center gap-3 mt-5">
-          <div class="hero-avatars">
-            <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop&auto=format" alt="Donor">
-            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&auto=format" alt="Donor">
-            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&auto=format" alt="Donor">
-          </div>
-          <div>
-            <div class="fw-bold font-display" style="font-size:.9rem;">12,600+ donors</div>
-            <div class="text-muted" style="font-size:.8rem;">trust Hopewell with their giving</div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6" data-aos="fade-left" data-aos-delay="120">
-        <div class="hero-media">
-          <div class="hero-media-frame">
-            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&h=1000&fit=crop&auto=format" alt="Children supported by Hopewell smiling" loading="lazy">
-          </div>
-          <div class="float-card float-card-1">
-            <span class="fc-icon"><i class="bi bi-cup-hot-fill"></i></span>
-            <div><div class="fc-val">42,180</div><div class="fc-label">Meals served today</div></div>
-          </div>
-          <div class="float-card float-card-2">
-            <span class="fc-icon"><i class="bi bi-shield-check"></i></span>
-            <div><div class="fc-val">100%</div><div class="fc-label">Verified &amp; secure</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<!-- ============================================
-     IMPACT STATS
-============================================ -->
-<section class="section-pad pt-0" id="impact">
-  <div class="container">
-    <div class="stats-band" data-aos="zoom-in">
-      <div class="row g-0">
-        <div class="col-6 col-md-3 stat-item">
-          <div class="stat-num"><span class="counter" data-target="184000">0</span>+</div>
-          <div class="stat-label">Meals Served</div>
-        </div>
-        <div class="col-6 col-md-3 stat-item">
-          <div class="stat-num"><span class="counter" data-target="52300">0</span>+</div>
-          <div class="stat-label">Children Helped</div>
-        </div>
-        <div class="col-6 col-md-3 stat-item">
-          <div class="stat-num"><span class="counter" data-target="3800">0</span>+</div>
-          <div class="stat-label">Active Volunteers</div>
-        </div>
-        <div class="col-6 col-md-3 stat-item">
-          <div class="stat-num">$<span class="counter" data-target="2400000">0</span></div>
-          <div class="stat-label">Funds Raised</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     ABOUT
-============================================ -->
-<section class="section-pad" id="about">
-  <div class="container contact-card about-card">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6" data-aos="fade-right">
-        <div class="about-collage">
-          <div class="about-badge">
-            <div class="ab-ring"><span>13yrs</span></div>
-            <div>
-              <div class="fw-bold font-display" style="font-size:.9rem;">Trusted Since</div>
-              <div class="text-muted" style="font-size:.78rem;">2013 &middot; 40 countries</div>
+                <!-- Auth Buttons -->
+                <div class="d-flex align-items-center gap-2">
+                    @auth
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-teal btn-sm px-3">
+                            <i class="ti ti-layout-dashboard me-1"></i>Open Dashboard
+                        </a>
+                    @else
+                        <a href="{{ route('login') }}" class="btn btn-ghost-secondary btn-sm px-3 d-none d-sm-inline-block">
+                            Sign In
+                        </a>
+                        <a href="{{ route('login') }}" class="btn btn-teal btn-sm px-3.5">
+                            <i class="ti ti-arrow-right me-1"></i>Get Started Free
+                        </a>
+                    @endauth
+                </div>
             </div>
-          </div>
-          <div class="img-a"><img src="https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=800&h=650&fit=crop&auto=format" alt="Volunteers distributing supplies" loading="lazy"></div>
-          <div class="img-b"><img src="https://images.unsplash.com/photo-1593113630400-ea4288922497?w=500&h=500&fit=crop&auto=format" alt="Child receiving school supplies" loading="lazy"></div>
         </div>
-      </div>
-      <div class="col-lg-6" data-aos="fade-left">
-        <span class="eyebrow"><i class="bi bi-flag-fill"></i> Our Story</span>
-        <h2 class="section-title mt-3 mb-3" style="font-size:clamp(1.7rem,3vw,2.4rem);">We believe generosity works best when it's traceable.</h2>
-        <p class="section-sub">Hopewell started in a single village kitchen in 2013 and has grown into a donor network spanning 40 countries &mdash; without ever losing sight of the person on the receiving end of a gift.</p>
-        <ul class="about-list mt-3">
-          <li><span class="ic"><i class="bi bi-eye-fill"></i></span><div><strong>Full transparency</strong><div class="text-muted small">Track your donation from wallet to warehouse to doorstep.</div></div></li>
-          <li><span class="ic"><i class="bi bi-patch-check-fill"></i></span><div><strong>Verified NGO partners</strong><div class="text-muted small">Every partner is audited annually by an independent body.</div></div></li>
-          <li><span class="ic"><i class="bi bi-globe-americas"></i></span><div><strong>On-the-ground reach</strong><div class="text-muted small">Local teams in 40 countries, not a single head office.</div></div></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
+    </header>
 
-<!-- ============================================
-     CAUSES
-============================================ -->
-<section class="section-pad bg-white" id="causes">
-  <div class="container">
-    <div class="text-center mx-auto mb-5" style="max-width:640px;" data-aos="fade-up">
-      <span class="eyebrow"><i class="bi bi-heart-fill"></i> Active Campaigns</span>
-      <h2 class="section-title mt-3" style="font-size:clamp(1.8rem,3.2vw,2.5rem);">Causes waiting for you</h2>
-      <p class="section-sub mx-auto mt-2">Every campaign below is independently verified and updated weekly with real disbursement records.</p>
-    </div>
-    <div class="row g-4">
-
-      <div class="col-md-6 col-lg-4" data-aos="fade-up">
-        <div class="cause-card">
-          <div class="cause-img">
-            <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=420&fit=crop&auto=format" alt="Meals for children campaign" loading="lazy">
-            <span class="cause-tag">Nutrition</span>
-          </div>
-          <div class="cause-body">
-            <h5 class="font-display fw-bold">Daily Meals for 500 Children</h5>
-            <p class="text-muted small mb-0">Providing nutritious school lunches across rural districts.</p>
-            <div class="cause-progress-track"><div class="cause-progress-fill" data-progress="78"></div></div>
-            <div class="cause-meta"><span class="raised">$23,400 raised</span><span class="goal">of $30,000</span></div>
-            <button class="cause-donate">Donate to this cause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="cause-card">
-          <div class="cause-img">
-            <img src="https://images.unsplash.com/photo-1541692641319-981cc79ee10a?w=600&h=420&fit=crop&auto=format" alt="Clean water well campaign" loading="lazy">
-            <span class="cause-tag">Clean Water</span>
-          </div>
-          <div class="cause-body">
-            <h5 class="font-display fw-bold">Wells for 12 Villages</h5>
-            <p class="text-muted small mb-0">Building sustainable water access in drought-hit regions.</p>
-            <div class="cause-progress-track"><div class="cause-progress-fill" data-progress="55"></div></div>
-            <div class="cause-meta"><span class="raised">$16,500 raised</span><span class="goal">of $30,000</span></div>
-            <button class="cause-donate">Donate to this cause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="cause-card">
-          <div class="cause-img">
-            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=420&fit=crop&auto=format" alt="School supplies campaign" loading="lazy">
-            <span class="cause-tag">Education</span>
-          </div>
-          <div class="cause-body">
-            <h5 class="font-display fw-bold">Books &amp; Bags for 800 Kids</h5>
-            <p class="text-muted small mb-0">Full school kits ahead of the new academic year.</p>
-            <div class="cause-progress-track"><div class="cause-progress-fill" data-progress="92"></div></div>
-            <div class="cause-meta"><span class="raised">$18,400 raised</span><span class="goal">of $20,000</span></div>
-            <button class="cause-donate">Donate to this cause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-4" data-aos="fade-up">
-        <div class="cause-card">
-          <div class="cause-img">
-            <img src="https://images.unsplash.com/photo-1584515933487-779824d29309?w=600&h=420&fit=crop&auto=format" alt="Mobile health clinic campaign" loading="lazy">
-            <span class="cause-tag">Healthcare</span>
-          </div>
-          <div class="cause-body">
-            <h5 class="font-display fw-bold">Mobile Health Clinics</h5>
-            <p class="text-muted small mb-0">Free checkups and medicine for remote communities.</p>
-            <div class="cause-progress-track"><div class="cause-progress-fill" data-progress="41"></div></div>
-            <div class="cause-meta"><span class="raised">$12,300 raised</span><span class="goal">of $30,000</span></div>
-            <button class="cause-donate">Donate to this cause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="100">
-        <div class="cause-card">
-          <div class="cause-img">
-            <img src="https://images.unsplash.com/photo-1618477388954-7852f32655ec?w=600&h=420&fit=crop&auto=format" alt="Emergency relief campaign" loading="lazy">
-            <span class="cause-tag">Emergency Relief</span>
-          </div>
-          <div class="cause-body">
-            <h5 class="font-display fw-bold">Flood Relief Fund</h5>
-            <p class="text-muted small mb-0">Shelter, food and blankets for displaced families.</p>
-            <div class="cause-progress-track"><div class="cause-progress-fill" data-progress="66"></div></div>
-            <div class="cause-meta"><span class="raised">$19,800 raised</span><span class="goal">of $30,000</span></div>
-            <button class="cause-donate">Donate to this cause</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="200">
-        <div class="cause-card">
-          <div class="cause-img">
-            <img src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=600&h=420&fit=crop&auto=format" alt="Elderly care campaign" loading="lazy">
-            <span class="cause-tag">Elder Care</span>
-          </div>
-          <div class="cause-body">
-            <h5 class="font-display fw-bold">Warm Homes for Elders</h5>
-            <p class="text-muted small mb-0">Companionship, meals and care for isolated seniors.</p>
-            <div class="cause-progress-track"><div class="cause-progress-fill" data-progress="34"></div></div>
-            <div class="cause-meta"><span class="raised">$8,100 raised</span><span class="goal">of $24,000</span></div>
-            <button class="cause-donate">Donate to this cause</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     WHY CHOOSE US
-============================================ -->
-<section class="section-pad" id="why" style="background:var(--clr-bg);">
-  <div class="container">
-    <div class="text-center mx-auto mb-5" style="max-width:640px;" data-aos="fade-up">
-      <span class="eyebrow"><i class="bi bi-award-fill"></i> Why Hopewell</span>
-      <h2 class="section-title mt-3" style="font-size:clamp(1.8rem,3.2vw,2.5rem);">Giving you can actually verify</h2>
-    </div>
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4" data-aos="fade-up">
-        <div class="why-card">
-          <div class="why-ic"><i class="bi bi-eye-fill"></i></div>
-          <h5 class="font-display fw-bold">Transparent Donations</h5>
-          <p class="text-muted mb-0">See exactly how each contribution is spent, with receipts down to the last dollar.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
-        <div class="why-card">
-          <div class="why-ic"><i class="bi bi-patch-check-fill"></i></div>
-          <h5 class="font-display fw-bold">Verified NGOs</h5>
-          <p class="text-muted mb-0">Every partner organization passes a rigorous annual compliance audit.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
-        <div class="why-card">
-          <div class="why-ic"><i class="bi bi-shield-lock-fill"></i></div>
-          <h5 class="font-display fw-bold">Secure Payments</h5>
-          <p class="text-muted mb-0">Bank-grade encryption protects every transaction, every time.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up">
-        <div class="why-card">
-          <div class="why-ic"><i class="bi bi-graph-up-arrow"></i></div>
-          <h5 class="font-display fw-bold">Real-Time Impact</h5>
-          <p class="text-muted mb-0">Live dashboards show your donation's effect as it happens on the ground.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="80">
-        <div class="why-card">
-          <div class="why-ic"><i class="bi bi-file-earmark-text-fill"></i></div>
-          <h5 class="font-display fw-bold">Tax Benefits</h5>
-          <p class="text-muted mb-0">Instant, downloadable tax receipts for every donation you make.</p>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="160">
-        <div class="why-card">
-          <div class="why-ic"><i class="bi bi-headset"></i></div>
-          <h5 class="font-display fw-bold">24/7 Donor Support</h5>
-          <p class="text-muted mb-0">A real human is always one message away if you have questions.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     HOW IT WORKS
-============================================ -->
-<section class="section-pad bg-white" id="how">
-  <div class="container contact-card">
-    <div class="text-center mx-auto mb-5" style="max-width:640px;" data-aos="fade-up">
-      <span class="eyebrow"><i class="bi bi-signpost-split-fill"></i> Simple Process</span>
-      <h2 class="section-title mt-3" style="font-size:clamp(1.8rem,3.2vw,2.5rem);">How your gift travels</h2>
-    </div>
-    <div class="hiw-wrap">
-      <div class="hiw-line"></div>
-      <div class="row g-4">
-        <div class="col-md-4 hiw-step" data-aos="fade-up">
-          <div class="hiw-num">1</div>
-          <h5 class="font-display fw-bold">Choose a Cause</h5>
-          <p class="text-muted">Browse verified campaigns and pick the one that speaks to you.</p>
-        </div>
-        <div class="col-md-4 hiw-step" data-aos="fade-up" data-aos-delay="120">
-          <div class="hiw-num">2</div>
-          <h5 class="font-display fw-bold">Donate Securely</h5>
-          <p class="text-muted">Give in seconds through an encrypted, PCI-compliant checkout.</p>
-        </div>
-        <div class="col-md-4 hiw-step" data-aos="fade-up" data-aos-delay="240">
-          <div class="hiw-num">3</div>
-          <h5 class="font-display fw-bold">Track Your Impact</h5>
-          <p class="text-muted">Follow real updates and photos as your gift reaches the ground.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     VOLUNTEERS
-============================================ -->
-<section class="section-pad" id="volunteers">
-  <div class="container">
-    <div class="text-center mx-auto mb-5" style="max-width:640px;" data-aos="fade-up">
-      <span class="eyebrow"><i class="bi bi-people-fill"></i> Our People</span>
-      <h2 class="section-title mt-3" style="font-size:clamp(1.8rem,3.2vw,2.5rem);">The hands behind every delivery</h2>
-    </div>
-    <div class="row g-4">
-      <div class="col-6 col-md-3" data-aos="fade-up">
-        <div class="vol-card">
-          <div class="vol-img"><img src="https://img.magnific.com/free-photo/portrait-young-handsome-guy-chrsitmas_114579-78899.jpg" alt="Volunteer Aria Chen" loading="lazy"></div>
-          <div class="vol-overlay">
-            <div class="fw-bold font-display">Aria Chen</div>
-            <div class="small opacity-75">Field Coordinator</div>
-            <div class="vol-social"><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-linkedin"></i></a></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="80">
-        <div class="vol-card">
-          <div class="vol-img"><img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=480&fit=crop&auto=format" alt="Volunteer Marcus Lee" loading="lazy"></div>
-          <div class="vol-overlay">
-            <div class="fw-bold font-display">Marcus Lee</div>
-            <div class="small opacity-75">Logistics Lead</div>
-            <div class="vol-social"><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-linkedin"></i></a></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="160">
-        <div class="vol-card">
-          <div class="vol-img"><img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=480&fit=crop&auto=format" alt="Volunteer Priya Nair" loading="lazy"></div>
-          <div class="vol-overlay">
-            <div class="fw-bold font-display">Priya Nair</div>
-            <div class="small opacity-75">Community Outreach</div>
-            <div class="vol-social"><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-linkedin"></i></a></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-6 col-md-3" data-aos="fade-up" data-aos-delay="240">
-        <div class="vol-card">
-          <div class="vol-img"><img src="https://img.magnific.com/free-photo/portrait-young-handsome-man-with-curly-hair_1303-27415.jpg" alt="Volunteer Daniel Osei" loading="lazy"></div>
-          <div class="vol-overlay">
-            <div class="fw-bold font-display">Daniel Osei</div>
-            <div class="small opacity-75">Medical Volunteer</div>
-            <div class="vol-social"><a href="#"><i class="bi bi-facebook"></i></a><a href="#"><i class="bi bi-instagram"></i></a><a href="#"><i class="bi bi-linkedin"></i></a></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================
-     TESTIMONIALS
-============================================ -->
-<section class="section-pad bg-white" id="testimonials">
-  <div class="container">
-    <div class="testi-section p-4 p-md-5" data-aos="zoom-in">
-      <div class="text-center mx-auto mb-5" style="max-width:600px;">
-        <span class="eyebrow" style="background:rgba(255,255,255,.15);color:#fff;"><i class="bi bi-chat-quote-fill"></i> Donor Voices</span>
-        <h2 class="section-title mt-3 text-white" style="font-size:clamp(1.7rem,3vw,2.3rem);">Stories from our giving community</h2>
-      </div>
-      <div id="testiCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-          <div class="carousel-item active">
-            <div class="row g-4 justify-content-center">
-              <div class="col-md-6 col-lg-4">
-                <div class="testi-card">
-                  <div class="testi-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                  <p class="testi-quote">"I could actually see photos of the well being built with my donation. That kind of proof changed how I think about giving."</p>
-                  <div class="testi-person">
-                    <img src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=100&h=100&fit=crop&auto=format" alt="Rachel Kim">
-                    <div><div class="testi-name">Rachel Kim</div><div class="testi-role">Monthly Donor</div></div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 col-lg-4">
-                <div class="testi-card">
-                  <div class="testi-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                  <p class="testi-quote">"Checkout took less than a minute and I had a tax receipt in my inbox before I'd even closed the tab."</p>
-                  <div class="testi-person">
-                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&auto=format" alt="James Okafor">
-                    <div><div class="testi-name">James Okafor</div><div class="testi-role">First-Time Donor</div></div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-lg-4 d-none d-lg-block">
-                <div class="testi-card">
-                  <div class="testi-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i></div>
-                  <p class="testi-quote">"As an NGO partner, the audit process was thorough but fair &mdash; it's clearly what keeps donor trust so high."</p>
-                  <div class="testi-person">
-                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&auto=format" alt="Sofia Bianchi">
-                    <div><div class="testi-name">Sofia Bianchi</div><div class="testi-role">Partner NGO Director</div></div>
-                  </div>
-                </div>
-              </div>
+    <!-- ========================================================================= -->
+    <!-- STEP 1: HIGH-IMPACT HERO SECTION                                         -->
+    <!-- ========================================================================= -->
+    <section class="hero-section text-center">
+        <div class="container-xl">
+            <!-- Official API Trust Badge -->
+            <div class="d-inline-flex align-items-center gap-1.5 badge-teal-soft px-3 py-1.5 rounded-pill mb-3 fs-7">
+                <i class="ti ti-shield-check fs-3"></i>
+                <span>Official Meta Graph API & Google Cloud Partner Architecture</span>
             </div>
-          </div>
-          <div class="carousel-item">
-            <div class="row g-4 justify-content-center">
-              <div class="col-md-6 col-lg-5">
-                <div class="testi-card">
-                  <div class="testi-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                  <p class="testi-quote">"My workplace giving program matched my donation automatically. Hopewell made the whole thing effortless."</p>
-                  <div class="testi-person">
-                    <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&auto=format" alt="Tanvi Deshpande">
-                    <div><div class="testi-name">Tanvi Deshpande</div><div class="testi-role">Corporate Donor</div></div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6 col-lg-5">
-                <div class="testi-card">
-                  <div class="testi-stars"><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i></div>
-                  <p class="testi-quote">"The impact updates felt personal, not like a form letter. I've since set up a recurring monthly gift."</p>
-                  <div class="testi-person">
-                    <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&auto=format" alt="Elliot Novak">
-                    <div><div class="testi-name">Elliot Novak</div><div class="testi-role">Recurring Donor</div></div>
-                  </div>
-                </div>
-              </div>
+
+            <!-- Primary Headline -->
+            <h1 class="hero-title mb-3">
+                Scale Your Social Presence & Audience Inquiries <br class="d-none d-md-inline">
+                <span class="text-teal-gradient">100% on Autopilot</span>
+            </h1>
+
+            <!-- Subtitle -->
+            <p class="hero-subtitle mb-4">
+                The centralized social management command center built for creators, public figures, and brands. 
+                Schedule posts across Facebook, Instagram, and YouTube, reply to community comments 24/7 with customized contextual AI, and automatically dispatch private direct messages to interested leads.
+            </p>
+
+            <!-- CTA Buttons -->
+            <div class="d-flex align-items-center justify-content-center gap-2 mb-4">
+                <a href="{{ route('login') }}" class="btn btn-teal btn-lg px-4 py-2.5">
+                    <i class="ti ti-bolt me-1.5"></i>Start Free Trial
+                </a>
+                <a href="#preview" class="btn btn-outline-secondary btn-lg px-4 py-2.5">
+                    <i class="ti ti-player-play me-1.5"></i>Live Platform Preview
+                </a>
             </div>
-          </div>
-        </div>
-        <div class="carousel-indicators">
-          <button type="button" data-bs-target="#testiCarousel" data-bs-slide-to="0" class="active" aria-label="Slide 1"></button>
-          <button type="button" data-bs-target="#testiCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ============================================
-     CTA BANNER
-============================================ -->
-<section class="section-pad" id="cta">
-  <div class="container">
-    <div class="cta-banner" data-aos="zoom-in">
-      <i class="bi bi-heart-fill" style="font-size:2.4rem;"></i>
-      <h2 class="mt-3">Someone, somewhere, is waiting on the other side of your generosity.</h2>
-      <p class="mb-4" style="opacity:.92;">Every gift, however small, moves a real story forward today.</p>
-      <button class="btn-cta" id="ctaDonateBtn"><i class="bi bi-heart-fill me-2"></i>Donate Now</button>
-    </div>
-  </div>
-</section>
+            <!-- Micro Trust Indicators (Zero Emojis, Pure SVG Icons) -->
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-4 text-muted small mb-5">
+                <div class="d-flex align-items-center gap-1.5">
+                    <i class="ti ti-check text-teal fs-3"></i>
+                    <span>No credit card required</span>
+                </div>
+                <div class="d-flex align-items-center gap-1.5">
+                    <i class="ti ti-check text-teal fs-3"></i>
+                    <span>Zero password storage (OAuth 2.0)</span>
+                </div>
+                <div class="d-flex align-items-center gap-1.5">
+                    <i class="ti ti-check text-teal fs-3"></i>
+                    <span>24/7 Auto-Renew Token Protection</span>
+                </div>
+            </div>
 
-<!-- ============================================
-     CONTACT
-============================================ -->
-<section class="section-pad bg-white" id="contact">
-  <div class="container">
-    <div class="text-center mx-auto mb-5" style="max-width:640px;" data-aos="fade-up">
-      <span class="eyebrow"><i class="bi bi-envelope-fill"></i> Get In Touch</span>
-      <h2 class="section-title mt-3" style="font-size:clamp(1.8rem,3.2vw,2.5rem);">We'd love to hear from you</h2>
-    </div>
-    <div class="row g-5">
-      <div class="col-lg-5 contact-card" data-aos="fade-right">
-        <div class="contact-info-item">
-          <span class="ic"><i class="bi bi-geo-alt-fill"></i></span>
-          <div><strong>Our Office</strong><div class="text-muted small">221 Riverside Lane, Austin, TX 78701</div></div>
+            <!-- ============================================================= -->
+            <!-- LIVE PRODUCT DASHBOARD PREVIEW MOCKUP                         -->
+            <!-- ============================================================= -->
+            <div id="preview" class="browser-mockup text-start">
+                <!-- Browser Bar -->
+                <div class="browser-header">
+                    <div>
+                        <span class="browser-dot dot-red"></span>
+                        <span class="browser-dot dot-yellow"></span>
+                        <span class="browser-dot dot-green"></span>
+                    </div>
+                    <div class="browser-url-bar">
+                        <i class="ti ti-lock text-teal"></i>
+                        <span>https://socialmanager.rezel.online/admin/dashboard</span>
+                    </div>
+                    <div class="ms-auto d-flex align-items-center gap-2">
+                        <span class="badge bg-teal-lt text-teal">
+                            <span class="status-dot bg-teal me-1.5"></span>System Live
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Mockup Content Body -->
+                <div class="mockup-body">
+                    <!-- Top Metric Cards -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-12 col-md-4">
+                            <div class="mock-card p-3">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="text-muted small fw-semibold">Connected Channels</span>
+                                    <span class="badge badge-teal-soft"><i class="ti ti-check me-1"></i>Active</span>
+                                </div>
+                                <div class="h3 fw-bold mb-1 text-dark">3 Channels</div>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span><i class="ti ti-brand-facebook brand-icon-fb"></i> FB Page</span>
+                                    <span>•</span>
+                                    <span><i class="ti ti-brand-instagram brand-icon-ig"></i> IG Pro</span>
+                                    <span>•</span>
+                                    <span><i class="ti ti-brand-youtube brand-icon-yt"></i> YouTube</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="mock-card p-3">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="text-muted small fw-semibold">AI Comments Processed</span>
+                                    <span class="badge bg-teal-lt text-teal">98.4% Accuracy</span>
+                                </div>
+                                <div class="h3 fw-bold mb-1 text-dark">1,420</div>
+                                <div class="small text-muted">
+                                    <span class="text-teal fw-semibold"><i class="ti ti-trending-up me-1"></i>+18.2%</span> vs last week
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="mock-card p-3">
+                                <div class="d-flex align-items-center justify-content-between mb-1">
+                                    <span class="text-muted small fw-semibold">Auto DMs Dispatched</span>
+                                    <span class="badge badge-outline text-teal">Instant (0.8s)</span>
+                                </div>
+                                <div class="h3 fw-bold mb-1 text-dark">312</div>
+                                <div class="small text-muted">Private Comment-to-DM triggers</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Split View: Left Calendar + Right Live AI Auto-Reply & DM -->
+                    <div class="row g-3">
+                        <!-- Left: Publishing Calendar Preview -->
+                        <div class="col-12 col-lg-6">
+                            <div class="mock-card p-3.5 h-100">
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-calendar text-teal fs-2"></i>
+                                        <span class="fw-bold text-dark">Publishing Schedule Calendar</span>
+                                    </div>
+                                    <span class="badge bg-secondary-lt text-secondary">Today</span>
+                                </div>
+
+                                <!-- Scheduled Event 1 (Published) -->
+                                <div class="mock-event-pill mock-event-published justify-content-between">
+                                    <div class="d-flex align-items-center gap-2 text-truncate">
+                                        <i class="ti ti-brand-youtube brand-icon-yt fs-3"></i>
+                                        <span class="text-truncate">Budget 2026 Analysis - Full Video</span>
+                                    </div>
+                                    <span class="badge badge-outline text-success bg-white ms-2">
+                                        <i class="ti ti-check me-1"></i>Published
+                                    </span>
+                                </div>
+
+                                <!-- Scheduled Event 2 (Scheduled) -->
+                                <div class="mock-event-pill mock-event-scheduled justify-content-between">
+                                    <div class="d-flex align-items-center gap-2 text-truncate">
+                                        <i class="ti ti-brand-instagram brand-icon-ig fs-3"></i>
+                                        <span class="text-truncate">Reel: 5 Important Welfare Schemes</span>
+                                    </div>
+                                    <span class="badge badge-outline text-primary bg-white ms-2">
+                                        <i class="ti ti-clock me-1"></i>04:30 PM
+                                    </span>
+                                </div>
+
+                                <!-- Scheduled Event 3 (Scheduled) -->
+                                <div class="mock-event-pill mock-event-scheduled justify-content-between mb-0">
+                                    <div class="d-flex align-items-center gap-2 text-truncate">
+                                        <i class="ti ti-brand-facebook brand-icon-fb fs-3"></i>
+                                        <span class="text-truncate">Public Grievance Camp Announcement</span>
+                                    </div>
+                                    <span class="badge badge-outline text-primary bg-white ms-2">
+                                        <i class="ti ti-clock me-1"></i>07:00 PM
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Live AI Moderation & Auto DM Stream -->
+                        <div class="col-12 col-lg-6">
+                            <div class="mock-card p-3.5 h-100">
+                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-messages text-teal fs-2"></i>
+                                        <span class="fw-bold text-dark">Live AI Comment Moderation & Auto DM</span>
+                                    </div>
+                                    <span class="badge badge-teal-soft">Live Stream</span>
+                                </div>
+
+                                <!-- User Comment Card -->
+                                <div class="p-2.5 rounded-2 bg-light border mb-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="avatar avatar-xs rounded-circle bg-azure text-white">RS</span>
+                                            <span class="fw-semibold small text-dark">Ramesh Sharma</span>
+                                            <span class="text-muted fs-8"><i class="ti ti-brand-instagram brand-icon-ig"></i> Instagram</span>
+                                        </div>
+                                        <span class="text-muted fs-8">2m ago</span>
+                                    </div>
+                                    <div class="small text-secondary mb-2">
+                                        "Sir please send me the application form link for the education scheme."
+                                    </div>
+
+                                    <!-- AI Public Reply -->
+                                    <div class="p-2 rounded-2 bg-white border-start border-teal border-3 ms-2 mb-2">
+                                        <div class="d-flex align-items-center gap-1.5 mb-1 text-teal fs-8 fw-semibold">
+                                            <i class="ti ti-robot"></i>
+                                            <span>AI Public Reply (Humble & Respectful Tone)</span>
+                                        </div>
+                                        <div class="fs-8 text-dark">
+                                            "Ramesh ji, yojna ka official application form link aapke private direct message (DM) me bhej diya gaya hai. Kripya apna inbox check karein."
+                                        </div>
+                                    </div>
+
+                                    <!-- Auto DM Dispatched Badge -->
+                                    <div class="d-inline-flex align-items-center gap-1 badge badge-teal-soft py-1 px-2 fs-8">
+                                        <i class="ti ti-mail-forward"></i>
+                                        <span>Auto DM Dispatched to @ramesh_sharma via Instagram Direct</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End Browser Mockup -->
         </div>
-        <div class="contact-info-item">
-          <span class="ic"><i class="bi bi-envelope-fill"></i></span>
-          <div><strong>Email Us</strong><div class="text-muted small">hello@hopewell.org</div></div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 2: CERTIFIED PLATFORMS RIBBON                                        -->
+    <!-- ========================================================================= -->
+    <section id="platforms" class="py-5 bg-white border-top border-bottom">
+        <div class="container-xl">
+            <div class="text-center mb-4">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-api-app me-1"></i>Official Integrations</span>
+                <h3 class="fw-bold text-dark mb-1">Directly Connected to Official Platform APIs</h3>
+                <p class="text-muted small">No web scrapers, no unofficial bots. 100% compliant with platform developer terms.</p>
+            </div>
+
+            <div class="row g-3 justify-content-center">
+                <!-- Facebook Platform Card -->
+                <div class="col-12 col-md-4">
+                    <div class="platform-card d-flex flex-column">
+                        <div class="d-flex align-items-center gap-3 mb-2.5">
+                            <span class="avatar avatar-md rounded-2" style="background: rgba(24, 119, 242, 0.08); color: #1877f2;">
+                                <i class="ti ti-brand-facebook fs-1"></i>
+                            </span>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">Facebook Pages</h4>
+                                <span class="badge badge-outline text-primary fs-8">Graph API v20.0</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Permanent Page tokens with real-time Webhook feed subscription. Publish posts, sync comments, and dispatch Messenger replies.</p>
+                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Photos & Videos</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Auto Moderation</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Instant DMs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instagram Platform Card -->
+                <div class="col-12 col-md-4">
+                    <div class="platform-card d-flex flex-column">
+                        <div class="d-flex align-items-center gap-3 mb-2.5">
+                            <span class="avatar avatar-md rounded-2" style="background: rgba(214, 41, 118, 0.08); color: #d62976;">
+                                <i class="ti ti-brand-instagram fs-1"></i>
+                            </span>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">Instagram Professional</h4>
+                                <span class="badge badge-outline text-pink fs-8">Business & Creator</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Linked Instagram account automation. Schedule Carousels & Reels, track public interactions, and send private Direct Messages.</p>
+                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Reels Publishing</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Comment-to-DM</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Direct Messaging</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- YouTube Platform Card -->
+                <div class="col-12 col-md-4">
+                    <div class="platform-card d-flex flex-column">
+                        <div class="d-flex align-items-center gap-3 mb-2.5">
+                            <span class="avatar avatar-md rounded-2" style="background: rgba(224, 36, 36, 0.08); color: #e02424;">
+                                <i class="ti ti-brand-youtube fs-1"></i>
+                            </span>
+                            <div>
+                                <h4 class="fw-bold mb-0 text-dark">YouTube Channels</h4>
+                                <span class="badge badge-outline text-danger fs-8">Data API v3</span>
+                            </div>
+                        </div>
+                        <p class="text-muted small mb-3">Resumable video & Shorts publishing with automated 24/7 background token renewal. Public comment threading and auto-hiding.</p>
+                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Shorts & Videos</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Auto-Renew Token</span>
+                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Troll Shield</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="contact-info-item">
-          <span class="ic"><i class="bi bi-telephone-fill"></i></span>
-          <div><strong>Call Us</strong><div class="text-muted small">+1 (555) 204-8890</div></div>
-        </div>
-        <div class="map-placeholder"><i class="bi bi-pin-map-fill me-2"></i> Map Embed Placeholder</div>
-      </div>
-      <div class="col-lg-7" data-aos="fade-left">
-        <div class="contact-card">
-          <form id="contactForm" novalidate>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 2: CORE FEATURES BENTO GRID                                          -->
+    <!-- ========================================================================= -->
+    <section id="features" class="py-6" style="background-color: #fafbfc;">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-layers-linked me-1"></i>Core Capabilities</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Engineered for High-Stakes Social Operations</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    Every tool required to publish rich media, engage thousands of citizens and followers, and protect brand reputation around the clock.
+                </p>
+            </div>
+
+            <!-- Bento Box Grid -->
             <div class="row g-3">
-              <div class="col-md-6">
-                <label class="form-label small fw-semibold" for="cf-name">Full Name</label>
-                <input type="text" class="form-control form-control-hw" id="cf-name" placeholder="Jane Doe" required>
-              </div>
-              <div class="col-md-6">
-                <label class="form-label small fw-semibold" for="cf-email">Email Address</label>
-                <input type="email" class="form-control form-control-hw" id="cf-email" placeholder="jane@example.com" required>
-              </div>
-              <div class="col-12">
-                <label class="form-label small fw-semibold" for="cf-subject">Subject</label>
-                <input type="text" class="form-control form-control-hw" id="cf-subject" placeholder="How can we help?">
-              </div>
-              <div class="col-12">
-                <label class="form-label small fw-semibold" for="cf-message">Message</label>
-                <textarea class="form-control form-control-hw" id="cf-message" rows="4" placeholder="Tell us more&hellip;" required></textarea>
-              </div>
-              <div class="col-12">
-                <button type="submit" class="btn-hw-primary w-100 justify-content-center">Send Message <i class="bi bi-send"></i></button>
-              </div>
-              <div class="col-12" id="formStatus" role="status" aria-live="polite"></div>
+                <!-- Bento Card 1: Content Publishing & Drag-Drop Calendar (7 Columns) -->
+                <div class="col-12 col-lg-7">
+                    <div class="bento-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-calendar-event fs-1"></i>
+                            </span>
+                            <span class="badge badge-outline text-teal">1-Minute Background Daemon</span>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-2">Unified Multi-Platform Content Scheduler</h3>
+                        <p class="text-muted mb-4">
+                            Compose your message once, upload your image or video, and schedule it across Facebook, Instagram, and YouTube. Our automated server daemon executes scheduled publishes every 60 seconds with zero manual intervention.
+                        </p>
+
+                        <!-- Inner Feature Showcase Mockup -->
+                        <div class="p-3 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="small fw-semibold text-secondary">Active Calendar Slots</span>
+                                <span class="small text-teal"><i class="ti ti-clock me-1"></i>Queue Running</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <div class="p-2 rounded-2 bg-white border d-flex align-items-center gap-2">
+                                        <i class="ti ti-video text-danger"></i>
+                                        <div class="text-truncate">
+                                            <div class="fw-semibold small text-truncate">Weekly Address Video</div>
+                                            <div class="text-muted fs-8">YouTube • 1080p Resumable</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="p-2 rounded-2 bg-white border d-flex align-items-center gap-2">
+                                        <i class="ti ti-device-mobile text-pink"></i>
+                                        <div class="text-truncate">
+                                            <div class="fw-semibold small text-truncate">Highlights Reel</div>
+                                            <div class="text-muted fs-8">Instagram • 9:16 Vertical</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 2: Contextual Multi-AI Personas (5 Columns) -->
+                <div class="col-12 col-lg-5">
+                    <div class="bento-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-brain fs-1"></i>
+                            </span>
+                            <span class="badge badge-teal-soft">Gemini, OpenAI, Qwen</span>
+                        </div>
+                        <h3 class="fw-bold text-dark mb-2">Adaptive AI Personas</h3>
+                        <p class="text-muted mb-3">
+                            Customize the response voice for each channel. AI analyzes sentiment and drafts authentic replies in your selected voice.
+                        </p>
+
+                        <!-- Tone Selector Chips Preview -->
+                        <div class="p-3 rounded-2 bg-light border mt-auto">
+                            <span class="small text-secondary fw-semibold d-block mb-2">Configurable Tones:</span>
+                            <div class="d-flex flex-wrap gap-1 mb-2.5">
+                                <span class="badge bg-white text-teal border border-teal fs-8"><i class="ti ti-check me-1"></i>Humble & Respectful</span>
+                                <span class="badge bg-white text-secondary border fs-8">Patriotic & Inspiring</span>
+                                <span class="badge bg-white text-secondary border fs-8">Assertive & Firm</span>
+                                <span class="badge bg-white text-secondary border fs-8">Formal & Official</span>
+                            </div>
+                            <span class="small text-secondary fw-semibold d-block mb-1.5">Languages Supported:</span>
+                            <div class="d-flex gap-1">
+                                <span class="badge bg-teal-lt text-teal fs-8">Hindi + Hinglish</span>
+                                <span class="badge bg-secondary-lt text-secondary fs-8">Pure Hindi</span>
+                                <span class="badge bg-secondary-lt text-secondary fs-8">English</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 3: Instant Comment-to-DM Engine (4 Columns) -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="bento-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-mail-forward fs-1"></i>
+                            </span>
+                            <span class="badge badge-outline text-primary">Private Replies API</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Automated Comment-to-DM</h4>
+                        <p class="text-muted small mb-3">
+                            Convert public interactions into private inquiries. When a user comments specific keywords on Instagram or Facebook, send an instant DM with the link, details, or registration form.
+                        </p>
+                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
+                                <span>Rule Trigger Mode</span>
+                                <span class="text-teal fw-semibold">Contains Keyword</span>
+                            </div>
+                            <div class="small fw-semibold text-dark">
+                                Keywords: <code>link</code>, <code>apply</code>, <code>scheme</code>, <code>help</code>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 4: 24/7 Anti-Troll Shield (4 Columns) -->
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="bento-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-shield-lock fs-1"></i>
+                            </span>
+                            <span class="badge badge-outline text-danger">Zero Human Delay</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">24/7 Anti-Troll & Abuse Shield</h4>
+                        <p class="text-muted small mb-3">
+                            Our AI toxicity classification scans incoming comments for abusive language, hate speech, and troll attacks, automatically hiding them from public view before they cause brand harm.
+                        </p>
+                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
+                                <span>Action Taken</span>
+                                <span class="badge bg-danger-lt text-danger fs-8">Auto-Hidden</span>
+                            </div>
+                            <div class="small text-muted text-truncate">
+                                Abusive comment hidden on Facebook & YouTube
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bento Card 5: Real-Time Political Sentiment War Room (4 Columns) -->
+                <div class="col-12 col-md-12 col-lg-4">
+                    <div class="bento-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                                <i class="ti ti-chart-dots-3 fs-1"></i>
+                            </span>
+                            <span class="badge badge-teal-soft">Sentiment War Room</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Live Sentiment Intelligence</h4>
+                        <p class="text-muted small mb-3">
+                            Know exactly what your constituents and customers think. Real-time categorization of comments into Positive, Grievances, and Complaints with interactive trend graphs.
+                        </p>
+                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                            <div class="d-flex align-items-center justify-content-between small mb-1.5">
+                                <span class="fw-semibold text-dark">Constituent Sentiment</span>
+                                <span class="text-teal fw-bold">84% Positive</span>
+                            </div>
+                            <div class="progress progress-sm">
+                                <div class="progress-bar bg-teal" style="width: 84%"></div>
+                                <div class="progress-bar bg-warning" style="width: 12%"></div>
+                                <div class="progress-bar bg-danger" style="width: 4%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </form>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- ============================================
-     FOOTER
-============================================ -->
-<footer class="footer-hw">
-  <svg class="footer-wave" viewBox="0 0 1440 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <path fill="#0B1220" d="M0,32 C240,70 480,0 720,18 C960,36 1200,70 1440,26 L1440,70 L0,70 Z"></path>
-  </svg>
-  <span class="footer-glow"></span>
-  <span class="footer-glow-2"></span>
-  <div class="container footer-top">
-    <div class="row g-4">
-      <div class="col-lg-4 col-md-6">
-        <a class="hw-logo text-white" href="#home">
-          <span class="hw-logo-mark"><i class="bi bi-heart-fill"></i></span>
-          Hope<span class="dot" style="color:var(--clr-primary);">well</span>
-        </a>
-        <p class="mt-3">A transparent, donor-first charity connecting givers directly to verified causes worldwide since 2013. Every gift is tracked from wallet to doorstep.</p>
-        <div class="footer-social mt-3">
-          <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
-          <a href="#" aria-label="Twitter / X"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
-          <a href="#" aria-label="LinkedIn"><i class="bi bi-linkedin"></i></a>
-          <a href="#" aria-label="YouTube"><i class="bi bi-youtube"></i></a>
+    <!-- ========================================================================= -->
+    <!-- STEP 3: HOW IT WORKS (3 CLEAR STEPS)                                      -->
+    <!-- ========================================================================= -->
+    <section id="how-it-works" class="py-6 bg-white border-top border-bottom">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-route me-1"></i>Simple 3-Step Setup</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Up and Running in Under 5 Minutes</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    No complex server setups or API keys required. Authenticate your accounts and let our background automation handle engagement.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Step 01 -->
+                <div class="col-12 col-md-4">
+                    <div class="process-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
+                                01
+                            </span>
+                            <span class="badge badge-outline text-teal"><i class="ti ti-shield-check me-1"></i>OAuth 2.0</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Connect Your Accounts</h4>
+                        <p class="text-muted small mb-3">
+                            Link your Facebook Page, Instagram Professional account, and YouTube channel in 1 click using official platform dialogs.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-0 mt-auto">
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Zero password storage</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>AES-256 encrypted access tokens</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Automatic 24/7 token renewal</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 02 -->
+                <div class="col-12 col-md-4">
+                    <div class="process-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
+                                02
+                            </span>
+                            <span class="badge badge-teal-soft"><i class="ti ti-adjustments me-1"></i>Custom Tone</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Configure AI Tone & Rules</h4>
+                        <p class="text-muted small mb-3">
+                            Choose your preferred AI communication voice and specify keywords for automated private direct messaging.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-0 mt-auto">
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Choose Humble, Patriotic, or Formal voice</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Set Comment-to-DM keyword triggers</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Turn on 24/7 Anti-Troll Shield</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Step 03 -->
+                <div class="col-12 col-md-4">
+                    <div class="process-card d-flex flex-column">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
+                                03
+                            </span>
+                            <span class="badge badge-outline text-success"><i class="ti ti-bolt me-1"></i>Live Automation</span>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-2">Operate on Full Autopilot</h4>
+                        <p class="text-muted small mb-3">
+                            Scheduled posts publish automatically on time. Incoming comments are answered in seconds, and private DMs convert leads 24/7.
+                        </p>
+                        <ul class="list-unstyled small text-secondary mb-0">
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Real-time Meta Webhook ingestion (&lt; 1s)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5 mb-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Every-minute publishing scheduler</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-1.5">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Live sentiment reporting on your dashboard</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================================================= -->
+            <!-- INTERACTIVE WORKFLOW PREVIEWS (TABS)                          -->
+            <!-- ============================================================= -->
+            <div class="card border mt-5 p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                <div class="text-center mb-4">
+                    <span class="badge badge-teal-soft mb-1.5"><i class="ti ti-eye me-1"></i>Interactive Simulation</span>
+                    <h3 class="fw-bold text-dark mb-1">See SocialManager in Action</h3>
+                    <p class="text-muted small">Explore how our background daemons handle real community interactions across different scenarios.</p>
+                </div>
+
+                <!-- Tabler Navigation Tabs -->
+                <ul class="nav nav-tabs nav-fill mb-4" data-bs-toggle="tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-ai-reply" class="nav-link active fw-semibold" data-bs-toggle="tab" aria-selected="true" role="tab">
+                            <i class="ti ti-messages text-teal me-1.5 fs-2"></i>
+                            <span>AI Comment Threading</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-auto-dm" class="nav-link fw-semibold" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="ti ti-mail-forward text-primary me-1.5 fs-2"></i>
+                            <span>Comment-to-DM Flow</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a href="#tab-troll-shield" class="nav-link fw-semibold" data-bs-toggle="tab" aria-selected="false" role="tab" tabindex="-1">
+                            <i class="ti ti-shield-lock text-danger me-1.5 fs-2"></i>
+                            <span>Anti-Troll Shield</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Tab Contents -->
+                <div class="tab-content">
+                    <!-- Tab 1: AI Comment Threading -->
+                    <div class="tab-pane active show" id="tab-ai-reply" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-5">
+                                <span class="badge bg-teal-lt text-teal mb-2"><i class="ti ti-brain me-1"></i>Contextual Intelligence</span>
+                                <h4 class="fw-bold text-dark mb-2">Natural Multilingual Replies Without Human Fatigue</h4>
+                                <p class="text-muted small mb-3">
+                                    When constituents or fans comment on YouTube or Facebook, the Gemini AI engine analyzes the tone, detects grievances or compliments, and drafts a tailored, human-like response in under 5 seconds.
+                                </p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-clock me-1"></i>Response Time: ~3.8s</span>
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-world me-1"></i>Hindi + Hinglish</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-7">
+                                <div class="p-3.5 rounded-2 bg-light border">
+                                    <!-- Incoming Comment -->
+                                    <div class="p-3 rounded-2 bg-white border mb-2.5">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-azure text-white">MK</span>
+                                                <span class="fw-semibold small text-dark">Manoj Kumar</span>
+                                                <span class="badge bg-danger-lt text-danger fs-8"><i class="ti ti-brand-youtube me-1"></i>YouTube</span>
+                                            </div>
+                                            <span class="text-muted fs-8">Incoming Comment</span>
+                                        </div>
+                                        <div class="small text-dark">
+                                            "Sir hamare ward me road reconstruction ka kaam kab tak start hoga? Traffic bohot badh gaya hai."
+                                        </div>
+                                    </div>
+
+                                    <!-- AI Detection Pipeline -->
+                                    <div class="d-flex align-items-center gap-2 mb-2.5 px-2">
+                                        <i class="ti ti-arrow-down text-teal"></i>
+                                        <span class="badge badge-teal-soft fs-8">Sentiment: Public Inquiry / Civic Grievance (Score: 0.94)</span>
+                                        <span class="badge badge-outline text-secondary fs-8">Tone: Humble & Respectful</span>
+                                    </div>
+
+                                    <!-- Live Published Thread Reply -->
+                                    <div class="p-3 rounded-2 bg-white border-start border-teal border-3 ms-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-teal text-white"><i class="ti ti-check"></i></span>
+                                                <span class="fw-semibold small text-dark">Official Channel Reply</span>
+                                                <span class="badge bg-teal-lt text-teal fs-8">Auto-Approved Live</span>
+                                            </div>
+                                            <span class="text-muted fs-8">Published in 3.8s</span>
+                                        </div>
+                                        <div class="small text-dark">
+                                            "Manoj ji, namaskar. Ward me road reconstruction ka tender pass ho chuka hai aur next week se physical road work shuru ho raha hai. Aapki suvidha hamari prathmikta hai."
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Comment-to-DM Lead Capture -->
+                    <div class="tab-pane" id="tab-auto-dm" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-5">
+                                <span class="badge bg-primary-lt text-primary mb-2"><i class="ti ti-mail-forward me-1"></i>Lead Generation</span>
+                                <h4 class="fw-bold text-dark mb-2">Automated Conversion from Public Comments to Private DMs</h4>
+                                <p class="text-muted small mb-3">
+                                    Set keyword rules for specific campaign posts or channel-wide. When a follower asks for a link, brochure, or support, our Meta integration sends a private message to their Instagram Direct or Messenger inbox immediately.
+                                </p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-bolt text-teal me-1"></i>Webhook Latency: &lt; 800ms</span>
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-brand-instagram text-pink me-1"></i>Instagram Direct</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-7">
+                                <div class="p-3.5 rounded-2 bg-light border">
+                                    <!-- Public Post Interaction -->
+                                    <div class="p-3 rounded-2 bg-white border mb-2.5">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-pink text-white">PK</span>
+                                                <span class="fw-semibold small text-dark">Priya Kapoor</span>
+                                                <span class="badge bg-pink-lt text-pink fs-8"><i class="ti ti-brand-instagram me-1"></i>Instagram Post</span>
+                                            </div>
+                                            <span class="badge bg-light text-secondary border fs-8">Public Comment</span>
+                                        </div>
+                                        <div class="small text-dark">
+                                            "Interested in joining the youth volunteer campaign. How do I register?"
+                                        </div>
+                                    </div>
+
+                                    <!-- Automated Rule Trigger -->
+                                    <div class="d-flex align-items-center gap-2 mb-2.5 px-2">
+                                        <i class="ti ti-arrow-down text-primary"></i>
+                                        <span class="badge badge-outline text-primary fs-8">Keyword Matched: "register"</span>
+                                        <span class="badge bg-teal-lt text-teal fs-8">Auto DM Dispatched</span>
+                                    </div>
+
+                                    <!-- Private Instagram DM Window -->
+                                    <div class="p-3 rounded-2 bg-white border border-primary border-opacity-25 ms-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="ti ti-brand-instagram text-pink fs-3"></i>
+                                                <span class="fw-semibold small text-dark">Private Instagram Direct Message</span>
+                                            </div>
+                                            <span class="badge bg-teal-lt text-teal fs-8">Delivered to Inbox</span>
+                                        </div>
+                                        <div class="small text-dark mb-1">
+                                            "Hi Priya! Thank you for your enthusiasm to join our team. Here is your direct volunteer registration form link: <code>https://campaign.portal/register</code>. We look forward to working with you!"
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Silent Anti-Troll Shield -->
+                    <div class="tab-pane" id="tab-troll-shield" role="tabpanel">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-lg-5">
+                                <span class="badge bg-danger-lt text-danger mb-2"><i class="ti ti-shield-x me-1"></i>Brand Safety</span>
+                                <h4 class="fw-bold text-dark mb-2">Zero-Latency Brand & Political Protection</h4>
+                                <p class="text-muted small mb-3">
+                                    Coordinated troll attacks and abusive comments can damage public reputation. Our toxicity filter silently auto-hides abusive comments using official platform APIs before other citizens or followers ever notice them.
+                                </p>
+                                <div class="d-flex align-items-center gap-2 small text-muted">
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-eye-off text-danger me-1"></i>Silently Hidden</span>
+                                    <span class="badge bg-light text-secondary border"><i class="ti ti-check text-teal me-1"></i>Community Safe</span>
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-7">
+                                <div class="p-3.5 rounded-2 bg-light border">
+                                    <!-- Incoming Troll Comment -->
+                                    <div class="p-3 rounded-2 bg-white border mb-2.5">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="avatar avatar-xs rounded-circle bg-secondary text-white">TR</span>
+                                                <span class="fw-semibold small text-dark">Anonymous Troll User</span>
+                                                <span class="badge bg-primary-lt text-primary fs-8"><i class="ti ti-brand-facebook me-1"></i>Facebook Page</span>
+                                            </div>
+                                            <span class="text-muted fs-8">Incoming Comment</span>
+                                        </div>
+                                        <div class="small text-muted fst-italic">
+                                            "[Abusive defamatory statement and unparliamentary language attacking campaign]"
+                                        </div>
+                                    </div>
+
+                                    <!-- AI Detection Pipeline -->
+                                    <div class="d-flex align-items-center gap-2 mb-2.5 px-2">
+                                        <i class="ti ti-shield-alert text-danger"></i>
+                                        <span class="badge bg-danger-lt text-danger fs-8">Toxicity Score: 0.98 (Severe Abuse)</span>
+                                        <span class="badge badge-teal-soft fs-8">Auto-Hide Executed</span>
+                                    </div>
+
+                                    <!-- Action Result Card -->
+                                    <div class="p-3 rounded-2 bg-white border-start border-danger border-3 ms-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                            <div class="d-flex align-items-center gap-2">
+                                                <i class="ti ti-eye-off text-danger fs-3"></i>
+                                                <span class="fw-semibold small text-dark">Hidden on Facebook & YouTube</span>
+                                            </div>
+                                            <span class="badge bg-secondary-lt text-secondary fs-8">Public Thread Clean</span>
+                                        </div>
+                                        <div class="small text-muted">
+                                            Comment marked as <code>rejected</code> on YouTube and <code>is_hidden = true</code> on Meta Graph API. The troll is unaware their comment has been hidden, completely defusing engagement bait.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="footer-badges">
-          <span class="footer-badge"><i class="bi bi-patch-check-fill"></i> Registered 501(c)(3)</span>
-          <span class="footer-badge"><i class="bi bi-shield-lock-fill"></i> SSL Secured</span>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 4: TRANSPARENT PRICING PLANS                                         -->
+    <!-- ========================================================================= -->
+    <section id="pricing" class="py-6" style="background-color: #fafbfc;">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-tag me-1"></i>Predictable Pricing</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Simple Plans for Every Stage of Growth</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    From independent creators to full-scale political campaign war rooms. All plans include 24/7 background automation and official API compliance.
+                </p>
+            </div>
+
+            <div class="row g-4 align-items-stretch justify-content-center">
+                <!-- Starter Plan -->
+                <div class="col-12 col-lg-4">
+                    <div class="pricing-card d-flex flex-column">
+                        <div class="mb-3">
+                            <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Starter Creator</span>
+                            <h3 class="fw-bold text-dark mb-1">Single Channel</h3>
+                            <p class="text-muted small">Ideal for solo creators and local constituency representatives.</p>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
+                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
+                            <span class="display-5 fw-extrabold text-dark">2,499</span>
+                            <span class="text-muted small">/ month</span>
+                        </div>
+
+                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>1 Social Channel</strong> (Facebook, IG, or YouTube)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Multi-Platform Content Scheduler</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Up to <strong>500 AI Comment Replies</strong> / mo</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Basic Anti-Troll Auto-Hide Shield</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>AES-256 Token Encryption at Rest</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 text-muted">
+                                <i class="ti ti-x text-secondary"></i>
+                                <span>Comment-to-DM Private Messaging</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold">
+                                Get Started
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Campaign Plan (Featured with Teal Glow) -->
+                <div class="col-12 col-lg-4">
+                    <div class="pricing-card pricing-card-featured d-flex flex-column position-relative">
+                        <!-- Most Popular Tag -->
+                        <div class="position-absolute top-0 end-0 translate-middle-y me-3">
+                            <span class="badge bg-teal text-white py-1 px-2.5 fs-8">
+                                <i class="ti ti-star me-1"></i>Most Popular
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge badge-teal-soft fw-semibold mb-2">Professional</span>
+                            <h3 class="fw-bold text-dark mb-1">Campaign War Room</h3>
+                            <p class="text-muted small">Built for growing public figures, election war rooms, and brands.</p>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
+                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
+                            <span class="display-5 fw-extrabold text-teal">6,999</span>
+                            <span class="text-muted small">/ month</span>
+                        </div>
+
+                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Up to 5 Social Accounts</strong> (FB, IG &amp; YouTube)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Unlimited Scheduled Posts</strong>, Reels &amp; Shorts</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Unlimited AI Comment Replies</strong> (Gemini AI)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Comment-to-DM Engine</strong> (Messenger &amp; IG Direct)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Adaptive Tone Selector (Humble, Patriotic, Firm)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Real-Time Sentiment Intelligence &amp; Analytics</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Priority Background Queue Processing</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <a href="{{ route('login') }}" class="btn btn-teal w-100 py-2.5 shadow-sm fw-semibold">
+                                <i class="ti ti-bolt me-1"></i>Start 14-Day Free Trial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="col-12 col-lg-4">
+                    <div class="pricing-card d-flex flex-column">
+                        <div class="mb-3">
+                            <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Enterprise</span>
+                            <h3 class="fw-bold text-dark mb-1">State / National Network</h3>
+                            <p class="text-muted small">For major political organizations, agencies, and enterprise brands.</p>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
+                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
+                            <span class="display-5 fw-extrabold text-dark">19,999</span>
+                            <span class="text-muted small">/ month</span>
+                        </div>
+
+                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Unlimited Channels &amp; Team Seats</strong></span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Multi-Tenant Role Access (Admin / Manager / User)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Custom Fine-Tuned AI Persona &amp; Knowledge Base</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Dedicated Cloud VM &amp; High-Throughput Queue</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Custom Webhook Ingestion &amp; HMAC Verification</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>24/7 Dedicated Account Manager &amp; Phone SLA</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <a href="mailto:support@rezel.online?subject=Enterprise%20War%20Room%20Inquiry" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold">
+                                Contact Enterprise Team
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
+    </section>
 
-      <div class="col-6 col-md-3 col-lg-2">
-        <h6>Quick Links</h6>
-        <ul>
-          <li><a class="footer-link" href="#about"><i class="bi bi-caret-right-fill"></i>About Us</a></li>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Causes</a></li>
-          <li><a class="footer-link" href="#why"><i class="bi bi-caret-right-fill"></i>Why Hopewell</a></li>
-          <li><a class="footer-link" href="#volunteers"><i class="bi bi-caret-right-fill"></i>Volunteers</a></li>
-          <li><a class="footer-link" href="#testimonials"><i class="bi bi-caret-right-fill"></i>Testimonials</a></li>
-          <li><a class="footer-link" href="#contact"><i class="bi bi-caret-right-fill"></i>Contact</a></li>
-        </ul>
-      </div>
+    <!-- ========================================================================= -->
+    <!-- STEP 4: ENTERPRISE SECURITY & RELIABILITY GUARANTEE                       -->
+    <!-- ========================================================================= -->
+    <section id="security" class="py-6 bg-white border-top border-bottom">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-shield-check me-1"></i>Security Architecture</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Enterprise-Grade Security by Design</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    Because managing influential public profiles requires uncompromising safety, our infrastructure adheres to strict cryptographic standards.
+                </p>
+            </div>
 
-      <div class="col-6 col-md-3 col-lg-2">
-        <h6>Causes</h6>
-        <ul>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Nutrition</a></li>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Clean Water</a></li>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Education</a></li>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Healthcare</a></li>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Emergency Relief</a></li>
-          <li><a class="footer-link" href="#causes"><i class="bi bi-caret-right-fill"></i>Elder Care</a></li>
-        </ul>
-      </div>
+            <div class="row g-4">
+                <!-- Security Pillar 1 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="security-card d-flex flex-column">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-key fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">AES-256 Token Encryption</h4>
+                        <p class="text-muted small mb-0">
+                            All OAuth access tokens and refresh tokens are encrypted at rest using AES-256-CBC cipher with HMAC authentication. Plaintext tokens are never stored.
+                        </p>
+                    </div>
+                </div>
 
-      <div class="col-md-6 col-lg-4">
-        <h6>Get In Touch</h6>
-        <div class="footer-contact-item">
-          <span class="ic"><i class="bi bi-geo-alt-fill"></i></span>
-          <span>221 Riverside Lane, Austin, TX 78701</span>
+                <!-- Security Pillar 2 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="security-card d-flex flex-column">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-certificate fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">HMAC SHA-256 Webhook Check</h4>
+                        <p class="text-muted small mb-0">
+                            Every incoming Meta webhook is verified against Meta's cryptographic signature header (<code>X-Hub-Signature-256</code>), blocking 100% of unauthorized or forged requests.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Security Pillar 3 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="security-card d-flex flex-column">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-fingerprint fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">Zero Password Storage</h4>
+                        <p class="text-muted small mb-0">
+                            Authentication occurs strictly via official Meta Facebook Login and Google OAuth 2.0 prompts. Your social account passwords are never accessed or stored.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Security Pillar 4 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="security-card d-flex flex-column">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-server-2 fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">Azure Cloud Infrastructure</h4>
+                        <p class="text-muted small mb-0">
+                            Hosted on Microsoft Azure Virtual Machines with Docker containerization, Redis in-memory queue management, and 99.9% automated uptime monitoring.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="footer-contact-item">
-          <span class="ic"><i class="bi bi-envelope-fill"></i></span>
-          <span>hello@hopewell.org</span>
-        </div>
-        <div class="footer-contact-item">
-          <span class="ic"><i class="bi bi-telephone-fill"></i></span>
-          <span>+1 (555) 204-8890</span>
-        </div>
-        <h6 class="mt-4">Newsletter</h6>
-        <div class="newsletter-input">
-          <input type="email" placeholder="Your email address" aria-label="Email for newsletter">
-          <button type="button" aria-label="Subscribe"><i class="bi bi-arrow-right"></i></button>
-        </div>
-        <div class="newsletter-note"><i class="bi bi-shield-check"></i> No spam. Unsubscribe anytime.</div>
-      </div>
-    </div>
+    </section>
 
-    <div class="footer-divider"></div>
-    <div class="footer-bottom d-flex flex-wrap justify-content-between align-items-center gap-3">
-      <div>
-        <div>&copy; 2026 Hopewell Foundation. All rights reserved by <a href="https://www.templatemonster.com/authors/k29solutions/" target="_blank" rel="noopener noreferrer">K29Solutions</a></div>
-        <div class="footer-bottom-links mt-2">
-          <a href="privacy-policy.html">Privacy Policy</a>
-          <a href="terms-of-service.html">Terms of Service</a>
-          <a href="financial-reports.html">Financial Reports</a>
-          <a href="faq.html">FAQs</a>
+    <!-- ========================================================================= -->
+    <!-- STEP 5: FREQUENTLY ASKED QUESTIONS (ACCORDION)                            -->
+    <!-- ========================================================================= -->
+    <section id="faq" class="py-6 border-bottom bg-white">
+        <div class="container-xl">
+            <!-- Section Header -->
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft px-3 py-1.5 rounded-pill mb-2">
+                    <i class="ti ti-help-circle me-1"></i>Frequently Asked Questions
+                </span>
+                <h2 class="display-6 fw-bold text-dark mb-2">
+                    Everything You Need to Know
+                </h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">
+                    Direct technical clarity regarding Meta & Google API safety, rate limits, comment triggers, and data encryption.
+                </p>
+            </div>
+
+            <!-- Accordion Wrapper -->
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-9">
+                    <div class="accordion accordion-custom" id="faqAccordion">
+                        
+                        <!-- FAQ 1 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-shield-check text-teal fs-2"></i>
+                                        Can my Facebook, Instagram, or YouTube account get banned or restricted?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    No. Unlike unofficial scraping bots or browser automation scripts that risk account bans, SocialManager interacts exclusively through officially certified Meta Graph API (v22.0) and Google Cloud YouTube Data API (v3) protocols. Every comment response and scheduled post adheres strictly to platform rate-limiting and messaging policies. Your accounts remain 100% compliant and secure within enterprise developer boundaries.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-message-share text-teal fs-2"></i>
+                                        How does the Comment-to-DM lead capture trigger work on Instagram and Facebook?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    When a follower leaves a comment on your posts or reels, Meta's Realtime Webhooks immediately push the payload to our secure server in under 300 milliseconds. SocialManager evaluates the comment against your configured trigger keywords (such as PRICE, LINK, or DEMO) or natural language intent. The engine instantly posts a polite public reply confirming receipt while simultaneously dispatching a personalized private Direct Message (DM) to their inbox containing the relevant link, brochure, or checkout page.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-brand-youtube text-teal fs-2"></i>
+                                        How does YouTube comment automation work without exceeding Google API quotas?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    YouTube's Data API provides a default allocation of 10,000 units per day per Google Cloud project. Since YouTube comments operate on an optimized 10-minute cron check rather than streaming webhooks, polling your channel consumes only 1 unit per cycle (144 units per 24 hours). Posting an AI reply uses 50 units. The built-in rate-limiter and duplicate reply detector ensure your project never approaches or exceeds Google's quota limits.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-user-check text-teal fs-2"></i>
+                                        Can I customize the AI's personality, tone, and brand safety guidelines?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes. SocialManager features a dedicated AI Personas manager where you define exact brand voice guidelines, industry vocabulary, predefined knowledge base answers, and negative-sentiment escalation rules. You can also specify banned keywords and competitor filters so the AI never generates off-brand or risky statements.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 5 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-lock text-teal fs-2"></i>
+                                        How are social tokens and sensitive client credentials protected?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    All platform OAuth tokens are encrypted at rest using AES-256-CBC cipher with application-level key derivation via Laravel's native Crypt layer. Decrypted tokens are strictly excluded from JSON serializations, front-end payloads, and log files. Webhooks are validated using HMAC SHA-256 signatures, and we never access, request, or store your personal social media passwords.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 6 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading6">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-toggle-right text-teal fs-2"></i>
+                                        Can I review AI-generated responses before they get published?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse6" class="accordion-collapse collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes. SocialManager offers two operational modes. You can set it to Full Autopilot for immediate, hands-free 24/7 engagement, or switch to Review Queue mode where AI drafts replies and stages them for one-click human approval by your social media team.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="text-md-end">
-        <div class="footer-payments justify-content-md-end mb-2">
-          <i class="bi bi-credit-card-2-front" title="Cards accepted"></i>
-          <i class="bi bi-paypal" title="PayPal accepted"></i>
-          <i class="bi bi-google" title="Google Pay accepted"></i>
-          <i class="bi bi-apple" title="Apple Pay accepted"></i>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 5: HIGH-CONVERSION PRE-FOOTER CTA CARD                               -->
+    <!-- ========================================================================= -->
+    <section class="py-6 bg-light">
+        <div class="container-xl">
+            <div class="cta-banner-card p-4 p-md-5 text-white">
+                <div class="row align-items-center gy-4">
+                    <div class="col-12 col-lg-8">
+                        <span class="badge badge-teal-soft text-teal bg-teal-lt px-3 py-1.5 rounded-pill mb-3">
+                            <i class="ti ti-rocket me-1.5"></i>Supercharge Your Social Operations
+                        </span>
+                        <h2 class="display-6 fw-bold mb-3 text-white">
+                            Ready to Turn Comments into Conversations and Conversions?
+                        </h2>
+                        <p class="text-white-50 fs-5 mb-4" style="max-width: 650px;">
+                            Eliminate manual comment tracking, respond to customers in under 5 seconds, and drive qualified leads straight into your direct messages across Facebook, Instagram, and YouTube.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="{{ route('login') }}" class="btn btn-teal btn-lg px-4 py-2.5 fw-semibold shadow-sm">
+                                <i class="ti ti-bolt me-1.5"></i>Start 14-Day Free Trial
+                            </a>
+                            <a href="#platforms" class="btn btn-outline-light btn-lg px-4 py-2.5">
+                                <i class="ti ti-device-desktop me-1.5"></i>Explore Platform Integrations
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 p-3.5 rounded-3">
+                            <div class="d-flex flex-column gap-2.5">
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>14-day full-featured free trial</span>
+                                </div>
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>No credit card required to start</span>
+                                </div>
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>AES-256 token encryption at rest</span>
+                                </div>
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>Official Meta & Google APIs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div>Made with <i class="bi bi-heart-fill text-primary-hw"></i> for a better world &bull; Distributed by <a href="https://www.themewagon.com" target="_blank" rel="noopener noreferrer">ThemeWagon</a></div>
-      </div>
-    </div>
-  </div>
-</footer>
+    </section>
 
-<!-- ============================================
-     MOBILE STICKY DONATE BAR
-============================================ -->
-<div class="mobile-donate-bar">
-  <a href="#causes" class="btn-hw-primary">Donate Now <i class="bi bi-heart-fill"></i></a>
-</div>
+    <!-- ========================================================================= -->
+    <!-- STEP 5: MODERN 4-COLUMN FOOTER WITH COMPLIANCE & LEGAL LINKS              -->
+    <!-- ========================================================================= -->
+    <footer class="landing-footer pt-6 pb-4">
+        <div class="container-xl">
+            <div class="row g-4 mb-5">
+                <!-- Col 1: Brand Info -->
+                <div class="col-12 col-lg-4">
+                    <a href="{{ url('/') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none mb-3">
+                        <span class="avatar avatar-sm rounded-2 bg-teal-lt text-teal">
+                            <i class="ti ti-brand-campaignmonitor fs-2"></i>
+                        </span>
+                        <span class="fw-bold fs-3 text-white">Social<span class="text-teal">Manager</span></span>
+                        <span class="badge badge-teal-soft ms-1">v2.4</span>
+                    </a>
+                    <p class="text-muted small mb-3 pe-lg-4">
+                        Enterprise-grade social media publishing, AI comment auto-reply, and automated direct messaging built for creators, businesses, and digital agencies.
+                    </p>
+                    <div class="d-inline-flex align-items-center gap-2 px-2.5 py-1.5 rounded-2 bg-dark border border-secondary border-opacity-25 small">
+                        <span class="status-indicator-live"></span>
+                        <span class="text-white-50">Systems Status: <strong class="text-teal">All APIs Operational</strong></span>
+                    </div>
+                </div>
 
-<!-- ============================================
-     SCROLL TO TOP
-============================================ -->
-<div id="scrollTop" role="button" aria-label="Scroll to top" tabindex="0">
-  <svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="23"></circle><circle class="progress" cx="26" cy="26" r="23"></circle></svg>
-  <i class="bi bi-arrow-up"></i>
-</div>
+                <!-- Col 2: Platform Capabilities -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h5 class="footer-heading">Capabilities</h5>
+                    <ul class="footer-link-list">
+                        <li><a href="#features"><i class="ti ti-calendar-event text-teal"></i>Content Scheduler</a></li>
+                        <li><a href="#features"><i class="ti ti-robot text-teal"></i>AI Auto-Responder</a></li>
+                        <li><a href="#features"><i class="ti ti-message-share text-teal"></i>Comment-to-DM Engine</a></li>
+                        <li><a href="#features"><i class="ti ti-shield-half text-teal"></i>Anti-Troll Shield</a></li>
+                        <li><a href="#features"><i class="ti ti-chart-dots text-teal"></i>Sentiment Analytics</a></li>
+                        <li><a href="#security"><i class="ti ti-lock text-teal"></i>Encrypted Token Vault</a></li>
+                    </ul>
+                </div>
 
-<!-- ============================================
-     WATCH STORY MODAL (demo)
-============================================ -->
-<div class="modal fade" id="storyModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content" style="border-radius:20px;border:none;">
-      <div class="modal-header border-0">
-        <h5 class="modal-title font-display fw-bold">Our Story</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body pb-4">
-        <div class="ratio ratio-16x9 rounded-4 overflow-hidden">
-          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=900&h=500&fit=crop&auto=format" alt="Hopewell story preview" style="object-fit:cover;">
+                <!-- Col 3: Supported Ecosystem -->
+                <div class="col-6 col-md-3 col-lg-3">
+                    <h5 class="footer-heading">Supported Ecosystem</h5>
+                    <ul class="footer-link-list">
+                        <li><a href="#platforms"><i class="ti ti-brand-facebook text-teal"></i>Facebook Pages API</a></li>
+                        <li><a href="#platforms"><i class="ti ti-brand-instagram text-teal"></i>Instagram Professional API</a></li>
+                        <li><a href="#platforms"><i class="ti ti-brand-youtube text-teal"></i>YouTube Data API v3</a></li>
+                        <li><a href="#platforms"><i class="ti ti-brand-google text-teal"></i>Google Cloud OAuth 2.0</a></li>
+                        <li><a href="#security"><i class="ti ti-brand-azure text-teal"></i>Microsoft Azure Cloud</a></li>
+                        <li><a href="#security"><i class="ti ti-webhook text-teal"></i>HMAC SHA-256 Webhooks</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Trust & Compliance -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="footer-heading">Trust & Compliance</h5>
+                    <ul class="footer-link-list">
+                        <li><a href="{{ url('/privacy') }}"><i class="ti ti-file-shield text-teal"></i>Privacy Policy</a></li>
+                        <li><a href="{{ url('/terms') }}"><i class="ti ti-file-text text-teal"></i>Terms of Service</a></li>
+                        <li><a href="{{ url('/data-deletion') }}"><i class="ti ti-trash text-teal"></i>Data Deletion Policy</a></li>
+                        <li><a href="#security"><i class="ti ti-shield-lock text-teal"></i>Security Architecture</a></li>
+                        <li><a href="{{ route('login') }}"><i class="ti ti-login text-teal"></i>Client Portal Login</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="border-secondary border-opacity-25 my-4">
+
+            <!-- Bottom Row: Copyright & Disclaimer -->
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-muted small">
+                <span>&copy; {{ date('Y') }} <strong>SocialManager</strong>. Enterprise Social Media Infrastructure. All rights reserved.</span>
+                <a href="#" class="text-white-50 text-decoration-none">
+                    <i class="ti ti-arrow-up me-1"></i>Back to Top
+                </a>
+            </div>
+
+            <div class="mt-3 text-muted" style="font-size: 0.76rem; color: #64748b !important;">
+                Disclaimer: SocialManager is an independent SaaS automation platform. Meta, Facebook, and Instagram are registered trademarks of Meta Platforms, Inc. YouTube and Google are registered trademarks of Google LLC. SocialManager integrates exclusively through officially sanctioned, authenticated public API endpoints.
+            </div>
         </div>
-        <p class="text-muted mt-3 mb-0">Video placeholder &mdash; connect your hosted story video here.</p>
-      </div>
-    </div>
-  </div>
-</div>
+    </footer>
 
-<!-- Bootstrap Bundle -->
-<script src="{{ asset('hopewell/assets/bootstrap.bundle.min.js') }}"></script>
-<!-- AOS -->
-<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-<script src="{{ asset('hopewell/assets/script.js') }}"></script>
-
+    <!-- Tabler Core JS (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
 </body>
 </html>
