@@ -43,5 +43,14 @@ interface AIServiceInterface
      * ]
      */
     public function analyzeAndDraftReply(string $commentText, array $context = []): ?array;
+
+    /**
+     * Generate an SEO-friendly social/video description based on a title and target platform.
+     *
+     * @param string $title
+     * @param array $options ['platform' => 'youtube', 'tone' => ?string, 'language' => ?string]
+     * @return string|null
+     */
+    public function generateVideoDescription(string $title, array $options = []): ?string;
 }
 

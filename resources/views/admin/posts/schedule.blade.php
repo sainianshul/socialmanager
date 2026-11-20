@@ -676,9 +676,18 @@
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-1">
                                     <label class="form-label m-0">Video Description</label>
-                                    <span class="text-secondary small" id="yt-desc-counter">0 / 5000</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button type="button" class="btn btn-xs btn-outline-teal d-inline-flex align-items-center gap-1 py-0.5 px-2.5 rounded-2" id="btn-generate-ai-desc-schedule" title="Generate SEO-optimized YouTube description from Title using AI">
+                                            <i class="ti ti-sparkles text-teal"></i>
+                                            <span id="btn-ai-desc-text-schedule">Generate Description From AI</span>
+                                        </button>
+                                        <span class="text-secondary small" id="yt-desc-counter">0 / 5000</span>
+                                    </div>
                                 </div>
                                 <textarea name="description" id="youtube-description" class="form-control" rows="4" placeholder="Provide an overview of your video, chapters, links, and relevant contact info..."></textarea>
+                                <small class="form-hint mt-1">
+                                    <i class="ti ti-bulb me-1 text-teal"></i>Tip: Enter a Video Title above and click <strong>Generate Description From AI</strong> for an SEO-friendly summary and hashtags.
+                                </small>
                             </div>
 
                             <div class="row">
@@ -1188,6 +1197,50 @@
         $('#youtube-description').on('input', function () {
             let len = $(this).val().length;
             $('#yt-desc-counter').text(len + ' / 5000');
+        });
+
+        // AI Description Generator for YouTube Scheduler Modal
+        $('#btn-generate-ai-desc-schedule').on('click', function () {
+            let title = $.trim($('#youtube-title').val());
+            if (!title) {
+                alert('Please enter a Video Title first so AI can read it and generate an SEO-friendly description.');
+                $('#youtube-title').focus();
+                return;
+            }
+
+            let $btn = $(this);
+            let $btnText = $('#btn-ai-desc-text-schedule');
+            let origText = $btnText.text();
+
+            $btn.prop('disabled', true);
+            $btnText.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating...');
+
+            $.ajax({
+                url: "{{ route('admin.posts.generate-ai-description') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    title: title
+                },
+                success: function (res) {
+                    if (res.success && res.description) {
+                        $('#youtube-description').val(res.description).trigger('input');
+                    } else {
+                        alert(res.message || 'Could not generate description. Please try again.');
+                    }
+                },
+                error: function (xhr) {
+                    let msg = 'Failed to generate AI description. Please try again.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        msg = xhr.responseJSON.message;
+                    }
+                    alert(msg);
+                },
+                complete: function () {
+                    $btn.prop('disabled', false);
+                    $btnText.text(origText);
+                }
+            });
         });
 
         // 5. Radio Mode (Schedule vs Publish Now vs Draft) Toggle

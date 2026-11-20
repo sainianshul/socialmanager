@@ -189,6 +189,97 @@ EOT;
     }
 
     /**
+     * Generate SEO-friendly video description from title
+     */
+    public function generateVideoDescription(string $title, array $options = []): ?string
+    {
+        if (!$this->isConfigured() || empty(trim($title))) {
+            return null;
+        }
+
+        $platform = strtolower($options['platform'] ?? 'youtube');
+        $cleanTitle = PromptSecurityGuard::sanitizeInput($title);
+
+        $prompt = <<<EOT
+You are an expert YouTube SEO and Video Content Optimization Specialist.
+Generate an engaging, high-retention, SEO-optimized YouTube video description based on the provided video title.
+
+VIDEO TITLE:
+"{$cleanTitle}"
+
+INSTRUCTIONS:
+1. Compelling Overview: Write a 2-3 sentence engaging summary hooking viewers and incorporating high-intent search keywords naturally.
+2. In This Video / Highlights: Provide 3-4 bullet points highlighting the main takeaways.
+3. Call to Action: Friendly reminder to Like, Comment, and Subscribe for future updates.
+4. Inquiry / Connect: A brief note to check the links or comment below with thoughts or questions.
+5. SEO Hashtags: Include 4-6 relevant, high-search-volume hashtags at the very bottom (e.g. #topic #updates #guide).
+6. Tone: Professional, enthusiastic, clear, and audience-friendly. Match the language tone of the title (Hindi / Hinglish / English).
+7. Output: Output ONLY the plain description text ready to be pasted into YouTube. Do NOT include markdown code blocks or meta commentary.
+EOT;
+
+        try {
+            $response = $this->callGeminiText($this->endpoint, $prompt);
+
+            if (!$response->successful() && $this->model !== 'gemini-flash-lite-latest') {
+                $fallbackEndpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-lite-latest:generateContent";
+                $response = $this->callGeminiText($fallbackEndpoint, $prompt);
+            }
+
+            if (!$response->successful()) {
+                Log::warning('Gemini generateVideoDescription failed with status ' . $response->status());
+                return null;
+            }
+
+            $responseData = $response->json();
+            $candidates = $responseData['candidates'] ?? [];
+            if (empty($candidates)) {
+                return null;
+            }
+
+            $rawText = $candidates[0]['content']['parts'][0]['text'] ?? '';
+            $rawText = trim($rawText);
+
+            // Strip any accidental markdown formatting
+            if (str_starts_with($rawText, '```')) {
+                $rawText = preg_replace('/^```[a-zA-Z]*\n?/', '', $rawText);
+                $rawText = preg_replace('/\n?```$/', '', $rawText);
+            }
+
+            return trim($rawText);
+        } catch (\Throwable $e) {
+            Log::warning('Gemini generateVideoDescription exception: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Dispatch HTTP POST request to Google Gemini API for plain text output
+     */
+    protected function callGeminiText(string $endpoint, string $prompt)
+    {
+        return Http::timeout(20)
+            ->withHeaders([
+                'X-goog-api-key' => $this->apiKey,
+                'Content-Type'   => 'application/json',
+            ])
+            ->post("{$endpoint}?key={$this->apiKey}", [
+                'contents' => [
+                    [
+                        'parts' => [
+                            ['text' => $prompt]
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'temperature' => 0.7,
+                    'topK' => 40,
+                    'topP' => 0.95,
+                    'maxOutputTokens' => 800,
+                ]
+            ]);
+    }
+
+    /**
      * Dispatch HTTP POST request to Google Gemini API
      */
     protected function callGemini(string $endpoint, string $prompt)

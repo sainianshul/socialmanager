@@ -184,4 +184,66 @@ EOT;
             return null;
         }
     }
+
+    /**
+     * Generate SEO-friendly video description from title
+     */
+    public function generateVideoDescription(string $title, array $options = []): ?string
+    {
+        if (!$this->isConfigured() || empty(trim($title))) {
+            return null;
+        }
+
+        $platform = strtolower($options['platform'] ?? 'youtube');
+        $cleanTitle = PromptSecurityGuard::sanitizeInput($title);
+
+        $systemPrompt = <<<EOT
+You are an expert YouTube SEO and Video Content Optimization Specialist.
+Generate an engaging, high-retention, SEO-optimized YouTube video description based on the provided video title.
+
+INSTRUCTIONS:
+1. Compelling Overview: Write a 2-3 sentence engaging summary hooking viewers and incorporating high-intent keywords naturally.
+2. In This Video / Highlights: Provide 3-4 bullet points highlighting the main takeaways.
+3. Call to Action: Friendly reminder to Like, Comment, and Subscribe for future updates.
+4. Inquiry / Connect: A brief note to check the links or comment below with thoughts or questions.
+5. SEO Hashtags: Include 4-6 relevant, high-search-volume hashtags at the very bottom (e.g. #topic #updates #guide).
+6. Tone: Professional, enthusiastic, clear, and audience-friendly. Match the language tone of the title (Hindi / Hinglish / English).
+7. Output: Output ONLY the plain description text ready to be pasted into YouTube. Do NOT include markdown code blocks or meta commentary.
+EOT;
+
+        try {
+            $endpoint = rtrim($this->baseUrl, '/') . '/chat/completions';
+
+            $response = Http::timeout(20)
+                ->withToken($this->apiKey)
+                ->post($endpoint, [
+                    'model' => $this->model,
+                    'messages' => [
+                        ['role' => 'system', 'content' => $systemPrompt],
+                        ['role' => 'user', 'content' => "Generate YouTube video description for title: \"{$cleanTitle}\""],
+                    ],
+                    'temperature' => 0.7,
+                ]);
+
+            if (!$response->successful()) {
+                Log::warning("{$this->providerName} generateVideoDescription failed with status " . $response->status());
+                return null;
+            }
+
+            $responseData = $response->json();
+            $content = $responseData['choices'][0]['message']['content'] ?? '';
+            $content = trim($content);
+
+            // Strip any accidental markdown formatting
+            if (str_starts_with($content, '```')) {
+                $content = preg_replace('/^```[a-zA-Z]*\n?/', '', $content);
+                $content = preg_replace('/\n?```$/', '', $content);
+            }
+
+            return trim($content);
+        } catch (\Throwable $e) {
+            Log::warning("{$this->providerName} generateVideoDescription exception: " . $e->getMessage());
+            return null;
+        }
+    }
 }

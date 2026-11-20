@@ -843,4 +843,74 @@ class SchedulePostController extends Controller
             abort(403, 'Unauthorized access to this scheduled post.');
         }
     }
+
+    /**
+     * Generate SEO-friendly YouTube video description using AI from entered Title.
+     */
+    public function generateAiDescription(Request $request)
+    {
+        $request->validate([
+            'title' => 'required|string|min:3|max:100',
+        ]);
+
+        $title = trim($request->input('title'));
+
+        try {
+            $aiService = app(\App\Contracts\AIServiceInterface::class);
+            $description = null;
+
+            if ($aiService->isConfigured()) {
+                $description = $aiService->generateVideoDescription($title, [
+                    'platform' => 'youtube',
+                ]);
+            }
+
+            if (empty($description)) {
+                $description = $this->generateFallbackDescription($title);
+            }
+
+            return response()->json([
+                'success'         => true,
+                'description'     => $description,
+                'character_count' => mb_strlen($description),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('AI Description Generation error: ' . $e->getMessage());
+
+            $fallback = $this->generateFallbackDescription($title);
+            return response()->json([
+                'success'         => true,
+                'description'     => $fallback,
+                'character_count' => mb_strlen($fallback),
+            ]);
+        }
+    }
+
+    /**
+     * Rule-based smart SEO fallback description when external AI is offline or unconfigured.
+     */
+    protected function generateFallbackDescription(string $title): string
+    {
+        $cleanTitle = trim($title);
+        $words = array_filter(explode(' ', preg_replace('/[^a-zA-Z0-9\s]/', '', $cleanTitle)));
+        $hashtags = [];
+        foreach (array_slice($words, 0, 4) as $w) {
+            if (strlen($w) > 2) {
+                $hashtags[] = '#' . ucfirst(strtolower($w));
+            }
+        }
+        $hashtags[] = '#YouTube';
+        $hashtags[] = '#Updates';
+        $tagStr = implode(' ', array_unique($hashtags));
+
+        return "Welcome to this official video on: {$cleanTitle}\n\n"
+            . "In this video, we provide an in-depth breakdown and comprehensive updates regarding {$cleanTitle}. Watch till the end for complete insights, important announcements, and key details.\n\n"
+            . "What You Will Learn:\n"
+            . "- Complete overview and critical highlights\n"
+            . "- In-depth explanation of {$cleanTitle}\n"
+            . "- Actionable guidance and official updates\n\n"
+            . "If you found this video helpful, please LIKE, SHARE, and SUBSCRIBE for more timely updates!\n"
+            . "Drop your questions and valuable feedback in the comments section below.\n\n"
+            . "{$tagStr}";
+    }
 }

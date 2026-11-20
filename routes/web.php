@@ -55,6 +55,7 @@ Route::prefix('admin')->group(function () {
                 Route::match(['put', 'post'], 'schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'update'])->name('schedule.update');
                 Route::post('schedule/{scheduledPost}/publish-now', [\App\Http\Controllers\Admin\SchedulePostController::class, 'publishNow'])->name('schedule.publish-now');
                 Route::delete('schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'destroy'])->name('schedule.destroy');
+                Route::post('generate-ai-description', [\App\Http\Controllers\Admin\SchedulePostController::class, 'generateAiDescription'])->name('generate-ai-description');
             });
 
             // Auto DM (Comment-to-Inbox Automation)

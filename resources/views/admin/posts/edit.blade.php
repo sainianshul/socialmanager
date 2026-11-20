@@ -134,9 +134,18 @@
                     <div class="mb-4">
                         <div class="d-flex justify-content-between align-items-center mb-1">
                             <label class="form-label fw-bold text-dark m-0">Description</label>
-                            <span class="text-secondary small" id="yt-desc-counter">{{ strlen(old('description', $scheduledPost->description ?: $scheduledPost->content)) }} / 5000</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-xs btn-outline-teal d-inline-flex align-items-center gap-1 py-0.5 px-2.5 rounded-2" id="btn-generate-ai-desc-edit" title="Generate SEO-optimized YouTube description from Title using AI">
+                                    <i class="ti ti-sparkles text-teal"></i>
+                                    <span id="btn-ai-desc-text-edit">Generate Description From AI</span>
+                                </button>
+                                <span class="text-secondary small" id="yt-desc-counter">{{ strlen(old('description', $scheduledPost->description ?: $scheduledPost->content)) }} / 5000</span>
+                            </div>
                         </div>
                         <textarea name="description" id="youtube-description" class="form-control" rows="5" placeholder="Video description (optional)">{{ old('description', $scheduledPost->description ?: $scheduledPost->content) }}</textarea>
+                        <small class="form-hint mt-1">
+                            <i class="ti ti-bulb me-1 text-teal"></i>Tip: Enter a Video Title above and click <strong>Generate Description From AI</strong> for an SEO-friendly summary and hashtags.
+                        </small>
                     </div>
 
                     {{-- Video File (Current preview + Replacement option) --}}
@@ -447,6 +456,50 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $('#youtube-description').on('input', function () {
         $('#yt-desc-counter').text($(this).val().length + ' / 5000');
+    });
+
+    // AI Description Generator for Edit Post Form
+    $('#btn-generate-ai-desc-edit').on('click', function () {
+        let title = $.trim($('#youtube-title').val());
+        if (!title) {
+            alert('Please enter a Video Title first so AI can read it and generate an SEO-friendly description.');
+            $('#youtube-title').focus();
+            return;
+        }
+
+        let $btn = $(this);
+        let $btnText = $('#btn-ai-desc-text-edit');
+        let origText = $btnText.text();
+
+        $btn.prop('disabled', true);
+        $btnText.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating...');
+
+        $.ajax({
+            url: "{{ route('admin.posts.generate-ai-description') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                title: title
+            },
+            success: function (res) {
+                if (res.success && res.description) {
+                    $('#youtube-description').val(res.description).trigger('input');
+                } else {
+                    alert(res.message || 'Could not generate description. Please try again.');
+                }
+            },
+            error: function (xhr) {
+                let msg = 'Failed to generate AI description. Please try again.';
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    msg = xhr.responseJSON.message;
+                }
+                alert(msg);
+            },
+            complete: function () {
+                $btn.prop('disabled', false);
+                $btnText.text(origText);
+            }
+        });
     });
 
     $('input[name="publish_mode"]:checked').trigger('change');
