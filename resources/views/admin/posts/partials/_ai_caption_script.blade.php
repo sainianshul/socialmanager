@@ -96,7 +96,7 @@
             },
             complete: function () {
                 $btn.prop('disabled', false);
-                $btnText.html('Generate Captions with AI');
+                $btnText.html('Generate Caption');
             }
         });
     });
@@ -130,7 +130,7 @@
 
         currentVariations.forEach(function (v, idx) {
             let activeClass = idx === activeVariationIndex ? 'active btn-primary text-white' : 'btn-outline-primary';
-            let btnHtml = '<button type="button" class="btn btn-sm ' + activeClass + ' flex-shrink-0 ai-var-btn" data-index="' + idx + '">' + (v.title || ('Option ' + (idx + 1))) + '</button>';
+            let btnHtml = '<button type="button" class="btn btn-xs rounded-pill ' + activeClass + ' flex-shrink-0 ai-var-btn px-2.5 py-1" data-index="' + idx + '">' + ('Option ' + (idx + 1)) + '</button>';
             $wrap.append(btnHtml);
         });
     }
