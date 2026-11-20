@@ -2,7 +2,7 @@
 <div class="modal fade" id="modal-ai-caption" tabindex="-1" aria-labelledby="modalAiCaptionLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 780px;">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-            {{-- Modal Header (Clean without subtext) --}}
+            {{-- Modal Header --}}
             <div class="modal-header border-0 pb-0 pt-4 px-4 bg-white d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2.5">
                     <div class="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-3" style="width: 38px; height: 38px;">
@@ -15,19 +15,36 @@
 
             {{-- Modal Body --}}
             <div class="modal-body p-4 bg-white">
-                {{-- Form Field 1: Topic --}}
+                {{-- Unified Prompt Card: Textarea + Embedded Ideas Toolbar --}}
                 <div class="mb-3.5">
                     <label class="form-label text-dark fw-semibold small mb-1.5">Topic</label>
-                    <textarea id="ai-studio-topic" class="form-control" rows="3" placeholder="What is this post about?" style="font-size: 0.95rem; border-radius: 10px; border-color: #d1d5db; line-height: 1.5;"></textarea>
-                    
-                    {{-- Minimal Quick Idea Tags --}}
-                    <div class="d-flex align-items-center gap-1.5 overflow-x-auto pt-2 pb-0.5 flex-nowrap" id="ai-preset-pills" style="scrollbar-width: none;">
-                        <button type="button" class="badge bg-light text-secondary border cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-pill ai-preset-btn fw-normal" data-preset="Product launch announcement">Launch</button>
-                        <button type="button" class="badge bg-light text-secondary border cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-pill ai-preset-btn fw-normal" data-preset="Helpful tips and advice">Tips</button>
-                        <button type="button" class="badge bg-light text-secondary border cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-pill ai-preset-btn fw-normal" data-preset="Behind the scenes look">Behind The Scenes</button>
-                        <button type="button" class="badge bg-light text-secondary border cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-pill ai-preset-btn fw-normal" data-preset="Community greeting and best wishes">Greeting</button>
-                        <button type="button" class="badge bg-light text-secondary border cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-pill ai-preset-btn fw-normal" data-preset="Special offer and discount">Offer</button>
-                        <button type="button" class="badge bg-light text-secondary border cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-pill ai-preset-btn fw-normal" data-preset="Question for the community">Question</button>
+                    <div class="card p-3 shadow-none unified-topic-card" style="border: 1px solid #d1d5db !important; border-radius: 12px; background: #ffffff;">
+                        <textarea id="ai-studio-topic" class="form-control border-0 p-0 shadow-none" rows="3" placeholder="What is this post about?" style="resize: none; background: transparent; font-size: 0.95rem; line-height: 1.5; color: #1e293b;"></textarea>
+                        
+                        {{-- Embedded Ideas Toolbar --}}
+                        <div class="d-flex align-items-center justify-content-between pt-2.5 mt-2 border-top" style="border-color: #f1f5f9 !important;">
+                            <div class="d-flex align-items-center gap-1.5 overflow-x-auto flex-nowrap" id="ai-preset-pills" style="scrollbar-width: none;">
+                                <span class="text-secondary small fw-medium flex-shrink-0" style="font-size: 11px; color: #94a3b8;">Ideas:</span>
+                                <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 ai-preset-btn" data-preset="Product launch announcement">
+                                    <i class="ti ti-rocket me-1 text-primary"></i>Launch
+                                </button>
+                                <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 ai-preset-btn" data-preset="Helpful tips and advice">
+                                    <i class="ti ti-bulb me-1 text-warning"></i>Tips
+                                </button>
+                                <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 ai-preset-btn" data-preset="Behind the scenes look">
+                                    <i class="ti ti-camera me-1 text-info"></i>Behind The Scenes
+                                </button>
+                                <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 ai-preset-btn" data-preset="Community greeting and best wishes">
+                                    <i class="ti ti-heart me-1 text-danger"></i>Greeting
+                                </button>
+                                <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 ai-preset-btn" data-preset="Special offer and discount">
+                                    <i class="ti ti-percentage me-1 text-success"></i>Offer
+                                </button>
+                                <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 ai-preset-btn" data-preset="Question for the community">
+                                    <i class="ti ti-help me-1 text-purple"></i>Question
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -128,3 +145,29 @@
         </div>
     </div>
 </div>
+
+<style>
+.unified-topic-card:focus-within {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+}
+.ai-preset-btn {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+    font-size: 11.5px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+.ai-preset-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+    color: #0f172a;
+}
+.ai-preset-btn.active {
+    background: #eff6ff !important;
+    border-color: #bfdbfe !important;
+    color: #1d4ed8 !important;
+    box-shadow: 0 1px 2px rgba(29, 78, 216, 0.05);
+}
+</style>

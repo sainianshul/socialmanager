@@ -32,8 +32,8 @@
     $(document).on('click', '.ai-preset-btn', function () {
         let presetText = $(this).data('preset');
         $('#ai-studio-topic').val(presetText).focus();
-        $('.ai-preset-btn').removeClass('bg-primary text-white').addClass('bg-light text-secondary');
-        $(this).removeClass('bg-light text-secondary').addClass('bg-primary text-white');
+        $('.ai-preset-btn').removeClass('active');
+        $(this).addClass('active');
     });
 
     // Execute Generation
