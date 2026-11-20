@@ -32,25 +32,15 @@ class CheckMetaWebhooksCommand extends Command
             ])->json();
             $this->info("App-Level Webhook Subscriptions: " . json_encode($whRes, JSON_PRETTY_PRINT));
 
-            // Check if Instagram object is subscribed
-            $hasInstagram = false;
-            foreach ($whRes['data'] ?? [] as $sub) {
-                if (($sub['object'] ?? '') === 'instagram') {
-                    $hasInstagram = true;
-                }
-            }
-
-            if (!$hasInstagram) {
-                $this->warn("Instagram Webhook Object is NOT subscribed in Meta App. Subscribing Instagram object now...");
-                $igSubRes = Http::timeout(10)->post("https://graph.facebook.com/{$apiVersion}/{$appId}/subscriptions", [
-                    'object'       => 'instagram',
-                    'callback_url' => 'https://socialmanager.rezel.online/webhook/meta',
-                    'fields'       => 'comments,mentions,messages',
-                    'verify_token' => config('services.facebook.webhook_verify_token', 'warroom_secret_token_123'),
-                    'access_token' => $appToken,
-                ])->json();
-                $this->line("Instagram Subscription Result: " . json_encode($igSubRes));
-            }
+            // Ensure Page Webhook Object is subscribed with feed, mention, messages
+            $pageSubRes = Http::timeout(10)->post("https://graph.facebook.com/{$apiVersion}/{$appId}/subscriptions", [
+                'object'       => 'page',
+                'callback_url' => 'https://socialmanager.rezel.online/webhook/meta',
+                'fields'       => 'feed,mention,messages,ratings',
+                'verify_token' => config('services.facebook.webhook_verify_token', 'warroom_secret_token_123'),
+                'access_token' => $appToken,
+            ])->json();
+            $this->line("Page Subscription Refresh Result: " . json_encode($pageSubRes));
         } catch (\Throwable $e) {
             $this->warn("App check warning: " . $e->getMessage());
         }
