@@ -6,49 +6,34 @@
     let currentHashtags = [];
     let activeVariationIndex = 0;
 
-    // Toggle AI Studio
-    $('#btn-toggle-ai-caption').on('click', function (e) {
-        e.preventDefault();
-        let $studio = $('#ai-caption-studio-box');
-        $studio.toggleClass('d-none');
-
-        if (!$studio.hasClass('d-none')) {
-            // Auto pre-fill topic if user already typed in caption
-            let existingContent = $.trim($('#composer-content').val());
-            let currentTopic = $.trim($('#ai-studio-topic').val());
-            if (!currentTopic && existingContent) {
-                // Take first 150 chars or first line as topic idea
-                let firstLine = existingContent.split('\n')[0].substring(0, 150);
-                $('#ai-studio-topic').val(firstLine);
-            }
-
-            // Sync platform dropdown with active platform if available
-            let activePlatform = $('#selected-platform').val();
-            if (activePlatform == 2) {
-                $('#ai-studio-platform').val('instagram');
-            } else if (activePlatform == 1) {
-                $('#ai-studio-platform').val('facebook');
-            }
-
-            $('#ai-studio-topic').focus();
-            $('html, body').animate({
-                scrollTop: $studio.offset().top - 90
-            }, 250);
+    // Modal show hook: pre-fill topic if user already started writing caption
+    $('#modal-ai-caption').on('show.bs.modal', function () {
+        let existingContent = $.trim($('#composer-content').val());
+        let currentTopic = $.trim($('#ai-studio-topic').val());
+        if (!currentTopic && existingContent) {
+            let firstLine = existingContent.split('\n')[0].substring(0, 150);
+            $('#ai-studio-topic').val(firstLine);
         }
-    });
 
-    // Close AI Studio
-    $('#btn-close-ai-studio').on('click', function (e) {
-        e.preventDefault();
-        $('#ai-caption-studio-box').addClass('d-none');
+        // Sync platform dropdown with active platform if available
+        let activePlatform = $('#selected-platform').val();
+        if (activePlatform == 2) {
+            $('#ai-studio-platform').val('instagram');
+        } else if (activePlatform == 1) {
+            $('#ai-studio-platform').val('facebook');
+        }
+
+        setTimeout(function() {
+            $('#ai-studio-topic').focus();
+        }, 300);
     });
 
     // Quick Idea Preset Pills
     $(document).on('click', '.ai-preset-btn', function () {
         let presetText = $(this).data('preset');
         $('#ai-studio-topic').val(presetText).focus();
-        $('.ai-preset-btn').removeClass('badge-primary bg-primary text-white').addClass('bg-white text-secondary');
-        $(this).removeClass('bg-white text-secondary').addClass('bg-primary text-white');
+        $('.ai-preset-btn').removeClass('bg-primary text-white').addClass('bg-light text-secondary');
+        $(this).removeClass('bg-light text-secondary').addClass('bg-primary text-white');
     });
 
     // Execute Generation
@@ -72,7 +57,6 @@
 
         let $btn = $('#btn-run-ai-caption');
         let $btnText = $('#btn-run-ai-text');
-        let origHtml = $btnText.html();
 
         $btn.prop('disabled', true);
         $btnText.html('<span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating viral hooks & hashtags...');
@@ -112,7 +96,7 @@
             },
             complete: function () {
                 $btn.prop('disabled', false);
-                $btnText.html('Generate with AI');
+                $btnText.html('Generate Captions with AI');
             }
         });
     });
@@ -146,7 +130,7 @@
 
         currentVariations.forEach(function (v, idx) {
             let activeClass = idx === activeVariationIndex ? 'active btn-primary text-white' : 'btn-outline-primary';
-            let btnHtml = '<button type="button" class="btn btn-xs ' + activeClass + ' flex-shrink-0 ai-var-btn" data-index="' + idx + '">' + (v.title || ('Option ' + (idx + 1))) + '</button>';
+            let btnHtml = '<button type="button" class="btn btn-sm ' + activeClass + ' flex-shrink-0 ai-var-btn" data-index="' + idx + '">' + (v.title || ('Option ' + (idx + 1))) + '</button>';
             $wrap.append(btnHtml);
         });
     }
@@ -174,12 +158,12 @@
         $cloud.empty();
 
         if (!currentHashtags.length) {
-            $cloud.append('<span class="text-secondary fs-8">No hashtags generated.</span>');
+            $cloud.append('<span class="text-secondary small">No hashtags generated.</span>');
             return;
         }
 
         currentHashtags.forEach(function (tag) {
-            let pill = $('<span class="badge bg-primary-lt text-primary cursor-pointer user-select-none ai-hashtag-chip active" style="transition: all 0.15s ease;">' + tag + '</span>');
+            let pill = $('<span class="badge bg-primary-lt text-primary cursor-pointer user-select-none ai-hashtag-chip active py-1.5 px-2.5" style="transition: all 0.15s ease;">' + tag + '</span>');
             pill.data('tag', tag);
             $cloud.append(pill);
         });
@@ -230,6 +214,8 @@
         if (!fullText) {
             if (typeof showToast === 'function') {
                 showToast('Nothing to insert.', 'warning');
+            } else {
+                alert('Nothing to insert.');
             }
             return;
         }
@@ -238,63 +224,61 @@
         $('#composer-content').val(fullText).trigger('input');
 
         // If in YouTube mode, also insert into description and populate tags
-        if (!$('#youtube-fields-section').hasClass('d-none')) {
+        if ($('#youtube-description').length > 0 && !$('#youtube-fields-section').hasClass('d-none')) {
             $('#youtube-description').val(fullText).trigger('input');
-
-            let tagsOnly = getActiveHashtags().map(function (t) {
-                return t.replace(/^#/, '');
-            });
-            if (tagsOnly.length > 0 && !$('#youtube-tags').val()) {
-                $('#youtube-tags').val(tagsOnly.join(', '));
+            let tags = getActiveHashtags().map(t => t.replace('#', ''));
+            if (tags.length > 0) {
+                let existingTags = $.trim($('#youtube-tags').val());
+                let combinedTags = existingTags ? existingTags + ', ' + tags.join(', ') : tags.join(', ');
+                $('#youtube-tags').val(combinedTags);
             }
         }
 
-        // Close studio smoothly
-        $('#ai-caption-studio-box').addClass('d-none');
-
-        if (typeof showToast === 'function') {
-            showToast('AI Caption & Hashtags applied to post!', 'success');
+        // Close Modal
+        let modalEl = document.getElementById('modal-ai-caption');
+        if (modalEl) {
+            let modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) {
+                modalInstance.hide();
+            }
         }
 
-        $('#composer-content').focus();
+        if (typeof showToast === 'function') {
+            showToast('Caption applied to post successfully!', 'success');
+        }
     });
 
     // Copy Full Text
     $('#btn-copy-full-ai-text').on('click', function () {
         let fullText = buildFullText();
-        copyToClipboard(fullText, 'Caption and hashtags copied to clipboard!');
+        if (!fullText) return;
+
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(fullText).then(function () {
+                if (typeof showToast === 'function') {
+                    showToast('Full caption & hashtags copied to clipboard!', 'success');
+                } else {
+                    alert('Copied to clipboard!');
+                }
+            });
+        }
     });
 
     // Copy Only Hashtags
     $('#btn-copy-only-hashtags').on('click', function () {
         let tags = getActiveHashtags();
-        if (!tags.length) {
-            if (typeof showToast === 'function') {
-                showToast('No active hashtags to copy.', 'warning');
-            }
-            return;
+        if (!tags.length) return;
+
+        let tagText = tags.join(' ');
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(tagText).then(function () {
+                if (typeof showToast === 'function') {
+                    showToast('Hashtags copied to clipboard!', 'success');
+                } else {
+                    alert('Hashtags copied!');
+                }
+            });
         }
-        copyToClipboard(tags.join(' '), 'Hashtags copied to clipboard!');
     });
-
-    // Clipboard helper
-    function copyToClipboard(text, successMsg) {
-        if (!navigator.clipboard) {
-            let temp = $('<textarea>');
-            $('body').append(temp);
-            temp.val(text).select();
-            document.execCommand('copy');
-            temp.remove();
-        } else {
-            navigator.clipboard.writeText(text);
-        }
-
-        if (typeof showToast === 'function') {
-            showToast(successMsg, 'success');
-        } else {
-            alert(successMsg);
-        }
-    }
-
 })(jQuery);
 </script>
