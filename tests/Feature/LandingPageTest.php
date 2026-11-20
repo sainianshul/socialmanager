@@ -30,6 +30,11 @@ class LandingPageTest extends TestCase
         $response->assertSee('AI Comment Threading');
         $response->assertSee('Comment-to-DM Flow');
         $response->assertSee('Anti-Troll Shield');
+        $response->assertSee('Simple Plans for Every Stage of Growth');
+        $response->assertSee('Campaign War Room');
+        $response->assertSee('Enterprise-Grade Security by Design');
+        $response->assertSee('AES-256 Token Encryption');
+        $response->assertSee('HMAC SHA-256 Webhook Check');
     }
 
     public function test_authenticated_user_redirects_to_dashboard(): void

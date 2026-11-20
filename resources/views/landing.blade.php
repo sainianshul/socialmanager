@@ -1003,7 +1003,253 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- PLACEHOLDER FOR STEP 4 (Pricing Plans & Security Guarantees)               -->
+    <!-- STEP 4: TRANSPARENT PRICING PLANS                                         -->
+    <!-- ========================================================================= -->
+    <section id="pricing" class="py-6" style="background-color: #fafbfc;">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-tag me-1"></i>Predictable Pricing</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Simple Plans for Every Stage of Growth</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    From independent creators to full-scale political campaign war rooms. All plans include 24/7 background automation and official API compliance.
+                </p>
+            </div>
+
+            <div class="row g-4 align-items-stretch justify-content-center">
+                <!-- Starter Plan -->
+                <div class="col-12 col-lg-4">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="mb-3">
+                            <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Starter Creator</span>
+                            <h3 class="fw-bold text-dark mb-1">Single Channel</h3>
+                            <p class="text-muted small">Ideal for solo creators and local constituency representatives.</p>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
+                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
+                            <span class="display-5 fw-extrabold text-dark">2,499</span>
+                            <span class="text-muted small">/ month</span>
+                        </div>
+
+                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>1 Social Channel</strong> (Facebook, IG, or YouTube)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Multi-Platform Content Scheduler</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Up to <strong>500 AI Comment Replies</strong> / mo</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Basic Anti-Troll Auto-Hide Shield</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>AES-256 Token Encryption at Rest</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 text-muted">
+                                <i class="ti ti-x text-secondary"></i>
+                                <span>Comment-to-DM Private Messaging</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold">
+                                Get Started
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pro Campaign Plan (Featured with Teal Glow) -->
+                <div class="col-12 col-lg-4">
+                    <div class="card h-100 p-4 position-relative" style="border-radius: 12px; background: #ffffff; border: 2px solid var(--brand-teal); box-shadow: 0 12px 35px rgba(12, 166, 120, 0.12);">
+                        <!-- Most Popular Tag -->
+                        <div class="position-absolute top-0 end-0 translate-middle-y me-3">
+                            <span class="badge bg-teal text-white py-1 px-2.5 fs-8">
+                                <i class="ti ti-star me-1"></i>Most Popular
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <span class="badge badge-teal-soft fw-semibold mb-2">Professional</span>
+                            <h3 class="fw-bold text-dark mb-1">Campaign War Room</h3>
+                            <p class="text-muted small">Built for growing public figures, election war rooms, and brands.</p>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
+                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
+                            <span class="display-5 fw-extrabold text-teal">6,999</span>
+                            <span class="text-muted small">/ month</span>
+                        </div>
+
+                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Up to 5 Social Accounts</strong> (FB, IG &amp; YouTube)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Unlimited Scheduled Posts</strong>, Reels &amp; Shorts</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Unlimited AI Comment Replies</strong> (Gemini AI)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Comment-to-DM Engine</strong> (Messenger &amp; IG Direct)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Adaptive Tone Selector (Humble, Patriotic, Firm)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Real-Time Sentiment Intelligence &amp; Analytics</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Priority Background Queue Processing</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <a href="{{ route('login') }}" class="btn btn-teal w-100 py-2.5 shadow-sm fw-semibold">
+                                <i class="ti ti-bolt me-1"></i>Start 14-Day Free Trial
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enterprise Plan -->
+                <div class="col-12 col-lg-4">
+                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                        <div class="mb-3">
+                            <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Enterprise</span>
+                            <h3 class="fw-bold text-dark mb-1">State / National Network</h3>
+                            <p class="text-muted small">For major political organizations, agencies, and enterprise brands.</p>
+                        </div>
+
+                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
+                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
+                            <span class="display-5 fw-extrabold text-dark">19,999</span>
+                            <span class="text-muted small">/ month</span>
+                        </div>
+
+                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span><strong>Unlimited Channels &amp; Team Seats</strong></span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Multi-Tenant Role Access (Admin / Manager / User)</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Custom Fine-Tuned AI Persona &amp; Knowledge Base</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Dedicated Cloud VM &amp; High-Throughput Queue</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2 mb-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>Custom Webhook Ingestion &amp; HMAC Verification</span>
+                            </li>
+                            <li class="d-flex align-items-center gap-2">
+                                <i class="ti ti-check text-teal"></i>
+                                <span>24/7 Dedicated Account Manager &amp; Phone SLA</span>
+                            </li>
+                        </ul>
+
+                        <div class="mt-auto">
+                            <a href="mailto:support@rezel.online?subject=Enterprise%20War%20Room%20Inquiry" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold">
+                                Contact Enterprise Team
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 4: ENTERPRISE SECURITY & RELIABILITY GUARANTEE                       -->
+    <!-- ========================================================================= -->
+    <section id="security" class="py-6 bg-white border-top border-bottom">
+        <div class="container-xl">
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft mb-2"><i class="ti ti-shield-check me-1"></i>Security Architecture</span>
+                <h2 class="fw-bold text-dark mb-2 display-6">Enterprise-Grade Security by Design</h2>
+                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
+                    Because managing influential public profiles requires uncompromising safety, our infrastructure adheres to strict cryptographic standards.
+                </p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Security Pillar 1 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-key fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">AES-256 Token Encryption</h4>
+                        <p class="text-muted small mb-0">
+                            All OAuth access tokens and refresh tokens are encrypted at rest using AES-256-CBC cipher with HMAC authentication. Plaintext tokens are never stored.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Security Pillar 2 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-certificate fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">HMAC SHA-256 Webhook Check</h4>
+                        <p class="text-muted small mb-0">
+                            Every incoming Meta webhook is verified against Meta's cryptographic signature header (<code>X-Hub-Signature-256</code>), blocking 100% of unauthorized or forged requests.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Security Pillar 3 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-fingerprint fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">Zero Password Storage</h4>
+                        <p class="text-muted small mb-0">
+                            Authentication occurs strictly via official Meta Facebook Login and Google OAuth 2.0 prompts. Your social account passwords are never accessed or stored.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Security Pillar 4 -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
+                            <i class="ti ti-server-2 fs-1"></i>
+                        </span>
+                        <h4 class="fw-bold text-dark mb-2">Azure Cloud Infrastructure</h4>
+                        <p class="text-muted small mb-0">
+                            Hosted on Microsoft Azure Virtual Machines with Docker containerization, Redis in-memory queue management, and 99.9% automated uptime monitoring.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
     <!-- PLACEHOLDER FOR STEP 5 (Client FAQs, CTA & Legal Compliant Footer)        -->
     <!-- ========================================================================= -->
 
