@@ -50,7 +50,6 @@ $(document).ready(function() {
         let title = btn.data('title') || 'Social Post';
 
         if (!canvaConnected) {
-            // If not connected, prompt user to connect or open direct template
             if (confirm('Canva account is not connected yet for direct sync. Would you like to connect now? (Click Cancel to open Canva template directly)')) {
                 window.location.href = "{{ route('admin.canva.auth') }}";
             } else {
@@ -74,14 +73,12 @@ $(document).ready(function() {
             success: function(res) {
                 btn.prop('disabled', false).html(originalHtml);
                 if (res.success && res.edit_url) {
-                    // Pre-fill design ID
                     $('#canva-design-id-input').val(res.design_id);
                     $('#canva-import-feedback')
                         .removeClass('d-none text-danger')
                         .addClass('text-success')
                         .html('<i class="ti ti-check me-1"></i>Design opened in new tab! Finish editing on Canva, then click <b>Import to Post</b> below.');
 
-                    // Open Canva Editor in new tab
                     window.open(res.edit_url, '_blank');
                 } else {
                     alert(res.message || 'Could not launch Canva editor.');
@@ -103,7 +100,6 @@ $(document).ready(function() {
             return;
         }
 
-        // Extract ID if full URL pasted (e.g. https://www.canva.com/design/DAFVztcvd9z/edit)
         let designId = inputVal;
         let urlMatch = inputVal.match(/design\/([a-zA-Z0-9_-]+)/);
         if (urlMatch && urlMatch[1]) {
@@ -133,7 +129,6 @@ $(document).ready(function() {
                 if (res.success && res.image_url) {
                     feedback.removeClass('text-primary text-danger').addClass('text-success').html('<i class="ti ti-check me-1"></i>Imported successfully! Attached to your post.');
 
-                    // Attach to Media Preview in Composer Form
                     attachCanvaImageToComposer(res.image_url, res.relative_path, res.filename);
 
                     setTimeout(function() {
@@ -168,34 +163,144 @@ $(document).ready(function() {
         });
     });
 
-    // Helper: Attach Canva Image to Composer
-    function attachCanvaImageToComposer(url, path, filename) {
-        let container = $('#canva-imported-media-container');
-        if (container.length === 0) {
-            $('#meta-media-section').append('<div id="canva-imported-media-container" class="mt-3"></div>');
-            container = $('#canva-imported-media-container');
+    // 5. Media Uploader & Attachment Hub Handling
+    function updateAttachmentCount() {
+        let localCount = 0;
+        let fileInput = document.getElementById('composer-media-files');
+        if (fileInput && fileInput.files) {
+            localCount = fileInput.files.length;
         }
+        let canvaCount = $('input[name="canva_media_paths[]"]').length;
+        let total = localCount + canvaCount;
 
-        let itemHtml = `
-            <div class="card card-sm border bg-light-subtle p-2 mb-2 d-flex flex-row align-items-center justify-content-between canva-imported-item" style="border-radius: 10px;">
-                <div class="d-flex align-items-center gap-2">
-                    <img src="${url}" class="rounded border" style="width: 48px; height: 48px; object-fit: cover;" alt="Canva graphic">
-                    <div>
-                        <div class="fw-bold small text-dark">${filename}</div>
-                        <span class="badge bg-primary-subtle text-primary" style="font-size: 10px;">Imported from Canva</span>
+        $('#media-attached-count').text(total + ' attached');
+
+        if (total > 0) {
+            $('#media-uploader-empty-state').addClass('d-none');
+            $('#composer-media-preview-grid').removeClass('d-none');
+            $('#media-uploader-active-bar').removeClass('d-none');
+        } else {
+            $('#media-uploader-empty-state').removeClass('d-none');
+            $('#composer-media-preview-grid').addClass('d-none');
+            $('#media-uploader-active-bar').addClass('d-none');
+        }
+    }
+
+    // Trigger file browse from buttons
+    $(document).on('click', '#btn-trigger-file-browser, #btn-add-more-media', function(e) {
+        e.preventDefault();
+        $('#composer-media-files').click();
+    });
+
+    // Render local device uploads in preview grid
+    $('#composer-media-files').on('change', function() {
+        // Clear previous local previews
+        $('.local-media-preview-item').remove();
+
+        if (this.files && this.files.length > 0) {
+            Array.from(this.files).forEach((file, idx) => {
+                let isImage = file.type.startsWith('image/');
+                let isVideo = file.type.startsWith('video/');
+                let sizeStr = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+                if (file.size < 1024 * 1024) {
+                    sizeStr = (file.size / 1024).toFixed(0) + ' KB';
+                }
+
+                let previewHtml = '';
+                if (isImage) {
+                    let objectUrl = URL.createObjectURL(file);
+                    previewHtml = `
+                        <div class="col-6 col-sm-4 col-md-3 local-media-preview-item">
+                            <div class="card card-sm border position-relative overflow-hidden shadow-xs h-100" style="border-radius: 10px;">
+                                <img src="${objectUrl}" class="w-100" style="height: 110px; object-fit: cover;" alt="Upload preview">
+                                <div class="p-2 bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="badge bg-light text-secondary border" style="font-size: 10px;">Device</span>
+                                        <span class="text-muted" style="font-size: 11px;">${sizeStr}</span>
+                                    </div>
+                                    <div class="small fw-semibold text-truncate text-dark mt-1" title="${file.name}">${file.name}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (isVideo) {
+                    previewHtml = `
+                        <div class="col-6 col-sm-4 col-md-3 local-media-preview-item">
+                            <div class="card card-sm border position-relative overflow-hidden shadow-xs h-100 bg-dark text-white d-flex align-items-center justify-content-center" style="height: 145px; border-radius: 10px;">
+                                <div class="text-center p-2">
+                                    <i class="ti ti-video fs-1 text-primary mb-1"></i>
+                                    <div class="small fw-semibold text-truncate text-white" style="max-width: 120px;">${file.name}</div>
+                                    <span class="badge bg-secondary" style="font-size: 10px;">${sizeStr}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                $('#composer-media-preview-grid').append(previewHtml);
+            });
+        }
+        updateAttachmentCount();
+    });
+
+    // Drag & Drop Handling on Composer Media Card
+    let dropCard = $('#composer-media-card');
+    if (dropCard.length > 0) {
+        dropCard.on('dragover dragenter', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropCard.css({ 'border-color': '#6366f1', 'background': '#eef2ff' });
+        });
+
+        dropCard.on('dragleave dragend', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropCard.css({ 'border-color': '#cbd5e1', 'background': '#fafbfc' });
+        });
+
+        dropCard.on('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropCard.css({ 'border-color': '#cbd5e1', 'background': '#fafbfc' });
+
+            let dt = e.originalEvent.dataTransfer;
+            if (dt && dt.files && dt.files.length > 0) {
+                let fileInput = document.getElementById('composer-media-files');
+                if (fileInput) {
+                    fileInput.files = dt.files;
+                    $(fileInput).trigger('change');
+                }
+            }
+        });
+    }
+
+    // Helper: Attach Canva Image to Composer Grid
+    function attachCanvaImageToComposer(url, path, filename) {
+        let cardHtml = `
+            <div class="col-6 col-sm-4 col-md-3 canva-imported-item">
+                <div class="card card-sm border position-relative overflow-hidden shadow-xs h-100" style="border-radius: 10px; border-color: #8b5cf6 !important;">
+                    <img src="${url}" class="w-100" style="height: 110px; object-fit: cover;" alt="Canva graphic">
+                    <button type="button" class="btn btn-sm btn-icon btn-dark bg-opacity-75 position-absolute top-0 end-0 m-1.5 rounded-circle border-0 text-white btn-remove-canva-media" title="Remove attachment" style="width: 26px; height: 26px;">
+                        <i class="ti ti-x" style="font-size: 12px;"></i>
+                    </button>
+                    <div class="p-2 bg-white">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="badge text-white" style="background: linear-gradient(135deg, #00c4cc, #7d2ae8); font-size: 10px;">Canva</span>
+                            <span class="text-success small fw-semibold" style="font-size: 10px;">Ready</span>
+                        </div>
+                        <div class="small fw-semibold text-truncate text-dark mt-1" title="${filename}">${filename}</div>
                     </div>
+                    <input type="hidden" name="canva_media_paths[]" value="${path}">
                 </div>
-                <input type="hidden" name="canva_media_paths[]" value="${path}">
-                <button type="button" class="btn btn-sm btn-icon btn-outline-danger rounded-circle border-0 btn-remove-canva-media" title="Remove attachment">
-                    <i class="ti ti-trash"></i>
-                </button>
             </div>
         `;
-        container.append(itemHtml);
+
+        $('#composer-media-preview-grid').append(cardHtml);
+        updateAttachmentCount();
 
         // Also if on YouTube tab, populate thumbnail preview
         if ($('#youtube-thumbnail-preview').length > 0) {
-            $('#youtube-thumbnail-preview').attr('src', url).removeClass('d-none');
+            $('#youtube-thumbnail-preview').attr('src', url);
+            $('#youtube-thumbnail-preview-box').removeClass('d-none');
             $('#canva-imported-media-container').append(`<input type="hidden" name="canva_thumbnail" value="${path}">`);
         }
     }
@@ -203,6 +308,22 @@ $(document).ready(function() {
     // Remove Canva Media
     $(document).on('click', '.btn-remove-canva-media', function() {
         $(this).closest('.canva-imported-item').remove();
+        updateAttachmentCount();
     });
+
+    // YouTube Thumbnail live preview
+    $('#youtube-thumbnail').on('change', function() {
+        if (this.files && this.files[0]) {
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                $('#youtube-thumbnail-preview').attr('src', e.target.result);
+                $('#youtube-thumbnail-preview-box').removeClass('d-none');
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Initial check
+    updateAttachmentCount();
 });
 </script>

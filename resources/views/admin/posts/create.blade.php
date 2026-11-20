@@ -224,6 +224,10 @@
                                     <i class="ti ti-sparkles text-primary"></i>
                                     <span class="fw-semibold">AI Caption & Hashtags</span>
                                 </button>
+                                <button type="button" class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
+                                    <i class="ti ti-brand-canva text-primary"></i>
+                                    <span class="fw-semibold text-dark">Design on Canva</span>
+                                </button>
                                 <span class="text-secondary small" id="caption-counter">0 / 5000</span>
                             </div>
                         </div>
@@ -235,14 +239,59 @@
                     </div>
 
                     {{-- Meta Media Upload Area --}}
-                    <div id="meta-media-section" class="mb-3">
-                        <div class="d-flex align-items-center justify-content-between mb-1.5">
-                            <label class="form-label fw-bold text-dark m-0">Media Attachment</label>
-                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                    <div id="meta-media-section" class="mb-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <label class="form-label fw-bold text-dark m-0 d-flex align-items-center gap-1.5">
+                                <i class="ti ti-photo-plus text-primary"></i> Media Attachment
+                                <span class="badge bg-light text-secondary border rounded-pill ms-1" id="media-attached-count" style="font-size: 11px;">0 attached</span>
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
                                 <i class="ti ti-brand-canva me-1 text-primary"></i>Design on Canva
                             </button>
                         </div>
-                        <input type="file" name="media_files[]" class="form-control" id="composer-media-files" accept="image/*,video/*" multiple>
+
+                        {{-- Hidden real file input --}}
+                        <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple>
+
+                        {{-- Modern Media Dropzone & Uploader Card --}}
+                        <div class="card border p-3" id="composer-media-card" style="border-radius: 14px; background: #fafbfc; border: 1.5px dashed #cbd5e1 !important; transition: all 0.2s ease;">
+                            {{-- Empty state prompt --}}
+                            <div class="text-center py-3" id="media-uploader-empty-state">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width: 48px; height: 48px; background: #eef2ff;">
+                                    <i class="ti ti-photo-up fs-2 text-primary"></i>
+                                </div>
+                                <h6 class="fw-bold text-dark mb-1">Add Photos, Videos, or Graphics</h6>
+                                <p class="text-secondary small mb-3" style="max-width: 420px; margin: 0 auto;">Select media from your computer or create professional visuals using Canva templates.</p>
+                                
+                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
+                                    <button type="button" class="btn btn-sm btn-white border rounded-pill px-3 py-1.5 fw-semibold shadow-xs" id="btn-trigger-file-browser">
+                                        <i class="ti ti-upload me-1 text-secondary"></i>Browse Device
+                                    </button>
+                                    <button type="button" class="btn btn-sm rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs text-white" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" style="background: linear-gradient(135deg, #00c4cc, #7d2ae8); border: none;">
+                                        <i class="ti ti-brand-canva me-1 text-white"></i>Design on Canva
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Live Attachments Grid --}}
+                            <div class="row g-2 d-none" id="composer-media-preview-grid"></div>
+
+                            {{-- Active Toolbar when items exist --}}
+                            <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-2 d-none" id="media-uploader-active-bar" style="border-color: #e2e8f0 !important;">
+                                <span class="text-secondary small" style="font-size: 11px;">Max 50MB per file &bull; Images and MP4/MOV videos supported</span>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2.5 py-1" id="btn-add-more-media">
+                                        <i class="ti ti-plus me-1"></i>Add More
+                                    </button>
+                                    <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                        <i class="ti ti-brand-canva me-1"></i>Design on Canva
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Canva Imported Hidden Inputs Container --}}
+                        <div id="canva-imported-media-container"></div>
                     </div>
 
                     {{-- Cross-Posting Section (Directly under Media Attachment) --}}
@@ -375,10 +424,21 @@
                                 <div class="d-flex align-items-center justify-content-between mb-1.5">
                                     <label class="form-label fw-bold text-dark m-0">Thumbnail</label>
                                     <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5" style="font-size: 11px;" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                        <i class="ti ti-brand-canva me-1"></i>Canva Thumbnail
+                                        <i class="ti ti-brand-canva me-1"></i>Canva Thumbnail (16:9)
                                     </button>
                                 </div>
-                                <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control" accept="image/jpeg,image/png">
+                                <div class="p-2.5 rounded border bg-light-subtle">
+                                    <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control form-control-sm mb-2" accept="image/jpeg,image/png">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                        <span class="text-secondary" style="font-size: 11px;">1280 &times; 720 px (16:9 recommended)</span>
+                                        <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-2.5 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                            <i class="ti ti-sparkles me-1"></i>Create in Canva
+                                        </button>
+                                    </div>
+                                    <div id="youtube-thumbnail-preview-box" class="mt-2 d-none">
+                                        <img id="youtube-thumbnail-preview" src="" class="rounded border shadow-xs" style="max-height: 85px; width: auto; object-fit: cover;" alt="Thumbnail preview">
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -921,10 +981,12 @@ document.addEventListener('DOMContentLoaded', function () {
             let mode = $('input[name="publish_mode"]:checked').val();
             if (hasInstagram && mode !== 'draft') {
                 let mediaInput = document.getElementById('composer-media-files');
-                if (!mediaInput || !mediaInput.files || mediaInput.files.length === 0) {
+                let hasUploadedFiles = mediaInput && mediaInput.files && mediaInput.files.length > 0;
+                let hasCanvaFiles = $('input[name="canva_media_paths[]"]').length > 0;
+                if (!hasUploadedFiles && !hasCanvaFiles) {
                     e.preventDefault();
                     alert('Instagram requires at least one photo or video attachment.');
-                    $('#composer-media-files').focus();
+                    $('#btn-trigger-file-browser').focus();
                     return false;
                 }
             }

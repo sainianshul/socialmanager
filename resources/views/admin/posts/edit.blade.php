@@ -263,6 +263,10 @@
                                     <i class="ti ti-sparkles text-primary"></i>
                                     <span class="fw-semibold">AI Caption & Hashtags</span>
                                 </button>
+                                <button type="button" class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
+                                    <i class="ti ti-brand-canva text-primary"></i>
+                                    <span class="fw-semibold text-dark">Design on Canva</span>
+                                </button>
                                 <span class="text-secondary small" id="caption-counter">{{ strlen(old('content', $scheduledPost->content ?? '')) }} / {{ $platform === 2 ? '2200' : '5000' }}</span>
                             </div>
                         </div>
