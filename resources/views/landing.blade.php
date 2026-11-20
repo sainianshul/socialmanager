@@ -611,38 +611,125 @@
             font-weight: 700;
         }
 
-        /* Platform Ribbon Cards */
-        .platform-card {
+        /* ===================================================================== */
+        /* APPLE-STYLE MINIMALIST PLATFORMS SECTION                              */
+        /* ===================================================================== */
+        .apple-platforms-section {
+            padding: 95px 0;
             background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            border-radius: 16px;
-            padding: 1.75rem;
-            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+            border-top: 1px solid rgba(15, 23, 42, 0.05);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+        }
+        .apple-section-eyebrow {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #0ca678;
+        }
+        .apple-section-headline {
+            font-size: 2.35rem;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            color: #0f172a;
+            line-height: 1.2;
+        }
+        .apple-section-subhead {
+            font-size: 1.08rem;
+            color: #64748b;
+            line-height: 1.6;
+            margin: 0;
+            font-weight: 400;
+        }
+        .apple-platform-card {
+            background: #ffffff;
+            border: 1px solid rgba(15, 23, 42, 0.07);
+            border-radius: 24px;
+            padding: 40px 32px;
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.03);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
         }
-        .platform-card:hover {
+        .apple-platform-card:hover {
             transform: translateY(-5px);
-            border-color: rgba(12, 166, 120, 0.35);
-            box-shadow: 0 18px 36px -8px rgba(12, 166, 120, 0.12), 0 0 0 1px rgba(12, 166, 120, 0.2);
+            border-color: rgba(15, 23, 42, 0.14);
+            box-shadow: 0 24px 48px -12px rgba(15, 23, 42, 0.08);
         }
-
-        .platform-tag-pill {
-            background: #f1f5f9;
-            color: #475569;
-            border-radius: 999px;
-            padding: 4px 11px;
-            font-size: 0.76rem;
+        .apple-icon-wrapper {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
+        }
+        .apple-platform-card:hover .apple-icon-wrapper {
+            transform: scale(1.08);
+        }
+        .apple-icon-fb {
+            background: #edf5ff;
+            color: #1877f2;
+        }
+        .apple-icon-ig {
+            background: #fdf2f8;
+            color: #d62976;
+        }
+        .apple-icon-yt {
+            background: #fef2f2;
+            color: #e02424;
+        }
+        .apple-card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #0f172a;
+            margin: 0 0 12px 0;
+        }
+        .apple-card-desc {
+            font-size: 0.96rem;
+            line-height: 1.65;
+            color: #64748b;
+            margin: 0 0 32px 0;
+            font-weight: 400;
+        }
+        .apple-card-meta {
+            padding-top: 20px;
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: auto;
+        }
+        .apple-api-chip {
+            font-size: 0.8rem;
             font-weight: 600;
+            color: #64748b;
+            letter-spacing: 0.01em;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .apple-api-chip::before {
+            content: '';
+            display: inline-block;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+        .apple-official-badge {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #0ca678;
             display: inline-flex;
             align-items: center;
             gap: 4px;
-            border: none;
-            transition: background 0.2s ease, color 0.2s ease;
-        }
-        .platform-tag-pill:hover {
-            background: #e2e8f0;
-            color: #0f172a;
         }
 
         .bento-micro-surface {
@@ -1183,76 +1270,58 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 2: CERTIFIED PLATFORMS RIBBON                                        -->
+    <!-- STEP 2: CERTIFIED PLATFORMS RIBBON (APPLE-STYLE MINIMAL)                  -->
     <!-- ========================================================================= -->
-    <section id="platforms" class="py-5 bg-white border-top border-bottom">
+    <section id="platforms" class="apple-platforms-section">
         <div class="container-xl">
-            <div class="text-center mb-4">
-                <span class="badge badge-teal-soft mb-2"><i class="ti ti-api-app me-1"></i>Official Integrations</span>
-                <h3 class="fw-bold text-dark mb-1">Directly Connected to Official Platform APIs</h3>
-                <p class="text-muted small">No web scrapers, no unofficial bots. 100% compliant with platform developer terms.</p>
+            <div class="text-center mb-5" style="max-width: 680px; margin-left: auto; margin-right: auto;">
+                <span class="apple-section-eyebrow mb-2 d-inline-block">OFFICIAL ECOSYSTEM</span>
+                <h2 class="apple-section-headline mb-3">Directly connected to official platform APIs.</h2>
+                <p class="apple-section-subhead">Zero scrapers. Full enterprise compliance across Meta and Google Cloud.</p>
             </div>
 
-            <div class="row g-3 justify-content-center">
+            <div class="row g-4 justify-content-center">
                 <!-- Facebook Platform Card -->
                 <div class="col-12 col-md-4">
-                    <div class="platform-card d-flex flex-column">
-                        <div class="d-flex align-items-center gap-3 mb-2.5">
-                            <span class="avatar avatar-md rounded-2" style="background: rgba(24, 119, 242, 0.08); color: #1877f2;">
-                                <i class="ti ti-brand-facebook fs-1"></i>
-                            </span>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark">Facebook Pages</h4>
-                                <span class="badge badge-outline text-primary fs-8">Graph API v20.0</span>
-                            </div>
+                    <div class="apple-platform-card">
+                        <div class="apple-icon-wrapper apple-icon-fb">
+                            <i class="ti ti-brand-facebook"></i>
                         </div>
-                        <p class="text-muted small mb-3">Permanent Page tokens with real-time Webhook feed subscription. Publish posts, sync comments, and dispatch Messenger replies.</p>
-                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Photos & Videos</span>
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Auto Moderation</span>
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Instant DMs</span>
+                        <h3 class="apple-card-title">Facebook Pages</h3>
+                        <p class="apple-card-desc">Publish content, sync community interactions, and dispatch real-time private messages.</p>
+                        <div class="apple-card-meta">
+                            <span class="apple-api-chip">Meta Graph API</span>
+                            <span class="apple-official-badge"><i class="ti ti-shield-check"></i>Official</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Instagram Platform Card -->
                 <div class="col-12 col-md-4">
-                    <div class="platform-card d-flex flex-column">
-                        <div class="d-flex align-items-center gap-3 mb-2.5">
-                            <span class="avatar avatar-md rounded-2" style="background: rgba(214, 41, 118, 0.08); color: #d62976;">
-                                <i class="ti ti-brand-instagram fs-1"></i>
-                            </span>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark">Instagram Professional</h4>
-                                <span class="badge badge-outline text-pink fs-8">Business & Creator</span>
-                            </div>
+                    <div class="apple-platform-card">
+                        <div class="apple-icon-wrapper apple-icon-ig">
+                            <i class="ti ti-brand-instagram"></i>
                         </div>
-                        <p class="text-muted small mb-3">Linked Instagram account automation. Schedule Carousels & Reels, track public interactions, and send private Direct Messages.</p>
-                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Reels Publishing</span>
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Comment-to-DM</span>
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Direct Messaging</span>
+                        <h3 class="apple-card-title">Instagram Professional</h3>
+                        <p class="apple-card-desc">Schedule Reels and Carousels, track post engagement, and automate private Comment-to-DM triggers.</p>
+                        <div class="apple-card-meta">
+                            <span class="apple-api-chip">Instagram Graph API</span>
+                            <span class="apple-official-badge"><i class="ti ti-shield-check"></i>Official</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- YouTube Platform Card -->
                 <div class="col-12 col-md-4">
-                    <div class="platform-card d-flex flex-column">
-                        <div class="d-flex align-items-center gap-3 mb-2.5">
-                            <span class="avatar avatar-md rounded-2" style="background: rgba(224, 36, 36, 0.08); color: #e02424;">
-                                <i class="ti ti-brand-youtube fs-1"></i>
-                            </span>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark">YouTube Channels</h4>
-                                <span class="badge badge-outline text-danger fs-8">Data API v3</span>
-                            </div>
+                    <div class="apple-platform-card">
+                        <div class="apple-icon-wrapper apple-icon-yt">
+                            <i class="ti ti-brand-youtube"></i>
                         </div>
-                        <p class="text-muted small mb-3">Resumable video & Shorts publishing with automated 24/7 background token renewal. Public comment threading and auto-hiding.</p>
-                        <div class="d-flex flex-wrap gap-1.5 mt-auto">
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Shorts & Videos</span>
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Auto-Renew Token</span>
-                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Troll Shield</span>
+                        <h3 class="apple-card-title">YouTube Channels</h3>
+                        <p class="apple-card-desc">Upload videos and Shorts with 24/7 background token renewal and automated comment filtering.</p>
+                        <div class="apple-card-meta">
+                            <span class="apple-api-chip">YouTube Data API v3</span>
+                            <span class="apple-official-badge"><i class="ti ti-shield-check"></i>Official</span>
                         </div>
                     </div>
                 </div>
