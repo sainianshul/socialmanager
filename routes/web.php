@@ -132,3 +132,8 @@ Route::get('/auth/youtube/callback', [\App\Http\Controllers\Admin\YouTubeAuthCon
 
 // Meta Webhook Endpoint (Challenge Verification & Live Event Receiver)
 Route::match(['GET', 'POST'], '/webhook/meta', [\App\Http\Controllers\MetaWebhookController::class, 'handle'])->name('meta.webhook');
+
+// Public Legal & Meta Compliance Pages (Required for Meta App Review & Live Mode)
+Route::get('/privacy', [\App\Http\Controllers\LegalController::class, 'privacy'])->name('legal.privacy');
+Route::get('/terms', [\App\Http\Controllers\LegalController::class, 'terms'])->name('legal.terms');
+Route::match(['GET', 'POST'], '/data-deletion', [\App\Http\Controllers\LegalController::class, 'dataDeletion'])->name('legal.data-deletion');
