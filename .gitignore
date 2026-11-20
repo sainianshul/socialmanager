@@ -27,3 +27,5 @@ frankenphp
 frankenphp-worker.php
 *.zip
 *.log
+hopewell-v1.0.0/
+resources/views/landing_tabler_backup.blade.php
