@@ -3,8 +3,11 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return redirect()->route('admin.dashboard');
-});
+    if (auth()->check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return view('landing');
+})->name('home');
 
 Route::prefix('admin')->group(function () {
     // Auth Routes
