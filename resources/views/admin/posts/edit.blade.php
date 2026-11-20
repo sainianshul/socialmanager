@@ -182,7 +182,12 @@
 
                         {{-- Thumbnail (Current preview + Replacement option) --}}
                         <div class="col-md-6">
-                            <label class="form-label fw-bold text-dark">Custom Thumbnail</label>
+                            <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                <label class="form-label fw-bold text-dark m-0">Custom Thumbnail</label>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5" style="font-size: 11px;" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                    <i class="ti ti-brand-canva me-1"></i>Canva Thumbnail
+                                </button>
+                            </div>
 
                             @if($scheduledPost->thumbnail_path)
                                 @php
@@ -270,7 +275,12 @@
 
                     {{-- Current Media Gallery Preview + New Media Upload --}}
                     <div class="mb-4" id="meta-media-container">
-                        <label class="form-label fw-bold text-dark mb-2">Media Attachment</label>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <label class="form-label fw-bold text-dark m-0">Media Attachment</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                <i class="ti ti-brand-canva me-1 text-primary"></i>Design on Canva
+                            </button>
+                        </div>
 
                         @if(!empty($scheduledPost->media_urls) && count($scheduledPost->media_urls) > 0)
                             <div class="p-3 bg-light rounded border mb-3">
@@ -387,6 +397,9 @@
             </div>
         </div>
     </div>
+
+    {{-- Canva Design Studio Modal --}}
+    @include('admin.posts.partials._canva_studio_modal')
 
 @endsection
 
@@ -516,5 +529,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @include('admin.posts.partials._ai_caption_script')
+@include('admin.posts.partials._canva_studio_script')
 @endpush
 

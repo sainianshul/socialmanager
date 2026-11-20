@@ -59,6 +59,16 @@ Route::prefix('admin')->group(function () {
                 Route::post('generate-ai-caption', [\App\Http\Controllers\Admin\SchedulePostController::class, 'generateAiCaption'])->name('generate-ai-caption');
             });
 
+            // Canva Connect Integration
+            Route::prefix('canva')->name('canva.')->group(function () {
+                Route::get('auth', [\App\Http\Controllers\Admin\CanvaController::class, 'auth'])->name('auth');
+                Route::get('callback', [\App\Http\Controllers\Admin\CanvaController::class, 'callback'])->name('callback');
+                Route::get('status', [\App\Http\Controllers\Admin\CanvaController::class, 'status'])->name('status');
+                Route::post('create-design', [\App\Http\Controllers\Admin\CanvaController::class, 'createDesign'])->name('create-design');
+                Route::post('export-design', [\App\Http\Controllers\Admin\CanvaController::class, 'exportDesign'])->name('export-design');
+                Route::post('disconnect', [\App\Http\Controllers\Admin\CanvaController::class, 'disconnect'])->name('disconnect');
+            });
+
             // Auto DM (Comment-to-Inbox Automation)
             Route::prefix('auto-dm')->name('auto-dm.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\AutoDmController::class, 'index'])->name('index');

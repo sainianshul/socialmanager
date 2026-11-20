@@ -354,6 +354,11 @@ class SchedulePostController extends Controller
                 $thumb = $request->file('thumbnail');
                 $thumbName = time() . '_thumb_' . Str::random(10) . '.' . $thumb->getClientOriginalExtension();
                 $thumbnailPath = $thumb->storeAs('uploads/thumbnails', $thumbName, 'public');
+            } elseif ($request->filled('canva_thumbnail')) {
+                $canvaThumb = $request->input('canva_thumbnail');
+                if (is_string($canvaThumb) && Storage::disk('public')->exists($canvaThumb)) {
+                    $thumbnailPath = $canvaThumb;
+                }
             }
 
             if ($request->filled('tags')) {
@@ -375,7 +380,15 @@ class SchedulePostController extends Controller
                 'scheduled_at'  => 'nullable|date',
             ]);
 
-            if ($publishMode !== 'draft' && !$request->hasFile('media_files')) {
+            if ($request->filled('canva_media_paths')) {
+                foreach ((array) $request->input('canva_media_paths') as $cPath) {
+                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
+                        $mediaUrls[] = $cPath;
+                    }
+                }
+            }
+
+            if ($publishMode !== 'draft' && !$request->hasFile('media_files') && empty($mediaUrls)) {
                 return redirect()->back()
                     ->withErrors(['media_files' => 'At least one photo or video file is required for Instagram posts.'])
                     ->withInput();
@@ -404,7 +417,15 @@ class SchedulePostController extends Controller
 
             $postType = $validated['post_type'] ?? 'photo';
 
-            if (in_array(Account::TYPE_INSTAGRAM, $accountPlatforms) && $publishMode !== 'draft' && !$request->hasFile('media_files')) {
+            if ($request->filled('canva_media_paths')) {
+                foreach ((array) $request->input('canva_media_paths') as $cPath) {
+                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
+                        $mediaUrls[] = $cPath;
+                    }
+                }
+            }
+
+            if (in_array(Account::TYPE_INSTAGRAM, $accountPlatforms) && $publishMode !== 'draft' && !$request->hasFile('media_files') && empty($mediaUrls)) {
                 return redirect()->back()
                     ->withErrors(['media_files' => 'At least one photo or video file is required because one or more Instagram accounts are selected.'])
                     ->withInput();
@@ -648,6 +669,11 @@ class SchedulePostController extends Controller
                 $thumb = $request->file('thumbnail');
                 $thumbName = time() . '_thumb_' . Str::random(10) . '.' . $thumb->getClientOriginalExtension();
                 $thumbnailPath = $thumb->storeAs('uploads/thumbnails', $thumbName, 'public');
+            } elseif ($request->filled('canva_thumbnail')) {
+                $canvaThumb = $request->input('canva_thumbnail');
+                if (is_string($canvaThumb) && Storage::disk('public')->exists($canvaThumb)) {
+                    $thumbnailPath = $canvaThumb;
+                }
             }
 
             $tags = null;
@@ -689,7 +715,17 @@ class SchedulePostController extends Controller
                     $path = $file->storeAs('uploads/scheduled_posts', $filename, 'public');
                     $mediaUrls[] = $path;
                 }
-            } elseif ($publishMode !== 'draft' && empty($mediaUrls)) {
+            }
+
+            if ($request->filled('canva_media_paths')) {
+                foreach ((array) $request->input('canva_media_paths') as $cPath) {
+                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
+                        $mediaUrls[] = $cPath;
+                    }
+                }
+            }
+
+            if ($publishMode !== 'draft' && empty($mediaUrls)) {
                 return redirect()->back()
                     ->withErrors(['media_files' => 'At least one photo or video file is required for Instagram posts.'])
                     ->withInput();
@@ -729,6 +765,14 @@ class SchedulePostController extends Controller
                     $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
                     $path = $file->storeAs('uploads/scheduled_posts', $filename, 'public');
                     $mediaUrls[] = $path;
+                }
+            }
+
+            if ($request->filled('canva_media_paths')) {
+                foreach ((array) $request->input('canva_media_paths') as $cPath) {
+                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
+                        $mediaUrls[] = $cPath;
+                    }
                 }
             }
 
@@ -867,6 +911,18 @@ class SchedulePostController extends Controller
 
             if (empty($description)) {
                 $description = $this->generateFallbackDescription($title);
+            } elseif (!str_contains($description, '#')) {
+                $cleanTitle = trim($title);
+                $words = array_filter(explode(' ', preg_replace('/[^a-zA-Z0-9\s]/', '', $cleanTitle)));
+                $hashtags = [];
+                foreach (array_slice($words, 0, 4) as $w) {
+                    if (strlen($w) > 2) {
+                        $hashtags[] = '#' . ucfirst(strtolower($w));
+                    }
+                }
+                $hashtags[] = '#YouTube';
+                $hashtags[] = '#Updates';
+                $description .= "\n\n" . implode(' ', array_unique($hashtags));
             }
 
             return response()->json([

@@ -58,6 +58,12 @@ return [
         'client_secret' => env('INSTAGRAM_APP_SECRET', env('FACEBOOK_APP_KEY')),
     ],
 
+    'canva' => [
+        'client_id' => env('CANVA_CLIENT_ID'),
+        'client_secret' => env('CANVA_CLIENT_SECRET'),
+        'redirect' => env('CANVA_REDIRECT_URI', 'https://socialmanager.rezel.online/admin/canva/callback'),
+    ],
+
     // Universal AI Providers for Political Sentiment Analysis & Smart Replies
     'ai' => [
         'default' => env('AI_PROVIDER', 'gemini'),

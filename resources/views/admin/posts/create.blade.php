@@ -236,7 +236,12 @@
 
                     {{-- Meta Media Upload Area --}}
                     <div id="meta-media-section" class="mb-3">
-                        <label class="form-label fw-bold text-dark">Media Attachment</label>
+                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                            <label class="form-label fw-bold text-dark m-0">Media Attachment</label>
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                <i class="ti ti-brand-canva me-1 text-primary"></i>Design on Canva
+                            </button>
+                        </div>
                         <input type="file" name="media_files[]" class="form-control" id="composer-media-files" accept="image/*,video/*" multiple>
                     </div>
 
@@ -367,7 +372,12 @@
                                 <input type="file" name="video_file" id="youtube-video-file" class="form-control" accept="video/mp4,video/quicktime,video/webm">
                             </div>
                             <div class="col-md-6 mb-4">
-                                <label class="form-label fw-bold text-dark">Thumbnail</label>
+                                <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                    <label class="form-label fw-bold text-dark m-0">Thumbnail</label>
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5" style="font-size: 11px;" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                        <i class="ti ti-brand-canva me-1"></i>Canva Thumbnail
+                                    </button>
+                                </div>
                                 <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control" accept="image/jpeg,image/png">
                             </div>
                         </div>
@@ -424,6 +434,9 @@
             </div>
         </form>
     </div>
+
+    {{-- Canva Design Studio Modal --}}
+    @include('admin.posts.partials._canva_studio_modal')
 
 @endsection
 
@@ -981,4 +994,5 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 @include('admin.posts.partials._ai_caption_script')
+@include('admin.posts.partials._canva_studio_script')
 @endpush

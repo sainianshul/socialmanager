@@ -32,5 +32,8 @@
         <env name="FACEBOOK_APP_ID" value="1658585039195864"/>
         <env name="FACEBOOK_APP_KEY" value="7b1b257899645bf98e0bdf3c6e6cb916"/>
         <env name="META_VERIFY_TOKEN" value="warroom_secret_token_123"/>
+        <env name="CANVA_CLIENT_ID" value="OC-testing_client_id"/>
+        <env name="CANVA_CLIENT_SECRET" value="testing_secret_key_dummy_value"/>
+        <env name="CANVA_REDIRECT_URI" value="http://localhost/admin/canva/callback"/>
     </php>
 </phpunit>
