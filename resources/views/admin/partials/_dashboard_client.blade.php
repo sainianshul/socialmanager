@@ -24,14 +24,14 @@
     <div class="col-6 col-lg-3">
         <a href="{{ route('admin.accounts.index') }}" class="card card-sm card-link text-decoration-none" title="View Connected Accounts">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary">
                             <i class="ti ti-plug-connected fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">CHANNELS</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">CHANNELS</div>
                         <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($channelsCount) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -48,14 +48,14 @@
     <div class="col-6 col-lg-3">
         <a href="{{ route('admin.posts.facebook') }}" class="card card-sm card-link text-decoration-none" title="View Facebook Posts">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-success-lt text-success">
                             <i class="ti ti-article fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">TOTAL POSTS</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">TOTAL POSTS</div>
                         <div class="h2 mb-0 fw-bold text-body stat-value">{{ number_format($totalPosts) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -72,14 +72,14 @@
     <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-purple-lt text-purple">
                             <i class="ti ti-calendar-time fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">SCHEDULED</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">SCHEDULED</div>
                         <div class="h2 mb-0 fw-bold text-dark stat-value">{{ number_format($scheduledCount) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -94,14 +94,14 @@
     <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-azure-lt text-azure">
                             <i class="ti ti-circle-check fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">AUTO-PUBLISHED</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">AUTO-PUBLISHED</div>
                         <div class="h2 mb-0 fw-bold text-dark stat-value">{{ number_format($publishedScheduledCount) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -116,14 +116,14 @@
     <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-warning-lt text-warning">
                             <i class="ti ti-message-circle fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">TOTAL COMMENTS</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">TOTAL COMMENTS</div>
                         <div class="h2 mb-0 fw-bold text-dark stat-value">{{ number_format($totalComments) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -140,14 +140,14 @@
     <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                             <i class="ti ti-robot fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">AI REPLIED</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">AI REPLIED</div>
                         <div class="h2 mb-0 fw-bold text-dark stat-value">{{ number_format($repliedCount) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -162,14 +162,14 @@
     <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-info-lt text-info">
                             <i class="ti ti-clock-edit fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">PENDING REVIEW</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">PENDING REVIEW</div>
                         <div class="h2 mb-0 fw-bold text-dark stat-value">{{ number_format($pendingReviewCount) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">
@@ -186,14 +186,14 @@
     <div class="col-6 col-lg-3">
         <div class="card card-sm">
             <div class="card-body">
-                <div class="row align-items-center stat-row">
+                <div class="row g-2 align-items-center stat-row">
                     <div class="col-auto stat-icon-col">
                         <span class="avatar avatar-md rounded-2 bg-danger-lt text-danger">
                             <i class="ti ti-shield-check fs-2"></i>
                         </span>
                     </div>
                     <div class="col stat-content-col">
-                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label" style="letter-spacing: 0.05em;">HIDDEN TROLLS</div>
+                        <div class="text-uppercase text-secondary fw-semibold fs-7 stat-label">HIDDEN TROLLS</div>
                         <div class="h2 mb-0 fw-bold text-dark stat-value">{{ number_format($hiddenCount) }}</div>
                     </div>
                     <div class="col-auto text-end stat-badge-col">

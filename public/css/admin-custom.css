@@ -663,6 +663,31 @@ body,
     }
 }
 
+/* --- Dashboard Stat Grid (Desktop & Shared) --- */
+.dashboard-stat-grid .card-body {
+    padding: 0.85rem 0.75rem;
+}
+.dashboard-stat-grid .stat-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+.dashboard-stat-grid .stat-value {
+    line-height: 1.1;
+}
+.dashboard-stat-grid .stat-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.45rem;
+    white-space: nowrap;
+}
+.dashboard-stat-grid .avatar.avatar-md {
+    width: 38px;
+    height: 38px;
+}
+
 /* ============================================
    MOBILE RESPONSIVE — 576px and below (small)
    ============================================ */
