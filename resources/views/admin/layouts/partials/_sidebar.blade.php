@@ -21,8 +21,8 @@
         </h1>
 
         <!-- Brand Logo (Mobile) -->
-        <h1 class="navbar-brand navbar-brand-autodark d-lg-none mb-0 py-2">
-            <a href="{{ url('/admin') }}" class="d-flex align-items-center gap-2 text-decoration-none text-reset">
+        <h1 class="navbar-brand navbar-brand-autodark d-lg-none mb-0 py-1 px-1">
+            <a href="{{ url('/admin') }}" class="d-flex align-items-center gap-2 text-decoration-none text-reset" title="SocialManager">
                 <div class="navbar-brand-image text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background-color: #1db8ab !important;">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 3v18" />
@@ -31,12 +31,12 @@
                         <path d="M18.364 5.636L5.636 18.364" />
                     </svg>
                 </div>
-                <span class="navbar-brand-title fw-bold text-body fs-3">SocialManager</span>
+                <span class="navbar-brand-title fw-bold text-body fs-4 mb-0">SocialManager</span>
             </a>
         </h1>
 
         <!-- Mobile Quick Actions -->
-        <div class="navbar-nav flex-row d-lg-none">
+        <div class="navbar-nav flex-row d-lg-none align-items-center">
             <div class="nav-item d-flex me-3">
                 <a href="javascript:void(0)" class="nav-link px-0 hide-theme-dark btn-theme-toggle" title="Enable dark mode" data-bs-toggle="tooltip"
                    data-bs-placement="bottom" data-theme="dark">

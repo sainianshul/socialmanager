@@ -67,6 +67,20 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Auto-close mobile sidebar collapse when clicking a link
+    var sidebarMenu = document.getElementById('sidebar-menu');
+    if (sidebarMenu) {
+        sidebarMenu.addEventListener('click', function (e) {
+            var navLink = e.target.closest('.nav-link:not([data-bs-toggle])');
+            if (navLink && window.innerWidth < 992 && sidebarMenu.classList.contains('show')) {
+                var toggler = document.querySelector('.navbar-vertical .navbar-toggler');
+                if (toggler) {
+                    toggler.click();
+                }
+            }
+        });
+    }
+
     // Expand / Collapse long comments and replies
     document.addEventListener('click', function (e) {
         var moreBtn = e.target.closest('.btn-comment-more');
