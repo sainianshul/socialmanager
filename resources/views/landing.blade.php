@@ -732,40 +732,242 @@
             gap: 4px;
         }
 
-        .bento-micro-surface {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-top: auto;
-            border: none;
-        }
-        .bento-slot-card {
-            background: #ffffff;
-            border-radius: 10px;
-            padding: 10px 12px;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: none;
+        /* ===================================================================== */
+        /* DARK COMMAND CENTER (BIONIC BENTO GRID - BILLION DOLLAR SAAS)         */
+        /* ===================================================================== */
+        .dark-command-section {
+            background: #090d16;
+            position: relative;
+            padding: 105px 0;
+            overflow: hidden;
+            color: #f8fafc;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        /* Bento Grid Cards */
-        .bento-card {
-            background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            border-radius: 18px;
-            padding: 1.85rem;
+        .dark-mesh-glow-left {
+            position: absolute;
+            top: 5%;
+            left: 5%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(12, 166, 120, 0.18) 0%, transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dark-mesh-glow-right {
+            position: absolute;
+            bottom: 5%;
+            right: 5%;
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.14) 0%, transparent 70%);
+            filter: blur(90px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dark-command-header {
+            position: relative;
+            z-index: 1;
+            max-width: 720px;
+            margin: 0 auto 60px auto;
+            text-align: center;
+        }
+
+        .dark-section-eyebrow {
+            font-size: 0.78rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #34d399;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            padding: 5px 14px;
+            border-radius: 999px;
+            display: inline-block;
+            margin-bottom: 14px;
+        }
+
+        .dark-section-headline {
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            color: #ffffff;
+            line-height: 1.2;
+            margin-bottom: 14px;
+        }
+
+        .dark-section-subhead {
+            font-size: 1.08rem;
+            color: #94a3b8;
+            line-height: 1.65;
+            margin: 0;
+            font-weight: 400;
+        }
+
+        .dark-bento-card {
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 34px;
             height: 100%;
-            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+            box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1;
         }
-        .bento-card:hover {
+
+        .dark-bento-card:hover {
             transform: translateY(-5px);
+            border-color: rgba(12, 166, 120, 0.45);
+            box-shadow: 0 24px 50px -10px rgba(12, 166, 120, 0.22);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .dark-card-badge {
+            font-size: 0.74rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+        }
+        .dark-badge-teal {
+            background: rgba(12, 166, 120, 0.15);
+            border-color: rgba(12, 166, 120, 0.3);
+            color: #34d399;
+        }
+        .dark-badge-rose {
+            background: rgba(244, 63, 94, 0.15);
+            border-color: rgba(244, 63, 94, 0.3);
+            color: #fb7185;
+        }
+        .dark-badge-blue {
+            background: rgba(59, 130, 246, 0.15);
+            border-color: rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+        }
+
+        .dark-card-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #ffffff;
+            margin: 16px 0 8px 0;
+        }
+
+        .dark-card-desc {
+            font-size: 0.94rem;
+            line-height: 1.6;
+            color: #94a3b8;
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
+
+        /* Dark Visual Surface Components */
+        .dark-visual-panel {
+            background: rgba(2, 6, 23, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-top: auto;
+        }
+
+        /* Scheduler Timeline Slot Strip */
+        .dark-timeline-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 9px 12px;
+            margin-bottom: 8px;
+            font-size: 0.82rem;
+            transition: all 0.2s ease;
+        }
+        .dark-timeline-row:last-child {
+            margin-bottom: 0;
+        }
+        .dark-timeline-row:hover {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(12, 166, 120, 0.3);
+        }
+
+        /* AI Voice Visualizer Bars */
+        .ai-voice-equalizer {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            height: 20px;
+        }
+        .equalizer-bar {
+            width: 3px;
+            background: #10b981;
+            border-radius: 2px;
+            animation: eqDance 1.2s ease-in-out infinite alternate;
+        }
+        .equalizer-bar:nth-child(2) { animation-delay: 0.2s; height: 16px; }
+        .equalizer-bar:nth-child(3) { animation-delay: 0.4s; height: 12px; }
+        .equalizer-bar:nth-child(4) { animation-delay: 0.1s; height: 18px; }
+        .equalizer-bar:nth-child(5) { animation-delay: 0.3s; height: 10px; }
+
+        @keyframes eqDance {
+            0% { transform: scaleY(0.4); }
+            100% { transform: scaleY(1.2); }
+        }
+
+        .dark-pill-chip {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            padding: 4px 11px;
+            font-size: 0.76rem;
+            color: #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .dark-pill-active {
+            background: rgba(12, 166, 120, 0.18);
             border-color: rgba(12, 166, 120, 0.35);
-            box-shadow: 0 20px 40px -8px rgba(12, 166, 120, 0.14), 0 0 0 1px rgba(12, 166, 120, 0.2);
+            color: #34d399;
+            font-weight: 600;
+        }
+
+        /* Interactive DM Trigger Flow Strip */
+        .dm-flow-pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+            padding: 4px 0;
+        }
+        .dm-flow-box {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            color: #e2e8f0;
+        }
+        .dm-flow-arrow {
+            color: #10b981;
+            font-size: 1rem;
+            animation: pulseArrow 1.5s infinite;
+        }
+        @keyframes pulseArrow {
+            0%, 100% { transform: translateX(0); opacity: 0.6; }
+            50% { transform: translateX(4px); opacity: 1; }
         }
 
         /* ===================================================================== */
@@ -1451,117 +1653,169 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 2: CORE FEATURES BENTO GRID                                          -->
+    <!-- STEP 2: CORE CAPABILITIES (BIONIC DARK SAAS BENTO GRID)                   -->
     <!-- ========================================================================= -->
-    <section id="features" class="py-6" style="background-color: #fafbfc;">
-        <div class="container-xl">
-            <div class="text-center mb-5">
-                <span class="badge badge-teal-soft mb-2"><i class="ti ti-layers-linked me-1"></i>Core Capabilities</span>
-                <h2 class="fw-bold text-dark mb-2 display-6">Engineered for High-Stakes Social Operations</h2>
-                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
-                    Every tool required to publish rich media, engage thousands of citizens and followers, and protect brand reputation around the clock.
+    <section id="features" class="dark-command-section">
+        <!-- Ambient Glowing Background Meshes -->
+        <div class="dark-mesh-glow-left"></div>
+        <div class="dark-mesh-glow-right"></div>
+
+        <div class="container-xl position-relative" style="z-index: 1;">
+            <!-- Section Header -->
+            <div class="dark-command-header">
+                <span class="dark-section-eyebrow">COMMAND CENTER CORE</span>
+                <h2 class="dark-section-headline">Engineered for High-Stakes Social Operations</h2>
+                <p class="dark-section-subhead">
+                    Every mission-critical tool built to publish rich media, moderate thousands of follower inquiries, and protect brand reputation around the clock.
                 </p>
             </div>
 
-            <!-- Bento Box Grid -->
-            <div class="row g-3">
+            <!-- Bento Grid -->
+            <div class="row g-4">
                 <!-- Bento Card 1: Content Publishing & Drag-Drop Calendar (7 Columns) -->
                 <div class="col-12 col-lg-7">
-                    <div class="bento-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                    <div class="dark-bento-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="avatar avatar-md rounded-3 bg-teal-lt text-teal">
                                 <i class="ti ti-calendar-event fs-1"></i>
                             </span>
-                            <span class="badge badge-outline text-teal">1-Minute Background Daemon</span>
+                            <span class="dark-card-badge dark-badge-teal">
+                                <i class="ti ti-clock me-1"></i>1-Minute Background Daemon
+                            </span>
                         </div>
-                        <h3 class="fw-bold text-dark mb-2">Unified Multi-Platform Content Scheduler</h3>
-                        <p class="text-muted mb-4">
-                            Compose your message once, upload your image or video, and schedule it across Facebook, Instagram, and YouTube. Our automated server daemon executes scheduled publishes every 60 seconds with zero manual intervention.
+                        <h3 class="dark-card-title">Unified Multi-Platform Content Scheduler</h3>
+                        <p class="dark-card-desc">
+                            Compose your message once, attach high-res images or 1080p video, and schedule across Facebook, Instagram, and YouTube. Our automated server daemon executes scheduled publishes every 60 seconds with zero manual intervention.
                         </p>
 
-                        <!-- Inner Feature Showcase Mockup -->
-                        <div class="bento-micro-surface">
+                        <!-- Visual Software Timeline Surface -->
+                        <div class="dark-visual-panel">
                             <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="small fw-semibold text-secondary">Active Calendar Slots</span>
-                                <span class="small text-teal"><i class="ti ti-clock me-1"></i>Queue Running</span>
+                                <span class="fs-8 text-secondary fw-semibold">LIVE SCHEDULE QUEUE</span>
+                                <span class="fs-8 text-teal d-inline-flex align-items-center gap-1">
+                                    <span class="radar-dot-pulse"></span> Daemon Active
+                                </span>
                             </div>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <div class="bento-slot-card">
-                                        <i class="ti ti-video text-danger fs-3"></i>
-                                        <div class="text-truncate">
-                                            <div class="fw-semibold small text-truncate">Weekly Address Video</div>
-                                            <div class="text-muted fs-8">YouTube • 1080p Resumable</div>
-                                        </div>
-                                    </div>
+
+                            <!-- Timeline Item 1 -->
+                            <div class="dark-timeline-row">
+                                <div class="d-flex align-items-center gap-2 text-truncate">
+                                    <span class="avatar avatar-xs rounded-2 bg-red-lt text-danger">
+                                        <i class="ti ti-brand-youtube"></i>
+                                    </span>
+                                    <span class="text-truncate text-light fw-medium">Budget 2026 Analysis - Full Video</span>
                                 </div>
-                                <div class="col-6">
-                                    <div class="bento-slot-card">
-                                        <i class="ti ti-device-mobile text-pink fs-3"></i>
-                                        <div class="text-truncate">
-                                            <div class="fw-semibold small text-truncate">Highlights Reel</div>
-                                            <div class="text-muted fs-8">Instagram • 9:16 Vertical</div>
-                                        </div>
-                                    </div>
+                                <span class="badge bg-teal-lt text-teal fs-8">1080p Resumable</span>
+                            </div>
+
+                            <!-- Timeline Item 2 -->
+                            <div class="dark-timeline-row">
+                                <div class="d-flex align-items-center gap-2 text-truncate">
+                                    <span class="avatar avatar-xs rounded-2 bg-pink-lt text-pink">
+                                        <i class="ti ti-brand-instagram"></i>
+                                    </span>
+                                    <span class="text-truncate text-light fw-medium">Reel: 5 Important Welfare Schemes</span>
                                 </div>
+                                <span class="badge bg-purple-lt text-purple fs-8">9:16 Vertical</span>
+                            </div>
+
+                            <!-- Timeline Item 3 -->
+                            <div class="dark-timeline-row">
+                                <div class="d-flex align-items-center gap-2 text-truncate">
+                                    <span class="avatar avatar-xs rounded-2 bg-blue-lt text-primary">
+                                        <i class="ti ti-brand-facebook"></i>
+                                    </span>
+                                    <span class="text-truncate text-light fw-medium">Public Grievance Camp Announcement</span>
+                                </div>
+                                <span class="badge bg-blue-lt text-primary fs-8">Page Feed</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bento Card 2: Contextual Multi-AI Personas (5 Columns) -->
+                <!-- Bento Card 2: Adaptive AI Personas (5 Columns) -->
                 <div class="col-12 col-lg-5">
-                    <div class="bento-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                    <div class="dark-bento-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="avatar avatar-md rounded-3 bg-teal-lt text-teal">
                                 <i class="ti ti-brain fs-1"></i>
                             </span>
-                            <span class="badge badge-teal-soft">Gemini, OpenAI, Qwen</span>
+                            <span class="dark-card-badge dark-badge-teal">
+                                Gemini, OpenAI, Qwen
+                            </span>
                         </div>
-                        <h3 class="fw-bold text-dark mb-2">Adaptive AI Personas</h3>
-                        <p class="text-muted mb-3">
-                            Customize the response voice for each channel. AI analyzes sentiment and drafts authentic replies in your selected voice.
+                        <h3 class="dark-card-title">Adaptive AI Personas</h3>
+                        <p class="dark-card-desc">
+                            Customize the response voice for each channel. AI analyzes sentiment, detects nuance, and drafts authentic replies in your selected voice.
                         </p>
 
-                        <!-- Tone Selector Chips Preview -->
-                        <div class="bento-micro-surface">
-                            <span class="small text-secondary fw-semibold d-block mb-2">Configurable Tones:</span>
-                            <div class="d-flex flex-wrap gap-1 mb-2.5">
-                                <span class="badge bg-teal text-white rounded-pill fs-8"><i class="ti ti-check me-1"></i>Humble & Respectful</span>
-                                <span class="badge bg-white text-secondary rounded-pill shadow-xs fs-8">Patriotic & Inspiring</span>
-                                <span class="badge bg-white text-secondary rounded-pill shadow-xs fs-8">Assertive & Firm</span>
-                                <span class="badge bg-white text-secondary rounded-pill shadow-xs fs-8">Formal & Official</span>
+                        <!-- Visual AI Tuner Surface -->
+                        <div class="dark-visual-panel">
+                            <!-- Equalizer Visualizer & Active Persona -->
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom border-white border-opacity-10">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="ai-voice-equalizer">
+                                        <div class="equalizer-bar" style="height: 14px;"></div>
+                                        <div class="equalizer-bar"></div>
+                                        <div class="equalizer-bar"></div>
+                                        <div class="equalizer-bar"></div>
+                                        <div class="equalizer-bar"></div>
+                                    </div>
+                                    <span class="fs-8 text-light fw-bold">Active Voice Persona</span>
+                                </div>
+                                <span class="dark-pill-chip dark-pill-active">
+                                    <i class="ti ti-check"></i>Humble & Respectful
+                                </span>
                             </div>
-                            <span class="small text-secondary fw-semibold d-block mb-1.5">Languages Supported:</span>
-                            <div class="d-flex gap-1">
-                                <span class="badge bg-teal-lt text-teal rounded-pill fs-8">Hindi + Hinglish</span>
-                                <span class="badge bg-secondary-lt text-secondary rounded-pill fs-8">Pure Hindi</span>
-                                <span class="badge bg-secondary-lt text-secondary rounded-pill fs-8">English</span>
+
+                            <!-- Configurable Tones -->
+                            <div class="d-flex flex-wrap gap-1.5 mb-2.5">
+                                <span class="dark-pill-chip">Patriotic & Inspiring</span>
+                                <span class="dark-pill-chip">Assertive & Firm</span>
+                                <span class="dark-pill-chip">Formal & Official</span>
+                            </div>
+
+                            <!-- Languages Supported -->
+                            <div class="d-flex align-items-center gap-2 text-muted fs-8">
+                                <span>Languages:</span>
+                                <span class="badge bg-teal-lt text-teal fs-8">Hindi + Hinglish</span>
+                                <span class="badge bg-dark text-secondary fs-8">Pure Hindi</span>
+                                <span class="badge bg-dark text-secondary fs-8">English</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Bento Card 3: Instant Comment-to-DM Engine (4 Columns) -->
+                <!-- Bento Card 3: Instant Comment-to-DM (4 Columns) -->
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="bento-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                    <div class="dark-bento-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="avatar avatar-md rounded-3 bg-teal-lt text-teal">
                                 <i class="ti ti-mail-forward fs-1"></i>
                             </span>
-                            <span class="badge badge-outline text-primary">Private Replies API</span>
+                            <span class="dark-card-badge dark-badge-blue">
+                                Private Replies API
+                            </span>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">Automated Comment-to-DM</h4>
-                        <p class="text-muted small mb-3">
-                            Convert public interactions into private inquiries. When a user comments specific keywords on Instagram or Facebook, send an instant DM with the link, details, or registration form.
+                        <h3 class="dark-card-title">Automated Comment-to-DM</h3>
+                        <p class="dark-card-desc">
+                            Convert public interactions into private inquiries. When a user comments specific keywords on Instagram or Facebook, send an instant DM with details or links.
                         </p>
-                        <div class="bento-micro-surface">
-                            <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
-                                <span>Rule Trigger Mode</span>
-                                <span class="text-teal fw-semibold">Contains Keyword</span>
+
+                        <!-- Visual Interactive Pipeline Surface -->
+                        <div class="dark-visual-panel">
+                            <div class="dm-flow-pipeline mb-2">
+                                <div class="dm-flow-box">
+                                    <i class="ti ti-message text-teal me-1"></i>Comment: "link"
+                                </div>
+                                <i class="ti ti-arrow-right dm-flow-arrow"></i>
+                                <div class="dm-flow-box" style="border-color: rgba(12, 166, 120, 0.4);">
+                                    <i class="ti ti-send text-teal me-1"></i>Private DM (0.8s)
+                                </div>
                             </div>
-                            <div class="small fw-semibold text-dark">
-                                Keywords: <code>link</code>, <code>apply</code>, <code>scheme</code>, <code>help</code>
+                            <div class="fs-8 text-muted d-flex justify-content-between">
+                                <span>Rule: Contains Keyword</span>
+                                <span class="text-teal fw-semibold">100% Meta Compliant</span>
                             </div>
                         </div>
                     </div>
@@ -1569,24 +1823,29 @@
 
                 <!-- Bento Card 4: 24/7 Anti-Troll Shield (4 Columns) -->
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="bento-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                    <div class="dark-bento-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="avatar avatar-md rounded-3 bg-teal-lt text-teal">
                                 <i class="ti ti-shield-lock fs-1"></i>
                             </span>
-                            <span class="badge badge-outline text-danger">Zero Human Delay</span>
+                            <span class="dark-card-badge dark-badge-rose">
+                                Zero Human Delay
+                            </span>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">24/7 Anti-Troll & Abuse Shield</h4>
-                        <p class="text-muted small mb-3">
-                            Our AI toxicity classification scans incoming comments for abusive language, hate speech, and troll attacks, automatically hiding them from public view before they cause brand harm.
+                        <h3 class="dark-card-title">24/7 Anti-Troll & Abuse Shield</h3>
+                        <p class="dark-card-desc">
+                            Our AI toxicity classification scans incoming comments for abusive language, hate speech, and troll attacks, automatically hiding them from public view in 0.3 seconds.
                         </p>
-                        <div class="bento-micro-surface">
-                            <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
-                                <span>Action Taken</span>
-                                <span class="badge bg-danger-lt text-danger fs-8">Auto-Hidden</span>
+
+                        <!-- Visual Toxicity Shield HUD Surface -->
+                        <div class="dark-visual-panel">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="fs-8 text-danger fw-semibold"><i class="ti ti-alert-triangle me-1"></i>Threat Detected</span>
+                                <span class="badge bg-danger-lt text-danger fs-8">Toxicity 96%</span>
                             </div>
-                            <div class="small text-muted text-truncate">
-                                Abusive comment hidden on Facebook & YouTube
+                            <div class="d-flex align-items-center justify-content-between text-muted fs-8">
+                                <span class="text-truncate">Hate comment hidden</span>
+                                <span class="text-teal fw-semibold"><i class="ti ti-check me-0.5"></i>Auto-Shielded</span>
                             </div>
                         </div>
                     </div>
@@ -1594,26 +1853,34 @@
 
                 <!-- Bento Card 5: Real-Time Political Sentiment War Room (4 Columns) -->
                 <div class="col-12 col-md-12 col-lg-4">
-                    <div class="bento-card d-flex flex-column">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
+                    <div class="dark-bento-card">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="avatar avatar-md rounded-3 bg-teal-lt text-teal">
                                 <i class="ti ti-chart-dots-3 fs-1"></i>
                             </span>
-                            <span class="badge badge-teal-soft">Sentiment War Room</span>
+                            <span class="dark-card-badge dark-badge-teal">
+                                Sentiment War Room
+                            </span>
                         </div>
-                        <h4 class="fw-bold text-dark mb-2">Live Sentiment Intelligence</h4>
-                        <p class="text-muted small mb-3">
+                        <h3 class="dark-card-title">Live Sentiment Intelligence</h3>
+                        <p class="dark-card-desc">
                             Know exactly what your constituents and customers think. Real-time categorization of comments into Positive, Grievances, and Complaints with interactive trend graphs.
                         </p>
-                        <div class="bento-micro-surface">
+
+                        <!-- Visual Sentiment Meter Surface -->
+                        <div class="dark-visual-panel">
                             <div class="d-flex align-items-center justify-content-between small mb-1.5">
-                                <span class="fw-semibold text-dark">Constituent Sentiment</span>
+                                <span class="fw-semibold text-light">Constituent Sentiment</span>
                                 <span class="text-teal fw-bold">84% Positive</span>
                             </div>
-                            <div class="progress progress-sm">
+                            <div class="progress progress-sm mb-2" style="background: rgba(255, 255, 255, 0.08); height: 6px;">
                                 <div class="progress-bar bg-teal" style="width: 84%"></div>
                                 <div class="progress-bar bg-warning" style="width: 12%"></div>
                                 <div class="progress-bar bg-danger" style="width: 4%"></div>
+                            </div>
+                            <div class="d-flex justify-content-between fs-8 text-muted">
+                                <span><i class="ti ti-trending-up text-teal me-0.5"></i>+12.4% Trust Index</span>
+                                <span>Meta & YouTube</span>
                             </div>
                         </div>
                     </div>
