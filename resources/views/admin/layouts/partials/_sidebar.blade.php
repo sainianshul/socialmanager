@@ -223,14 +223,6 @@
                             <span class="nav-link-title">Auto DM</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="AI Assistant">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
-                                <i class="ti ti-sparkles fs-2"></i>
-                            </span>
-                            <span class="nav-link-title">AI Assistant</span>
-                        </a>
-                    </li>
 
                     {{-- HELP & SUPPORT --}}
                     <li class="nav-section-title">Help & Support</li>
