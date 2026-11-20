@@ -588,41 +588,22 @@
             font-weight: 400;
         }
 
-        /* Modern 4-Column Footer */
+        /* Minimal Apple-Style Footer */
         .landing-footer {
-            background: #0b1320;
-            color: #94a3b8;
-            border-top: 1px solid #1e293b;
+            background: #ffffff;
+            color: #64748b;
+            border-top: 1px solid rgba(15, 23, 42, 0.06);
+            padding: 48px 0 36px;
         }
-        .landing-footer a {
-            color: #94a3b8;
+        .landing-footer a.footer-link {
+            color: #64748b;
             text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
             transition: color 0.15s ease;
         }
-        .landing-footer a:hover {
-            color: #2dd4bf;
-        }
-        .footer-heading {
-            color: #f8fafc;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            margin-bottom: 1.25rem;
-        }
-        .footer-link-list {
-            list-style: none;
-            padding-left: 0;
-            margin-bottom: 0;
-        }
-        .footer-link-list li {
-            margin-bottom: 0.8rem;
-            font-size: 0.92rem;
-        }
-        .footer-link-list li a {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
+        .landing-footer a.footer-link:hover {
+            color: #0ca678;
         }
         .status-indicator-live {
             width: 8px;
@@ -654,15 +635,17 @@
     <header class="landing-navbar">
         <div class="container-xl">
             <div class="d-flex align-items-center justify-content-between">
-                <!-- Brand Logo -->
-                <a href="{{ url('/') }}" class="brand-logo d-flex align-items-center gap-2.5 text-decoration-none">
-                    <span class="brand-logo-mark">
-                        <i class="ti ti-brand-campaignmonitor fs-2 text-white"></i>
-                    </span>
-                    <div class="d-flex align-items-center gap-2">
-                        <span class="brand-logo-title">Social<span class="text-teal-gradient">Manager</span></span>
-                        <span class="badge badge-teal-soft">v2.4</span>
+                <!-- Brand Logo (Official SocialManager Logo) -->
+                <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+                    <div class="navbar-brand-image text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background-color: #1db8ab !important;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3v18" />
+                            <path d="M3 12h18" />
+                            <path d="M5.636 5.636l12.728 12.728" />
+                            <path d="M18.364 5.636L5.636 18.364" />
+                        </svg>
                     </div>
+                    <span class="fw-bold text-dark fs-3 mb-0">SocialManager</span>
                 </a>
 
                 <!-- Desktop Navigation Capsule Island -->
@@ -1123,81 +1106,41 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 5: MODERN 4-COLUMN FOOTER WITH COMPLIANCE & LEGAL LINKS              -->
+        <!-- ========================================================================= -->
+    <!-- STEP 5: MINIMAL APPLE-STYLE FOOTER                                        -->
     <!-- ========================================================================= -->
-    <footer class="landing-footer pt-6 pb-4">
+    <footer class="landing-footer">
         <div class="container-xl">
-            <div class="row g-4 mb-5">
-                <!-- Col 1: Brand Info -->
-                <div class="col-12 col-lg-4">
-                    <a href="{{ url('/') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none mb-3">
-                        <span class="avatar avatar-sm rounded-2 bg-teal-lt text-teal">
-                            <i class="ti ti-brand-campaignmonitor fs-2"></i>
-                        </span>
-                        <span class="fw-bold fs-3 text-white">Social<span class="text-teal">Manager</span></span>
-                        <span class="badge badge-teal-soft ms-1">v2.4</span>
-                    </a>
-                    <p class="text-muted small mb-3 pe-lg-4">
-                        Enterprise-grade social media publishing, AI comment auto-reply, and automated direct messaging built for creators, businesses, and digital agencies.
-                    </p>
-                    <div class="d-inline-flex align-items-center gap-2 px-2.5 py-1.5 rounded-2 bg-dark border border-secondary border-opacity-25 small">
-                        <span class="status-indicator-live"></span>
-                        <span class="text-white-50">Systems Status: <strong class="text-teal">All APIs Operational</strong></span>
+            <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-4 pb-4 border-bottom border-light">
+                <!-- Brand Logo (Official SocialManager Logo) -->
+                <a href="{{ url('/') }}" class="d-flex align-items-center gap-2 text-decoration-none">
+                    <div class="navbar-brand-image text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px; background-color: #1db8ab !important;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3v18" />
+                            <path d="M3 12h18" />
+                            <path d="M5.636 5.636l12.728 12.728" />
+                            <path d="M18.364 5.636L5.636 18.364" />
+                        </svg>
                     </div>
-                </div>
-
-                <!-- Col 2: Platform Capabilities -->
-                <div class="col-6 col-md-3 col-lg-2">
-                    <h5 class="footer-heading">Capabilities</h5>
-                    <ul class="footer-link-list">
-                        <li><a href="#features"><i class="ti ti-calendar-event text-teal"></i>Content Scheduler</a></li>
-                        <li><a href="#features"><i class="ti ti-robot text-teal"></i>AI Auto-Responder</a></li>
-                        <li><a href="#features"><i class="ti ti-message-share text-teal"></i>Comment-to-DM Engine</a></li>
-                        <li><a href="#features"><i class="ti ti-shield-half text-teal"></i>Anti-Troll Shield</a></li>
-                        <li><a href="#features"><i class="ti ti-chart-dots text-teal"></i>Sentiment Analytics</a></li>
-                        <li><a href="#faq"><i class="ti ti-lock text-teal"></i>Encrypted Token Vault</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 3: Supported Ecosystem -->
-                <div class="col-6 col-md-3 col-lg-3">
-                    <h5 class="footer-heading">Supported Ecosystem</h5>
-                    <ul class="footer-link-list">
-                        <li><a href="#platforms"><i class="ti ti-brand-facebook text-teal"></i>Facebook Pages API</a></li>
-                        <li><a href="#platforms"><i class="ti ti-brand-instagram text-teal"></i>Instagram Professional API</a></li>
-                        <li><a href="#platforms"><i class="ti ti-brand-youtube text-teal"></i>YouTube Data API v3</a></li>
-                        <li><a href="#platforms"><i class="ti ti-brand-google text-teal"></i>Google Cloud OAuth 2.0</a></li>
-                        <li><a href="#faq"><i class="ti ti-brand-azure text-teal"></i>Microsoft Azure Cloud</a></li>
-                        <li><a href="#faq"><i class="ti ti-webhook text-teal"></i>HMAC SHA-256 Webhooks</a></li>
-                    </ul>
-                </div>
-
-                <!-- Col 4: Trust & Compliance -->
-                <div class="col-12 col-md-6 col-lg-3">
-                    <h5 class="footer-heading">Trust & Compliance</h5>
-                    <ul class="footer-link-list">
-                        <li><a href="{{ url('/privacy') }}"><i class="ti ti-file-shield text-teal"></i>Privacy Policy</a></li>
-                        <li><a href="{{ url('/terms') }}"><i class="ti ti-file-text text-teal"></i>Terms of Service</a></li>
-                        <li><a href="{{ url('/data-deletion') }}"><i class="ti ti-trash text-teal"></i>Data Deletion Policy</a></li>
-                        <li><a href="#faq"><i class="ti ti-shield-lock text-teal"></i>Security Architecture</a></li>
-                        <li><a href="{{ route('login') }}"><i class="ti ti-login text-teal"></i>Client Portal Login</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Divider -->
-            <hr class="border-secondary border-opacity-25 my-4">
-
-            <!-- Bottom Row: Copyright & Disclaimer -->
-            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-muted small">
-                <span>&copy; {{ date('Y') }} <strong>SocialManager</strong>. Enterprise Social Media Infrastructure. All rights reserved.</span>
-                <a href="#" class="text-white-50 text-decoration-none">
-                    <i class="ti ti-arrow-up me-1"></i>Back to Top
+                    <span class="fw-bold text-dark fs-3 mb-0">SocialManager</span>
                 </a>
+
+                <!-- Navigation & Legal Links -->
+                <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4">
+                    <a href="#features" class="footer-link">Why SocialManager</a>
+                    <a href="#platforms" class="footer-link">Platforms</a>
+                    <a href="#how-it-works" class="footer-link">How It Works</a>
+                    <a href="#faq" class="footer-link">FAQ</a>
+                    <a href="{{ url('/privacy') }}" class="footer-link">Privacy Policy</a>
+                    <a href="{{ url('/terms') }}" class="footer-link">Terms of Service</a>
+                    <a href="{{ url('/data-deletion') }}" class="footer-link">Data Deletion Policy</a>
+                    <a href="{{ route('login') }}" class="footer-link fw-semibold text-teal">Sign In</a>
+                </div>
             </div>
 
-            <div class="mt-3 text-muted" style="font-size: 0.76rem; color: #64748b !important;">
-                Disclaimer: SocialManager is an independent SaaS automation platform. Meta, Facebook, and Instagram are registered trademarks of Meta Platforms, Inc. YouTube and Google are registered trademarks of Google LLC. SocialManager integrates exclusively through officially sanctioned, authenticated public API endpoints.
+            <!-- Bottom Copyright -->
+            <div class="pt-3 text-muted small">
+                &copy; {{ date('Y') }} SocialManager.
             </div>
         </div>
     </footer>

@@ -37,7 +37,9 @@ class LandingPageTest extends TestCase
         $response->assertSee('Privacy Policy');
         $response->assertSee('Terms of Service');
         $response->assertSee('Data Deletion Policy');
-        $response->assertSee('All APIs Operational');
+        $response->assertDontSee('All APIs Operational');
+        $response->assertDontSee('v2.4');
+        $response->assertDontSee('Enterprise Social Media Infrastructure');
     }
 
     public function test_authenticated_user_redirects_to_dashboard(): void
