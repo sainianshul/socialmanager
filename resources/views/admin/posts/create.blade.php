@@ -240,32 +240,33 @@
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <label class="form-label fw-bold text-dark m-0 d-flex align-items-center gap-1.5">
                                 <i class="ti ti-photo-plus text-primary"></i> Media Attachment
-                                <span class="badge bg-light text-secondary border rounded-pill ms-1" id="media-attached-count" style="font-size: 11px;">0 attached</span>
                             </label>
-                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                <i class="ti ti-brand-canva me-1 text-primary"></i>Design on Canva
-                            </button>
+                            <span class="badge bg-light text-secondary border rounded-pill" id="media-attached-count" style="font-size: 11px;">0 attached</span>
                         </div>
 
                         {{-- Hidden real file input --}}
                         <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple>
 
-                        {{-- Modern Media Dropzone & Uploader Card --}}
-                        <div class="card border p-3" id="composer-media-card" style="border-radius: 14px; background: #fafbfc; border: 1.5px dashed #cbd5e1 !important; transition: all 0.2s ease;">
-                            {{-- Empty state prompt --}}
-                            <div class="text-center py-3" id="media-uploader-empty-state">
-                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-2" style="width: 48px; height: 48px; background: #eef2ff;">
-                                    <i class="ti ti-photo-up fs-2 text-primary"></i>
+                        {{-- Compact Modern Media Dropzone Card --}}
+                        <div class="card border px-3 py-2.5" id="composer-media-card" style="border-radius: 12px; background: #fafbfc; border: 1.5px dashed #cbd5e1 !important; transition: all 0.2s ease;">
+                            {{-- Compact Empty State --}}
+                            <div class="d-flex flex-column align-items-center justify-content-center text-center py-2" id="media-uploader-empty-state">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-1.5" style="width: 36px; height: 36px; background: #f1f5f9;">
+                                    <i class="ti ti-cloud-upload fs-3 text-secondary"></i>
                                 </div>
-                                <h6 class="fw-bold text-dark mb-1">Add Photos, Videos, or Graphics</h6>
-                                <p class="text-secondary small mb-3" style="max-width: 420px; margin: 0 auto;">Select media from your computer or create professional visuals using Canva templates.</p>
+                                <div class="small text-secondary mb-2" style="font-size: 0.85rem;">
+                                    Drag and drop media here, or choose source:
+                                </div>
                                 
-                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-                                    <button type="button" class="btn btn-sm btn-white border rounded-pill px-3 py-1.5 fw-semibold shadow-xs" id="btn-trigger-file-browser">
-                                        <i class="ti ti-upload me-1 text-secondary"></i>Browse Device
+                                {{-- Modular Source Action Buttons (Easily expandable for future providers) --}}
+                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap" id="media-source-actions">
+                                    <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" id="btn-trigger-file-browser">
+                                        <i class="ti ti-upload text-secondary"></i>
+                                        <span>Upload File</span>
                                     </button>
-                                    <button type="button" class="btn btn-sm rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs text-white" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" style="background: linear-gradient(135deg, #00c4cc, #7d2ae8); border: none;">
-                                        <i class="ti ti-brand-canva me-1 text-white"></i>Design on Canva
+                                    <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
+                                        <i class="ti ti-brand-canva text-primary"></i>
+                                        <span>Choose Canva</span>
                                     </button>
                                 </div>
                             </div>
@@ -592,6 +593,29 @@
     }
     [data-bs-theme="dark"] .custom-multi-select .dropdown-item:hover {
         background-color: #1e293b;
+    }
+    .media-source-btn {
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        color: #334155;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.15s ease;
+    }
+    .media-source-btn:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+    [data-bs-theme="dark"] .media-source-btn {
+        background: #111a2d !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: #cbd5e1 !important;
+    }
+    [data-bs-theme="dark"] .media-source-btn:hover {
+        background: #1e293b !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
+        color: #f8fafc !important;
     }
 </style>
 @endpush

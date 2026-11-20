@@ -277,10 +277,9 @@
                     {{-- Current Media Gallery Preview + New Media Upload --}}
                     <div class="mb-4" id="meta-media-container">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <label class="form-label fw-bold text-dark m-0">Media Attachment</label>
-                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                <i class="ti ti-brand-canva me-1 text-primary"></i>Design on Canva
-                            </button>
+                            <label class="form-label fw-bold text-dark m-0 d-flex align-items-center gap-1.5">
+                                <i class="ti ti-photo text-primary"></i> Media Attachment
+                            </label>
                         </div>
 
                         @if(!empty($scheduledPost->media_urls) && count($scheduledPost->media_urls) > 0)
@@ -312,7 +311,18 @@
                             </div>
                         @endif
 
-                        <input type="file" name="media_files[]" class="form-control" id="composer-media-files" accept="image/*,video/*" multiple>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                            <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" onclick="$('#composer-media-files').click()">
+                                <i class="ti ti-upload text-secondary"></i>
+                                <span>Upload File</span>
+                            </button>
+                            <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
+                                <i class="ti ti-brand-canva text-primary"></i>
+                                <span>Choose Canva</span>
+                            </button>
+                            <span id="composer-edit-selected-filename" class="small text-secondary ms-1"></span>
+                        </div>
+                        <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple onchange="let n = this.files.length; $('#composer-edit-selected-filename').text(n > 0 ? (n + ' file(s) selected') : '');">
                         <div class="form-text small text-secondary">
                             <i class="ti ti-help-circle me-1"></i>Select new media file(s) only if you want to replace current attachments. Leave blank to keep existing files.
                         </div>
@@ -438,6 +448,29 @@
     }
     [data-bs-theme="dark"] .post-type-pill:hover {
         background: #162035 !important;
+        color: #f8fafc !important;
+    }
+    .media-source-btn {
+        background: #ffffff;
+        border: 1px solid #d1d5db;
+        color: #334155;
+        font-size: 0.85rem;
+        font-weight: 500;
+        transition: all 0.15s ease;
+    }
+    .media-source-btn:hover {
+        background: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+    [data-bs-theme="dark"] .media-source-btn {
+        background: #111a2d !important;
+        border-color: rgba(255, 255, 255, 0.15) !important;
+        color: #cbd5e1 !important;
+    }
+    [data-bs-theme="dark"] .media-source-btn:hover {
+        background: #1e293b !important;
+        border-color: rgba(255, 255, 255, 0.25) !important;
         color: #f8fafc !important;
     }
 </style>
