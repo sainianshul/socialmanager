@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Crypt;
 
 class Account extends Model
 {
@@ -68,6 +70,93 @@ class Account extends Model
         'token_expires_at' => 'datetime',
         'last_synced_at' => 'datetime',
     ];
+
+    /**
+     * Hide sensitive credentials from JSON and array serialization
+     */
+    protected $hidden = [
+        'access_token',
+        'refresh_token',
+        'google_refresh_token',
+    ];
+
+    /**
+     * Transparently encrypt / decrypt access_token (AES-256)
+     */
+    protected function accessToken(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    return Crypt::decryptString($value);
+                } catch (\Throwable) {
+                    return $value; // Fallback for existing legacy plaintext
+                }
+            },
+            set: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    Crypt::decryptString($value);
+                    return $value; // Already encrypted
+                } catch (\Throwable) {
+                    return Crypt::encryptString($value);
+                }
+            }
+        );
+    }
+
+    /**
+     * Transparently encrypt / decrypt refresh_token (AES-256)
+     */
+    protected function refreshToken(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    return Crypt::decryptString($value);
+                } catch (\Throwable) {
+                    return $value;
+                }
+            },
+            set: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    Crypt::decryptString($value);
+                    return $value;
+                } catch (\Throwable) {
+                    return Crypt::encryptString($value);
+                }
+            }
+        );
+    }
+
+    /**
+     * Transparently encrypt / decrypt google_refresh_token (AES-256)
+     */
+    protected function googleRefreshToken(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    return Crypt::decryptString($value);
+                } catch (\Throwable) {
+                    return $value;
+                }
+            },
+            set: function ($value) {
+                if (empty($value)) return $value;
+                try {
+                    Crypt::decryptString($value);
+                    return $value;
+                } catch (\Throwable) {
+                    return Crypt::encryptString($value);
+                }
+            }
+        );
+    }
 
     /**
      * Platform checks
