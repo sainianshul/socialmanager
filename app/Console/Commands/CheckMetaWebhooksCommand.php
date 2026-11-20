@@ -14,6 +14,27 @@ class CheckMetaWebhooksCommand extends Command
     public function handle(): int
     {
         $apiVersion = 'v20.0';
+        $appId = config('services.facebook.client_id');
+        $appSecret = config('services.facebook.client_secret');
+        $appToken = "{$appId}|{$appSecret}";
+
+        $this->info("=== Meta App Overview (App ID: {$appId}) ===");
+        try {
+            $appRes = Http::timeout(10)->get("https://graph.facebook.com/{$apiVersion}/{$appId}", [
+                'fields' => 'name,link,app_type,category',
+                'access_token' => $appToken,
+            ])->json();
+            $this->line("App Details: " . json_encode($appRes));
+
+            // Check App-level Webhook Subscriptions
+            $whRes = Http::timeout(10)->get("https://graph.facebook.com/{$apiVersion}/{$appId}/subscriptions", [
+                'access_token' => $appToken,
+            ])->json();
+            $this->info("App-Level Webhook Subscriptions: " . json_encode($whRes, JSON_PRETTY_PRINT));
+        } catch (\Throwable $e) {
+            $this->warn("App check warning: " . $e->getMessage());
+        }
+
         $accounts = Account::where('account_type', Account::TYPE_FACEBOOK)
             ->where('is_active', true)
             ->get();
