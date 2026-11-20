@@ -78,10 +78,10 @@ class AnalyticsManagementTest extends TestCase
         $response->assertOk();
         $response->assertViewIs('admin.analytics.index');
         $response->assertSee('Sentiment Analytics');
-        $response->assertSee('FAVOURABILITY');
-        $response->assertSee('GRIEVANCES');
-        $response->assertSee('TOTAL COMMENTS');
-        $response->assertSee('TOTAL AUDIENCE');
+        $response->assertSee('POSITIVE SENTIMENT');
+        $response->assertSee('NEGATIVE SENTIMENT');
+        $response->assertSee('NEUTRAL & INQUIRIES', false);
+        $response->assertSee('OVERALL SENTIMENT');
         $response->assertSee('Rajesh Sharma');
         $response->assertSee('Development project inaugurate');
     }

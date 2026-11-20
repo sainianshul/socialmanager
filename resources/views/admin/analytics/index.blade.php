@@ -38,92 +38,91 @@
     </div>
 
     {{-- Top Row: 4 High-Impact Sentiment KPI Cards --}}
-    <div class="row row-deck row-cards mb-4">
+    <div class="row row-deck row-cards mb-4 dashboard-stat-grid">
 
-        {{-- 1. Sentiment Favourability --}}
-        <div class="col-sm-6 col-lg-3">
+        {{-- 1. Positive Sentiment --}}
+        <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-body p-3.5">
                     <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">FAVOURABILITY</span>
-                        <span class="badge bg-{{ $favorRatio >= 50 ? 'success' : 'warning' }}-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
-                            <i class="ti ti-thumb-up me-1"></i>{{ $favorRatio >= 50 ? 'Positive' : 'Cautious' }}
+                        <span class="text-uppercase text-secondary fw-bold stat-label" style="font-size: 0.72rem; letter-spacing: 0.05em;">POSITIVE SENTIMENT</span>
+                        <span class="badge bg-success-lt fw-semibold fs-8 px-2 py-1 rounded-pill stat-badge">
+                            <i class="ti ti-thumb-up me-1"></i>Positive
                         </span>
                     </div>
                     <div class="d-flex align-items-baseline gap-2 mb-2">
-                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ $favorRatio }}%</div>
+                        <div class="h1 mb-0 fw-bold text-success stat-value" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($positiveSentimentCount) }}</div>
+                        <span class="text-secondary small fw-medium">({{ $positivePercent }}%)</span>
                     </div>
                     <div class="text-secondary small d-flex align-items-center gap-1.5">
                         <span class="badge bg-success p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
-                        <span>{{ number_format($favorCount) }} pro</span>
-                        <span class="text-muted">&bull;</span>
-                        <span>{{ number_format($againstCount) }} critical</span>
+                        <span>Appreciation & praise</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 2. Grievances (Complaints) --}}
-        <div class="col-sm-6 col-lg-3">
+        {{-- 2. Negative Sentiment --}}
+        <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-body p-3.5">
                     <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">GRIEVANCES</span>
-                        <span class="badge bg-warning-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
-                            <i class="ti ti-alert-triangle me-1"></i>Actionable
+                        <span class="text-uppercase text-secondary fw-bold stat-label" style="font-size: 0.72rem; letter-spacing: 0.05em;">NEGATIVE SENTIMENT</span>
+                        <span class="badge bg-danger-lt fw-semibold fs-8 px-2 py-1 rounded-pill stat-badge">
+                            <i class="ti ti-thumb-down me-1"></i>Negative
                         </span>
                     </div>
                     <div class="d-flex align-items-baseline gap-2 mb-2">
-                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($complaintCount) }}</div>
-                        @if($totalComments > 0)
-                            <span class="text-secondary small fw-medium">({{ round(($complaintCount / $totalComments) * 100, 1) }}%)</span>
-                        @endif
+                        <div class="h1 mb-0 fw-bold text-danger stat-value" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($negativeSentimentCount) }}</div>
+                        <span class="text-secondary small fw-medium">({{ $negativePercent }}%)</span>
                     </div>
                     <div class="text-secondary small d-flex align-items-center gap-1.5">
-                        <span class="badge bg-warning p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
-                        <span>{{ number_format($trollsCount) }} trolls auto-filtered</span>
+                        <span class="badge bg-danger p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
+                        <span>Critical comments & issues</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        {{-- 3. Total Comments --}}
-        <div class="col-sm-6 col-lg-3">
+        {{-- 3. Neutral & Inquiries --}}
+        <div class="col-6 col-lg-3">
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-body p-3.5">
                     <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">TOTAL COMMENTS</span>
-                        <span class="badge bg-primary-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
-                            <i class="ti ti-messages me-1"></i>{{ number_format($repliedCount) }} Replied
+                        <span class="text-uppercase text-secondary fw-bold stat-label" style="font-size: 0.72rem; letter-spacing: 0.05em;">NEUTRAL & INQUIRIES</span>
+                        <span class="badge bg-azure-lt fw-semibold fs-8 px-2 py-1 rounded-pill stat-badge">
+                            <i class="ti ti-message-dots me-1"></i>Neutral
                         </span>
                     </div>
                     <div class="d-flex align-items-baseline gap-2 mb-2">
-                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($totalComments) }}</div>
-                    </div>
-                    <div class="text-secondary small d-flex align-items-center gap-1.5">
-                        <span class="badge bg-primary p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
-                        <span>Response Rate: <strong class="text-dark">{{ $responseRate }}%</strong></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- 4. Total Audience --}}
-        <div class="col-sm-6 col-lg-3">
-            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
-                <div class="card-body p-3.5">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <span class="text-uppercase text-secondary fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">TOTAL AUDIENCE</span>
-                        <span class="badge bg-azure-lt fw-semibold fs-8 px-2 py-1 rounded-pill">
-                            <i class="ti ti-users me-1"></i>Reach
-                        </span>
-                    </div>
-                    <div class="d-flex align-items-baseline gap-2 mb-2">
-                        <div class="h1 mb-0 fw-bold text-dark" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($totalAudience) }}</div>
+                        <div class="h1 mb-0 fw-bold text-azure stat-value" style="font-size: 2rem; letter-spacing: -0.03em;">{{ number_format($neutralSentimentCount) }}</div>
+                        <span class="text-secondary small fw-medium">({{ $neutralPercent }}%)</span>
                     </div>
                     <div class="text-secondary small d-flex align-items-center gap-1.5">
                         <span class="badge bg-azure p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
-                        <span>{{ number_format($totalPosts) }} broadcasts published</span>
+                        <span>Questions & feedback</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- 4. Overall Sentiment Pulse --}}
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+                <div class="card-body p-3.5">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="text-uppercase text-secondary fw-bold stat-label" style="font-size: 0.72rem; letter-spacing: 0.05em;">OVERALL SENTIMENT</span>
+                        <span class="badge bg-{{ $favorRatio >= 50 ? 'success' : 'warning' }}-lt fw-semibold fs-8 px-2 py-1 rounded-pill stat-badge">
+                            <i class="ti ti-heart-rate-monitor me-1"></i>{{ $favorRatio >= 50 ? 'Positive' : 'Caution' }}
+                        </span>
+                    </div>
+                    <div class="d-flex align-items-baseline gap-2 mb-2">
+                        <div class="h1 mb-0 fw-bold text-dark stat-value" style="font-size: 2rem; letter-spacing: -0.03em;">{{ $favorRatio }}%</div>
+                        <span class="text-secondary small fw-medium">Positive Pulse</span>
+                    </div>
+                    <div class="text-secondary small d-flex align-items-center gap-1.5">
+                        <span class="badge bg-primary p-1 rounded-circle" style="width: 6px; height: 6px;"></span>
+                        <span>Across <strong class="text-dark">{{ number_format($totalComments) }}</strong> total comments</span>
                     </div>
                 </div>
             </div>
@@ -139,8 +138,8 @@
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-header border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="d-flex flex-column">
-                        <h3 class="card-title fw-bold text-dark mb-1">Constituent Sentiment Timeline</h3>
-                        <div class="text-secondary small">Daily trend of positive feedback, criticism & citizen complaints</div>
+                        <h3 class="card-title fw-bold text-dark mb-1">Audience Sentiment Timeline</h3>
+                        <div class="text-secondary small">Daily trend of positive feedback, criticism & general inquiries</div>
                     </div>
                     <div class="d-flex align-items-center gap-3">
                         <div class="d-flex align-items-center gap-1">
@@ -152,8 +151,8 @@
                             <span class="text-secondary small">Critical</span>
                         </div>
                         <div class="d-flex align-items-center gap-1">
-                            <span class="badge bg-warning p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
-                            <span class="text-secondary small">Grievances</span>
+                            <span class="badge bg-azure p-1 rounded-circle" style="width: 8px; height: 8px;"></span>
+                            <span class="text-secondary small">Inquiries</span>
                         </div>
                     </div>
                 </div>
@@ -168,8 +167,8 @@
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-header border-bottom py-3">
                     <div class="d-flex flex-column">
-                        <h3 class="card-title fw-bold text-dark mb-1">Public Sentiment Pulse</h3>
-                        <div class="text-secondary small">Overall constituent tone breakdown</div>
+                        <h3 class="card-title fw-bold text-dark mb-1">Audience Sentiment Pulse</h3>
+                        <div class="text-secondary small">Overall sentiment tone breakdown across comments</div>
                     </div>
                 </div>
                 <div class="card-body d-flex flex-column justify-content-center">
@@ -197,42 +196,70 @@
     {{-- Row 3: Interaction Category Breakdown & Platform Matrix --}}
     <div class="row row-deck row-cards mb-4">
 
-        {{-- Left: Interaction Category Breakdown --}}
+        {{-- Left: Audience Intent Breakdown --}}
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-header border-bottom py-3">
                     <div class="d-flex flex-column">
-                        <h3 class="card-title fw-bold text-dark mb-1">Constituent Interaction Breakdown</h3>
-                        <div class="text-secondary small">Categorized by intent from citizen comments</div>
+                        <h3 class="card-title fw-bold text-dark mb-1">Audience Intent Breakdown</h3>
+                        <div class="text-secondary small">Categorized by AI intent across all audience comments</div>
                     </div>
                 </div>
                 <div class="card-body p-3.5">
-                    <div class="d-flex flex-column gap-3.5">
+                    <div class="d-flex flex-column gap-2.5">
                         @php
-                            $maxCount = max(1, max($categoryBreakdown));
-                            $categoryColors = [
-                                'Appreciation' => 'success',
-                                'Grievance / Issue' => 'warning',
-                                'Inquiry / Question' => 'primary',
-                                'Feedback / Suggestion' => 'azure',
-                                'Troll / Spam' => 'danger',
+                            $categoryMeta = [
+                                'Appreciation & Praise' => [
+                                    'color' => 'success',
+                                    'icon' => 'ti ti-heart-handshake',
+                                    'desc' => 'Positive praise, thanks & appreciation',
+                                ],
+                                'Questions & Inquiries' => [
+                                    'color' => 'azure',
+                                    'icon' => 'ti ti-help-circle',
+                                    'desc' => 'Direct questions & informational requests',
+                                ],
+                                'Feedback & Suggestions' => [
+                                    'color' => 'primary',
+                                    'icon' => 'ti ti-bulb',
+                                    'desc' => 'Constructive suggestions & feature ideas',
+                                ],
+                                'Issues & Concerns' => [
+                                    'color' => 'warning',
+                                    'icon' => 'ti ti-alert-triangle',
+                                    'desc' => 'User complaints, bug reports & issues',
+                                ],
+                                'Spam & Flagged' => [
+                                    'color' => 'danger',
+                                    'icon' => 'ti ti-shield-x',
+                                    'desc' => 'Hate speech, spam & auto-filtered trolls',
+                                ],
                             ];
                         @endphp
                         @foreach($categoryBreakdown as $catName => $count)
                             @php
                                 $percent = $totalComments > 0 ? round(($count / $totalComments) * 100, 1) : 0;
-                                $barWidth = round(($count / $maxCount) * 100, 1);
-                                $color = $categoryColors[$catName] ?? 'secondary';
+                                $meta = $categoryMeta[$catName] ?? ['color' => 'secondary', 'icon' => 'ti ti-message', 'desc' => 'Audience interactions'];
+                                $color = $meta['color'];
                             @endphp
-                            <div>
+                            <div class="p-2.5 rounded-3 border" style="background: #fafbfc;">
                                 <div class="d-flex justify-content-between align-items-center mb-1.5">
-                                    <span class="fw-semibold text-dark small">{{ $catName }}</span>
-                                    <span class="text-secondary small">
-                                        <strong class="text-dark">{{ number_format($count) }}</strong> <span class="text-muted">({{ $percent }}%)</span>
-                                    </span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="avatar avatar-xs rounded-2 bg-{{ $color }}-lt text-{{ $color }}" style="width: 28px; height: 28px;">
+                                            <i class="{{ $meta['icon'] }} fs-3"></i>
+                                        </span>
+                                        <div>
+                                            <span class="fw-semibold text-dark small d-block">{{ $catName }}</span>
+                                            <span class="text-secondary fs-8">{{ $meta['desc'] }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-end flex-shrink-0">
+                                        <span class="fw-bold text-dark small">{{ number_format($count) }}</span>
+                                        <span class="badge bg-{{ $color }}-lt text-{{ $color }} ms-1.5 fs-8 fw-semibold px-2 py-0.5 rounded-pill">{{ $percent }}%</span>
+                                    </div>
                                 </div>
-                                <div class="progress" style="height: 6px; border-radius: 999px; background: #f1f5f9;">
-                                    <div class="progress-bar bg-{{ $color }}" style="width: {{ $barWidth }}%; border-radius: 999px;"></div>
+                                <div class="progress" style="height: 6px; border-radius: 999px; background: #e2e8f0;">
+                                    <div class="progress-bar bg-{{ $color }}" role="progressbar" style="width: {{ $percent }}%; border-radius: 999px;" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
                         @endforeach
@@ -247,7 +274,7 @@
                 <div class="card-header border-bottom py-3">
                     <div class="d-flex flex-column">
                         <h3 class="card-title fw-bold text-dark mb-1">Platform Channel Matrix</h3>
-                        <div class="text-secondary small">Constituent reach and sentiment across platforms</div>
+                        <div class="text-secondary small">Audience reach and positive engagement across platforms</div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -323,8 +350,8 @@
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-header border-bottom py-3">
                     <div class="d-flex flex-column">
-                        <h3 class="card-title fw-bold text-dark mb-1">Top Engaging Public Statements</h3>
-                        <div class="text-secondary small">Broadcasts that generated the highest constituent interaction</div>
+                        <h3 class="card-title fw-bold text-dark mb-1">Top Performing Content</h3>
+                        <div class="text-secondary small">Broadcasts and posts that generated the highest audience engagement</div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -349,7 +376,7 @@
                                             {{ Str::limit($postText, 55) }}
                                         </div>
                                         <div class="text-secondary fs-7 mt-0.5">
-                                            <span>{{ $tp->account?->name ?: 'Channel' }}</span> • 
+                                            <span>{{ $tp->account?->name ?: 'Channel' }}</span> &bull; 
                                             <span>{{ $tp->published_at ? $tp->published_at->format('d M Y') : 'Recent' }}</span>
                                         </div>
                                     </div>
@@ -373,13 +400,13 @@
             </div>
         </div>
 
-        {{-- Right: Most Active Constituents (Frequent Commenters) --}}
+        {{-- Right: Most Active Community Members --}}
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
                 <div class="card-header border-bottom py-3">
                     <div class="d-flex flex-column">
-                        <h3 class="card-title fw-bold text-dark mb-1">Key Active Constituents</h3>
-                        <div class="text-secondary small">Frequent citizen participants in public discussions</div>
+                        <h3 class="card-title fw-bold text-dark mb-1">Most Active Community Members</h3>
+                        <div class="text-secondary small">Top audience members interacting across your channels</div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -401,17 +428,17 @@
                                     <div class="flex-grow-1 text-truncate pe-2">
                                         <div class="fw-semibold text-dark text-truncate small">{{ $tc->commenter_name }}</div>
                                         <div class="text-secondary fs-7 mt-0.5">
-                                            <span>{{ number_format($tc->total_comments) }} contributions</span>
+                                            <span>{{ number_format($tc->total_comments) }} interactions</span>
                                         </div>
                                     </div>
                                     <div class="flex-shrink-0">
                                         @if($isPositiveLean)
                                             <span class="badge bg-success-lt text-success small">
-                                                <i class="ti ti-thumb-up me-0.5"></i>Supporter
+                                                <i class="ti ti-thumb-up me-0.5"></i>Positive Contributor
                                             </span>
                                         @else
-                                            <span class="badge bg-warning-lt text-warning small">
-                                                <i class="ti ti-alert-circle me-0.5"></i>Critical / Grievance
+                                            <span class="badge bg-azure-lt text-azure small">
+                                                <i class="ti ti-message-circle me-0.5"></i>Feedback Contributor
                                             </span>
                                         @endif
                                     </div>
@@ -419,7 +446,7 @@
                             </div>
                         @empty
                             <div class="p-4 text-center text-secondary small">
-                                No constituent comment history found.
+                                No audience interactions found yet.
                             </div>
                         @endforelse
                     </div>
@@ -472,15 +499,19 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         },
         series: [
-            { name: "Pro / Positive", data: positiveSeries },
-            { name: "Critical / Against", data: negativeSeries },
-            { name: "Grievances", data: complaintSeries }
+            { name: "Positive", data: positiveSeries },
+            { name: "Critical", data: negativeSeries },
+            { name: "Inquiries", data: complaintSeries }
         ],
-        colors: ["#2fb344", "#d63939", "#f59f00"],
+        colors: ["#2fb344", "#d63939", "#0284c7"],
         xaxis: {
             categories: trendDates,
+            tickAmount: window.innerWidth < 768 ? 5 : 12,
             labels: {
-                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '12px' }
+                rotate: -35,
+                rotateAlways: false,
+                hideOverlappingLabels: true,
+                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '11px' }
             },
             axisBorder: { show: false },
             axisTicks: { show: false }
@@ -488,7 +519,7 @@ document.addEventListener("DOMContentLoaded", function () {
         yaxis: {
             tickAmount: 5,
             labels: {
-                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '12px' }
+                style: { colors: dark ? '#8896ab' : '#64748b', fontSize: '11px' }
             }
         },
         grid: {
@@ -497,7 +528,20 @@ document.addEventListener("DOMContentLoaded", function () {
             padding: { top: -20, right: 0, left: -4, bottom: -4 }
         },
         legend: { show: false },
-        tooltip: { theme: dark ? 'dark' : 'light' }
+        tooltip: { theme: dark ? 'dark' : 'light' },
+        responsive: [
+            {
+                breakpoint: 768,
+                options: {
+                    chart: { height: 240 },
+                    xaxis: {
+                        tickAmount: 5,
+                        labels: { rotate: -30, hideOverlappingLabels: true, style: { fontSize: '10px' } }
+                    },
+                    yaxis: { tickAmount: 3 }
+                }
+            }
+        ]
     };
 
     const trendEl = document.querySelector("#chart-sentiment-trend");

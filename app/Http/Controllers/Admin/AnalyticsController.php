@@ -89,14 +89,18 @@ class AnalyticsController extends Controller
         $neutralSentimentCount  = (clone $commentBase)->where('sentiment', 'neutral')->count();
         $negativeSentimentCount = (clone $commentBase)->where('sentiment', 'negative')->count();
 
+        $positivePercent = $totalComments > 0 ? round(($positiveSentimentCount / $totalComments) * 100, 1) : 0;
+        $negativePercent = $totalComments > 0 ? round(($negativeSentimentCount / $totalComments) * 100, 1) : 0;
+        $neutralPercent = $totalComments > 0 ? round(($neutralSentimentCount / $totalComments) * 100, 1) : 0;
+
         $repliedCount = (clone $commentBase)->where('status', Comment::STATUS_REPLIED)->count();
         $responseRate = $totalComments > 0 ? round(($repliedCount / $totalComments) * 100, 1) : 0;
 
-        // Political Favourability Ratio (Favor vs Against)
+        // Overall Favourability / Positive Sentiment Ratio
         $knownPoliticalPulse = $favorCount + $againstCount;
-        $favorRatio = $knownPoliticalPulse > 0 
-            ? round(($favorCount / $knownPoliticalPulse) * 100, 1) 
-            : ($totalComments > 0 ? round(($positiveSentimentCount / $totalComments) * 100, 1) : 0);
+        $favorRatio = $totalComments > 0 
+            ? round(($positiveSentimentCount / $totalComments) * 100, 1)
+            : ($knownPoliticalPulse > 0 ? round(($favorCount / $knownPoliticalPulse) * 100, 1) : 0);
 
         // ── 5. Total Public Reach & Engagement on Posts ───────────────
         $totalPosts = (clone $postBase)->count();
@@ -149,13 +153,13 @@ class AnalyticsController extends Controller
 
         // ── 7. Category Distribution ──────────────────────────────────
         $categoryBreakdown = [
-            'Appreciation' => (clone $commentBase)->where('category', 'appreciation')->count(),
-            'Grievance / Issue' => (clone $commentBase)->where(function ($q) {
+            'Appreciation & Praise' => (clone $commentBase)->where('category', 'appreciation')->count(),
+            'Questions & Inquiries' => (clone $commentBase)->whereIn('category', ['question', 'inquiry'])->count(),
+            'Feedback & Suggestions' => (clone $commentBase)->whereIn('category', ['feedback', 'suggestion'])->count(),
+            'Issues & Concerns' => (clone $commentBase)->where(function ($q) {
                 $q->where('category', 'complaint')->orWhere('is_complaint', true);
             })->count(),
-            'Inquiry / Question' => (clone $commentBase)->whereIn('category', ['question', 'inquiry'])->count(),
-            'Feedback / Suggestion' => (clone $commentBase)->whereIn('category', ['feedback', 'suggestion'])->count(),
-            'Troll / Spam' => (clone $commentBase)->where(function ($q) {
+            'Spam & Flagged' => (clone $commentBase)->where(function ($q) {
                 $q->whereIn('category', ['troll', 'spam', 'hate_speech'])->orWhere('is_abusive', true);
             })->count(),
         ];
@@ -216,6 +220,9 @@ class AnalyticsController extends Controller
             'positiveSentimentCount',
             'neutralSentimentCount',
             'negativeSentimentCount',
+            'positivePercent',
+            'negativePercent',
+            'neutralPercent',
             'repliedCount',
             'responseRate',
             'favorRatio',
