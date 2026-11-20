@@ -7,6 +7,11 @@
     <title>SocialManager - AI-Powered Social Media Management & Auto Engagement</title>
     <meta name="description" content="Enterprise social media publishing, smart AI community moderation, and automated Comment-to-DM for Facebook, Instagram, and YouTube."/>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+    
     <!-- Tabler Core CSS (CDN) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
     <!-- Tabler Icons Webfont -->
@@ -18,6 +23,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
         :root {
             --brand-teal: #1db8ab;
             --brand-teal-hover: #17a397;
@@ -76,6 +85,22 @@
             background-color: rgba(29, 184, 171, 0.08);
             color: #10857b;
             border-color: #10857b;
+        }
+        .btn-outline-hero {
+            color: #334155;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            font-weight: 600;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .btn-outline-hero:hover {
+            color: #0f172a;
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
         }
         .badge-teal-soft {
             background-color: rgba(29, 184, 171, 0.08);
@@ -590,9 +615,12 @@
 
         /* Minimal Apple-Style Footer */
         .landing-footer {
-            background: #ffffff;
+            background: rgba(255, 255, 255, 0.90);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-top: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 0 -4px 20px -2px rgba(15, 23, 42, 0.03), 0 -1px 2px rgba(0, 0, 0, 0.01);
             color: #64748b;
-            border-top: 1px solid rgba(15, 23, 42, 0.06);
             padding: 48px 0 36px;
         }
         .landing-footer a.footer-link {
@@ -712,9 +740,13 @@
             </p>
 
             <!-- CTA Button -->
-            <div class="d-flex align-items-center justify-content-center mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-3 mb-4">
                 <a href="{{ route('login') }}" class="btn btn-teal btn-lg px-4 py-2.5">
                     <i class="ti ti-bolt me-1.5"></i>Start Free
+                </a>
+                <a href="#features" class="btn btn-outline-hero btn-lg px-4 py-2.5">
+                    <span>Why SocialManager</span>
+                    <i class="ti ti-arrow-down ms-1.5"></i>
                 </a>
             </div>
 
@@ -988,11 +1020,11 @@
                 
                 <!-- FAQ 1 -->
                 <div class="apple-faq-item">
-                    <button class="apple-faq-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                    <button class="apple-faq-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="false" aria-controls="faqCollapse1">
                         <span>Can my Facebook, Instagram, or YouTube account get banned or restricted?</span>
                         <span class="apple-faq-icon"><i class="ti ti-plus"></i></span>
                     </button>
-                    <div id="faqCollapse1" class="collapse show" data-bs-parent="#faqAccordion">
+                    <div id="faqCollapse1" class="collapse" data-bs-parent="#faqAccordion">
                         <div class="apple-faq-body">
                             No. Unlike unofficial scraping bots or browser automation extensions that risk account flags, SocialManager communicates exclusively through certified Meta Graph API and Google Cloud YouTube Data API protocols. Every automated comment response and scheduled post strictly complies with platform rate-limiting and developer terms.
                         </div>
