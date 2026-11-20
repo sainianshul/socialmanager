@@ -301,32 +301,34 @@
 <div class="row row-deck row-cards">
     <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h3 class="card-title fw-bold text-body mb-0">Recent Published Posts & Activity</h3>
-                <div class="text-secondary small">Latest multi-channel broadcasts and synced interactions</div>
+            <div class="card-header d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-1">
+                <div>
+                    <h3 class="card-title fw-bold text-body mb-0">Recent Published Posts & Activity</h3>
+                    <div class="text-secondary small">Latest multi-channel broadcasts and synced interactions</div>
+                </div>
             </div>
             <div class="card-body p-0">
-                <div class="list-group list-group-flush">
+                <div class="list-group list-group-flush post-feed-list">
                     @forelse($recentPosts as $p)
-                        <div class="list-group-item px-3 py-3">
-                            <div class="d-flex align-items-center">
+                        <div class="list-group-item px-3 py-3 post-feed-item">
+                            <div class="d-flex align-items-center post-feed-row">
                                 @if($p->media_url)
-                                    <span class="avatar avatar-md rounded-2 me-3" style="background-image: url('{{ $p->media_url }}')"></span>
+                                    <span class="avatar avatar-md rounded-2 me-3 post-feed-thumb" style="background-image: url('{{ $p->media_url }}')"></span>
                                 @else
-                                    <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary me-3">
+                                    <span class="avatar avatar-md rounded-2 bg-primary-lt text-primary me-3 post-feed-thumb">
                                         <i class="ti ti-article fs-2"></i>
                                     </span>
                                 @endif
-                                <div class="flex-grow-1 text-truncate pe-3">
-                                    <div class="fw-semibold text-body text-truncate small">
+                                <div class="flex-grow-1 text-truncate pe-md-3 post-feed-content">
+                                    <div class="fw-semibold text-body text-truncate small post-feed-title">
                                         {{ $p->message ?: 'New media published to ' . ($p->account ? $p->account->name : 'Channel') }}
                                     </div>
-                                    <div class="text-secondary fs-7 mt-1">
-                                        <span>{{ $p->account ? $p->account->name : 'Social Channel' }}</span> • 
+                                    <div class="text-secondary fs-7 mt-1 post-feed-meta">
+                                        <span>{{ $p->account ? $p->account->name : 'Social Channel' }}</span> &bull; 
                                         <span>{{ $p->published_at ? $p->published_at->diffForHumans() : 'Recently' }}</span>
                                     </div>
                                 </div>
-                                <div class="d-flex align-items-center gap-3 text-secondary small flex-shrink-0">
+                                <div class="d-flex align-items-center gap-3 text-secondary small flex-shrink-0 post-feed-stats">
                                     @if(!empty($p->views_count))
                                         <span class="d-inline-flex align-items-center" title="Views"><i class="ti ti-eye me-1"></i> {{ number_format($p->views_count) }}</span>
                                     @endif

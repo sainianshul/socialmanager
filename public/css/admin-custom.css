@@ -697,6 +697,51 @@ body,
         font-size: 0.65rem !important;
         padding: 0.2rem 0.45rem !important;
     }
+
+    /* --- Step 4: Recent Posts Activity Feed Mobile (< 768px) --- */
+    .post-feed-item {
+        padding: 0.75rem 0.85rem !important;
+    }
+    .post-feed-row {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        row-gap: 0.35rem !important;
+    }
+    .post-feed-thumb {
+        width: 40px !important;
+        height: 40px !important;
+        margin-right: 0.65rem !important;
+        flex-shrink: 0 !important;
+        border-radius: 8px !important;
+    }
+    .post-feed-content {
+        flex: 1 1 calc(100% - 54px) !important;
+        min-width: 0 !important;
+        padding-right: 0 !important;
+    }
+    .post-feed-title {
+        font-size: 0.82rem !important;
+        line-height: 1.3 !important;
+        white-space: normal !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+    .post-feed-meta {
+        font-size: 0.7rem !important;
+        color: var(--tblr-secondary, #64748b) !important;
+        margin-top: 2px !important;
+    }
+    .post-feed-stats {
+        width: 100% !important;
+        padding-left: 54px !important;
+        margin-top: 0.2rem !important;
+        justify-content: flex-start !important;
+        gap: 0.85rem !important;
+        font-size: 0.75rem !important;
+    }
 }
 
 /* --- Dashboard Stat Grid (Desktop & Shared) --- */
@@ -731,9 +776,10 @@ body,
 @media (max-width: 575.98px) {
 
     /* Even tighter padding */
-    .page-wrapper > .page-body > .container-xl {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+    .page-wrapper > .page-body > .container-xl,
+    .page-wrapper > .page-body > .container-fluid {
+        padding-left: 0.65rem !important;
+        padding-right: 0.65rem !important;
     }
 
     .card-body {
