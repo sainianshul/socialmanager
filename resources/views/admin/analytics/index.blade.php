@@ -235,14 +235,19 @@
         {{-- Left: Audience Intent Breakdown --}}
         <div class="col-lg-6">
             <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
-                <div class="card-header border-bottom py-3">
-                    <div class="d-flex flex-column">
-                        <h3 class="card-title fw-bold text-dark mb-1">Audience Intent Breakdown</h3>
-                        <div class="text-secondary small">Categorized by AI intent across all audience comments</div>
+                <div class="card-header border-bottom py-3.5 px-4 bg-white" style="border-color: #f1f5f9 !important;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="card-title fw-bold text-dark mb-0.5" style="letter-spacing: -0.01em;">Audience Intent Breakdown</h3>
+                            <div class="text-secondary small">Categorized by AI intent across all audience comments</div>
+                        </div>
+                        <span class="badge bg-light text-secondary rounded-pill px-2.5 py-1 fs-8 fw-semibold border border-light-subtle">
+                            {{ number_format($totalComments) }} Total
+                        </span>
                     </div>
                 </div>
-                <div class="card-body p-3.5">
-                    <div class="d-flex flex-column gap-2.5">
+                <div class="card-body p-3 p-md-4 bg-white">
+                    <div class="d-flex flex-column">
                         @php
                             $categoryMeta = [
                                 'Appreciation & Praise' => [
@@ -278,23 +283,23 @@
                                 $meta = $categoryMeta[$catName] ?? ['color' => 'secondary', 'icon' => 'ti ti-message', 'desc' => 'Audience interactions'];
                                 $color = $meta['color'];
                             @endphp
-                            <div class="p-2.5 rounded-3 border" style="background: #fafbfc;">
-                                <div class="d-flex justify-content-between align-items-center mb-1.5">
-                                    <div class="d-flex align-items-center gap-2 flex-grow-1 min-w-0 pe-2">
-                                        <span class="avatar avatar-xs rounded-2 bg-{{ $color }}-lt text-{{ $color }} flex-shrink-0" style="width: 28px; height: 28px;">
-                                            <i class="{{ $meta['icon'] }} fs-3"></i>
+                            <div class="intent-row py-3 {{ !$loop->last ? 'border-bottom' : '' }}" style="border-color: #f1f5f9 !important;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="d-flex align-items-center gap-2.5 min-w-0 pe-2">
+                                        <span class="avatar avatar-sm bg-{{ $color }}-lt text-{{ $color }} flex-shrink-0" style="width: 34px; height: 34px; border-radius: 9px;">
+                                            <i class="{{ $meta['icon'] }} fs-2"></i>
                                         </span>
                                         <div class="min-w-0">
-                                            <span class="fw-semibold text-dark small d-block text-truncate">{{ $catName }}</span>
-                                            <span class="text-secondary fs-8 text-truncate d-block">{{ $meta['desc'] }}</span>
+                                            <span class="fw-semibold text-dark d-block text-truncate" style="font-size: 0.875rem;">{{ $catName }}</span>
+                                            <span class="text-secondary fs-8 text-truncate d-block mt-0.5">{{ $meta['desc'] }}</span>
                                         </div>
                                     </div>
-                                    <div class="text-end flex-shrink-0">
-                                        <span class="fw-bold text-dark small">{{ number_format($count) }}</span>
+                                    <div class="text-end flex-shrink-0 ps-2">
+                                        <span class="fw-bold text-dark" style="font-size: 0.95rem;">{{ number_format($count) }}</span>
                                         <span class="badge bg-{{ $color }}-lt text-{{ $color }} ms-1.5 fs-8 fw-semibold px-2 py-0.5 rounded-pill">{{ $percent }}%</span>
                                     </div>
                                 </div>
-                                <div class="progress" style="height: 6px; border-radius: 999px; background: #e2e8f0;">
+                                <div class="progress" style="height: 5px; border-radius: 999px; background: #f1f5f9;">
                                     <div class="progress-bar bg-{{ $color }}" role="progressbar" style="width: {{ $percent }}%; border-radius: 999px;" aria-valuenow="{{ $percent }}" aria-valuemin="0" aria-valuemax="100"></div>
                                 </div>
                             </div>
