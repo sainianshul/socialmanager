@@ -224,10 +224,6 @@
                                     <i class="ti ti-sparkles text-primary"></i>
                                     <span class="fw-semibold">AI Caption & Hashtags</span>
                                 </button>
-                                <button type="button" class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
-                                    <i class="ti ti-brand-canva text-primary"></i>
-                                    <span class="fw-semibold text-dark">Design on Canva</span>
-                                </button>
                                 <span class="text-secondary small" id="caption-counter">0 / 5000</span>
                             </div>
                         </div>
@@ -241,52 +237,33 @@
                             <label class="form-label fw-bold text-dark m-0 d-flex align-items-center gap-1.5">
                                 <i class="ti ti-photo-plus text-primary"></i> Media Attachment
                             </label>
-                            <span class="badge bg-light text-secondary border rounded-pill" id="media-attached-count" style="font-size: 11px;">0 attached</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-light text-secondary border rounded-pill" id="media-attached-count" style="font-size: 11px;">0 attached</span>
+                                <button type="button" class="btn btn-link btn-xs text-danger text-decoration-none p-0 d-none" id="btn-clear-all-media">Clear All</button>
+                            </div>
                         </div>
 
                         {{-- Hidden real file input --}}
                         <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple>
 
-                        {{-- Compact Modern Media Dropzone Card --}}
-                        <div class="card border px-3 py-2.5" id="composer-media-card" style="border-radius: 12px; background: #fafbfc; border: 1.5px dashed #cbd5e1 !important; transition: all 0.2s ease;">
-                            {{-- Compact Empty State --}}
-                            <div class="d-flex flex-column align-items-center justify-content-center text-center py-2" id="media-uploader-empty-state">
-                                <div class="d-inline-flex align-items-center justify-content-center rounded-circle mb-1.5" style="width: 36px; height: 36px; background: #f1f5f9;">
-                                    <i class="ti ti-cloud-upload fs-3 text-secondary"></i>
-                                </div>
-                                <div class="small text-secondary mb-2" style="font-size: 0.85rem;">
-                                    Drag and drop media here, or choose source:
-                                </div>
-                                
-                                {{-- Modular Source Action Buttons (Easily expandable for future providers) --}}
-                                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap" id="media-source-actions">
-                                    <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" id="btn-trigger-file-browser">
-                                        <i class="ti ti-upload text-secondary"></i>
-                                        <span>Upload File</span>
-                                    </button>
-                                    <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
-                                        <i class="ti ti-brand-canva text-primary"></i>
-                                        <span>Choose Canva</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            {{-- Live Attachments Grid --}}
-                            <div class="row g-2 d-none" id="composer-media-preview-grid"></div>
-
-                            {{-- Active Toolbar when items exist --}}
-                            <div class="d-flex align-items-center justify-content-between pt-2 border-top mt-2 d-none" id="media-uploader-active-bar" style="border-color: #e2e8f0 !important;">
-                                <span class="text-secondary small" style="font-size: 11px;">Max 50MB per file &bull; Images and MP4/MOV videos supported</span>
-                                <div class="d-flex gap-2">
-                                    <button type="button" class="btn btn-xs btn-outline-secondary rounded-pill px-2.5 py-1" id="btn-add-more-media">
-                                        <i class="ti ti-plus me-1"></i>Add More
-                                    </button>
-                                    <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                        <i class="ti ti-brand-canva me-1"></i>Design on Canva
-                                    </button>
-                                </div>
-                            </div>
+                        {{-- Two Distinct Action Buttons: Upload From Device & Design on Canva --}}
+                        <div class="d-flex align-items-center gap-2.5 flex-wrap mb-2">
+                            <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" id="btn-trigger-file-browser">
+                                <i class="ti ti-device-laptop fs-2 text-secondary"></i>
+                                <span>Upload From Device</span>
+                            </button>
+                            <button type="button" class="btn btn-outline-primary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                <i class="ti ti-brand-canva fs-2 text-primary"></i>
+                                <span>Design on Canva</span>
+                            </button>
                         </div>
+
+                        <div class="form-text small text-secondary mb-2" id="media-attachment-help-text">
+                            Attach photos or videos (JPG, PNG, MP4, MOV up to 50MB) from your computer or create graphics with Canva.
+                        </div>
+
+                        {{-- Live Attachments Grid --}}
+                        <div class="row g-2 d-none mt-1" id="composer-media-preview-grid"></div>
 
                         {{-- Canva Imported Hidden Inputs Container --}}
                         <div id="canva-imported-media-container"></div>

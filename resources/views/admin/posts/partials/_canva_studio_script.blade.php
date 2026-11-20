@@ -179,12 +179,25 @@ $(document).ready(function() {
             $('#media-uploader-empty-state').addClass('d-none');
             $('#composer-media-preview-grid').removeClass('d-none');
             $('#media-uploader-active-bar').removeClass('d-none');
+            $('#btn-clear-all-media').removeClass('d-none');
         } else {
             $('#media-uploader-empty-state').removeClass('d-none');
             $('#composer-media-preview-grid').addClass('d-none');
             $('#media-uploader-active-bar').addClass('d-none');
+            $('#btn-clear-all-media').addClass('d-none');
         }
     }
+
+    // Clear all attached media
+    $(document).on('click', '#btn-clear-all-media', function(e) {
+        e.preventDefault();
+        let fileInput = document.getElementById('composer-media-files');
+        if (fileInput) fileInput.value = '';
+        $('.local-media-preview-item').remove();
+        $('.canva-imported-item').remove();
+        $('#canva-imported-media-container').empty();
+        updateAttachmentCount();
+    });
 
     // Trigger file browse from buttons
     $(document).on('click', '#btn-trigger-file-browser, #btn-add-more-media', function(e) {

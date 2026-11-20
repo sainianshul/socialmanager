@@ -263,10 +263,6 @@
                                     <i class="ti ti-sparkles text-primary"></i>
                                     <span class="fw-semibold">AI Caption & Hashtags</span>
                                 </button>
-                                <button type="button" class="btn btn-xs btn-outline-secondary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
-                                    <i class="ti ti-brand-canva text-primary"></i>
-                                    <span class="fw-semibold text-dark">Design on Canva</span>
-                                </button>
                                 <span class="text-secondary small" id="caption-counter">{{ strlen(old('content', $scheduledPost->content ?? '')) }} / {{ $platform === 2 ? '2200' : '5000' }}</span>
                             </div>
                         </div>
@@ -311,14 +307,14 @@
                             </div>
                         @endif
 
-                        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-                            <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" onclick="$('#composer-media-files').click()">
-                                <i class="ti ti-upload text-secondary"></i>
-                                <span>Upload File</span>
+                        <div class="d-flex align-items-center gap-2.5 flex-wrap mb-2">
+                            <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" onclick="$('#composer-media-files').click()">
+                                <i class="ti ti-device-laptop fs-2 text-secondary"></i>
+                                <span>Upload From Device</span>
                             </button>
-                            <button type="button" class="btn btn-sm media-source-btn rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1.5 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio" title="Design on Canva">
-                                <i class="ti ti-brand-canva text-primary"></i>
-                                <span>Choose Canva</span>
+                            <button type="button" class="btn btn-outline-primary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                <i class="ti ti-brand-canva fs-2 text-primary"></i>
+                                <span>Design on Canva</span>
                             </button>
                             <span id="composer-edit-selected-filename" class="small text-secondary ms-1"></span>
                         </div>
