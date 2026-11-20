@@ -171,6 +171,110 @@
         .brand-icon-ig { color: #d62976; }
         .brand-icon-yt { color: #e02424; }
 
+        /* Accordion Custom Styling */
+        .accordion-custom .accordion-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 10px !important;
+            margin-bottom: 12px;
+            background: #ffffff;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .accordion-custom .accordion-item:hover {
+            border-color: #cbd5e1;
+        }
+        .accordion-custom .accordion-button {
+            font-weight: 600;
+            font-size: 1.05rem;
+            color: var(--navy-dark);
+            background: #ffffff;
+            padding: 1.15rem 1.35rem;
+            box-shadow: none !important;
+        }
+        .accordion-custom .accordion-button:not(.collapsed) {
+            color: var(--brand-teal);
+            background-color: rgba(12, 166, 120, 0.04);
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .accordion-custom .accordion-body {
+            padding: 1.25rem 1.35rem;
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Pre-Footer CTA Card */
+        .cta-banner-card {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #064e3b 100%);
+            border: 1px solid rgba(12, 166, 120, 0.35);
+            border-radius: 16px;
+            box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.35);
+            position: relative;
+            overflow: hidden;
+        }
+        .cta-banner-card::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -15%;
+            width: 480px;
+            height: 480px;
+            background: radial-gradient(circle, rgba(12, 166, 120, 0.22) 0%, rgba(12, 166, 120, 0) 70%);
+            pointer-events: none;
+        }
+
+        /* Modern 4-Column Footer */
+        .landing-footer {
+            background: #0b1329;
+            color: #94a3b8;
+            border-top: 1px solid #1e293b;
+        }
+        .landing-footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            transition: color 0.15s ease;
+        }
+        .landing-footer a:hover {
+            color: #20c997;
+        }
+        .footer-heading {
+            color: #f8fafc;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 1.2rem;
+        }
+        .footer-link-list {
+            list-style: none;
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+        .footer-link-list li {
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+        }
+        .footer-link-list li a {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-indicator-live {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: livePulse 2s infinite;
+        }
+        @keyframes livePulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
         @media (max-width: 991px) {
             .hero-title { font-size: 2.3rem; }
             .hero-subtitle { font-size: 1.05rem; }
@@ -1250,19 +1354,265 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- PLACEHOLDER FOR STEP 5 (Client FAQs, CTA & Legal Compliant Footer)        -->
+    <!-- STEP 5: FREQUENTLY ASKED QUESTIONS (ACCORDION)                            -->
     <!-- ========================================================================= -->
-
-    <!-- Basic Footer for Step 1 -->
-    <footer class="py-4 border-top bg-white text-center text-muted small">
+    <section id="faq" class="py-6 border-bottom bg-white">
         <div class="container-xl">
-            <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
-                <span>&copy; {{ date('Y') }} <strong>SocialManager</strong>. Enterprise Social Automation.</span>
-                <div class="d-flex gap-3">
-                    <a href="{{ url('/privacy') }}" class="text-muted text-decoration-none">Privacy Policy</a>
-                    <a href="{{ url('/terms') }}" class="text-muted text-decoration-none">Terms of Service</a>
-                    <a href="{{ url('/data-deletion') }}" class="text-muted text-decoration-none">Data Deletion</a>
+            <!-- Section Header -->
+            <div class="text-center mb-5">
+                <span class="badge badge-teal-soft px-3 py-1.5 rounded-pill mb-2">
+                    <i class="ti ti-help-circle me-1"></i>Frequently Asked Questions
+                </span>
+                <h2 class="display-6 fw-bold text-dark mb-2">
+                    Everything You Need to Know
+                </h2>
+                <p class="text-muted fs-5 mx-auto" style="max-width: 680px;">
+                    Direct technical clarity regarding Meta & Google API safety, rate limits, comment triggers, and data encryption.
+                </p>
+            </div>
+
+            <!-- Accordion Wrapper -->
+            <div class="row justify-content-center">
+                <div class="col-12 col-lg-9">
+                    <div class="accordion accordion-custom" id="faqAccordion">
+                        
+                        <!-- FAQ 1 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading1">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-shield-check text-teal fs-2"></i>
+                                        Can my Facebook, Instagram, or YouTube account get banned or restricted?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    No. Unlike unofficial scraping bots or browser automation scripts that risk account bans, SocialManager interacts exclusively through officially certified Meta Graph API (v22.0) and Google Cloud YouTube Data API (v3) protocols. Every comment response and scheduled post adheres strictly to platform rate-limiting and messaging policies. Your accounts remain 100% compliant and secure within enterprise developer boundaries.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 2 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading2">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-message-share text-teal fs-2"></i>
+                                        How does the Comment-to-DM lead capture trigger work on Instagram and Facebook?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    When a follower leaves a comment on your posts or reels, Meta's Realtime Webhooks immediately push the payload to our secure server in under 300 milliseconds. SocialManager evaluates the comment against your configured trigger keywords (such as PRICE, LINK, or DEMO) or natural language intent. The engine instantly posts a polite public reply confirming receipt while simultaneously dispatching a personalized private Direct Message (DM) to their inbox containing the relevant link, brochure, or checkout page.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 3 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading3">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-brand-youtube text-teal fs-2"></i>
+                                        How does YouTube comment automation work without exceeding Google API quotas?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    YouTube's Data API provides a default allocation of 10,000 units per day per Google Cloud project. Since YouTube comments operate on an optimized 10-minute cron check rather than streaming webhooks, polling your channel consumes only 1 unit per cycle (144 units per 24 hours). Posting an AI reply uses 50 units. The built-in rate-limiter and duplicate reply detector ensure your project never approaches or exceeds Google's quota limits.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 4 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading4">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse4" aria-expanded="false" aria-controls="faqCollapse4">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-user-check text-teal fs-2"></i>
+                                        Can I customize the AI's personality, tone, and brand safety guidelines?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse4" class="accordion-collapse collapse" aria-labelledby="faqHeading4" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes. SocialManager features a dedicated AI Personas manager where you define exact brand voice guidelines, industry vocabulary, predefined knowledge base answers, and negative-sentiment escalation rules. You can also specify banned keywords and competitor filters so the AI never generates off-brand or risky statements.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 5 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading5">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse5" aria-expanded="false" aria-controls="faqCollapse5">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-lock text-teal fs-2"></i>
+                                        How are social tokens and sensitive client credentials protected?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse5" class="accordion-collapse collapse" aria-labelledby="faqHeading5" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    All platform OAuth tokens are encrypted at rest using AES-256-CBC cipher with application-level key derivation via Laravel's native Crypt layer. Decrypted tokens are strictly excluded from JSON serializations, front-end payloads, and log files. Webhooks are validated using HMAC SHA-256 signatures, and we never access, request, or store your personal social media passwords.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FAQ 6 -->
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="faqHeading6">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse6" aria-expanded="false" aria-controls="faqCollapse6">
+                                    <span class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-toggle-right text-teal fs-2"></i>
+                                        Can I review AI-generated responses before they get published?
+                                    </span>
+                                </button>
+                            </h3>
+                            <div id="faqCollapse6" class="accordion-collapse collapse" aria-labelledby="faqHeading6" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes. SocialManager offers two operational modes. You can set it to Full Autopilot for immediate, hands-free 24/7 engagement, or switch to Review Queue mode where AI drafts replies and stages them for one-click human approval by your social media team.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 5: HIGH-CONVERSION PRE-FOOTER CTA CARD                               -->
+    <!-- ========================================================================= -->
+    <section class="py-6 bg-light">
+        <div class="container-xl">
+            <div class="cta-banner-card p-4 p-md-5 text-white">
+                <div class="row align-items-center gy-4">
+                    <div class="col-12 col-lg-8">
+                        <span class="badge badge-teal-soft text-teal bg-teal-lt px-3 py-1.5 rounded-pill mb-3">
+                            <i class="ti ti-rocket me-1.5"></i>Supercharge Your Social Operations
+                        </span>
+                        <h2 class="display-6 fw-bold mb-3 text-white">
+                            Ready to Turn Comments into Conversations and Conversions?
+                        </h2>
+                        <p class="text-white-50 fs-5 mb-4" style="max-width: 650px;">
+                            Eliminate manual comment tracking, respond to customers in under 5 seconds, and drive qualified leads straight into your direct messages across Facebook, Instagram, and YouTube.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="{{ route('login') }}" class="btn btn-teal btn-lg px-4 py-2.5 fw-semibold shadow-sm">
+                                <i class="ti ti-bolt me-1.5"></i>Start 14-Day Free Trial
+                            </a>
+                            <a href="#platforms" class="btn btn-outline-light btn-lg px-4 py-2.5">
+                                <i class="ti ti-device-desktop me-1.5"></i>Explore Platform Integrations
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="card bg-white bg-opacity-10 border border-white border-opacity-10 p-3.5 rounded-3">
+                            <div class="d-flex flex-column gap-2.5">
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>14-day full-featured free trial</span>
+                                </div>
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>No credit card required to start</span>
+                                </div>
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>AES-256 token encryption at rest</span>
+                                </div>
+                                <div class="d-flex align-items-center text-white small">
+                                    <i class="ti ti-circle-check text-teal fs-2 me-2"></i>
+                                    <span>Official Meta & Google APIs</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- STEP 5: MODERN 4-COLUMN FOOTER WITH COMPLIANCE & LEGAL LINKS              -->
+    <!-- ========================================================================= -->
+    <footer class="landing-footer pt-6 pb-4">
+        <div class="container-xl">
+            <div class="row g-4 mb-5">
+                <!-- Col 1: Brand Info -->
+                <div class="col-12 col-lg-4">
+                    <a href="{{ url('/') }}" class="d-inline-flex align-items-center gap-2 text-decoration-none mb-3">
+                        <span class="avatar avatar-sm rounded-2 bg-teal-lt text-teal">
+                            <i class="ti ti-brand-campaignmonitor fs-2"></i>
+                        </span>
+                        <span class="fw-bold fs-3 text-white">Social<span class="text-teal">Manager</span></span>
+                        <span class="badge badge-teal-soft ms-1">v2.4</span>
+                    </a>
+                    <p class="text-muted small mb-3 pe-lg-4">
+                        Enterprise-grade social media publishing, AI comment auto-reply, and automated direct messaging built for creators, businesses, and digital agencies.
+                    </p>
+                    <div class="d-inline-flex align-items-center gap-2 px-2.5 py-1.5 rounded-2 bg-dark border border-secondary border-opacity-25 small">
+                        <span class="status-indicator-live"></span>
+                        <span class="text-white-50">Systems Status: <strong class="text-teal">All APIs Operational</strong></span>
+                    </div>
+                </div>
+
+                <!-- Col 2: Platform Capabilities -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <h5 class="footer-heading">Capabilities</h5>
+                    <ul class="footer-link-list">
+                        <li><a href="#features"><i class="ti ti-calendar-event text-teal"></i>Content Scheduler</a></li>
+                        <li><a href="#features"><i class="ti ti-robot text-teal"></i>AI Auto-Responder</a></li>
+                        <li><a href="#features"><i class="ti ti-message-share text-teal"></i>Comment-to-DM Engine</a></li>
+                        <li><a href="#features"><i class="ti ti-shield-half text-teal"></i>Anti-Troll Shield</a></li>
+                        <li><a href="#features"><i class="ti ti-chart-dots text-teal"></i>Sentiment Analytics</a></li>
+                        <li><a href="#security"><i class="ti ti-lock text-teal"></i>Encrypted Token Vault</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Supported Ecosystem -->
+                <div class="col-6 col-md-3 col-lg-3">
+                    <h5 class="footer-heading">Supported Ecosystem</h5>
+                    <ul class="footer-link-list">
+                        <li><a href="#platforms"><i class="ti ti-brand-facebook text-teal"></i>Facebook Pages API</a></li>
+                        <li><a href="#platforms"><i class="ti ti-brand-instagram text-teal"></i>Instagram Professional API</a></li>
+                        <li><a href="#platforms"><i class="ti ti-brand-youtube text-teal"></i>YouTube Data API v3</a></li>
+                        <li><a href="#platforms"><i class="ti ti-brand-google text-teal"></i>Google Cloud OAuth 2.0</a></li>
+                        <li><a href="#security"><i class="ti ti-brand-azure text-teal"></i>Microsoft Azure Cloud</a></li>
+                        <li><a href="#security"><i class="ti ti-webhook text-teal"></i>HMAC SHA-256 Webhooks</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Trust & Compliance -->
+                <div class="col-12 col-md-6 col-lg-3">
+                    <h5 class="footer-heading">Trust & Compliance</h5>
+                    <ul class="footer-link-list">
+                        <li><a href="{{ url('/privacy') }}"><i class="ti ti-file-shield text-teal"></i>Privacy Policy</a></li>
+                        <li><a href="{{ url('/terms') }}"><i class="ti ti-file-text text-teal"></i>Terms of Service</a></li>
+                        <li><a href="{{ url('/data-deletion') }}"><i class="ti ti-trash text-teal"></i>Data Deletion Policy</a></li>
+                        <li><a href="#security"><i class="ti ti-shield-lock text-teal"></i>Security Architecture</a></li>
+                        <li><a href="{{ route('login') }}"><i class="ti ti-login text-teal"></i>Client Portal Login</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <hr class="border-secondary border-opacity-25 my-4">
+
+            <!-- Bottom Row: Copyright & Disclaimer -->
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-muted small">
+                <span>&copy; {{ date('Y') }} <strong>SocialManager</strong>. Enterprise Social Media Infrastructure. All rights reserved.</span>
+                <a href="#" class="text-white-50 text-decoration-none">
+                    <i class="ti ti-arrow-up me-1"></i>Back to Top
+                </a>
+            </div>
+
+            <div class="mt-3 text-muted" style="font-size: 0.76rem; color: #64748b !important;">
+                Disclaimer: SocialManager is an independent SaaS automation platform. Meta, Facebook, and Instagram are registered trademarks of Meta Platforms, Inc. YouTube and Google are registered trademarks of Google LLC. SocialManager integrates exclusively through officially sanctioned, authenticated public API endpoints.
             </div>
         </div>
     </footer>

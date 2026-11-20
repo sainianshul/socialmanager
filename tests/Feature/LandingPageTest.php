@@ -35,6 +35,15 @@ class LandingPageTest extends TestCase
         $response->assertSee('Enterprise-Grade Security by Design');
         $response->assertSee('AES-256 Token Encryption');
         $response->assertSee('HMAC SHA-256 Webhook Check');
+        $response->assertSee('Frequently Asked Questions');
+        $response->assertSee('Can my Facebook, Instagram, or YouTube account get banned or restricted?');
+        $response->assertSee('How does the Comment-to-DM lead capture trigger work on Instagram and Facebook?');
+        $response->assertSee('Ready to Turn Comments into Conversations and Conversions?');
+        $response->assertSee('14-day full-featured free trial');
+        $response->assertSee('Privacy Policy');
+        $response->assertSee('Terms of Service');
+        $response->assertSee('Data Deletion Policy');
+        $response->assertSee('All APIs Operational');
     }
 
     public function test_authenticated_user_redirects_to_dashboard(): void
