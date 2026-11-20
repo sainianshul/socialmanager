@@ -30,11 +30,6 @@ class LandingPageTest extends TestCase
         $response->assertSee('Connect Your Accounts');
         $response->assertSee('Configure AI Tone');
         $response->assertSee('Operate on Full Autopilot');
-        $response->assertSee('Simple Plans for Every Stage of Growth');
-        $response->assertSee('Campaign War Room');
-        $response->assertSee('Enterprise-Grade Security by Design');
-        $response->assertSee('AES-256 Token Encryption');
-        $response->assertSee('HMAC SHA-256 Webhook Check');
         $response->assertSee('Frequently Asked Questions');
         $response->assertSee('Can my Facebook, Instagram, or YouTube account get banned or restricted?');
         $response->assertSee('How does the Comment-to-DM lead capture trigger work on Instagram and Facebook?');

@@ -688,58 +688,6 @@
             gap: 4px;
         }
 
-        /* Security Cards */
-        .security-card {
-            background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            border-radius: 18px;
-            padding: 1.85rem;
-            height: 100%;
-            transition: all 0.28s ease;
-            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
-        }
-        .security-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(12, 166, 120, 0.35);
-            box-shadow: 0 18px 36px -8px rgba(12, 166, 120, 0.12);
-        }
-
-        /* Pricing Cards */
-        .pricing-card {
-            background: #ffffff;
-            border: 1px solid rgba(226, 232, 240, 0.85);
-            border-radius: 20px;
-            padding: 2.25rem;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            height: 100%;
-            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
-        }
-        .pricing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.1);
-        }
-        .pricing-card-featured {
-            border: 2px solid #0ca678 !important;
-            box-shadow: 0 20px 45px -8px rgba(12, 166, 120, 0.24) !important;
-            background: linear-gradient(180deg, rgba(12, 166, 120, 0.03) 0%, #ffffff 100%);
-        }
-        .pricing-badge-popular {
-            position: absolute;
-            top: -14px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #0ca678;
-            color: #ffffff;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 4px 14px;
-            border-radius: 999px;
-            box-shadow: 0 4px 12px rgba(12, 166, 120, 0.35);
-        }
-
         /* ===================================================================== */
         /* APPLE-STYLE MINIMALIST FAQ ACCORDION                                  */
         /* ===================================================================== */
@@ -897,7 +845,6 @@
                         <a href="#features" class="nav-capsule-link">Features</a>
                         <a href="#platforms" class="nav-capsule-link">Platforms</a>
                         <a href="#how-it-works" class="nav-capsule-link">How It Works</a>
-                        <a href="#pricing" class="nav-capsule-link">Pricing</a>
                         <a href="#faq" class="nav-capsule-link">FAQ</a>
                     </div>
                 </nav>
@@ -931,7 +878,6 @@
                     <a href="#features" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">Features</a>
                     <a href="#platforms" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">Platforms</a>
                     <a href="#how-it-works" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">How It Works</a>
-                    <a href="#pricing" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">Pricing</a>
                     <a href="#faq" class="nav-link py-2 px-3 rounded-2 fw-semibold text-dark">FAQ</a>
                     <hr class="my-2 border-secondary border-opacity-25">
                     @guest
@@ -1362,253 +1308,6 @@
     </section>
 
     <!-- ========================================================================= -->
-    <!-- STEP 4: TRANSPARENT PRICING PLANS                                         -->
-    <!-- ========================================================================= -->
-    <section id="pricing" class="py-6" style="background-color: #fafbfc;">
-        <div class="container-xl">
-            <div class="text-center mb-5">
-                <span class="badge badge-teal-soft mb-2"><i class="ti ti-tag me-1"></i>Predictable Pricing</span>
-                <h2 class="fw-bold text-dark mb-2 display-6">Simple Plans for Every Stage of Growth</h2>
-                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
-                    From independent creators to full-scale political campaign war rooms. All plans include 24/7 background automation and official API compliance.
-                </p>
-            </div>
-
-            <div class="row g-4 align-items-stretch justify-content-center">
-                <!-- Starter Plan -->
-                <div class="col-12 col-lg-4">
-                    <div class="pricing-card d-flex flex-column">
-                        <div class="mb-3">
-                            <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Starter Creator</span>
-                            <h3 class="fw-bold text-dark mb-1">Single Channel</h3>
-                            <p class="text-muted small">Ideal for solo creators and local constituency representatives.</p>
-                        </div>
-
-                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
-                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
-                            <span class="display-5 fw-extrabold text-dark">2,499</span>
-                            <span class="text-muted small">/ month</span>
-                        </div>
-
-                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span><strong>1 Social Channel</strong> (Facebook, IG, or YouTube)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Multi-Platform Content Scheduler</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Up to <strong>500 AI Comment Replies</strong> / mo</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Basic Anti-Troll Auto-Hide Shield</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>AES-256 Token Encryption at Rest</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 text-muted">
-                                <i class="ti ti-x text-secondary"></i>
-                                <span>Comment-to-DM Private Messaging</span>
-                            </li>
-                        </ul>
-
-                        <div class="mt-auto">
-                            <a href="{{ route('login') }}" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold">
-                                Get Started
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Pro Campaign Plan (Featured with Teal Glow) -->
-                <div class="col-12 col-lg-4">
-                    <div class="pricing-card pricing-card-featured d-flex flex-column position-relative">
-                        <!-- Most Popular Tag -->
-                        <div class="position-absolute top-0 end-0 translate-middle-y me-3">
-                            <span class="badge bg-teal text-white py-1 px-2.5 fs-8">
-                                <i class="ti ti-star me-1"></i>Most Popular
-                            </span>
-                        </div>
-
-                        <div class="mb-3">
-                            <span class="badge badge-teal-soft fw-semibold mb-2">Professional</span>
-                            <h3 class="fw-bold text-dark mb-1">Campaign War Room</h3>
-                            <p class="text-muted small">Built for growing public figures, election war rooms, and brands.</p>
-                        </div>
-
-                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
-                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
-                            <span class="display-5 fw-extrabold text-teal">6,999</span>
-                            <span class="text-muted small">/ month</span>
-                        </div>
-
-                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span><strong>Up to 5 Social Accounts</strong> (FB, IG &amp; YouTube)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span><strong>Unlimited Scheduled Posts</strong>, Reels &amp; Shorts</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span><strong>Unlimited AI Comment Replies</strong> (Gemini AI)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span><strong>Comment-to-DM Engine</strong> (Messenger &amp; IG Direct)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Adaptive Tone Selector (Humble, Patriotic, Firm)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Real-Time Sentiment Intelligence &amp; Analytics</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Priority Background Queue Processing</span>
-                            </li>
-                        </ul>
-
-                        <div class="mt-auto">
-                            <a href="{{ route('login') }}" class="btn btn-teal w-100 py-2.5 shadow-sm fw-semibold">
-                                <i class="ti ti-bolt me-1"></i>Start 14-Day Free Trial
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Enterprise Plan -->
-                <div class="col-12 col-lg-4">
-                    <div class="pricing-card d-flex flex-column">
-                        <div class="mb-3">
-                            <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Enterprise</span>
-                            <h3 class="fw-bold text-dark mb-1">State / National Network</h3>
-                            <p class="text-muted small">For major political organizations, agencies, and enterprise brands.</p>
-                        </div>
-
-                        <div class="d-flex align-items-baseline gap-1 my-3 pb-3 border-bottom">
-                            <span class="fs-4 text-muted fw-bold">&#8377;</span>
-                            <span class="display-5 fw-extrabold text-dark">19,999</span>
-                            <span class="text-muted small">/ month</span>
-                        </div>
-
-                        <ul class="list-unstyled small text-secondary mb-4 space-y-2">
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span><strong>Unlimited Channels &amp; Team Seats</strong></span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Multi-Tenant Role Access (Admin / Manager / User)</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Custom Fine-Tuned AI Persona &amp; Knowledge Base</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Dedicated Cloud VM &amp; High-Throughput Queue</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2 mb-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>Custom Webhook Ingestion &amp; HMAC Verification</span>
-                            </li>
-                            <li class="d-flex align-items-center gap-2">
-                                <i class="ti ti-check text-teal"></i>
-                                <span>24/7 Dedicated Account Manager &amp; Phone SLA</span>
-                            </li>
-                        </ul>
-
-                        <div class="mt-auto">
-                            <a href="mailto:support@rezel.online?subject=Enterprise%20War%20Room%20Inquiry" class="btn btn-outline-secondary w-100 py-2.5 fw-semibold">
-                                Contact Enterprise Team
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ========================================================================= -->
-    <!-- STEP 4: ENTERPRISE SECURITY & RELIABILITY GUARANTEE                       -->
-    <!-- ========================================================================= -->
-    <section id="security" class="py-6 bg-white border-top border-bottom">
-        <div class="container-xl">
-            <div class="text-center mb-5">
-                <span class="badge badge-teal-soft mb-2"><i class="ti ti-shield-check me-1"></i>Security Architecture</span>
-                <h2 class="fw-bold text-dark mb-2 display-6">Enterprise-Grade Security by Design</h2>
-                <p class="text-muted" style="max-width: 640px; margin: 0 auto; font-size: 1.05rem;">
-                    Because managing influential public profiles requires uncompromising safety, our infrastructure adheres to strict cryptographic standards.
-                </p>
-            </div>
-
-            <div class="row g-4">
-                <!-- Security Pillar 1 -->
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="security-card d-flex flex-column">
-                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
-                            <i class="ti ti-key fs-1"></i>
-                        </span>
-                        <h4 class="fw-bold text-dark mb-2">AES-256 Token Encryption</h4>
-                        <p class="text-muted small mb-0">
-                            All OAuth access tokens and refresh tokens are encrypted at rest using AES-256-CBC cipher with HMAC authentication. Plaintext tokens are never stored.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Security Pillar 2 -->
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="security-card d-flex flex-column">
-                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
-                            <i class="ti ti-certificate fs-1"></i>
-                        </span>
-                        <h4 class="fw-bold text-dark mb-2">HMAC SHA-256 Webhook Check</h4>
-                        <p class="text-muted small mb-0">
-                            Every incoming Meta webhook is verified against Meta's cryptographic signature header (<code>X-Hub-Signature-256</code>), blocking 100% of unauthorized or forged requests.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Security Pillar 3 -->
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="security-card d-flex flex-column">
-                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
-                            <i class="ti ti-fingerprint fs-1"></i>
-                        </span>
-                        <h4 class="fw-bold text-dark mb-2">Zero Password Storage</h4>
-                        <p class="text-muted small mb-0">
-                            Authentication occurs strictly via official Meta Facebook Login and Google OAuth 2.0 prompts. Your social account passwords are never accessed or stored.
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Security Pillar 4 -->
-                <div class="col-12 col-md-6 col-lg-3">
-                    <div class="security-card d-flex flex-column">
-                        <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
-                            <i class="ti ti-server-2 fs-1"></i>
-                        </span>
-                        <h4 class="fw-bold text-dark mb-2">Azure Cloud Infrastructure</h4>
-                        <p class="text-muted small mb-0">
-                            Hosted on Microsoft Azure Virtual Machines with Docker containerization, Redis in-memory queue management, and 99.9% automated uptime monitoring.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ========================================================================= -->
     <!-- STEP 5: FREQUENTLY ASKED QUESTIONS (APPLE-STYLE MINIMAL)                  -->
     <!-- ========================================================================= -->
     <section id="faq" class="apple-faq-section">
@@ -1738,7 +1437,7 @@
                         <li><a href="#features"><i class="ti ti-message-share text-teal"></i>Comment-to-DM Engine</a></li>
                         <li><a href="#features"><i class="ti ti-shield-half text-teal"></i>Anti-Troll Shield</a></li>
                         <li><a href="#features"><i class="ti ti-chart-dots text-teal"></i>Sentiment Analytics</a></li>
-                        <li><a href="#security"><i class="ti ti-lock text-teal"></i>Encrypted Token Vault</a></li>
+                        <li><a href="#faq"><i class="ti ti-lock text-teal"></i>Encrypted Token Vault</a></li>
                     </ul>
                 </div>
 
@@ -1750,8 +1449,8 @@
                         <li><a href="#platforms"><i class="ti ti-brand-instagram text-teal"></i>Instagram Professional API</a></li>
                         <li><a href="#platforms"><i class="ti ti-brand-youtube text-teal"></i>YouTube Data API v3</a></li>
                         <li><a href="#platforms"><i class="ti ti-brand-google text-teal"></i>Google Cloud OAuth 2.0</a></li>
-                        <li><a href="#security"><i class="ti ti-brand-azure text-teal"></i>Microsoft Azure Cloud</a></li>
-                        <li><a href="#security"><i class="ti ti-webhook text-teal"></i>HMAC SHA-256 Webhooks</a></li>
+                        <li><a href="#faq"><i class="ti ti-brand-azure text-teal"></i>Microsoft Azure Cloud</a></li>
+                        <li><a href="#faq"><i class="ti ti-webhook text-teal"></i>HMAC SHA-256 Webhooks</a></li>
                     </ul>
                 </div>
 
@@ -1762,7 +1461,7 @@
                         <li><a href="{{ url('/privacy') }}"><i class="ti ti-file-shield text-teal"></i>Privacy Policy</a></li>
                         <li><a href="{{ url('/terms') }}"><i class="ti ti-file-text text-teal"></i>Terms of Service</a></li>
                         <li><a href="{{ url('/data-deletion') }}"><i class="ti ti-trash text-teal"></i>Data Deletion Policy</a></li>
-                        <li><a href="#security"><i class="ti ti-shield-lock text-teal"></i>Security Architecture</a></li>
+                        <li><a href="#faq"><i class="ti ti-shield-lock text-teal"></i>Security Architecture</a></li>
                         <li><a href="{{ route('login') }}"><i class="ti ti-login text-teal"></i>Client Portal Login</a></li>
                     </ul>
                 </div>
