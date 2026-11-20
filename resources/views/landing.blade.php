@@ -1383,7 +1383,7 @@
                 <a href="{{ route('login') }}" class="btn btn-teal btn-lg px-4 py-2.5">
                     <i class="ti ti-bolt me-1.5"></i>Start Free Trial
                 </a>
-                <a href="#preview" class="btn btn-outline-secondary btn-lg px-4 py-2.5">
+                <a href="#features" class="btn btn-outline-secondary btn-lg px-4 py-2.5">
                     <i class="ti ti-player-play me-1.5"></i>Live Platform Preview
                 </a>
             </div>
@@ -1405,8 +1405,9 @@
             </div>
 
             <!-- ============================================================= -->
-            <!-- LIVE PRODUCT DASHBOARD PREVIEW MOCKUP                         -->
+            <!-- LIVE PRODUCT DASHBOARD PREVIEW MOCKUP (COMMENTED OUT)         -->
             <!-- ============================================================= -->
+            <!--
             <div class="hero-showcase-container" id="preview">
                 <!-- Ambient Pulsing Glow Aura -->
                 <div class="hero-glow-aura"></div>
@@ -1588,6 +1589,7 @@
                     </div>
                 </div>
             </div>
+            -->
             <!-- End Browser Mockup -->
         </div>
     </section>
