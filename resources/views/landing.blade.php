@@ -7,47 +7,89 @@
     <title>SocialManager - AI-Powered Social Media Management & Auto Engagement</title>
     <meta name="description" content="Enterprise social media publishing, smart AI community moderation, and automated Comment-to-DM for Facebook, Instagram, and YouTube."/>
     
-    <!-- Tabler Core & Icons -->
-    <link href="{{ asset('dist/css/tabler.min.css') }}" rel="stylesheet"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+    <!-- Tabler Core CSS (CDN) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/css/tabler.min.css">
+    <!-- Tabler Icons Webfont -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --brand-teal: #0ca678;
-            --brand-teal-hover: #099268;
-            --brand-teal-light: rgba(12, 166, 120, 0.08);
-            --brand-teal-border: rgba(12, 166, 120, 0.25);
+            --brand-teal: #1db8ab;
+            --brand-teal-hover: #17a397;
+            --brand-teal-dark: #10857b;
+            --brand-teal-light: rgba(29, 184, 171, 0.08);
+            --brand-teal-border: rgba(29, 184, 171, 0.25);
             --navy-dark: #0f172a;
+            --navy-surface: #1e293b;
+            --slate-body: #334155;
+            --slate-muted: #64748b;
             --slate-border: #e2e8f0;
+            --slate-bg: #f8fafc;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: #fafbfc;
             color: #1e293b;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Teal Buttons & Badges */
+        /* Modern Gradient Accents */
+        .text-teal-gradient {
+            background: linear-gradient(135deg, #1db8ab 0%, #0ca678 50%, #20c997 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Buttons & Badges */
         .btn-teal {
-            background-color: var(--brand-teal);
-            border-color: var(--brand-teal);
+            background-color: #1db8ab;
+            border-color: #1db8ab;
             color: #ffffff;
             font-weight: 600;
-            transition: all 0.2s ease-in-out;
+            border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(29, 184, 171, 0.28);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .btn-teal:hover {
-            background-color: var(--brand-teal-hover);
-            border-color: var(--brand-teal-hover);
+        .btn-teal:hover, .btn-teal:focus {
+            background-color: #17a397;
+            border-color: #17a397;
             color: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(12, 166, 120, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(29, 184, 171, 0.38);
+        }
+        .btn-outline-teal {
+            color: #1db8ab;
+            border-color: #1db8ab;
+            background: transparent;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+        .btn-outline-teal:hover {
+            background-color: rgba(29, 184, 171, 0.08);
+            color: #10857b;
+            border-color: #10857b;
         }
         .badge-teal-soft {
-            background-color: var(--brand-teal-light);
-            color: var(--brand-teal);
-            border: 1px solid var(--brand-teal-border);
+            background-color: rgba(29, 184, 171, 0.08);
+            color: #0d8a80;
+            border: 1px solid rgba(29, 184, 171, 0.25);
             font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+        .bg-teal-lt {
+            background-color: rgba(29, 184, 171, 0.08) !important;
+            color: #0d8a80 !important;
+        }
+        .text-teal {
+            color: #0d8a80 !important;
         }
 
         /* Sticky Glass Navbar */
@@ -55,107 +97,110 @@
             position: sticky;
             top: 0;
             z-index: 1030;
-            background: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.85);
+            transition: all 0.25s ease;
         }
         .nav-link-custom {
             color: #475569;
-            font-weight: 500;
-            font-size: 0.95rem;
-            padding: 0.5rem 1rem;
-            transition: color 0.15s ease;
+            font-weight: 550;
+            font-size: 0.92rem;
+            padding: 0.5rem 0.9rem;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+            text-decoration: none;
         }
         .nav-link-custom:hover {
-            color: var(--brand-teal);
+            color: #1db8ab;
+            background-color: rgba(29, 184, 171, 0.05);
         }
 
         /* Hero Styling */
         .hero-section {
-            padding: 80px 0 60px 0;
-            background: radial-gradient(circle at 50% 0%, rgba(12, 166, 120, 0.05) 0%, rgba(250, 251, 252, 0) 70%);
+            padding: 90px 0 70px 0;
+            background: radial-gradient(circle at 50% 0%, rgba(29, 184, 171, 0.09) 0%, rgba(250, 251, 252, 0) 70%),
+                        linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+            position: relative;
         }
         .hero-title {
-            font-size: 3.25rem;
+            font-size: 3.5rem;
             font-weight: 800;
-            line-height: 1.18;
-            letter-spacing: -0.03em;
-            color: var(--navy-dark);
-        }
-        .text-teal-gradient {
-            background: linear-gradient(135deg, #0ca678 0%, #20c997 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            line-height: 1.15;
+            letter-spacing: -0.035em;
+            color: #0f172a;
         }
         .hero-subtitle {
-            font-size: 1.2rem;
-            line-height: 1.65;
-            color: #64748b;
-            max-width: 720px;
+            font-size: 1.22rem;
+            line-height: 1.7;
+            color: #475569;
+            max-width: 740px;
             margin: 0 auto;
+            font-weight: 450;
         }
 
         /* Dashboard UI Mockup Frame */
         .browser-mockup {
             background: #ffffff;
-            border-radius: 12px;
+            border-radius: 14px;
             border: 1px solid #cbd5e1;
-            box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.04);
+            box-shadow: 0 25px 65px -15px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04);
             overflow: hidden;
-            margin-top: 40px;
+            margin-top: 45px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
         .browser-header {
-            background: #f8fafc;
+            background: #f1f5f9;
             border-bottom: 1px solid #e2e8f0;
-            padding: 10px 16px;
+            padding: 12px 18px;
             display: flex;
             align-items: center;
         }
         .browser-dot {
-            width: 11px;
-            height: 11px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             display: inline-block;
-            margin-right: 6px;
+            margin-right: 7px;
         }
         .dot-red { background-color: #ef4444; }
         .dot-yellow { background-color: #f59e0b; }
         .dot-green { background-color: #10b981; }
         .browser-url-bar {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 3px 14px;
-            font-size: 0.78rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 5px 14px;
+            font-size: 0.8rem;
             color: #64748b;
-            margin-left: 12px;
-            width: 320px;
+            margin-left: 14px;
+            width: 340px;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
         }
 
         /* Mockup Internal UI */
         .mockup-body {
             background: #f8fafc;
-            padding: 24px;
+            padding: 28px;
         }
         .mock-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border-radius: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
         }
         .mock-event-pill {
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 0.8rem;
+            padding: 7px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 9px;
         }
         .mock-event-published {
             background-color: #ecfdf5;
@@ -171,45 +216,159 @@
         .brand-icon-ig { color: #d62976; }
         .brand-icon-yt { color: #e02424; }
 
+        /* Platform Ribbon Cards */
+        .platform-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            height: 100%;
+        }
+        .platform-card:hover {
+            transform: translateY(-3px);
+            border-color: #cbd5e1;
+            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Bento Grid Cards */
+        .bento-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1.75rem;
+            height: 100%;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(29, 184, 171, 0.4);
+            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
+        }
+
+        /* Process Steps */
+        .process-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 2rem;
+            position: relative;
+            height: 100%;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.25s ease;
+        }
+        .process-card:hover {
+            transform: translateY(-3px);
+            border-color: #cbd5e1;
+            box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.07);
+        }
+        .step-number-badge {
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: #1db8ab;
+            background: rgba(29, 184, 171, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        /* Security Cards */
+        .security-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 1.75rem;
+            height: 100%;
+            transition: all 0.25s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .security-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(29, 184, 171, 0.4);
+            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.07);
+        }
+
+        /* Pricing Cards */
+        .pricing-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 2.25rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            height: 100%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 18px 36px -10px rgba(15, 23, 42, 0.09);
+        }
+        .pricing-card-featured {
+            border: 2px solid #1db8ab !important;
+            box-shadow: 0 16px 36px -8px rgba(29, 184, 171, 0.22) !important;
+            background: linear-gradient(180deg, rgba(29, 184, 171, 0.02) 0%, #ffffff 100%);
+        }
+        .pricing-badge-popular {
+            position: absolute;
+            top: -14px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1db8ab;
+            color: #ffffff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 4px 14px;
+            border-radius: 999px;
+            box-shadow: 0 4px 10px rgba(29, 184, 171, 0.3);
+        }
+
         /* Accordion Custom Styling */
         .accordion-custom .accordion-item {
             border: 1px solid #e2e8f0;
-            border-radius: 10px !important;
-            margin-bottom: 12px;
+            border-radius: 12px !important;
+            margin-bottom: 14px;
             background: #ffffff;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            transition: all 0.2s ease;
         }
         .accordion-custom .accordion-item:hover {
             border-color: #cbd5e1;
         }
         .accordion-custom .accordion-button {
-            font-weight: 600;
+            font-weight: 650;
             font-size: 1.05rem;
-            color: var(--navy-dark);
+            color: #0f172a;
             background: #ffffff;
-            padding: 1.15rem 1.35rem;
+            padding: 1.25rem 1.45rem;
             box-shadow: none !important;
         }
         .accordion-custom .accordion-button:not(.collapsed) {
-            color: var(--brand-teal);
-            background-color: rgba(12, 166, 120, 0.04);
+            color: #0d8a80;
+            background-color: rgba(29, 184, 171, 0.04);
             border-bottom: 1px solid #e2e8f0;
         }
         .accordion-custom .accordion-body {
-            padding: 1.25rem 1.35rem;
+            padding: 1.35rem 1.45rem;
             color: #475569;
-            font-size: 0.95rem;
-            line-height: 1.7;
+            font-size: 0.96rem;
+            line-height: 1.75;
         }
 
         /* Pre-Footer CTA Card */
         .cta-banner-card {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 65%, #064e3b 100%);
-            border: 1px solid rgba(12, 166, 120, 0.35);
-            border-radius: 16px;
-            box-shadow: 0 20px 45px -12px rgba(15, 23, 42, 0.35);
+            background: linear-gradient(135deg, #0b1320 0%, #111a2d 65%, #064e3b 100%);
+            border: 1px solid rgba(29, 184, 171, 0.35);
+            border-radius: 18px;
+            box-shadow: 0 25px 50px -15px rgba(11, 19, 32, 0.45);
             position: relative;
             overflow: hidden;
         }
@@ -220,13 +379,13 @@
             right: -15%;
             width: 480px;
             height: 480px;
-            background: radial-gradient(circle, rgba(12, 166, 120, 0.22) 0%, rgba(12, 166, 120, 0) 70%);
+            background: radial-gradient(circle, rgba(29, 184, 171, 0.25) 0%, rgba(29, 184, 171, 0) 70%);
             pointer-events: none;
         }
 
         /* Modern 4-Column Footer */
         .landing-footer {
-            background: #0b1329;
+            background: #0b1320;
             color: #94a3b8;
             border-top: 1px solid #1e293b;
         }
@@ -236,7 +395,7 @@
             transition: color 0.15s ease;
         }
         .landing-footer a:hover {
-            color: #20c997;
+            color: #2dd4bf;
         }
         .footer-heading {
             color: #f8fafc;
@@ -244,7 +403,7 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1.25rem;
         }
         .footer-link-list {
             list-style: none;
@@ -252,13 +411,13 @@
             margin-bottom: 0;
         }
         .footer-link-list li {
-            margin-bottom: 0.75rem;
-            font-size: 0.9rem;
+            margin-bottom: 0.8rem;
+            font-size: 0.92rem;
         }
         .footer-link-list li a {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
         .status-indicator-live {
             width: 8px;
@@ -276,7 +435,7 @@
         }
 
         @media (max-width: 991px) {
-            .hero-title { font-size: 2.3rem; }
+            .hero-title { font-size: 2.35rem; }
             .hero-subtitle { font-size: 1.05rem; }
             .browser-url-bar { display: none; }
         }
@@ -555,7 +714,7 @@
             <div class="row g-3 justify-content-center">
                 <!-- Facebook Platform Card -->
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px;">
+                    <div class="platform-card d-flex flex-column">
                         <div class="d-flex align-items-center gap-3 mb-2.5">
                             <span class="avatar avatar-md rounded-2" style="background: rgba(24, 119, 242, 0.08); color: #1877f2;">
                                 <i class="ti ti-brand-facebook fs-1"></i>
@@ -576,7 +735,7 @@
 
                 <!-- Instagram Platform Card -->
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px;">
+                    <div class="platform-card d-flex flex-column">
                         <div class="d-flex align-items-center gap-3 mb-2.5">
                             <span class="avatar avatar-md rounded-2" style="background: rgba(214, 41, 118, 0.08); color: #d62976;">
                                 <i class="ti ti-brand-instagram fs-1"></i>
@@ -597,7 +756,7 @@
 
                 <!-- YouTube Platform Card -->
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px;">
+                    <div class="platform-card d-flex flex-column">
                         <div class="d-flex align-items-center gap-3 mb-2.5">
                             <span class="avatar avatar-md rounded-2" style="background: rgba(224, 36, 36, 0.08); color: #e02424;">
                                 <i class="ti ti-brand-youtube fs-1"></i>
@@ -636,7 +795,7 @@
             <div class="row g-3">
                 <!-- Bento Card 1: Content Publishing & Drag-Drop Calendar (7 Columns) -->
                 <div class="col-12 col-lg-7">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="bento-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                                 <i class="ti ti-calendar-event fs-1"></i>
@@ -649,7 +808,7 @@
                         </p>
 
                         <!-- Inner Feature Showcase Mockup -->
-                        <div class="p-3 rounded-2 bg-light border">
+                        <div class="p-3 rounded-2 bg-light border mt-auto">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="small fw-semibold text-secondary">Active Calendar Slots</span>
                                 <span class="small text-teal"><i class="ti ti-clock me-1"></i>Queue Running</span>
@@ -680,7 +839,7 @@
 
                 <!-- Bento Card 2: Contextual Multi-AI Personas (5 Columns) -->
                 <div class="col-12 col-lg-5">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="bento-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                                 <i class="ti ti-brain fs-1"></i>
@@ -693,7 +852,7 @@
                         </p>
 
                         <!-- Tone Selector Chips Preview -->
-                        <div class="p-3 rounded-2 bg-light border">
+                        <div class="p-3 rounded-2 bg-light border mt-auto">
                             <span class="small text-secondary fw-semibold d-block mb-2">Configurable Tones:</span>
                             <div class="d-flex flex-wrap gap-1 mb-2.5">
                                 <span class="badge bg-white text-teal border border-teal fs-8"><i class="ti ti-check me-1"></i>Humble & Respectful</span>
@@ -713,7 +872,7 @@
 
                 <!-- Bento Card 3: Instant Comment-to-DM Engine (4 Columns) -->
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="bento-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                                 <i class="ti ti-mail-forward fs-1"></i>
@@ -738,7 +897,7 @@
 
                 <!-- Bento Card 4: 24/7 Anti-Troll Shield (4 Columns) -->
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="bento-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                                 <i class="ti ti-shield-lock fs-1"></i>
@@ -763,7 +922,7 @@
 
                 <!-- Bento Card 5: Real-Time Political Sentiment War Room (4 Columns) -->
                 <div class="col-12 col-md-12 col-lg-4">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="bento-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal">
                                 <i class="ti ti-chart-dots-3 fs-1"></i>
@@ -807,7 +966,7 @@
             <div class="row g-4">
                 <!-- Step 01 -->
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border p-4 shadow-none position-relative" style="border-radius: 12px; background: #fafbfc;">
+                    <div class="process-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
                                 01
@@ -818,7 +977,7 @@
                         <p class="text-muted small mb-3">
                             Link your Facebook Page, Instagram Professional account, and YouTube channel in 1 click using official platform dialogs.
                         </p>
-                        <ul class="list-unstyled small text-secondary mb-0">
+                        <ul class="list-unstyled small text-secondary mb-0 mt-auto">
                             <li class="d-flex align-items-center gap-1.5 mb-1.5">
                                 <i class="ti ti-check text-teal"></i>
                                 <span>Zero password storage</span>
@@ -837,7 +996,7 @@
 
                 <!-- Step 02 -->
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border p-4 shadow-none position-relative" style="border-radius: 12px; background: #fafbfc;">
+                    <div class="process-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
                                 02
@@ -848,7 +1007,7 @@
                         <p class="text-muted small mb-3">
                             Choose your preferred AI communication voice and specify keywords for automated private direct messaging.
                         </p>
-                        <ul class="list-unstyled small text-secondary mb-0">
+                        <ul class="list-unstyled small text-secondary mb-0 mt-auto">
                             <li class="d-flex align-items-center gap-1.5 mb-1.5">
                                 <i class="ti ti-check text-teal"></i>
                                 <span>Choose Humble, Patriotic, or Formal voice</span>
@@ -867,7 +1026,7 @@
 
                 <!-- Step 03 -->
                 <div class="col-12 col-md-4">
-                    <div class="card h-100 border p-4 shadow-none position-relative" style="border-radius: 12px; background: #fafbfc;">
+                    <div class="process-card d-flex flex-column">
                         <div class="d-flex align-items-center justify-content-between mb-3">
                             <span class="avatar avatar-md rounded-circle bg-teal text-white fw-bold fs-3">
                                 03
@@ -1122,7 +1281,7 @@
             <div class="row g-4 align-items-stretch justify-content-center">
                 <!-- Starter Plan -->
                 <div class="col-12 col-lg-4">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="pricing-card d-flex flex-column">
                         <div class="mb-3">
                             <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Starter Creator</span>
                             <h3 class="fw-bold text-dark mb-1">Single Channel</h3>
@@ -1172,7 +1331,7 @@
 
                 <!-- Pro Campaign Plan (Featured with Teal Glow) -->
                 <div class="col-12 col-lg-4">
-                    <div class="card h-100 p-4 position-relative" style="border-radius: 12px; background: #ffffff; border: 2px solid var(--brand-teal); box-shadow: 0 12px 35px rgba(12, 166, 120, 0.12);">
+                    <div class="pricing-card pricing-card-featured d-flex flex-column position-relative">
                         <!-- Most Popular Tag -->
                         <div class="position-absolute top-0 end-0 translate-middle-y me-3">
                             <span class="badge bg-teal text-white py-1 px-2.5 fs-8">
@@ -1233,7 +1392,7 @@
 
                 <!-- Enterprise Plan -->
                 <div class="col-12 col-lg-4">
-                    <div class="card h-100 border p-4 shadow-sm" style="border-radius: 12px; background: #ffffff;">
+                    <div class="pricing-card d-flex flex-column">
                         <div class="mb-3">
                             <span class="badge bg-secondary-lt text-secondary fw-semibold mb-2">Enterprise</span>
                             <h3 class="fw-bold text-dark mb-1">State / National Network</h3>
@@ -1300,7 +1459,7 @@
             <div class="row g-4">
                 <!-- Security Pillar 1 -->
                 <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                    <div class="security-card d-flex flex-column">
                         <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
                             <i class="ti ti-key fs-1"></i>
                         </span>
@@ -1313,7 +1472,7 @@
 
                 <!-- Security Pillar 2 -->
                 <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                    <div class="security-card d-flex flex-column">
                         <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
                             <i class="ti ti-certificate fs-1"></i>
                         </span>
@@ -1326,7 +1485,7 @@
 
                 <!-- Security Pillar 3 -->
                 <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                    <div class="security-card d-flex flex-column">
                         <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
                             <i class="ti ti-fingerprint fs-1"></i>
                         </span>
@@ -1339,7 +1498,7 @@
 
                 <!-- Security Pillar 4 -->
                 <div class="col-12 col-md-6 col-lg-3">
-                    <div class="card h-100 border p-3.5 shadow-none" style="border-radius: 10px; background: #fafbfc;">
+                    <div class="security-card d-flex flex-column">
                         <span class="avatar avatar-md rounded-2 bg-teal-lt text-teal mb-3">
                             <i class="ti ti-server-2 fs-1"></i>
                         </span>
@@ -1617,7 +1776,7 @@
         </div>
     </footer>
 
-    <!-- Tabler Core JS -->
-    <script src="{{ asset('dist/js/tabler.min.js') }}"></script>
+    <!-- Tabler Core JS (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0-beta20/dist/js/tabler.min.js"></script>
 </body>
 </html>
