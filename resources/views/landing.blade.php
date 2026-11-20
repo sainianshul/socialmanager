@@ -221,140 +221,490 @@
             font-weight: 450;
         }
 
-        /* Dashboard UI Mockup Frame */
-        .browser-mockup {
+        /* ===================================================================== */
+        /* HIGH-TECH SAAS ANIMATIONS & GLOW                                      */
+        /* ===================================================================== */
+        @keyframes pulseGlowAura {
+            0%, 100% {
+                transform: scale(1) translateY(0);
+                opacity: 0.75;
+            }
+            50% {
+                transform: scale(1.08) translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes mockupFloat {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        @keyframes radarPing {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        @keyframes shimmerSweep {
+            0% {
+                background-position: -200% 0;
+            }
+            100% {
+                background-position: 200% 0;
+            }
+        }
+
+        /* Ambient Glow & Floating Container */
+        .hero-showcase-container {
+            position: relative;
+            max-width: 1080px;
+            margin: 48px auto 0;
+            text-align: left;
+        }
+
+        .hero-glow-aura {
+            position: absolute;
+            top: -30px;
+            left: 8%;
+            right: 8%;
+            height: 400px;
+            background: radial-gradient(ellipse at 50% 50%, rgba(12, 166, 120, 0.28) 0%, rgba(32, 201, 151, 0.15) 35%, rgba(99, 102, 241, 0.08) 60%, transparent 75%);
+            filter: blur(75px);
+            z-index: 0;
+            pointer-events: none;
+            animation: pulseGlowAura 9s ease-in-out infinite alternate;
+        }
+
+        /* Main SaaS Window Frame */
+        .saas-mockup-frame {
+            position: relative;
+            z-index: 1;
             background: #ffffff;
-            border-radius: 14px;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 25px 65px -15px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.04);
+            border-radius: 20px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            box-shadow: 
+                0 0 0 1px rgba(15, 23, 42, 0.03),
+                0 25px 60px -15px rgba(15, 23, 42, 0.14),
+                0 45px 95px -20px rgba(12, 166, 120, 0.18);
             overflow: hidden;
-            margin-top: 45px;
+            animation: mockupFloat 8s ease-in-out infinite;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .browser-header {
-            background: #f1f5f9;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 12px 18px;
+        .saas-mockup-frame:hover {
+            box-shadow: 
+                0 0 0 1px rgba(15, 23, 42, 0.05),
+                0 30px 70px -15px rgba(15, 23, 42, 0.18),
+                0 55px 110px -20px rgba(12, 166, 120, 0.25);
+        }
+
+        /* macOS Dark Chrome Bar */
+        .mockup-header-chrome {
+            background: #0f172a;
+            padding: 13px 20px;
             display: flex;
             align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .browser-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 7px;
-        }
-        .dot-red { background-color: #ef4444; }
-        .dot-yellow { background-color: #f59e0b; }
-        .dot-green { background-color: #10b981; }
-        .browser-url-bar {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 5px 14px;
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-left: 14px;
-            width: 340px;
+        .traffic-dots-group {
             display: flex;
             align-items: center;
             gap: 7px;
-            box-shadow: inset 0 1px 2px rgba(0,0,0,0.02);
         }
+        .traffic-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .dot-apple-red { background: #ff5f56; box-shadow: 0 0 8px rgba(255, 95, 86, 0.6); }
+        .dot-apple-yellow { background: #ffbd2e; box-shadow: 0 0 8px rgba(255, 189, 46, 0.6); }
+        .dot-apple-green { background: #27c93f; box-shadow: 0 0 8px rgba(39, 201, 63, 0.6); }
 
-        /* Mockup Internal UI */
-        .mockup-body {
-            background: #f8fafc;
-            padding: 28px;
-        }
-        .mock-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
-        }
-        .mock-event-pill {
-            padding: 7px 12px;
-            border-radius: 8px;
-            font-size: 0.82rem;
-            font-weight: 600;
+        .mockup-url-pill {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            padding: 5px 16px;
+            font-size: 0.78rem;
+            color: #94a3b8;
+            margin-left: 18px;
             display: flex;
             align-items: center;
+            gap: 8px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+        .mockup-live-status {
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.14);
+            border: 1px solid rgba(16, 185, 129, 0.28);
+            border-radius: 999px;
+            padding: 4px 14px;
+            font-size: 0.76rem;
+            font-weight: 700;
+            color: #34d399;
+            letter-spacing: 0.02em;
+        }
+        .radar-dot-pulse {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            animation: radarPing 2s infinite cubic-bezier(0, 0, 0.2, 1);
+        }
+
+        /* Canvas & Modern Components */
+        .mockup-canvas {
+            background: #f8fafc;
+            padding: 24px;
+        }
+
+        /* 3 Borderless Floating Stat Cards */
+        .saas-stat-card {
+            background: #ffffff;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 18px;
+            box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            height: 100%;
+        }
+        .saas-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px -4px rgba(15, 23, 42, 0.08);
+        }
+        .stat-card-title {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .stat-card-num {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #0f172a;
+            line-height: 1.2;
+            margin: 4px 0;
+        }
+        .stat-pill {
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.74rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .stat-pill-teal {
+            background: rgba(12, 166, 120, 0.12);
+            color: #0ca678;
+        }
+        .stat-pill-emerald {
+            background: rgba(16, 185, 129, 0.12);
+            color: #059669;
+        }
+        .stat-pill-indigo {
+            background: rgba(99, 102, 241, 0.12);
+            color: #4f46e5;
+        }
+
+        /* Two Showcase Panels (Calendar & AI Moderation) */
+        .saas-showcase-panel {
+            background: #ffffff;
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .saas-panel-heading {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .panel-icon-squircle {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(12, 166, 120, 0.1);
+            color: #0ca678;
+            font-size: 1.15rem;
+        }
+        .panel-title-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        /* Publishing Schedule Queue Strips (NO UGLY RECTANGLES!) */
+        .saas-queue-strip {
+            background: #f8fafc;
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             margin-bottom: 9px;
+            transition: transform 0.2s ease, background 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
-        .mock-event-published {
-            background-color: #ecfdf5;
-            border: 1px solid #86efac;
-            color: #064e3b;
+        .saas-queue-strip:last-child {
+            margin-bottom: 0;
         }
-        .mock-event-scheduled {
-            background-color: #eff6ff;
-            border: 1px solid #93c5fd;
-            color: #0f2d59;
+        .saas-queue-strip::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
         }
+        .queue-yt::before { background: #e02424; }
+        .queue-ig::before { background: #d62976; }
+        .queue-fb::before { background: #1877f2; }
+
+        .saas-queue-strip:hover {
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+        .queue-title {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-left: 8px;
+        }
+
+        /* Live AI Moderation Stream - Clean Chat Bubble Layout */
+        .moderation-chat-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .chat-bubble-inbound {
+            background: #f1f5f9;
+            border-radius: 4px 14px 14px 14px;
+            padding: 11px 14px;
+        }
+        .chat-inbound-user {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .user-avatar-mark {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            font-size: 0.65rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .user-name-text {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .user-platform-tag {
+            font-size: 0.72rem;
+            color: #d62976;
+            font-weight: 600;
+        }
+        .chat-comment-body {
+            font-size: 0.82rem;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .chat-bubble-reply {
+            background: linear-gradient(135deg, rgba(12, 166, 120, 0.08) 0%, rgba(32, 201, 151, 0.04) 100%);
+            border-left: 3px solid #0ca678;
+            border-radius: 14px 4px 14px 14px;
+            padding: 11px 14px;
+            margin-left: 12px;
+        }
+        .chat-reply-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #0ca678;
+            font-size: 0.74rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .chat-reply-body {
+            font-size: 0.81rem;
+            color: #0f172a;
+            line-height: 1.45;
+        }
+
+        /* Shimmering Auto-DM Dispatch Banner */
+        .auto-dm-dispatch-shimmer {
+            background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 35%, #a7f3d0 50%, #d1fae5 65%, #ecfdf5 100%);
+            background-size: 200% 100%;
+            animation: shimmerSweep 3.5s infinite linear;
+            border-radius: 10px;
+            padding: 9px 13px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: #065f46;
+            font-size: 0.78rem;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(16, 185, 129, 0.14);
+        }
+        .dispatch-icon-box {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: #0ca678;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
         .brand-icon-fb { color: #1877f2; }
         .brand-icon-ig { color: #d62976; }
         .brand-icon-yt { color: #e02424; }
 
+        /* General Badge Outline Refinement */
+        .badge-outline {
+            background: rgba(12, 166, 120, 0.08) !important;
+            border: 1px solid rgba(12, 166, 120, 0.22) !important;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
         /* Platform Ribbon Cards */
         .platform-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1.5rem;
-            transition: all 0.25s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 16px;
+            padding: 1.75rem;
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
             height: 100%;
         }
         .platform-card:hover {
-            transform: translateY(-3px);
-            border-color: #cbd5e1;
-            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
+            transform: translateY(-5px);
+            border-color: rgba(12, 166, 120, 0.35);
+            box-shadow: 0 18px 36px -8px rgba(12, 166, 120, 0.12), 0 0 0 1px rgba(12, 166, 120, 0.2);
+        }
+
+        .platform-tag-pill {
+            background: #f1f5f9;
+            color: #475569;
+            border-radius: 999px;
+            padding: 4px 11px;
+            font-size: 0.76rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            border: none;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+        .platform-tag-pill:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        .bento-micro-surface {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 14px 16px;
+            margin-top: auto;
+            border: none;
+        }
+        .bento-slot-card {
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
         }
 
         /* Bento Grid Cards */
         .bento-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 1.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 18px;
+            padding: 1.85rem;
             height: 100%;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
         }
         .bento-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(29, 184, 171, 0.4);
-            box-shadow: 0 16px 32px -8px rgba(15, 23, 42, 0.08);
+            transform: translateY(-5px);
+            border-color: rgba(12, 166, 120, 0.35);
+            box-shadow: 0 20px 40px -8px rgba(12, 166, 120, 0.14), 0 0 0 1px rgba(12, 166, 120, 0.2);
         }
 
         /* Process Steps */
         .process-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 18px;
             padding: 2rem;
             position: relative;
             height: 100%;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            transition: all 0.25s ease;
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
+            transition: all 0.28s ease;
         }
         .process-card:hover {
-            transform: translateY(-3px);
-            border-color: #cbd5e1;
-            box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.07);
+            transform: translateY(-5px);
+            border-color: rgba(12, 166, 120, 0.35);
+            box-shadow: 0 18px 36px -8px rgba(12, 166, 120, 0.12);
         }
         .step-number-badge {
             font-size: 0.85rem;
             font-weight: 800;
             letter-spacing: 0.05em;
-            color: #1db8ab;
-            background: rgba(29, 184, 171, 0.1);
-            padding: 4px 10px;
-            border-radius: 6px;
+            color: #0ca678;
+            background: rgba(12, 166, 120, 0.1);
+            padding: 4px 12px;
+            border-radius: 999px;
             display: inline-block;
             margin-bottom: 1rem;
         }
@@ -362,45 +712,45 @@
         /* Security Cards */
         .security-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 1.75rem;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 18px;
+            padding: 1.85rem;
             height: 100%;
-            transition: all 0.25s ease;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.28s ease;
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
         }
         .security-card:hover {
-            transform: translateY(-3px);
-            border-color: rgba(29, 184, 171, 0.4);
-            box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.07);
+            transform: translateY(-5px);
+            border-color: rgba(12, 166, 120, 0.35);
+            box-shadow: 0 18px 36px -8px rgba(12, 166, 120, 0.12);
         }
 
         /* Pricing Cards */
         .pricing-card {
             background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.85);
+            border-radius: 20px;
             padding: 2.25rem;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             height: 100%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 20px -4px rgba(15, 23, 42, 0.05);
         }
         .pricing-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 18px 36px -10px rgba(15, 23, 42, 0.09);
+            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.1);
         }
         .pricing-card-featured {
-            border: 2px solid #1db8ab !important;
-            box-shadow: 0 16px 36px -8px rgba(29, 184, 171, 0.22) !important;
-            background: linear-gradient(180deg, rgba(29, 184, 171, 0.02) 0%, #ffffff 100%);
+            border: 2px solid #0ca678 !important;
+            box-shadow: 0 20px 45px -8px rgba(12, 166, 120, 0.24) !important;
+            background: linear-gradient(180deg, rgba(12, 166, 120, 0.03) 0%, #ffffff 100%);
         }
         .pricing-badge-popular {
             position: absolute;
             top: -14px;
             left: 50%;
             transform: translateX(-50%);
-            background: #1db8ab;
+            background: #0ca678;
             color: #ffffff;
             font-size: 0.75rem;
             font-weight: 700;
@@ -408,7 +758,7 @@
             letter-spacing: 0.08em;
             padding: 4px 14px;
             border-radius: 999px;
-            box-shadow: 0 4px 10px rgba(29, 184, 171, 0.3);
+            box-shadow: 0 4px 12px rgba(12, 166, 120, 0.35);
         }
 
         /* Accordion Custom Styling */
@@ -647,157 +997,180 @@
             <!-- ============================================================= -->
             <!-- LIVE PRODUCT DASHBOARD PREVIEW MOCKUP                         -->
             <!-- ============================================================= -->
-            <div id="preview" class="browser-mockup text-start">
-                <!-- Browser Bar -->
-                <div class="browser-header">
-                    <div>
-                        <span class="browser-dot dot-red"></span>
-                        <span class="browser-dot dot-yellow"></span>
-                        <span class="browser-dot dot-green"></span>
-                    </div>
-                    <div class="browser-url-bar">
-                        <i class="ti ti-lock text-teal"></i>
-                        <span>https://socialmanager.rezel.online/admin/dashboard</span>
-                    </div>
-                    <div class="ms-auto d-flex align-items-center gap-2">
-                        <span class="badge bg-teal-lt text-teal">
-                            <span class="status-dot bg-teal me-1.5"></span>System Live
-                        </span>
-                    </div>
-                </div>
+            <div class="hero-showcase-container" id="preview">
+                <!-- Ambient Pulsing Glow Aura -->
+                <div class="hero-glow-aura"></div>
 
-                <!-- Mockup Content Body -->
-                <div class="mockup-body">
-                    <!-- Top Metric Cards -->
-                    <div class="row g-3 mb-3">
-                        <div class="col-12 col-md-4">
-                            <div class="mock-card p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="text-muted small fw-semibold">Connected Channels</span>
-                                    <span class="badge badge-teal-soft"><i class="ti ti-check me-1"></i>Active</span>
-                                </div>
-                                <div class="h3 fw-bold mb-1 text-dark">3 Channels</div>
-                                <div class="d-flex align-items-center gap-2 small text-muted">
-                                    <span><i class="ti ti-brand-facebook brand-icon-fb"></i> FB Page</span>
-                                    <span>•</span>
-                                    <span><i class="ti ti-brand-instagram brand-icon-ig"></i> IG Pro</span>
-                                    <span>•</span>
-                                    <span><i class="ti ti-brand-youtube brand-icon-yt"></i> YouTube</span>
-                                </div>
-                            </div>
+                <!-- Main SaaS Window Frame -->
+                <div class="saas-mockup-frame">
+                    <!-- macOS Dark Chrome Bar -->
+                    <div class="mockup-header-chrome">
+                        <div class="traffic-dots-group">
+                            <span class="traffic-dot dot-apple-red"></span>
+                            <span class="traffic-dot dot-apple-yellow"></span>
+                            <span class="traffic-dot dot-apple-green"></span>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <div class="mock-card p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="text-muted small fw-semibold">AI Comments Processed</span>
-                                    <span class="badge bg-teal-lt text-teal">98.4% Accuracy</span>
-                                </div>
-                                <div class="h3 fw-bold mb-1 text-dark">1,420</div>
-                                <div class="small text-muted">
-                                    <span class="text-teal fw-semibold"><i class="ti ti-trending-up me-1"></i>+18.2%</span> vs last week
-                                </div>
-                            </div>
+                        <div class="mockup-url-pill d-none d-sm-flex">
+                            <i class="ti ti-lock text-teal"></i>
+                            <span>https://socialmanager.rezel.online/admin/dashboard</span>
                         </div>
-                        <div class="col-12 col-md-4">
-                            <div class="mock-card p-3">
-                                <div class="d-flex align-items-center justify-content-between mb-1">
-                                    <span class="text-muted small fw-semibold">Auto DMs Dispatched</span>
-                                    <span class="badge badge-outline text-teal">Instant (0.8s)</span>
-                                </div>
-                                <div class="h3 fw-bold mb-1 text-dark">312</div>
-                                <div class="small text-muted">Private Comment-to-DM triggers</div>
-                            </div>
+                        <div class="mockup-live-status">
+                            <span class="radar-dot-pulse"></span>
+                            <span>Autopilot Active • System Live</span>
                         </div>
                     </div>
 
-                    <!-- Split View: Left Calendar + Right Live AI Auto-Reply & DM -->
-                    <div class="row g-3">
-                        <!-- Left: Publishing Calendar Preview -->
-                        <div class="col-12 col-lg-6">
-                            <div class="mock-card p-3.5 h-100">
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-calendar text-teal fs-2"></i>
-                                        <span class="fw-bold text-dark">Publishing Schedule Calendar</span>
+                    <!-- Canvas Body -->
+                    <div class="mockup-canvas">
+                        <!-- Top 3 Floating Stat Cards (Borderless) -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-4">
+                                <div class="saas-stat-card">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="stat-card-title">Connected Channels</span>
+                                        <span class="stat-pill stat-pill-teal"><i class="ti ti-circle-check fs-4"></i>Active</span>
                                     </div>
-                                    <span class="badge bg-secondary-lt text-secondary">Today</span>
+                                    <div class="stat-card-num">3 Channels</div>
+                                    <div class="d-flex align-items-center gap-2 small text-muted">
+                                        <span class="d-inline-flex align-items-center gap-1"><i class="ti ti-brand-facebook brand-icon-fb"></i> FB Page</span>
+                                        <span class="text-secondary">•</span>
+                                        <span class="d-inline-flex align-items-center gap-1"><i class="ti ti-brand-instagram brand-icon-ig"></i> IG Pro</span>
+                                        <span class="text-secondary">•</span>
+                                        <span class="d-inline-flex align-items-center gap-1"><i class="ti ti-brand-youtube brand-icon-yt"></i> YouTube</span>
+                                    </div>
                                 </div>
-
-                                <!-- Scheduled Event 1 (Published) -->
-                                <div class="mock-event-pill mock-event-published justify-content-between">
-                                    <div class="d-flex align-items-center gap-2 text-truncate">
-                                        <i class="ti ti-brand-youtube brand-icon-yt fs-3"></i>
-                                        <span class="text-truncate">Budget 2026 Analysis - Full Video</span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="saas-stat-card">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="stat-card-title">AI Comments Processed</span>
+                                        <span class="stat-pill stat-pill-emerald">98.4% Accuracy</span>
                                     </div>
-                                    <span class="badge badge-outline text-success bg-white ms-2">
-                                        <i class="ti ti-check me-1"></i>Published
-                                    </span>
+                                    <div class="stat-card-num">1,420</div>
+                                    <div class="small text-muted">
+                                        <span class="text-teal fw-semibold"><i class="ti ti-trending-up me-1"></i>+18.2%</span> vs last week
+                                    </div>
                                 </div>
-
-                                <!-- Scheduled Event 2 (Scheduled) -->
-                                <div class="mock-event-pill mock-event-scheduled justify-content-between">
-                                    <div class="d-flex align-items-center gap-2 text-truncate">
-                                        <i class="ti ti-brand-instagram brand-icon-ig fs-3"></i>
-                                        <span class="text-truncate">Reel: 5 Important Welfare Schemes</span>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="saas-stat-card">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <span class="stat-card-title">Auto DMs Dispatched</span>
+                                        <span class="stat-pill stat-pill-indigo"><i class="ti ti-bolt fs-4"></i>Instant (0.8s)</span>
                                     </div>
-                                    <span class="badge badge-outline text-primary bg-white ms-2">
-                                        <i class="ti ti-clock me-1"></i>04:30 PM
-                                    </span>
-                                </div>
-
-                                <!-- Scheduled Event 3 (Scheduled) -->
-                                <div class="mock-event-pill mock-event-scheduled justify-content-between mb-0">
-                                    <div class="d-flex align-items-center gap-2 text-truncate">
-                                        <i class="ti ti-brand-facebook brand-icon-fb fs-3"></i>
-                                        <span class="text-truncate">Public Grievance Camp Announcement</span>
-                                    </div>
-                                    <span class="badge badge-outline text-primary bg-white ms-2">
-                                        <i class="ti ti-clock me-1"></i>07:00 PM
-                                    </span>
+                                    <div class="stat-card-num">312</div>
+                                    <div class="small text-muted">Private Comment-to-DM triggers</div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Right: Live AI Moderation & Auto DM Stream -->
-                        <div class="col-12 col-lg-6">
-                            <div class="mock-card p-3.5 h-100">
-                                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-messages text-teal fs-2"></i>
-                                        <span class="fw-bold text-dark">Live AI Comment Moderation & Auto DM</span>
-                                    </div>
-                                    <span class="badge badge-teal-soft">Live Stream</span>
-                                </div>
-
-                                <!-- User Comment Card -->
-                                <div class="p-2.5 rounded-2 bg-light border mb-2">
-                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <!-- Split View: Left Publishing Calendar + Right Live AI Moderation -->
+                        <div class="row g-3">
+                            <!-- Left: Publishing Schedule Calendar -->
+                            <div class="col-12 col-lg-6">
+                                <div class="saas-showcase-panel">
+                                    <div class="saas-panel-heading">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="avatar avatar-xs rounded-circle bg-azure text-white">RS</span>
-                                            <span class="fw-semibold small text-dark">Ramesh Sharma</span>
-                                            <span class="text-muted fs-8"><i class="ti ti-brand-instagram brand-icon-ig"></i> Instagram</span>
+                                            <div class="panel-icon-squircle">
+                                                <i class="ti ti-calendar-event"></i>
+                                            </div>
+                                            <span class="panel-title-text">Publishing Schedule Calendar</span>
                                         </div>
-                                        <span class="text-muted fs-8">2m ago</span>
-                                    </div>
-                                    <div class="small text-secondary mb-2">
-                                        "Sir please send me the application form link for the education scheme."
+                                        <span class="stat-pill stat-pill-teal">Today</span>
                                     </div>
 
-                                    <!-- AI Public Reply -->
-                                    <div class="p-2 rounded-2 bg-white border-start border-teal border-3 ms-2 mb-2">
-                                        <div class="d-flex align-items-center gap-1.5 mb-1 text-teal fs-8 fw-semibold">
-                                            <i class="ti ti-robot"></i>
-                                            <span>AI Public Reply (Humble & Respectful Tone)</span>
+                                    <!-- Queue Strip 1 (Published - YouTube) -->
+                                    <div class="saas-queue-strip queue-yt">
+                                        <div class="d-flex align-items-center gap-2 text-truncate">
+                                            <span class="avatar avatar-xs rounded-2 bg-red-lt text-danger">
+                                                <i class="ti ti-brand-youtube fs-3"></i>
+                                            </span>
+                                            <span class="queue-title text-truncate">Budget 2026 Analysis - Full Video</span>
                                         </div>
-                                        <div class="fs-8 text-dark">
-                                            "Ramesh ji, yojna ka official application form link aapke private direct message (DM) me bhej diya gaya hai. Kripya apna inbox check karein."
-                                        </div>
+                                        <span class="stat-pill stat-pill-emerald ms-2">
+                                            <i class="ti ti-check"></i>Published
+                                        </span>
                                     </div>
 
-                                    <!-- Auto DM Dispatched Badge -->
-                                    <div class="d-inline-flex align-items-center gap-1 badge badge-teal-soft py-1 px-2 fs-8">
-                                        <i class="ti ti-mail-forward"></i>
-                                        <span>Auto DM Dispatched to @ramesh_sharma via Instagram Direct</span>
+                                    <!-- Queue Strip 2 (Scheduled - Instagram) -->
+                                    <div class="saas-queue-strip queue-ig">
+                                        <div class="d-flex align-items-center gap-2 text-truncate">
+                                            <span class="avatar avatar-xs rounded-2 bg-pink-lt text-pink">
+                                                <i class="ti ti-brand-instagram fs-3"></i>
+                                            </span>
+                                            <span class="queue-title text-truncate">Reel: 5 Important Welfare Schemes</span>
+                                        </div>
+                                        <span class="stat-pill stat-pill-indigo ms-2">
+                                            <i class="ti ti-clock"></i>04:30 PM
+                                        </span>
+                                    </div>
+
+                                    <!-- Queue Strip 3 (Scheduled - Facebook) -->
+                                    <div class="saas-queue-strip queue-fb">
+                                        <div class="d-flex align-items-center gap-2 text-truncate">
+                                            <span class="avatar avatar-xs rounded-2 bg-blue-lt text-primary">
+                                                <i class="ti ti-brand-facebook fs-3"></i>
+                                            </span>
+                                            <span class="queue-title text-truncate">Public Grievance Camp Announcement</span>
+                                        </div>
+                                        <span class="stat-pill stat-pill-indigo ms-2">
+                                            <i class="ti ti-clock"></i>07:00 PM
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Live AI Moderation & Auto DM Stream -->
+                            <div class="col-12 col-lg-6">
+                                <div class="saas-showcase-panel">
+                                    <div class="saas-panel-heading">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="panel-icon-squircle">
+                                                <i class="ti ti-messages"></i>
+                                            </div>
+                                            <span class="panel-title-text">Live AI Comment Moderation & Auto DM</span>
+                                        </div>
+                                        <span class="stat-pill stat-pill-teal">
+                                            <span class="radar-dot-pulse me-1"></span>Live Stream
+                                        </span>
+                                    </div>
+
+                                    <div class="moderation-chat-stream">
+                                        <!-- User Inbound Comment Bubble -->
+                                        <div class="chat-bubble-inbound">
+                                            <div class="chat-inbound-user">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="user-avatar-mark">RS</div>
+                                                    <span class="user-name-text">Ramesh Sharma</span>
+                                                    <span class="user-platform-tag"><i class="ti ti-brand-instagram me-0.5"></i>Instagram</span>
+                                                </div>
+                                                <span class="text-muted fs-8">2m ago</span>
+                                            </div>
+                                            <div class="chat-comment-body">
+                                                "Sir please send me the application form link for the education scheme."
+                                            </div>
+                                        </div>
+
+                                        <!-- AI Public Reply Bubble -->
+                                        <div class="chat-bubble-reply">
+                                            <div class="chat-reply-header">
+                                                <i class="ti ti-robot fs-3"></i>
+                                                <span>AI Public Reply (Humble & Respectful Tone)</span>
+                                            </div>
+                                            <div class="chat-reply-body">
+                                                "Ramesh ji, yojna ka official application form link aapke private direct message (DM) me bhej diya gaya hai. Kripya apna inbox check karein."
+                                            </div>
+                                        </div>
+
+                                        <!-- Auto-DM Dispatch Shimmer Notification Bar -->
+                                        <div class="auto-dm-dispatch-shimmer">
+                                            <div class="dispatch-icon-box">
+                                                <i class="ti ti-mail-forward"></i>
+                                            </div>
+                                            <div class="text-truncate">
+                                                Auto DM Dispatched to @ramesh_sharma via Instagram Direct
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -835,9 +1208,9 @@
                         </div>
                         <p class="text-muted small mb-3">Permanent Page tokens with real-time Webhook feed subscription. Publish posts, sync comments, and dispatch Messenger replies.</p>
                         <div class="d-flex flex-wrap gap-1.5 mt-auto">
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Photos & Videos</span>
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Auto Moderation</span>
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Instant DMs</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Photos & Videos</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Auto Moderation</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Instant DMs</span>
                         </div>
                     </div>
                 </div>
@@ -856,9 +1229,9 @@
                         </div>
                         <p class="text-muted small mb-3">Linked Instagram account automation. Schedule Carousels & Reels, track public interactions, and send private Direct Messages.</p>
                         <div class="d-flex flex-wrap gap-1.5 mt-auto">
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Reels Publishing</span>
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Comment-to-DM</span>
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Direct Messaging</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Reels Publishing</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Comment-to-DM</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Direct Messaging</span>
                         </div>
                     </div>
                 </div>
@@ -877,9 +1250,9 @@
                         </div>
                         <p class="text-muted small mb-3">Resumable video & Shorts publishing with automated 24/7 background token renewal. Public comment threading and auto-hiding.</p>
                         <div class="d-flex flex-wrap gap-1.5 mt-auto">
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Shorts & Videos</span>
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Auto-Renew Token</span>
-                            <span class="badge bg-light text-secondary border fs-8"><i class="ti ti-check text-teal me-1"></i>Troll Shield</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Shorts & Videos</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Auto-Renew Token</span>
+                            <span class="platform-tag-pill"><i class="ti ti-check text-teal"></i>Troll Shield</span>
                         </div>
                     </div>
                 </div>
@@ -917,15 +1290,15 @@
                         </p>
 
                         <!-- Inner Feature Showcase Mockup -->
-                        <div class="p-3 rounded-2 bg-light border mt-auto">
+                        <div class="bento-micro-surface">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="small fw-semibold text-secondary">Active Calendar Slots</span>
                                 <span class="small text-teal"><i class="ti ti-clock me-1"></i>Queue Running</span>
                             </div>
                             <div class="row g-2">
                                 <div class="col-6">
-                                    <div class="p-2 rounded-2 bg-white border d-flex align-items-center gap-2">
-                                        <i class="ti ti-video text-danger"></i>
+                                    <div class="bento-slot-card">
+                                        <i class="ti ti-video text-danger fs-3"></i>
                                         <div class="text-truncate">
                                             <div class="fw-semibold small text-truncate">Weekly Address Video</div>
                                             <div class="text-muted fs-8">YouTube • 1080p Resumable</div>
@@ -933,8 +1306,8 @@
                                     </div>
                                 </div>
                                 <div class="col-6">
-                                    <div class="p-2 rounded-2 bg-white border d-flex align-items-center gap-2">
-                                        <i class="ti ti-device-mobile text-pink"></i>
+                                    <div class="bento-slot-card">
+                                        <i class="ti ti-device-mobile text-pink fs-3"></i>
                                         <div class="text-truncate">
                                             <div class="fw-semibold small text-truncate">Highlights Reel</div>
                                             <div class="text-muted fs-8">Instagram • 9:16 Vertical</div>
@@ -961,19 +1334,19 @@
                         </p>
 
                         <!-- Tone Selector Chips Preview -->
-                        <div class="p-3 rounded-2 bg-light border mt-auto">
+                        <div class="bento-micro-surface">
                             <span class="small text-secondary fw-semibold d-block mb-2">Configurable Tones:</span>
                             <div class="d-flex flex-wrap gap-1 mb-2.5">
-                                <span class="badge bg-white text-teal border border-teal fs-8"><i class="ti ti-check me-1"></i>Humble & Respectful</span>
-                                <span class="badge bg-white text-secondary border fs-8">Patriotic & Inspiring</span>
-                                <span class="badge bg-white text-secondary border fs-8">Assertive & Firm</span>
-                                <span class="badge bg-white text-secondary border fs-8">Formal & Official</span>
+                                <span class="badge bg-teal text-white rounded-pill fs-8"><i class="ti ti-check me-1"></i>Humble & Respectful</span>
+                                <span class="badge bg-white text-secondary rounded-pill shadow-xs fs-8">Patriotic & Inspiring</span>
+                                <span class="badge bg-white text-secondary rounded-pill shadow-xs fs-8">Assertive & Firm</span>
+                                <span class="badge bg-white text-secondary rounded-pill shadow-xs fs-8">Formal & Official</span>
                             </div>
                             <span class="small text-secondary fw-semibold d-block mb-1.5">Languages Supported:</span>
                             <div class="d-flex gap-1">
-                                <span class="badge bg-teal-lt text-teal fs-8">Hindi + Hinglish</span>
-                                <span class="badge bg-secondary-lt text-secondary fs-8">Pure Hindi</span>
-                                <span class="badge bg-secondary-lt text-secondary fs-8">English</span>
+                                <span class="badge bg-teal-lt text-teal rounded-pill fs-8">Hindi + Hinglish</span>
+                                <span class="badge bg-secondary-lt text-secondary rounded-pill fs-8">Pure Hindi</span>
+                                <span class="badge bg-secondary-lt text-secondary rounded-pill fs-8">English</span>
                             </div>
                         </div>
                     </div>
@@ -992,7 +1365,7 @@
                         <p class="text-muted small mb-3">
                             Convert public interactions into private inquiries. When a user comments specific keywords on Instagram or Facebook, send an instant DM with the link, details, or registration form.
                         </p>
-                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                        <div class="bento-micro-surface">
                             <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
                                 <span>Rule Trigger Mode</span>
                                 <span class="text-teal fw-semibold">Contains Keyword</span>
@@ -1017,7 +1390,7 @@
                         <p class="text-muted small mb-3">
                             Our AI toxicity classification scans incoming comments for abusive language, hate speech, and troll attacks, automatically hiding them from public view before they cause brand harm.
                         </p>
-                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                        <div class="bento-micro-surface">
                             <div class="d-flex align-items-center justify-content-between text-muted fs-8 mb-1">
                                 <span>Action Taken</span>
                                 <span class="badge bg-danger-lt text-danger fs-8">Auto-Hidden</span>
@@ -1042,7 +1415,7 @@
                         <p class="text-muted small mb-3">
                             Know exactly what your constituents and customers think. Real-time categorization of comments into Positive, Grievances, and Complaints with interactive trend graphs.
                         </p>
-                        <div class="p-2.5 rounded-2 bg-light border mt-auto">
+                        <div class="bento-micro-surface">
                             <div class="d-flex align-items-center justify-content-between small mb-1.5">
                                 <span class="fw-semibold text-dark">Constituent Sentiment</span>
                                 <span class="text-teal fw-bold">84% Positive</span>
