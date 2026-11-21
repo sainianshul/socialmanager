@@ -20,7 +20,7 @@ class FestivalStudioController extends Controller
 
         $todayFestival = $upcomingFestivals->first(fn($f) => $f->festival_date->isToday());
         $selectedFestivalId = $request->query('festival_id', $todayFestival?->id ?? $upcomingFestivals->first()?->id);
-        $selectedFestival = $upcomingFestivals->firstWhere('id', $selectedFestivalId) ?? $upcomingFestivals->first();
+        $selectedFestival = $upcomingFestivals->firstWhere('id', (int) $selectedFestivalId) ?? $upcomingFestivals->first();
 
         $partyFilter = $request->query('party', 'all');
 
@@ -40,6 +40,22 @@ class FestivalStudioController extends Controller
         }
 
         $templates = $templatesQuery->get();
+
+        // Support seamless AJAX date switching without full page refresh
+        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json([
+                'success' => true,
+                'festival_id' => $selectedFestival?->id,
+                'title' => $selectedFestival?->title,
+                'festival_date' => $selectedFestival?->festival_date?->format('d M Y'),
+                'caption' => $selectedFestival?->ready_caption,
+                'hashtags' => $selectedFestival?->hashtags,
+                'html' => view('admin.festival_studio.partials._content', compact(
+                    'selectedFestival',
+                    'templates'
+                ))->render(),
+            ]);
+        }
 
         $user = auth()->user();
         $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;

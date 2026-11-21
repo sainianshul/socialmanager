@@ -41,4 +41,33 @@ class FestivalStudioTest extends TestCase
         $response->assertSee('Festival Studio');
         $response->assertSee(route('admin.festival-studio.index'));
     }
+
+    public function test_festival_studio_ajax_returns_json_content(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $festival = Festival::first();
+
+        $response = $this->actingAs($user)->getJson(
+            route('admin.festival-studio.index', ['festival_id' => $festival->id]),
+            ['X-Requested-With' => 'XMLHttpRequest']
+        );
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'festival_id' => $festival->id,
+            'title' => $festival->title,
+        ]);
+        $response->assertJsonStructure([
+            'success',
+            'festival_id',
+            'title',
+            'festival_date',
+            'caption',
+            'hashtags',
+            'html',
+        ]);
+    }
 }

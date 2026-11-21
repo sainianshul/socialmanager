@@ -134,7 +134,16 @@
     pointer-events: auto;
 }
 
-
+/* Dynamic Content Area Transition */
+#festival-content-area {
+    min-height: 250px;
+    transition: opacity 0.18s ease-in-out;
+}
+#festival-content-area.is-loading {
+    opacity: 0.35;
+    pointer-events: none;
+    user-select: none;
+}
 </style>
 @endpush
 
@@ -166,8 +175,9 @@
                         $isToday = $festival->festival_date->isToday();
                         $daysAway = now()->startOfDay()->diffInDays($festival->festival_date->startOfDay(), false);
                     @endphp
-                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $festival->id, 'party' => $partyFilter]) }}" 
-                       class="fs-date-pill {{ $isSelected ? 'active' : '' }}">
+                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $festival->id]) }}" 
+                       class="fs-date-pill {{ $isSelected ? 'active' : '' }}"
+                       data-festival-id="{{ $festival->id }}">
                         <div class="d-flex align-items-center justify-content-between mb-1">
                             <span class="text-secondary small fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.04em;">
                                 {{ $festival->festival_date->format('D') }}
@@ -192,129 +202,158 @@
         </div>
     @endif
 
-    {{-- Festival & Gallery Control Bar --}}
-    @if($selectedFestival)
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3 pb-2 border-bottom">
-            <div class="d-flex align-items-center gap-2">
-                <h3 class="fw-bold m-0 text-dark">{{ $selectedFestival->title }}</h3>
-                <span class="badge bg-primary-lt rounded-pill">{{ $selectedFestival->festival_date->format('d M Y') }}</span>
-            </div>
-
-            <div class="d-flex flex-wrap align-items-center gap-2">
-                {{-- Quick Copy Caption Button --}}
-                @if(!empty($selectedFestival->ready_caption))
-                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1" id="btn-copy-caption">
-                        <i class="ti ti-copy me-1"></i><span id="copy-btn-text">Copy Caption</span>
-                    </button>
-                    {{-- Hidden text storage for copy --}}
-                    <div id="festival-caption-text" class="d-none">{{ $selectedFestival->ready_caption }}{{ !empty($selectedFestival->hashtags) ? "\n\n" . $selectedFestival->hashtags : '' }}</div>
-                @endif
-
-
-            </div>
-        </div>
-    @endif
-
-    {{-- Templates Grid with Live User Branding --}}
-    @if($templates->isNotEmpty())
-        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-3 mb-4">
-            @foreach($templates as $template)
-                @php
-                    $scheduleUrl = route('admin.posts.create', [
-                        'date' => $selectedFestival?->festival_date?->format('Y-m-d\T08:00'),
-                        'caption' => ($selectedFestival?->ready_caption ?? '') . ($selectedFestival?->hashtags ? "\n\n" . $selectedFestival->hashtags : ''),
-                    ]);
-                @endphp
-                <div class="col">
-                    <div class="fs-template-card h-100 d-flex flex-column">
-                        
-                        {{-- 1:1 Aspect Ratio Poster Container --}}
-                        <div class="fs-template-preview-wrapper">
-                            <img src="{{ $template->image_url }}" alt="{{ $template->title }}" class="fs-template-preview-img" loading="lazy">
-                            
-                            {{-- Top Party Badge --}}
-                            <div class="position-absolute top-0 start-0 m-2.5 d-flex gap-1 z-1">
-                                @if($template->party)
-                                    <span class="badge bg-dark text-white rounded-pill shadow-xs" style="font-size: 10px; padding: 3px 8px;">
-                                        {{ $template->party->short_code }}
-                                    </span>
-                                @endif
-                            </div>
-
-                            {{-- Hover Actions Overlay --}}
-                            <div class="fs-template-overlay">
-                                <a href="{{ $scheduleUrl }}" class="btn btn-primary rounded-pill px-3 py-2 w-100 shadow-sm text-decoration-none">
-                                    <i class="ti ti-wand me-1"></i>Use This Poster
-                                </a>
-                                <a href="{{ $scheduleUrl }}" class="btn btn-outline-light rounded-pill px-3 py-1.5 w-100 text-decoration-none small">
-                                    <i class="ti ti-calendar-time me-1"></i>Schedule for Festival
-                                </a>
-                            </div>
-                        </div>
-
-                        {{-- Minimal Card Footer --}}
-                        <div class="p-2.5 d-flex align-items-center justify-content-between">
-                            <span class="small fw-semibold text-dark text-truncate me-2" title="{{ $template->title }}">
-                                {{ $template->title }}
-                            </span>
-                            <div class="d-flex gap-1 flex-shrink-0">
-                                <a href="{{ $scheduleUrl }}" class="btn btn-xs btn-outline-primary rounded-pill px-2.5" title="Use Poster">
-                                    Use
-                                </a>
-                                <a href="{{ $scheduleUrl }}" class="btn btn-xs btn-ghost-secondary rounded-pill px-2" title="Schedule">
-                                    <i class="ti ti-calendar"></i>
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    @else
-        <div class="border border-dashed rounded-4 p-5 text-center my-4 bg-light-subtle">
-            <div class="avatar avatar-md bg-secondary-lt rounded-circle mb-2">
-                <i class="ti ti-photo-off text-secondary fs-3"></i>
-            </div>
-            <div class="fw-semibold text-dark mb-1">No templates found for this filter</div>
-            <a href="{{ route('admin.festival-studio.index', ['festival_id' => $selectedFestival?->id, 'party' => 'all']) }}" class="btn btn-xs btn-outline-secondary rounded-pill mt-2">
-                Show All Designs
-            </a>
-        </div>
-    @endif
+    {{-- Dynamic Festival Content Area (Smooth AJAX without page refresh) --}}
+    <div id="festival-content-area" class="position-relative">
+        @include('admin.festival_studio.partials._content')
+    </div>
 
 @endsection
 
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    var copyBtn = document.getElementById('btn-copy-caption');
-    var copyText = document.getElementById('copy-btn-text');
-    var captionEl = document.getElementById('festival-caption-text');
+    var contentArea = document.getElementById('festival-content-area');
+    var activeAbortController = null;
 
-    if (copyBtn && captionEl) {
-        copyBtn.addEventListener('click', function () {
-            var fullText = captionEl.innerText;
-            navigator.clipboard.writeText(fullText).then(function () {
-                copyText.innerText = 'Copied!';
-                copyBtn.classList.replace('btn-outline-secondary', 'btn-success');
-                setTimeout(function () {
-                    copyText.innerText = 'Copy Caption';
-                    copyBtn.classList.replace('btn-success', 'btn-outline-secondary');
-                }, 2000);
-            }).catch(function () {
-                var ta = document.createElement('textarea');
-                ta.value = fullText;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                copyText.innerText = 'Copied!';
-                setTimeout(function () {
-                    copyText.innerText = 'Copy Caption';
-                }, 2000);
-            });
+    // Delegate Date Pill Click to switch festival dynamically
+    document.addEventListener('click', function (e) {
+        var pill = e.target.closest('.fs-date-pill');
+        if (!pill) return;
+
+        e.preventDefault();
+
+        // If already selected and not currently loading, skip
+        if (pill.classList.contains('active') && !contentArea.classList.contains('is-loading')) {
+            return;
+        }
+
+        var festivalId = pill.getAttribute('data-festival-id');
+        var targetUrl = pill.getAttribute('href');
+
+        switchFestival(targetUrl, festivalId, pill, true);
+    });
+
+    function switchFestival(url, festivalId, activePill, pushState) {
+        // 1. Immediately update UI active pill state
+        document.querySelectorAll('.fs-date-pill').forEach(function (el) {
+            el.classList.remove('active');
         });
+        if (activePill) {
+            activePill.classList.add('active');
+            activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        // 2. Abort previous in-flight AJAX request to prevent race conditions
+        if (activeAbortController) {
+            activeAbortController.abort();
+        }
+        activeAbortController = new AbortController();
+
+        // 3. Mark content area as loading
+        if (contentArea) {
+            contentArea.classList.add('is-loading');
+        }
+
+        // 4. Fetch festival content via AJAX
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            signal: activeAbortController.signal
+        })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('HTTP error ' + response.status);
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            if (data && data.html) {
+                contentArea.innerHTML = data.html;
+
+                // Sync URL in browser address bar without page reload
+                if (pushState && window.history && window.history.pushState) {
+                    window.history.pushState({ festival_id: festivalId, url: url }, '', url);
+                }
+            }
+        })
+        .catch(function (err) {
+            if (err.name === 'AbortError') {
+                return;
+            }
+            console.error('Festival Studio AJAX error:', err);
+            // Fallback graceful degradation
+            window.location.href = url;
+        })
+        .finally(function () {
+            if (contentArea) {
+                contentArea.classList.remove('is-loading');
+            }
+        });
+    }
+
+    // Handle Browser History Back / Forward navigation (popstate)
+    window.addEventListener('popstate', function (event) {
+        var currentUrl = window.location.href;
+        var urlParams = new URLSearchParams(window.location.search);
+        var festivalId = urlParams.get('festival_id');
+
+        var targetPill = festivalId 
+            ? document.querySelector('.fs-date-pill[data-festival-id="' + festivalId + '"]')
+            : document.querySelector('.fs-date-pill');
+
+        if (targetPill) {
+            switchFestival(currentUrl, festivalId, targetPill, false);
+        } else {
+            window.location.reload();
+        }
+    });
+
+    // Delegated Copy Caption Button Handler
+    document.addEventListener('click', function (e) {
+        var copyBtn = e.target.closest('#btn-copy-caption');
+        if (!copyBtn) return;
+
+        var captionEl = document.getElementById('festival-caption-text');
+        var copyText = document.getElementById('copy-btn-text') || copyBtn;
+        if (!captionEl) return;
+
+        var fullText = captionEl.innerText;
+
+        function showSuccess() {
+            var origText = copyText.innerText;
+            copyText.innerText = 'Copied!';
+            copyBtn.classList.replace('btn-outline-secondary', 'btn-success');
+            setTimeout(function () {
+                copyText.innerText = origText || 'Copy Caption';
+                copyBtn.classList.replace('btn-success', 'btn-outline-secondary');
+            }, 2000);
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullText).then(showSuccess).catch(function () {
+                fallbackCopy(fullText, showSuccess);
+            });
+        } else {
+            fallbackCopy(fullText, showSuccess);
+        }
+    });
+
+    function fallbackCopy(text, callback) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            if (callback) callback();
+        } catch (e) {
+            console.error('Fallback copy failed', e);
+        }
+        document.body.removeChild(ta);
     }
 });
 </script>
