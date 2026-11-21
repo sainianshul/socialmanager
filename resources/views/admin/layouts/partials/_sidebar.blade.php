@@ -156,6 +156,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.festival-studio.*') ? 'active' : '' }}" href="{{ route('admin.festival-studio.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Festival Studio">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-warning">
+                                <i class="ti ti-sparkles fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Festival Studio</span>
+                            <span class="badge bg-warning-lt ms-auto">Auto</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.posts.instagram') ? 'active' : '' }}" href="{{ route('admin.posts.instagram') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Instagram Posts">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-pink">
                                 <i class="ti ti-brand-instagram fs-2"></i>

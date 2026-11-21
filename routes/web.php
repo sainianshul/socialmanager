@@ -28,6 +28,11 @@ Route::prefix('admin')->group(function () {
             // Political Analytics (Politics Analyses)
             Route::get('analytics', [\App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics.index');
 
+            // Festival Studio (Auto Poster & Scheduler)
+            Route::prefix('festival-studio')->name('festival-studio.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'index'])->name('index');
+            });
+
             // Connected Social Accounts (Meta / Facebook & Instagram)
             Route::prefix('accounts')->name('accounts.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\AccountController::class, 'index'])->name('index');
