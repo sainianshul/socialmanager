@@ -42,10 +42,14 @@ class FestivalTemplate extends Model
     public function getImageUrlAttribute(): ?string
     {
         if (empty($this->template_image_path)) {
-            return null;
+            return asset('images/festival-templates-sample.jpg');
         }
-        return filter_var($this->template_image_path, FILTER_VALIDATE_URL)
-            ? $this->template_image_path
-            : asset('storage/' . $this->template_image_path);
+        if (filter_var($this->template_image_path, FILTER_VALIDATE_URL)) {
+            return $this->template_image_path;
+        }
+        if (str_starts_with($this->template_image_path, 'images/')) {
+            return asset($this->template_image_path);
+        }
+        return asset('storage/' . $this->template_image_path);
     }
 }

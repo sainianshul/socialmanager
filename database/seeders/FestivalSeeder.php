@@ -108,11 +108,42 @@ class FestivalSeeder extends Seeder
             ],
         ];
 
+        $bjp = \App\Models\PoliticalParty::where('short_code', 'BJP')->first();
+        $inc = \App\Models\PoliticalParty::where('short_code', 'INC')->first();
+        $aap = \App\Models\PoliticalParty::where('short_code', 'AAP')->first();
+
+        $sampleTemplates = [
+            ['title' => 'Heritage Floral Edition', 'image' => 'images/templates/template-1.jpg', 'party_id' => $bjp?->id],
+            ['title' => 'Divine Classic Border', 'image' => 'images/templates/template-2.jpg', 'party_id' => null],
+            ['title' => 'Patriotic Golden Aura', 'image' => 'images/templates/template-3.jpg', 'party_id' => $inc?->id],
+            ['title' => 'National Standard Strip', 'image' => 'images/templates/template-4.jpg', 'party_id' => $bjp?->id],
+            ['title' => 'Sacred Traditional Blessings', 'image' => 'images/templates/template-5.jpg', 'party_id' => null],
+            ['title' => 'Memorial Tribute Frame', 'image' => 'images/templates/template-6.jpg', 'party_id' => null],
+            ['title' => 'Celebration Glow Card', 'image' => 'images/templates/template-7.jpg', 'party_id' => $aap?->id],
+            ['title' => 'Veer Standard Royal Saffron', 'image' => 'images/templates/template-8.jpg', 'party_id' => $bjp?->id],
+        ];
+
         foreach ($festivals as $fest) {
-            Festival::updateOrCreate(
+            $festival = Festival::updateOrCreate(
                 ['title' => $fest['title'], 'festival_date' => $fest['festival_date']],
                 $fest
             );
+
+            foreach ($sampleTemplates as $tmpl) {
+                \App\Models\FestivalTemplate::updateOrCreate(
+                    [
+                        'festival_id' => $festival->id,
+                        'title' => $tmpl['title'],
+                    ],
+                    [
+                        'party_id' => $tmpl['party_id'],
+                        'template_image_path' => $tmpl['image'],
+                        'thumbnail_path' => $tmpl['image'],
+                        'photo_position' => 'bottom-right',
+                        'is_active' => true,
+                    ]
+                );
+            }
         }
     }
 }

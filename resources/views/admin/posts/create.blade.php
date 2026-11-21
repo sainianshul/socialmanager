@@ -228,7 +228,7 @@
                             </div>
                         </div>
 
-                        <textarea name="content" id="composer-content" class="form-control" rows="5" placeholder="Write caption...">{{ old('content') }}</textarea>
+                        <textarea name="content" id="composer-content" class="form-control" rows="5" placeholder="Write caption...">{{ old('content', request('caption')) }}</textarea>
                     </div>
 
                     {{-- Meta Media Upload Area --}}

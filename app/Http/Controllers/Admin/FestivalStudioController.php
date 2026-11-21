@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Festival;
 use App\Models\FestivalTemplate;
+use App\Models\PoliticalParty;
 use Illuminate\Http\Request;
 
 class FestivalStudioController extends Controller
@@ -22,20 +23,36 @@ class FestivalStudioController extends Controller
         $selectedFestivalId = $request->query('festival_id', $upcomingFestivals->first()?->id);
         $selectedFestival = $upcomingFestivals->firstWhere('id', $selectedFestivalId) ?? $upcomingFestivals->first();
 
-        $templates = $selectedFestival
+        $partyFilter = $request->query('party', 'all');
+
+        $templatesQuery = $selectedFestival
             ? FestivalTemplate::where('festival_id', $selectedFestival->id)
                 ->where('is_active', true)
                 ->with('party')
-                ->get()
-            : collect();
+            : FestivalTemplate::whereRaw('1 = 0');
 
-        $userBranding = auth()->user()->defaultBranding ?? auth()->user()->brandings()->first();
+        if (!empty($partyFilter) && $partyFilter !== 'all') {
+            $party = PoliticalParty::where('short_code', strtoupper($partyFilter))->first();
+            if ($party) {
+                $templatesQuery->where(function ($q) use ($party) {
+                    $q->where('party_id', $party->id)->orWhereNull('party_id');
+                });
+            }
+        }
+
+        $templates = $templatesQuery->get();
+
+        $user = auth()->user();
+        $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;
+        $parties = PoliticalParty::where('is_active', true)->get();
 
         return view('admin.festival_studio.index', compact(
             'upcomingFestivals',
             'selectedFestival',
             'templates',
-            'userBranding'
+            'userBranding',
+            'parties',
+            'partyFilter'
         ));
     }
 }
