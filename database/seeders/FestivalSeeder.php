@@ -209,12 +209,8 @@ class FestivalSeeder extends Seeder
             ],
         ];
 
-        $extraVariants = [
-            ['title' => 'Official Leadership Edition', 'image' => 'images/templates/template-2.jpg', 'party_id' => $bjp?->id],
-            ['title' => 'Patriotic Standard Frame', 'image' => 'images/templates/template-3.jpg', 'party_id' => $inc?->id],
-            ['title' => 'Sacred Traditional Aura', 'image' => 'images/templates/template-5.jpg', 'party_id' => null],
-            ['title' => 'Veer Standard Royal Saffron', 'image' => 'images/templates/template-8.jpg', 'party_id' => $bjp?->id],
-        ];
+        // Delete all old blurry dummy cropped templates
+        FestivalTemplate::where('template_image_path', 'like', '%template-%')->delete();
 
         foreach ($festivals as $fest) {
             $primaryTemplate = $fest['primary_template'] ?? null;
@@ -227,7 +223,7 @@ class FestivalSeeder extends Seeder
                 $fest
             );
 
-            // 1. If primary authentic uploaded template exists, add it first!
+            // Only add authentic, clean uploaded posters
             if ($primaryTemplate) {
                 FestivalTemplate::updateOrCreate(
                     [
@@ -238,23 +234,6 @@ class FestivalSeeder extends Seeder
                         'party_id' => $bjp?->id,
                         'title' => $primaryTitle ?: ($festival->title . ' Authentic Special'),
                         'thumbnail_path' => $primaryTemplate,
-                        'photo_position' => 'bottom-right',
-                        'is_active' => true,
-                    ]
-                );
-            }
-
-            // 2. Add 3 complementary variants so user always has 4 ready templates
-            foreach ($extraVariants as $var) {
-                FestivalTemplate::updateOrCreate(
-                    [
-                        'festival_id' => $festival->id,
-                        'title' => $var['title'] . ' - ' . $festival->title,
-                    ],
-                    [
-                        'party_id' => $var['party_id'],
-                        'template_image_path' => $var['image'],
-                        'thumbnail_path' => $var['image'],
                         'photo_position' => 'bottom-right',
                         'is_active' => true,
                     ]

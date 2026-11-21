@@ -111,55 +111,6 @@
     transform: scale(1.03);
 }
 
-/* Live User Branding Bar Overlaid on Poster */
-.fs-poster-branding-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.55) 70%, transparent 100%);
-    padding: 24px 12px 10px 12px;
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    z-index: 2;
-    color: #ffffff;
-    pointer-events: none;
-}
-.fs-poster-user-info {
-    flex: 1;
-    min-width: 0;
-    padding-right: 8px;
-}
-.fs-poster-user-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: #ffffff;
-    line-height: 1.2;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-.fs-poster-user-desig {
-    font-size: 10px;
-    color: rgba(255, 255, 255, 0.85);
-    line-height: 1.2;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
-}
-.fs-poster-user-photo {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid #ffffff;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    flex-shrink: 0;
-}
-
 /* Hover Overlay */
 .fs-template-overlay {
     position: absolute;
@@ -323,7 +274,7 @@
                 <div class="col">
                     <div class="fs-template-card h-100 d-flex flex-column">
                         
-                        {{-- 1:1 Aspect Ratio Poster with Live User Branding Overlay --}}
+                        {{-- 1:1 Aspect Ratio Poster Container --}}
                         <div class="fs-template-preview-wrapper">
                             <img src="{{ $template->image_url }}" alt="{{ $template->title }}" class="fs-template-preview-img" loading="lazy">
                             
@@ -334,19 +285,6 @@
                                         {{ $template->party->short_code }}
                                     </span>
                                 @endif
-                            </div>
-
-                            {{-- Live User Branding Bottom Bar --}}
-                            <div class="fs-poster-branding-bar">
-                                <div class="fs-poster-user-info">
-                                    <div class="fs-poster-user-name">
-                                        {{ auth()->user()->name }}
-                                    </div>
-                                    <div class="fs-poster-user-desig">
-                                        {{ $userBranding?->designation ?? 'Politician / Leader' }}
-                                    </div>
-                                </div>
-                                <img src="{{ $userCutout }}" alt="{{ auth()->user()->name }}" class="fs-poster-user-photo">
                             </div>
 
                             {{-- Hover Actions Overlay --}}
