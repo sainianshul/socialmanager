@@ -154,4 +154,28 @@ class FestivalStudioTest extends TestCase
         $this->assertNotNull($scheduledPost);
         $this->assertTrue($scheduledPost->scheduled_at->isFuture());
     }
+
+    public function test_festival_studio_renders_with_active_leadership_strip_overlay(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $this->seed(\Database\Seeders\PoliticalPartySeeder::class);
+        $this->seed(\Database\Seeders\PoliticalLeaderSeeder::class);
+
+        $user = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $bjp = \App\Models\PoliticalParty::where('short_code', 'BJP')->first();
+
+        \App\Models\UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'display_name' => 'Dr. Leader Test',
+            'is_default' => true,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('admin.festival-studio.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Header Strip:');
+        $response->assertSee('fs-strip-overlay');
+        $response->assertSee('Dr. Leader Test');
+    }
 }

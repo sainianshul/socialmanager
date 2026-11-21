@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Account;
 use App\Models\Festival;
 use App\Models\FestivalTemplate;
+use App\Models\LeaderStrip;
 use App\Models\PoliticalParty;
 use App\Models\ScheduledPost;
 use Carbon\Carbon;
@@ -67,6 +68,29 @@ class FestivalStudioController extends Controller
             $scheduledFestivalIds = array_values(array_unique($scheduledFestivalIds));
         }
 
+        $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;
+        $partyId = $userBranding?->party_id;
+
+        $userStrips = $user 
+            ? $user->leaderStrips()->with(['leaders', 'party'])->orderByDesc('is_default')->get() 
+            : collect();
+
+        $systemStrip = null;
+        if ($partyId) {
+            $systemStrip = LeaderStrip::where('party_id', $partyId)
+                ->where('is_system', true)
+                ->where('is_default', true)
+                ->with(['leaders', 'party'])
+                ->first();
+        }
+
+        $activeStrip = $user?->defaultLeaderStrip ?? $systemStrip;
+        $allStrips = $userStrips->merge($systemStrip ? collect([$systemStrip]) : collect())->unique('id');
+
+        $userCutout = $userBranding?->defaultImage?->cutout_url 
+            ?? ($user?->profile_photo ? asset('storage/' . $user->profile_photo) : null)
+            ?? 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'User') . '&background=1db8ab&color=fff&bold=true&size=128';
+
         // Support seamless AJAX date switching without full page refresh
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json([
@@ -80,12 +104,15 @@ class FestivalStudioController extends Controller
                 'html' => view('admin.festival_studio.partials._content', compact(
                     'selectedFestival',
                     'templates',
-                    'scheduledTemplateIds'
+                    'scheduledTemplateIds',
+                    'activeStrip',
+                    'allStrips',
+                    'userBranding',
+                    'userCutout'
                 ))->render(),
             ]);
         }
 
-        $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;
         $parties = PoliticalParty::where('is_active', true)->get();
 
         $accountsQuery = Account::query()
@@ -95,10 +122,6 @@ class FestivalStudioController extends Controller
             $accountsQuery->where('user_id', $user->id);
         }
         $accounts = $accountsQuery->orderBy('account_type')->orderBy('name')->get();
-
-        $userCutout = $userBranding?->defaultImage?->cutout_url 
-            ?? ($user?->profile_photo ? asset('storage/' . $user->profile_photo) : null)
-            ?? 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'User') . '&background=1db8ab&color=fff&bold=true&size=128';
 
         return view('admin.festival_studio.index', compact(
             'upcomingFestivals',
@@ -110,7 +133,9 @@ class FestivalStudioController extends Controller
             'partyFilter',
             'accounts',
             'scheduledFestivalIds',
-            'scheduledTemplateIds'
+            'scheduledTemplateIds',
+            'activeStrip',
+            'allStrips'
         ));
     }
 

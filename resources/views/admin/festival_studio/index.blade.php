@@ -228,6 +228,127 @@
     transform: translateX(-50%) translateY(0);
     opacity: 1;
 }
+
+/* Live Poster Header Strip Overlay */
+.fs-poster-header-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 8px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.fs-strip-chip {
+    display: inline-flex;
+    align-items: center;
+}
+.fs-strip-chip img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    object-fit: cover;
+    background: #ffffff;
+}
+.fs-strip-party-logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #ffffff;
+    padding: 1.5px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Live Poster Bottom Branding Overlay */
+.fs-poster-bottom-branding {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 8px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.fs-branding-badge {
+    color: #ffffff;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    max-width: 70%;
+}
+.fs-branding-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+.fs-branding-desig {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+.fs-branding-cutout {
+    width: 44px;
+    height: 52px;
+    object-fit: contain;
+    object-position: bottom;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+}
+
+/* Modal Specific Larger Overlays */
+.qs-modal-header-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.qs-modal-header-strip .fs-strip-chip img {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+}
+.qs-modal-bottom-branding {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    z-index: 3;
+    pointer-events: none;
+}
+.qs-modal-bottom-branding .fs-branding-name {
+    font-size: 0.95rem;
+}
+.qs-modal-bottom-branding .fs-branding-desig {
+    font-size: 0.75rem;
+}
+.qs-modal-bottom-branding .fs-branding-cutout {
+    width: 60px;
+    height: 72px;
+}
 </style>
 @endpush
 
@@ -688,6 +809,78 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         document.body.removeChild(ta);
     }
+
+    // ======================================================================
+    // STEP 4: HEADER STRIP POSTER CONTROLS & DYNAMIC SWITCHING
+    // ======================================================================
+    // 1. Header Strip Visibility Toggle (Main toolbar)
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'fs-toggle-header-strip') {
+            var isChecked = e.target.checked;
+            document.querySelectorAll('.fs-strip-overlay').forEach(function (el) {
+                if (isChecked) {
+                    el.classList.remove('d-none');
+                } else {
+                    el.classList.add('d-none');
+                }
+            });
+
+            var modalToggle = document.getElementById('qs-modal-toggle-strip');
+            if (modalToggle) {
+                modalToggle.checked = isChecked;
+            }
+
+            try {
+                localStorage.setItem('socialmanager_header_strip_enabled', isChecked ? '1' : '0');
+            } catch (err) {}
+        }
+
+        // 2. Header Strip Toggle inside Quick Schedule Modal
+        if (e.target && e.target.id === 'qs-modal-toggle-strip') {
+            var isModalChecked = e.target.checked;
+            var modalStrip = document.getElementById('qs-modal-header-strip');
+            if (modalStrip) {
+                if (isModalChecked) {
+                    modalStrip.classList.remove('d-none');
+                } else {
+                    modalStrip.classList.add('d-none');
+                }
+            }
+        }
+    });
+
+    // 3. Quick Strip Switcher in Festival Studio
+    document.addEventListener('click', async function (e) {
+        var switchItem = e.target.closest('.fs-strip-switch-item');
+        if (!switchItem) return;
+
+        e.preventDefault();
+        var stripId = switchItem.getAttribute('data-id');
+        var stripName = switchItem.getAttribute('data-name');
+        if (!stripId) return;
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        try {
+            var response = await fetch('/admin/leader-strips/' + stripId + '/default', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            var result = await response.json();
+            if (result.success) {
+                showStudioToast('Leadership strip changed to: ' + stripName);
+                setTimeout(function () {
+                    window.location.reload();
+                }, 400);
+            }
+        } catch (err) {
+            console.error('Error switching strip in Festival Studio:', err);
+        }
+    });
 });
 </script>
 @endpush

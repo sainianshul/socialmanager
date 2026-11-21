@@ -25,9 +25,51 @@
                         <div class="position-relative rounded-3 overflow-hidden border shadow-xs bg-dark">
                             <div style="padding-top: 100%; position: relative;">
                                 <img id="qs-modal-img" src="" alt="Poster Preview" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover;">
+
+                                {{-- Header Strip Overlay in Modal --}}
+                                @if(isset($activeStrip) && $activeStrip && $activeStrip->leaders->isNotEmpty())
+                                    <div class="qs-modal-header-strip fs-strip-overlay" id="qs-modal-header-strip">
+                                        <div class="d-flex align-items-center gap-1.5 overflow-hidden">
+                                            @foreach($activeStrip->leaders->take(6) as $leader)
+                                                <div class="fs-strip-chip" title="{{ $leader->name }}">
+                                                    <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}">
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                        @if($activeStrip->party && $activeStrip->party->symbol_logo && file_exists(public_path($activeStrip->party->symbol_logo)))
+                                            <img src="{{ asset($activeStrip->party->symbol_logo) }}" alt="{{ $activeStrip->party->name }}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: contain; background: #fff; padding: 2px; border: 1px solid rgba(255, 255, 255, 0.8);">
+                                        @endif
+                                    </div>
+                                @endif
+
+                                {{-- Bottom Branding Overlay in Modal --}}
+                                @if(isset($userBranding) && $userBranding)
+                                    <div class="qs-modal-bottom-branding" id="qs-modal-bottom-branding">
+                                        <div class="fs-branding-badge">
+                                            <div class="fs-branding-name text-truncate">{{ $userBranding->display_name }}</div>
+                                            @if($userBranding->designation)
+                                                <div class="fs-branding-desig text-truncate">{{ $userBranding->designation }}</div>
+                                            @endif
+                                        </div>
+                                        @if(isset($userCutout) && $userCutout)
+                                            <img src="{{ $userCutout }}" alt="{{ $userBranding->display_name }}" class="fs-branding-cutout">
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
                         </div>
-                        <div class="mt-2.5 text-center">
+
+                        {{-- Quick Controls under Modal Preview --}}
+                        @if(isset($activeStrip) && $activeStrip && $activeStrip->leaders->isNotEmpty())
+                            <div class="mt-2.5 d-flex align-items-center justify-content-center">
+                                <label class="form-check form-switch m-0 d-flex align-items-center gap-1.5 cursor-pointer">
+                                    <input class="form-check-input" type="checkbox" id="qs-modal-toggle-strip" checked>
+                                    <span class="small text-secondary fw-semibold">Include Header Strip</span>
+                                </label>
+                            </div>
+                        @endif
+
+                        <div class="mt-2 text-center">
                             <div class="fw-semibold text-dark small text-truncate" id="qs-modal-poster-title"></div>
                             <div class="d-flex align-items-center justify-content-center gap-1.5 mt-1.5 flex-wrap">
                                 <span class="badge bg-primary-lt rounded-pill px-2.5 py-1" id="qs-modal-festival-badge">
