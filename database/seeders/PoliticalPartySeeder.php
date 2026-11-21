@@ -15,6 +15,7 @@ class PoliticalPartySeeder extends Seeder
                 'short_code' => 'BJP',
                 'symbol_logo' => 'images/parties/bjp.jpeg',
                 'top_leaders_strip' => null,
+                'group_cutout_image' => 'images/parties/bjp-group-cutout.png',
                 'primary_color' => '#FF9933', // Saffron
                 'secondary_color' => '#0d6832', // Green
                 'is_active' => true,

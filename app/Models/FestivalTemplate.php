@@ -19,12 +19,15 @@ class FestivalTemplate extends Model
         'template_image_path',
         'thumbnail_path',
         'photo_position',
+        'preset_key',
+        'layout_config',
         'is_active',
     ];
 
     protected function casts(): array
     {
         return [
+            'layout_config' => 'array',
             'is_active' => 'boolean',
         ];
     }

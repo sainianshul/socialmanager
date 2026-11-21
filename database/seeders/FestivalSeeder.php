@@ -235,6 +235,7 @@ class FestivalSeeder extends Seeder
                         'title' => $primaryTitle ?: ($festival->title . ' Authentic Special'),
                         'thumbnail_path' => $primaryTemplate,
                         'photo_position' => 'bottom-right',
+                        'preset_key' => 'classic_political_right',
                         'is_active' => true,
                     ]
                 );

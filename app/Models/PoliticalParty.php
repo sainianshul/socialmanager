@@ -17,6 +17,7 @@ class PoliticalParty extends Model
         'short_code',
         'symbol_logo',
         'top_leaders_strip',
+        'group_cutout_image',
         'primary_color',
         'secondary_color',
         'is_active',
@@ -72,5 +73,20 @@ class PoliticalParty extends Model
         return filter_var($this->top_leaders_strip, FILTER_VALIDATE_URL)
             ? $this->top_leaders_strip
             : asset('storage/' . $this->top_leaders_strip);
+    }
+
+    public function getGroupCutoutUrlAttribute(): ?string
+    {
+        if (empty($this->group_cutout_image)) {
+            return null;
+        }
+        if (filter_var($this->group_cutout_image, FILTER_VALIDATE_URL)) {
+            return $this->group_cutout_image;
+        }
+        $cleanPath = ltrim($this->group_cutout_image, '/\\');
+        if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+        return asset('storage/' . $this->group_cutout_image);
     }
 }
