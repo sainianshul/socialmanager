@@ -16,15 +16,16 @@ class PoliticalLeaderSeeder extends Seeder
         $bjp = PoliticalParty::where('short_code', 'BJP')->first();
         if ($bjp) {
             $bjpLeaders = [
-                ['name' => 'Narendra Modi', 'designation' => 'Prime Minister', 'state' => 'National', 'order' => 1],
-                ['name' => 'Amit Shah', 'designation' => 'Home Minister', 'state' => 'National', 'order' => 2],
-                ['name' => 'J.P. Nadda', 'designation' => 'BJP National President', 'state' => 'National', 'order' => 3],
-                ['name' => 'Rajnath Singh', 'designation' => 'Defence Minister', 'state' => 'National', 'order' => 4],
-                ['name' => 'Yogi Adityanath', 'designation' => 'Chief Minister, UP', 'state' => 'Uttar Pradesh', 'order' => 5],
-                ['name' => 'Keshav Prasad Maurya', 'designation' => 'Deputy CM, UP', 'state' => 'Uttar Pradesh', 'order' => 6],
-                ['name' => 'Brajesh Pathak', 'designation' => 'Deputy CM, UP', 'state' => 'Uttar Pradesh', 'order' => 7],
-                ['name' => 'Bhajan Lal Sharma', 'designation' => 'Chief Minister, Rajasthan', 'state' => 'Rajasthan', 'order' => 8],
-                ['name' => 'Mohan Yadav', 'designation' => 'Chief Minister, MP', 'state' => 'Madhya Pradesh', 'order' => 9],
+                ['name' => 'Narendra Modi', 'designation' => 'Prime Minister', 'image' => 'images/leaders/narendramodi.jpg', 'state' => 'National', 'order' => 1],
+                ['name' => 'Amit Shah', 'designation' => 'Home Minister', 'image' => 'images/leaders/amitshah.jpg', 'state' => 'National', 'order' => 2],
+                ['name' => 'J.P. Nadda', 'designation' => 'BJP National President', 'image' => null, 'state' => 'National', 'order' => 3],
+                ['name' => 'Rajnath Singh', 'designation' => 'Defence Minister', 'image' => null, 'state' => 'National', 'order' => 4],
+                ['name' => 'Yogi Adityanath', 'designation' => 'Chief Minister, UP', 'image' => 'images/leaders/yogiadityanath.jpg', 'state' => 'Uttar Pradesh', 'order' => 5],
+                ['name' => 'Keshav Prasad Maurya', 'designation' => 'Deputy CM, UP', 'image' => 'images/leaders/keshavprshadmorya.jpg', 'state' => 'Uttar Pradesh', 'order' => 6],
+                ['name' => 'Brajesh Pathak', 'designation' => 'Deputy CM, UP', 'image' => null, 'state' => 'Uttar Pradesh', 'order' => 7],
+                ['name' => 'Atal Bihari Vajpayee', 'designation' => 'Former Prime Minister & Bharat Ratna', 'image' => 'images/leaders/atalbiharibajpyee.jpg', 'state' => 'National', 'order' => 8],
+                ['name' => 'Bhajan Lal Sharma', 'designation' => 'Chief Minister, Rajasthan', 'image' => null, 'state' => 'Rajasthan', 'order' => 9],
+                ['name' => 'Mohan Yadav', 'designation' => 'Chief Minister, MP', 'image' => null, 'state' => 'Madhya Pradesh', 'order' => 10],
             ];
 
             $savedBjpLeaders = [];
@@ -33,6 +34,7 @@ class PoliticalLeaderSeeder extends Seeder
                     ['party_id' => $bjp->id, 'name' => $data['name']],
                     [
                         'designation' => $data['designation'],
+                        'image' => $data['image'] ?? null,
                         'state' => $data['state'],
                         'is_active' => true,
                     ]
@@ -61,11 +63,11 @@ class PoliticalLeaderSeeder extends Seeder
         $inc = PoliticalParty::where('short_code', 'INC')->first();
         if ($inc) {
             $incLeaders = [
-                ['name' => 'Mallikarjun Kharge', 'designation' => 'Congress President', 'state' => 'National', 'order' => 1],
-                ['name' => 'Sonia Gandhi', 'designation' => 'Congress Parliamentary Leader', 'state' => 'National', 'order' => 2],
-                ['name' => 'Rahul Gandhi', 'designation' => 'Leader of Opposition', 'state' => 'National', 'order' => 3],
-                ['name' => 'Priyanka Gandhi Vadra', 'designation' => 'General Secretary', 'state' => 'National', 'order' => 4],
-                ['name' => 'Sukhvinder Singh Sukhu', 'designation' => 'Chief Minister, HP', 'state' => 'Himachal Pradesh', 'order' => 5],
+                ['name' => 'Mallikarjun Kharge', 'designation' => 'Congress President', 'image' => null, 'state' => 'National', 'order' => 1],
+                ['name' => 'Sonia Gandhi', 'designation' => 'Congress Parliamentary Leader', 'image' => null, 'state' => 'National', 'order' => 2],
+                ['name' => 'Rahul Gandhi', 'designation' => 'Leader of Opposition', 'image' => 'images/leaders/rahulgandhi.jpg', 'state' => 'National', 'order' => 3],
+                ['name' => 'Priyanka Gandhi Vadra', 'designation' => 'General Secretary', 'image' => null, 'state' => 'National', 'order' => 4],
+                ['name' => 'Sukhvinder Singh Sukhu', 'designation' => 'Chief Minister, HP', 'image' => null, 'state' => 'Himachal Pradesh', 'order' => 5],
             ];
 
             $savedIncLeaders = [];
@@ -74,6 +76,7 @@ class PoliticalLeaderSeeder extends Seeder
                     ['party_id' => $inc->id, 'name' => $data['name']],
                     [
                         'designation' => $data['designation'],
+                        'image' => $data['image'] ?? null,
                         'state' => $data['state'],
                         'is_active' => true,
                     ]
@@ -100,10 +103,10 @@ class PoliticalLeaderSeeder extends Seeder
         $aap = PoliticalParty::where('short_code', 'AAP')->first();
         if ($aap) {
             $aapLeaders = [
-                ['name' => 'Arvind Kejriwal', 'designation' => 'National Convener', 'state' => 'Delhi', 'order' => 1],
-                ['name' => 'Bhagwant Mann', 'designation' => 'Chief Minister, Punjab', 'state' => 'Punjab', 'order' => 2],
-                ['name' => 'Sanjay Singh', 'designation' => 'Rajya Sabha MP', 'state' => 'Delhi', 'order' => 3],
-                ['name' => 'Atishi Marlena', 'designation' => 'Chief Minister, Delhi', 'state' => 'Delhi', 'order' => 4],
+                ['name' => 'Arvind Kejriwal', 'designation' => 'National Convener', 'image' => 'images/leaders/arvindkejriwal.jpg', 'state' => 'Delhi', 'order' => 1],
+                ['name' => 'Bhagwant Mann', 'designation' => 'Chief Minister, Punjab', 'image' => null, 'state' => 'Punjab', 'order' => 2],
+                ['name' => 'Sanjay Singh', 'designation' => 'Rajya Sabha MP', 'image' => null, 'state' => 'Delhi', 'order' => 3],
+                ['name' => 'Atishi Marlena', 'designation' => 'Chief Minister, Delhi', 'image' => null, 'state' => 'Delhi', 'order' => 4],
             ];
 
             $savedAapLeaders = [];
@@ -112,6 +115,7 @@ class PoliticalLeaderSeeder extends Seeder
                     ['party_id' => $aap->id, 'name' => $data['name']],
                     [
                         'designation' => $data['designation'],
+                        'image' => $data['image'] ?? null,
                         'state' => $data['state'],
                         'is_active' => true,
                     ]
@@ -138,10 +142,10 @@ class PoliticalLeaderSeeder extends Seeder
         $sp = PoliticalParty::where('short_code', 'SP')->first();
         if ($sp) {
             $spLeaders = [
-                ['name' => 'Late Mulayam Singh Yadav', 'designation' => 'Founder & Netaji', 'state' => 'Uttar Pradesh', 'order' => 1],
-                ['name' => 'Akhilesh Yadav', 'designation' => 'National President', 'state' => 'Uttar Pradesh', 'order' => 2],
-                ['name' => 'Dimple Yadav', 'designation' => 'Lok Sabha MP', 'state' => 'Uttar Pradesh', 'order' => 3],
-                ['name' => 'Shivpal Singh Yadav', 'designation' => 'General Secretary', 'state' => 'Uttar Pradesh', 'order' => 4],
+                ['name' => 'Late Mulayam Singh Yadav', 'designation' => 'Founder & Netaji', 'image' => 'images/leaders/mulayamsinghyadav.jpg', 'state' => 'Uttar Pradesh', 'order' => 1],
+                ['name' => 'Akhilesh Yadav', 'designation' => 'National President', 'image' => 'images/leaders/akhileshyadav.jpg', 'state' => 'Uttar Pradesh', 'order' => 2],
+                ['name' => 'Dimple Yadav', 'designation' => 'Lok Sabha MP', 'image' => null, 'state' => 'Uttar Pradesh', 'order' => 3],
+                ['name' => 'Shivpal Singh Yadav', 'designation' => 'General Secretary', 'image' => null, 'state' => 'Uttar Pradesh', 'order' => 4],
             ];
 
             $savedSpLeaders = [];
@@ -150,6 +154,7 @@ class PoliticalLeaderSeeder extends Seeder
                     ['party_id' => $sp->id, 'name' => $data['name']],
                     [
                         'designation' => $data['designation'],
+                        'image' => $data['image'] ?? null,
                         'state' => $data['state'],
                         'is_active' => true,
                     ]
