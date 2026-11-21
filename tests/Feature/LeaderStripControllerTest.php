@@ -206,4 +206,25 @@ class LeaderStripControllerTest extends TestCase
         $response->assertSee('Leadership Strips');
         $response->assertSee('Create Strip');
     }
+
+    public function test_cannot_add_more_than_6_leaders_to_strip(): void
+    {
+        $leaders = PoliticalLeader::take(7)->get();
+        $items = $leaders->map(fn($l, $idx) => [
+            'leader_id' => $l->id,
+            'order' => $idx + 1,
+        ])->toArray();
+
+        $payload = [
+            'name' => 'Too Many Leaders Strip',
+            'party_id' => $this->bjp->id,
+            'items' => $items,
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('admin.leader-strips.store'), $payload);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['items']);
+    }
 }
