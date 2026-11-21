@@ -175,6 +175,41 @@ class CanvaIntegrationTest extends TestCase
         Storage::disk('public')->assertExists($relativePath);
     }
 
+    public function test_export_design_defaults_to_jpg_format(): void
+    {
+        Storage::fake('public');
+
+        $user = User::factory()->create();
+        Cache::put('canva_token_' . $user->id, 'mock_access_token_abc', 3600);
+
+        Http::fake([
+            'https://api.canva.com/rest/v1/exports*' => Http::response([
+                'job' => [
+                    'id'     => 'exp_job_jpg',
+                    'status' => 'success',
+                    'urls'   => [
+                        'https://export-download.canva.com/sample_image.jpg',
+                    ],
+                ],
+            ], 200),
+            'https://export-download.canva.com/*' => Http::response('fake_jpg_binary_data', 200),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('admin.canva.export-design'), [
+            'design_id' => 'DAFVztcvd9z',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+
+        $relativePath = $response->json('relative_path');
+        $this->assertNotEmpty($relativePath);
+        $this->assertStringEndsWith('.jpg', $relativePath);
+        Storage::disk('public')->assertExists($relativePath);
+    }
+
     public function test_post_create_view_renders_canva_button_and_modal(): void
     {
         $user = User::factory()->create();

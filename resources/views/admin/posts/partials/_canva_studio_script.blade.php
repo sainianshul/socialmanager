@@ -120,7 +120,7 @@ $(document).ready(function() {
             data: {
                 _token: csrfToken,
                 design_id: designId,
-                format: 'png'
+                format: 'jpg'
             },
             success: function(res) {
                 btn.prop('disabled', false);

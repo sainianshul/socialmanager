@@ -173,7 +173,7 @@ class CanvaController extends Controller
 
         try {
             $designId = $request->input('design_id');
-            $format = $request->input('format', 'png');
+            $format = $request->input('format', 'jpg');
 
             $downloadResult = $this->canvaService->exportAndDownloadDesign($token, $designId, $format);
 

@@ -200,21 +200,31 @@ class ScheduledPost extends Model
      */
     public function getFirstMediaUrlAttribute(): ?string
     {
-        if (!empty($this->thumbnail_path)) {
-            if (str_starts_with($this->thumbnail_path, 'http://') || str_starts_with($this->thumbnail_path, 'https://')) {
-                return $this->thumbnail_path;
-            }
-            return asset('storage/' . ltrim($this->thumbnail_path, '/'));
+        $rawPath = !empty($this->thumbnail_path) ? $this->thumbnail_path : (!empty($this->media_urls[0]) ? $this->media_urls[0] : null);
+
+        if (!$rawPath) {
+            return null;
         }
 
-        if (is_array($this->media_urls) && !empty($this->media_urls)) {
-            $path = $this->media_urls[0];
-            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
-                return $path;
+        if (str_starts_with($rawPath, 'http://') || str_starts_with($rawPath, 'https://')) {
+            $url = $rawPath;
+        } else {
+            $cleanPath = ltrim($rawPath, '/');
+            $appUrl = rtrim(config('app.url') ?? env('APP_URL') ?? '', '/');
+
+            if (!empty($appUrl) && !str_contains($appUrl, 'localhost:8001')) {
+                $url = $appUrl . '/storage/' . $cleanPath;
+            } else {
+                $url = asset('storage/' . $cleanPath);
             }
-            return asset('storage/' . ltrim($path, '/'));
         }
-        return null;
+
+        // External platforms like Instagram require direct HTTPS in production environments
+        if (str_starts_with($url, 'http://') && !str_contains($url, 'localhost') && !str_contains($url, '127.0.0.1')) {
+            $url = 'https://' . substr($url, 7);
+        }
+
+        return $url;
     }
 
     /**

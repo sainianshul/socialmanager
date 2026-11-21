@@ -135,7 +135,7 @@ class CanvaService
     /**
      * Export a design from Canva and download it to local storage.
      */
-    public function exportAndDownloadDesign(string $accessToken, string $designId, string $format = 'png'): array
+    public function exportAndDownloadDesign(string $accessToken, string $designId, string $format = 'jpg'): array
     {
         // 1. Initiate export job
         $jobResponse = Http::withToken($accessToken)
@@ -143,7 +143,7 @@ class CanvaService
             ->post('https://api.canva.com/rest/v1/exports', [
                 'design_id' => $designId,
                 'format'    => [
-                    'type' => in_array($format, ['png', 'jpg']) ? $format : 'png',
+                    'type' => in_array($format, ['png', 'jpg']) ? $format : 'jpg',
                 ],
             ]);
 

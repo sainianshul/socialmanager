@@ -888,4 +888,66 @@ class SchedulePostManagementTest extends TestCase
             'status' => ScheduledPost::STATUS_SCHEDULED,
         ]);
     }
+
+    public function test_ensure_public_https_url_replaces_localhost_and_forces_https(): void
+    {
+        config(['app.url' => 'https://socialmanager.rezel.online']);
+        $service = app(\App\Services\MetaPublishingService::class);
+
+        $urlWithLocalhost = 'http://localhost:8001/storage/posts/sample.jpg';
+        $this->assertEquals(
+            'https://socialmanager.rezel.online/storage/posts/sample.jpg',
+            $service->ensurePublicHttpsUrl($urlWithLocalhost)
+        );
+
+        $urlWithHttp = 'http://socialmanager.rezel.online/storage/posts/sample.jpg';
+        $this->assertEquals(
+            'https://socialmanager.rezel.online/storage/posts/sample.jpg',
+            $service->ensurePublicHttpsUrl($urlWithHttp)
+        );
+    }
+
+    public function test_instagram_publishing_auto_converts_png_to_jpeg(): void
+    {
+        Storage::fake('public');
+        config(['app.url' => 'https://socialmanager.rezel.online']);
+
+        // Create a 10x10 fake PNG in fake storage
+        $img = imagecreatetruecolor(10, 10);
+        ob_start();
+        imagepng($img);
+        $pngData = ob_get_clean();
+        imagedestroy($img);
+
+        $pngRelativePath = 'posts/canva/canva_sample_test.png';
+        Storage::disk('public')->put($pngRelativePath, $pngData);
+
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $igAccount = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_INSTAGRAM,
+            'meta_account_id' => '17841400000000000',
+            'name' => 'IG Business Test',
+            'access_token' => 'mock_ig_token',
+            'is_active' => true,
+        ]);
+
+        $scheduledPost = ScheduledPost::create([
+            'user_id' => $user->id,
+            'account_id' => $igAccount->id,
+            'platform' => Account::TYPE_INSTAGRAM,
+            'post_type' => 'photo',
+            'content' => 'Automated test with Canva PNG conversion',
+            'media_urls' => [$pngRelativePath],
+            'scheduled_at' => now(),
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+
+        $service = app(\App\Services\MetaPublishingService::class);
+        $jpegUrl = $service->ensureInstagramPhotoUrl($scheduledPost);
+
+        $this->assertNotNull($jpegUrl);
+        $this->assertStringStartsWith('https://socialmanager.rezel.online/storage/posts/instagram_converted/', $jpegUrl);
+        $this->assertStringEndsWith('.jpg', $jpegUrl);
+    }
 }

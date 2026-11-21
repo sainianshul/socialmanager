@@ -197,9 +197,12 @@ class MetaPublishingService
 
         if ($isReelOrVideo) {
             $params['media_type'] = 'REELS';
-            $params['video_url'] = $mediaUrl;
+            $params['video_url'] = $this->ensurePublicHttpsUrl($mediaUrl);
         } else {
-            $params['image_url'] = $mediaUrl;
+            // Instagram Content Publishing API strictly requires JPEG for photo containers.
+            // Automatically converts PNG/WebP/GIF to JPEG if needed and ensures public HTTPS URL.
+            $jpegUrl = $this->ensureInstagramPhotoUrl($scheduledPost);
+            $params['image_url'] = $jpegUrl ?: $this->ensurePublicHttpsUrl($mediaUrl);
         }
 
         $containerRes = Http::timeout(60)->post($containerUrl, $params)->json();
@@ -265,7 +268,7 @@ class MetaPublishingService
     /**
      * Resolve storage path to local absolute file path
      */
-    protected function resolveLocalDiskPath(?string $path): ?string
+    public function resolveLocalDiskPath(?string $path): ?string
     {
         if (empty($path)) {
             return null;
@@ -284,6 +287,110 @@ class MetaPublishingService
         }
 
         return null;
+    }
+
+    /**
+     * Ensure Instagram feed photo is in valid JPEG format as strictly required by Meta Graph API.
+     * Automatically converts PNG, WebP, or GIF media to high-quality JPEG and returns public HTTPS URL.
+     */
+    public function ensureInstagramPhotoUrl(ScheduledPost $scheduledPost): ?string
+    {
+        $mediaUrls = $scheduledPost->media_urls ?? [];
+        $rawPath = !empty($scheduledPost->thumbnail_path) ? $scheduledPost->thumbnail_path : ($mediaUrls[0] ?? null);
+
+        if (empty($rawPath)) {
+            return null;
+        }
+
+        $localPath = $this->resolveLocalDiskPath($rawPath);
+        if (!$localPath || !file_exists($localPath)) {
+            return $this->ensurePublicHttpsUrl($scheduledPost->first_media_url);
+        }
+
+        $extension = strtolower(pathinfo($localPath, PATHINFO_EXTENSION));
+
+        // If already JPEG, return its direct HTTPS URL
+        if (in_array($extension, ['jpg', 'jpeg'])) {
+            return $this->ensurePublicHttpsUrl($scheduledPost->first_media_url);
+        }
+
+        // Convert non-JPEG formats (PNG, WebP, GIF) to JPEG using GD
+        try {
+            $hash = md5_file($localPath);
+            $convertedRelPath = 'posts/instagram_converted/' . $hash . '.jpg';
+            $convertedDiskPath = Storage::disk('public')->path($convertedRelPath);
+
+            if (!file_exists($convertedDiskPath)) {
+                $dir = dirname($convertedDiskPath);
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0755, true);
+                }
+
+                $sourceImage = null;
+                if ($extension === 'png') {
+                    $sourceImage = @imagecreatefrompng($localPath);
+                } elseif ($extension === 'webp') {
+                    $sourceImage = @imagecreatefromwebp($localPath);
+                } elseif ($extension === 'gif') {
+                    $sourceImage = @imagecreatefromgif($localPath);
+                }
+
+                if ($sourceImage) {
+                    $w = imagesx($sourceImage);
+                    $h = imagesy($sourceImage);
+                    $canvas = imagecreatetruecolor($w, $h);
+
+                    // Fill white background for transparent PNGs
+                    $white = imagecolorallocate($canvas, 255, 255, 255);
+                    imagefill($canvas, 0, 0, $white);
+
+                    imagecopy($canvas, $sourceImage, 0, 0, 0, 0, $w, $h);
+                    imagejpeg($canvas, $convertedDiskPath, 95);
+
+                    imagedestroy($sourceImage);
+                    imagedestroy($canvas);
+                }
+            }
+
+            if (file_exists($convertedDiskPath)) {
+                $convertedUrl = Storage::disk('public')->url($convertedRelPath);
+                return $this->ensurePublicHttpsUrl($convertedUrl);
+            }
+        } catch (\Throwable $e) {
+            Log::warning("Instagram photo JPEG conversion failed for post #{$scheduledPost->id}: {$e->getMessage()}");
+        }
+
+        return $this->ensurePublicHttpsUrl($scheduledPost->first_media_url);
+    }
+
+    /**
+     * Ensure URL is publicly reachable via HTTPS without localhost or 301 redirect issues.
+     */
+    public function ensurePublicHttpsUrl(?string $url): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        $appUrl = rtrim(config('app.url') ?? env('APP_URL') ?? '', '/');
+
+        // If relative path starting with '/', prefix with appUrl
+        if (str_starts_with($url, '/')) {
+            $url = $appUrl . $url;
+        }
+
+        // Replace localhost or 127.0.0.1 host with APP_URL
+        if (preg_match('#^https?://(localhost|127\.0\.0\.1)(:\d+)?(/.*)?$#i', $url, $matches)) {
+            $path = $matches[3] ?? '';
+            $url = $appUrl . $path;
+        }
+
+        // Meta requires HTTPS in production; avoid 301 text/html redirects
+        if (str_starts_with($url, 'http://') && !str_contains($url, 'localhost') && !str_contains($url, '127.0.0.1')) {
+            $url = 'https://' . substr($url, 7);
+        }
+
+        return $url;
     }
 }
 
