@@ -86,6 +86,9 @@
                 <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-manual-comment">
                     <i class="ti ti-plus me-1"></i>New Comment
                 </button>
+                <button type="button" class="btn btn-outline-secondary btn-icon btn-toggle-stats" data-bs-toggle="collapse" data-bs-target="#analytics-stats-row" aria-expanded="false" aria-controls="analytics-stats-row" title="Analytics">
+                    <i class="ti ti-chart-bar fs-2"></i>
+                </button>
                 <form id="sync-comments-form" method="POST" action="{{ route('admin.comments.sync') }}" class="d-inline m-0">
                     @csrf
                     <button type="submit" class="btn btn-primary" id="btn-sync-comments">
@@ -130,7 +133,8 @@
     @endif
 
     {{-- Metric Stat Cards (Formal & Clean) --}}
-    <div class="row row-cards mb-3">
+    <div class="collapse mb-3" id="analytics-stats-row">
+        <div class="row row-cards">
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
@@ -198,6 +202,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 

@@ -231,6 +231,8 @@ class PostManagementTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Instagram Posts');
+        $response->assertSee('btn-toggle-stats', false);
+        $response->assertSee('analytics-stats-row', false);
         $response->assertSee('Behind the scenes reel on Instagram');
         $response->assertSee('Design Studio IG');
         $response->assertSee('350');
@@ -280,6 +282,8 @@ class PostManagementTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Facebook Posts');
+        $response->assertSee('btn-toggle-stats', false);
+        $response->assertSee('analytics-stats-row', false);
         $response->assertSee('New infrastructure initiative launched for community welfare.');
         $response->assertSee('Public Policy Bureau');
         $response->assertSee('520');
@@ -331,6 +335,8 @@ class PostManagementTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('YouTube Videos');
+        $response->assertSee('btn-toggle-stats', false);
+        $response->assertSee('analytics-stats-row', false);
         $response->assertSee('Complete Docker & Kubernetes Tutorial 2026');
         $response->assertSee('Tech Masterclass');
         $response->assertSee('12:25');

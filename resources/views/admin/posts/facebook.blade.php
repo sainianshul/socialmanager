@@ -10,7 +10,10 @@
             <div class="col">
                 <h2 class="page-title">Facebook Posts</h2>
             </div>
-            <div class="col-auto">
+            <div class="col-auto d-flex align-items-center gap-2">
+                <button type="button" class="btn btn-outline-secondary btn-icon btn-toggle-stats" data-bs-toggle="collapse" data-bs-target="#analytics-stats-row" aria-expanded="false" aria-controls="analytics-stats-row" title="Analytics">
+                    <i class="ti ti-chart-bar fs-2"></i>
+                </button>
                 <form id="sync-posts-form" method="POST" action="{{ route('admin.posts.sync') }}" class="d-inline m-0">
                     @csrf
                     <input type="hidden" name="account_id" value="{{ $selectedAccountId }}">
@@ -44,7 +47,8 @@
     @endif
 
     {{-- Metric Stat Cards (Formal & Clean) --}}
-    <div class="row row-cards mb-3">
+    <div class="collapse mb-3" id="analytics-stats-row">
+        <div class="row row-cards">
         <div class="col-sm-6 col-lg-3">
             <div class="card card-sm">
                 <div class="card-body">
@@ -112,6 +116,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 

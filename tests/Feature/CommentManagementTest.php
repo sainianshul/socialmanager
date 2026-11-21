@@ -418,6 +418,8 @@ class CommentManagementTest extends TestCase
         $pageResponse = $this->actingAs($user)->get(route('admin.comments.instagram'));
         $pageResponse->assertStatus(200);
         $pageResponse->assertSee('Instagram Comments');
+        $pageResponse->assertSee('btn-toggle-stats', false);
+        $pageResponse->assertSee('analytics-stats-row', false);
         $pageResponse->assertSee('Studio Instagram');
         // The Facebook account should not appear in the accounts filter dropdown on the Instagram page
         $pageResponse->assertDontSee('<option value="' . $fbAccount->id . '">Political FB Page</option>', false);
@@ -595,6 +597,8 @@ class CommentManagementTest extends TestCase
         $pageResponse = $this->actingAs($user)->get(route('admin.comments.facebook'));
         $pageResponse->assertStatus(200);
         $pageResponse->assertSee('Facebook Comments');
+        $pageResponse->assertSee('btn-toggle-stats', false);
+        $pageResponse->assertSee('analytics-stats-row', false);
         $pageResponse->assertSee('Official City Council Page');
         // Instagram account should NOT appear in the Facebook page select dropdown
         $pageResponse->assertDontSee('<option value="' . $igAccount->id . '">City Council IG</option>', false);
@@ -773,6 +777,8 @@ class CommentManagementTest extends TestCase
         $pageResponse = $this->actingAs($user)->get(route('admin.comments.youtube'));
         $pageResponse->assertStatus(200);
         $pageResponse->assertSee('YouTube Comments');
+        $pageResponse->assertSee('btn-toggle-stats', false);
+        $pageResponse->assertSee('analytics-stats-row', false);
         $pageResponse->assertSee('Tech Insights Hindi');
         // Facebook account should NOT appear in the YouTube channel filter dropdown
         $pageResponse->assertDontSee('<option value="' . $fbAccount->id . '">Social Facebook Page</option>', false);
