@@ -592,6 +592,51 @@ class PosterComposer
     }
 
     /**
+     * Get list of all available presets with metadata for UI dropdowns and admin selectors.
+     */
+    public function getAvailablePresets(): array
+    {
+        return [
+            [
+                'key'                => 'classic_political_right',
+                'name'               => 'Classic Political Right (Ram Navami Style)',
+                'description'        => 'Official top-left leaders group cutout, top-right party logo, candidate cutout on bottom-right, dual-color saffron & green footer bar with social handles.',
+                'badge'              => 'Dual Ribbon',
+                'leadership_mode'    => 'party_group_cutout',
+                'candidate_position' => 'bottom-right',
+                'footer_style'       => 'dual_ribbon',
+            ],
+            [
+                'key'                => 'leader_tribute_royal',
+                'name'               => 'Leader Tribute Royal (Modi 11-Years Style)',
+                'description'        => 'No top strip (for tribute & campaign art), candidate cutout on bottom-right, deep maroon footer bar with circular party logo on left and gold text.',
+                'badge'              => 'Royal Bar',
+                'leadership_mode'    => 'none',
+                'candidate_position' => 'bottom-right',
+                'footer_style'       => 'royal_bar',
+            ],
+            [
+                'key'                => 'individual_circle_strip',
+                'name'               => 'Custom 6-Leader Circle Strip',
+                'description'        => 'Frosted top banner displaying up to 6 custom circular leaders with crisp borders, party logo top-right, dual ribbon footer with social handles.',
+                'badge'              => 'Circle Chips',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'footer_style'       => 'dual_ribbon',
+            ],
+            [
+                'key'                => 'clean_no_leaders',
+                'name'               => 'Clean Minimal (Festival Focus)',
+                'description'        => 'No top senior leadership strip, focuses on festival greeting with candidate cutout on bottom and modern dark ribbon.',
+                'badge'              => 'Minimal',
+                'leadership_mode'    => 'none',
+                'candidate_position' => 'bottom-right',
+                'footer_style'       => 'dual_ribbon',
+            ],
+        ];
+    }
+
+    /**
      * Built-in Presets Catalog ensuring 10+ years stability & zero math for admin.
      */
     public function getDefaultPresetConfig(string $key): array

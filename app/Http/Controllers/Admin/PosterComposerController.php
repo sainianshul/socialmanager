@@ -1,0 +1,112 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\FestivalTemplate;
+use App\Models\LeaderStrip;
+use App\Models\UserBranding;
+use App\Services\PosterComposer;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+
+class PosterComposerController extends Controller
+{
+    protected PosterComposer $composer;
+
+    public function __construct(PosterComposer $composer)
+    {
+        $this->composer = $composer;
+    }
+
+    /**
+     * Get list of all available layout presets with rich metadata.
+     */
+    public function presets(): JsonResponse
+    {
+        return response()->json([
+            'success' => true,
+            'presets' => $this->composer->getAvailablePresets(),
+        ]);
+    }
+
+    /**
+     * Compose high-res branded poster dynamically on the server.
+     */
+    public function compose(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'template_id'   => 'required|integer|exists:festival_templates,id',
+            'preset_key'    => 'nullable|string|max:60',
+            'include_strip' => 'nullable|boolean',
+            'strip_id'      => 'nullable|integer|exists:leader_strips,id',
+            'branding_id'   => 'nullable|integer|exists:user_brandings,id',
+            'cutout_url'    => 'nullable|string',
+            'custom_config' => 'nullable|array',
+        ]);
+
+        $user = auth()->user();
+
+        // 1. Resolve Template with Party
+        $template = FestivalTemplate::with('party')->findOrFail($validated['template_id']);
+
+        // 2. Resolve User Branding Profile
+        $branding = null;
+        if (!empty($validated['branding_id'])) {
+            $branding = UserBranding::where('id', $validated['branding_id'])
+                ->when(!$user->isAdmin(), fn($q) => $q->where('user_id', $user->id))
+                ->first();
+        }
+        if (!$branding && $user) {
+            $branding = $user->defaultBranding ?? $user->brandings()->first();
+        }
+
+        // 3. Resolve Leadership Strip
+        $strip = null;
+        if (!empty($validated['strip_id'])) {
+            $strip = LeaderStrip::with('leaders')->find($validated['strip_id']);
+        }
+        if (!$strip && $user) {
+            $strip = $user->defaultLeaderStrip;
+        }
+        if (!$strip && $template->party_id) {
+            $strip = LeaderStrip::where('party_id', $template->party_id)
+                ->where('is_system', true)
+                ->where('is_default', true)
+                ->with('leaders')
+                ->first();
+        }
+
+        // 4. Compose Options
+        $options = [
+            'preset_key'    => $validated['preset_key'] ?? $template->preset_key,
+            'include_strip' => $request->has('include_strip') ? $request->boolean('include_strip') : true,
+            'cutout_url'    => $validated['cutout_url'] ?? null,
+        ];
+
+        try {
+            $result = $this->composer->composeToFile(
+                $template,
+                $branding,
+                $strip,
+                $options
+            );
+
+            return response()->json([
+                'success'       => true,
+                'message'       => 'Poster composed successfully.',
+                'image_url'     => $result['url'],
+                'relative_path' => $result['relative_path'],
+                'filename'      => $result['filename'],
+                'preset_used'   => $options['preset_key'] ?: 'classic_political_right',
+                'template_id'   => $template->id,
+                'title'         => $template->title,
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to compose poster: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+}
