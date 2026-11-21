@@ -143,48 +143,57 @@
                         placeholder="Search comments..." />
                 </div>
 
-                {{-- Right: Simple Filters & Controls --}}
-                <div class="d-flex align-items-center gap-2 flex-wrap">
+                {{-- Right: Collapsible Filter Controls, Filter Toggle Button & Refresh --}}
+                <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+                    {{-- Collapsible Filter Controls (Default Hidden) --}}
+                    <div class="collapse" id="filters-collapse">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            {{-- Channel Filter --}}
+                            <select id="filter-account" class="form-select" style="width: 175px;">
+                                <option value="">All Channels</option>
+                                @foreach($accounts as $acc)
+                                    <option value="{{ $acc->id }}">{{ $acc->name }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Status Filter --}}
+                            <select id="filter-status" class="form-select" style="width: 155px;">
+                                <option value="">All Status</option>
+                                @foreach($statusList as $val => $label)
+                                    <option value="{{ $val }}">{{ $label }}</option>
+                                @endforeach
+                            </select>
+
+                            {{-- Sentiment Filter --}}
+                            <select id="filter-sentiment" class="form-select" style="width: 145px;">
+                                <option value="">All Sentiments</option>
+                                <option value="positive">Positive</option>
+                                <option value="neutral">Neutral</option>
+                                <option value="negative">Negative</option>
+                            </select>
+
+                            {{-- Date Filter --}}
+                            <div class="input-icon" style="width: 155px;" data-bs-toggle="tooltip" title="Filter by date">
+                                <span class="input-icon-addon"><i class="ti ti-calendar"></i></span>
+                                <input type="date" id="filter-date" class="form-control" title="Filter by date">
+                            </div>
+                            <button type="button" class="btn btn-icon btn-ghost-secondary d-none" id="btn-clear-date" data-bs-toggle="tooltip" title="Clear Date Filter">
+                                <i class="ti ti-x"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Filter Toggle Button (Right beside Refresh) --}}
+                    <button type="button" class="btn btn-icon btn-outline-secondary btn-toggle-filter-bar position-relative" id="btn-toggle-filters" data-bs-toggle="collapse" data-bs-target="#filters-collapse" aria-expanded="false" aria-controls="filters-collapse" title="Filter">
+                        <i class="ti ti-filter"></i>
+                        <span class="badge bg-primary badge-dot position-absolute top-0 end-0 mt-1 me-1 d-none" id="filter-active-dot"></span>
+                    </button>
 
                     {{-- Refresh Button --}}
                     <button type="button" class="btn btn-icon btn-ghost-secondary" id="refresh-table-btn"
                         data-bs-toggle="tooltip" title="Refresh">
                         <i class="ti ti-refresh"></i>
                     </button>
-
-                    {{-- Channel Filter --}}
-                    <select id="filter-account" class="form-select" style="width: 175px;">
-                        <option value="">All Channels</option>
-                        @foreach($accounts as $acc)
-                            <option value="{{ $acc->id }}">{{ $acc->name }}</option>
-                        @endforeach
-                    </select>
-
-                    {{-- Status Filter --}}
-                    <select id="filter-status" class="form-select" style="width: 155px;">
-                        <option value="">All Status</option>
-                        @foreach($statusList as $val => $label)
-                            <option value="{{ $val }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-
-                    {{-- Sentiment Filter --}}
-                    <select id="filter-sentiment" class="form-select" style="width: 145px;">
-                        <option value="">All Sentiments</option>
-                        <option value="positive">Positive</option>
-                        <option value="neutral">Neutral</option>
-                        <option value="negative">Negative</option>
-                    </select>
-
-                    {{-- Date Filter --}}
-                    <div class="input-icon" style="width: 155px;" data-bs-toggle="tooltip" title="Filter by date">
-                        <span class="input-icon-addon"><i class="ti ti-calendar"></i></span>
-                        <input type="date" id="filter-date" class="form-control" title="Filter by date">
-                    </div>
-                    <button type="button" class="btn btn-icon btn-ghost-secondary d-none" id="btn-clear-date" data-bs-toggle="tooltip" title="Clear Date Filter">
-                        <i class="ti ti-x"></i>
-                    </button>
-
                 </div>
             </div>
         </div>
@@ -401,7 +410,19 @@
             });
 
             // Live Dropdown Filter Changes
+            function checkFilterActive() {
+                let hasVal = $('#filter-status').val() || $('#filter-account').val() || $('#filter-sentiment').val() || $('#filter-date').val();
+                if (hasVal) {
+                    $('#filter-active-dot').removeClass('d-none');
+                    $('#btn-toggle-filters').addClass('text-primary border-primary');
+                } else {
+                    $('#filter-active-dot').addClass('d-none');
+                    $('#btn-toggle-filters').removeClass('text-primary border-primary');
+                }
+            }
+
             $('#filter-account, #filter-status, #filter-sentiment').on('change', function () {
+                checkFilterActive();
                 table.draw();
             });
 
@@ -413,6 +434,7 @@
                 } else {
                     $('#btn-clear-date').addClass('d-none');
                 }
+                checkFilterActive();
                 table.draw();
             });
 
@@ -420,6 +442,7 @@
             $('#btn-clear-date').on('click', function () {
                 $('#filter-date').val('');
                 $(this).addClass('d-none');
+                checkFilterActive();
                 table.draw();
             });
 

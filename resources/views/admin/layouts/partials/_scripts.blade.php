@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Initialize tooltips
     if (window.bootstrap && bootstrap.Tooltip) {
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], .btn-toggle-stats[title]'));
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"], .btn-toggle-stats[title], .btn-toggle-filter-bar[title]'));
         tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
@@ -135,13 +135,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <style>
 .btn-toggle-stats.active,
-.btn-toggle-stats[aria-expanded="true"] {
+.btn-toggle-stats[aria-expanded="true"],
+.btn-toggle-filter-bar.active,
+.btn-toggle-filter-bar[aria-expanded="true"] {
     background-color: var(--tblr-primary, #206bc4) !important;
     border-color: var(--tblr-primary, #206bc4) !important;
     color: #ffffff !important;
 }
 .btn-toggle-stats.active i,
-.btn-toggle-stats[aria-expanded="true"] i {
+.btn-toggle-stats[aria-expanded="true"] i,
+.btn-toggle-filter-bar.active i,
+.btn-toggle-filter-bar[aria-expanded="true"] i {
     color: #ffffff !important;
 }
 </style>

@@ -152,39 +152,51 @@
                     @endif
                 </div>
 
-                {{-- Right: Channel Select Filter, Date Filter, Total Count & View Mode Toggle --}}
+                {{-- Right: Collapsible Filter Controls, Filter Toggle Button, Total Count & View Mode Toggle --}}
                 <div class="d-flex align-items-center flex-wrap gap-2 ms-auto">
-                    {{-- Channel & Date Filter --}}
-                    <form method="GET" action="{{ route('admin.posts.youtube') }}" class="m-0 d-flex align-items-center flex-wrap gap-2">
-                        <input type="hidden" name="view" value="{{ $viewMode }}">
-                        @if(request('q'))
-                            <input type="hidden" name="q" value="{{ request('q') }}">
-                        @endif
-                        <select name="account_id" class="form-select" style="width: 200px;" onchange="this.form.submit()">
-                            <option value="">All YouTube Channels ({{ $accounts->count() }})</option>
-                            @foreach($accounts as $acc)
-                                <option value="{{ $acc->id }}" {{ $selectedAccountId == $acc->id ? 'selected' : '' }}>
-                                    {{ $acc->name }} ({{ number_format($acc->subscriber_count) }} subs)
-                                </option>
-                            @endforeach
-                        </select>
-                        <div class="input-icon" style="width: 155px;" data-bs-toggle="tooltip" title="Filter by date">
-                            <span class="input-icon-addon"><i class="ti ti-calendar"></i></span>
-                            <input type="date" name="date" value="{{ request('date') }}" class="form-control" onchange="this.form.submit()">
+                    {{-- Collapsible Filter Controls (Default Hidden) --}}
+                    <div class="collapse {{ (request('account_id') || request('date')) ? 'show' : '' }}" id="filters-collapse">
+                        <div class="d-flex align-items-center flex-wrap gap-2">
+                            <form method="GET" action="{{ route('admin.posts.youtube') }}" class="m-0 d-flex align-items-center flex-wrap gap-2">
+                                <input type="hidden" name="view" value="{{ $viewMode }}">
+                                @if(request('q'))
+                                    <input type="hidden" name="q" value="{{ request('q') }}">
+                                @endif
+                                <select name="account_id" class="form-select" style="width: 200px;" onchange="this.form.submit()">
+                                    <option value="">All YouTube Channels ({{ $accounts->count() }})</option>
+                                    @foreach($accounts as $acc)
+                                        <option value="{{ $acc->id }}" {{ $selectedAccountId == $acc->id ? 'selected' : '' }}>
+                                            {{ $acc->name }} ({{ number_format($acc->subscriber_count) }} subs)
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <div class="input-icon" style="width: 155px;" data-bs-toggle="tooltip" title="Filter by date">
+                                    <span class="input-icon-addon"><i class="ti ti-calendar"></i></span>
+                                    <input type="date" name="date" value="{{ request('date') }}" class="form-control" onchange="this.form.submit()">
+                                </div>
+                            </form>
+
+                            @if(request('date'))
+                                <a href="{{ route('admin.posts.youtube', ['view' => $viewMode, 'q' => request('q'), 'account_id' => $selectedAccountId]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Clear Date Filter">
+                                    <i class="ti ti-x me-1"></i>{{ request('date') }}
+                                </a>
+                            @endif
+
+                            @if($selectedAccountId)
+                                <a href="{{ route('admin.posts.youtube', ['view' => $viewMode, 'q' => request('q'), 'date' => request('date')]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Reset Channel Filter">
+                                    <i class="ti ti-x me-1"></i>Reset
+                                </a>
+                            @endif
                         </div>
-                    </form>
+                    </div>
 
-                    @if(request('date'))
-                        <a href="{{ route('admin.posts.youtube', ['view' => $viewMode, 'q' => request('q'), 'account_id' => $selectedAccountId]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Clear Date Filter">
-                            <i class="ti ti-x me-1"></i>{{ request('date') }}
-                        </a>
-                    @endif
-
-                    @if($selectedAccountId)
-                        <a href="{{ route('admin.posts.youtube', ['view' => $viewMode, 'q' => request('q'), 'date' => request('date')]) }}" class="btn btn-ghost-secondary btn-sm" data-bs-toggle="tooltip" title="Reset Channel Filter">
-                            <i class="ti ti-x me-1"></i>Reset
-                        </a>
-                    @endif
+                    {{-- Filter Toggle Button (Right beside View Switcher) --}}
+                    <button type="button" class="btn btn-icon {{ (request('account_id') || request('date')) ? 'btn-outline-primary active' : 'btn-outline-secondary' }} btn-toggle-filter-bar position-relative" data-bs-toggle="collapse" data-bs-target="#filters-collapse" aria-expanded="{{ (request('account_id') || request('date')) ? 'true' : 'false' }}" aria-controls="filters-collapse" title="Filter">
+                        <i class="ti ti-filter"></i>
+                        @if(request('account_id') || request('date'))
+                            <span class="badge bg-primary badge-dot position-absolute top-0 end-0 mt-1 me-1"></span>
+                        @endif
+                    </button>
 
                     <span class="text-secondary small me-1 d-none d-sm-inline">{{ $posts->total() }} Videos</span>
 
