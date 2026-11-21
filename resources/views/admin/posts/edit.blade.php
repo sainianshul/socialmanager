@@ -87,6 +87,7 @@
         <form method="POST" action="{{ route('admin.posts.schedule.update', $scheduledPost->id) }}" enctype="multipart/form-data" id="form-edit-post">
             @csrf
             @method('PUT')
+            <input type="hidden" name="platform" id="selected-platform" value="{{ $platform }}">
             <input type="hidden" name="post_type" id="selected-post-type" value="{{ old('post_type', $scheduledPost->post_type) }}">
 
             <div class="card-body p-4">

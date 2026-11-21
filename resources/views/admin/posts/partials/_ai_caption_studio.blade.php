@@ -48,9 +48,9 @@
                     </div>
                 </div>
 
-                {{-- Form Controls Row: Normal Standard Selects with Increased Size --}}
+                {{-- Form Controls Row: Tone & Language (Platform automatically detected from main post form) --}}
                 <div class="row g-3 mb-3.5">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label text-secondary small fw-medium mb-1.5">Tone</label>
                         <select class="form-select form-control" id="ai-studio-tone" style="height: 44px; font-size: 0.95rem; border-radius: 10px; border-color: #d1d5db;">
                             <option value="engaging" selected>Engaging</option>
@@ -62,16 +62,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label text-secondary small fw-medium mb-1.5">Platform</label>
-                        <select class="form-select form-control" id="ai-studio-platform" style="height: 44px; font-size: 0.95rem; border-radius: 10px; border-color: #d1d5db;">
-                            <option value="all" selected>All Platforms</option>
-                            <option value="instagram">Instagram</option>
-                            <option value="facebook">Facebook</option>
-                        </select>
-                    </div>
-
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <label class="form-label text-secondary small fw-medium mb-1.5">Language</label>
                         <select class="form-select form-control" id="ai-studio-language" style="height: 44px; font-size: 0.95rem; border-radius: 10px; border-color: #d1d5db;">
                             <option value="English" selected>English</option>

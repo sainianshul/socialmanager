@@ -15,14 +15,6 @@
             $('#ai-studio-topic').val(firstLine);
         }
 
-        // Sync platform dropdown with active platform if available
-        let activePlatform = $('#selected-platform').val();
-        if (activePlatform == 2) {
-            $('#ai-studio-platform').val('instagram');
-        } else if (activePlatform == 1) {
-            $('#ai-studio-platform').val('facebook');
-        }
-
         setTimeout(function() {
             $('#ai-studio-topic').focus();
         }, 300);
@@ -52,8 +44,17 @@
         }
 
         let tone = $('#ai-studio-tone').val() || 'engaging';
-        let platform = $('#ai-studio-platform').val() || 'all';
         let language = $('#ai-studio-language').val() || 'English';
+
+        // Automatically determine target platform from form selection
+        let activePlatformId = $('#selected-platform').val();
+        let platform = 'all';
+        if (activePlatformId == 2) {
+            platform = 'instagram';
+        } else if (activePlatformId == 1) {
+            let crossIg = $('#check-cross-post-to-ig').is(':checked');
+            platform = crossIg ? 'all' : 'facebook';
+        }
 
         let $btn = $('#btn-run-ai-caption');
         let $btnText = $('#btn-run-ai-text');
