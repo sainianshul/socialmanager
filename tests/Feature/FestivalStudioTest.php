@@ -50,7 +50,7 @@ class FestivalStudioTest extends TestCase
         $this->seed(FestivalSeeder::class);
         $user = User::factory()->create(['role' => User::ROLE_USER]);
 
-        $festival = Festival::first();
+        $festival = Festival::where('festival_date', '>=', now()->toDateString())->first();
 
         $response = $this->actingAs($user)->getJson(
             route('admin.festival-studio.index', ['festival_id' => $festival->id]),
@@ -113,5 +113,45 @@ class FestivalStudioTest extends TestCase
             'content' => 'Samvidhan Diwas Shubhkaamna message',
             'status' => ScheduledPost::STATUS_SCHEDULED,
         ]);
+    }
+
+    public function test_quick_schedule_for_today_sets_time_10_minutes_ahead(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_INSTAGRAM,
+            'name' => 'Official Insta',
+            'meta_account_id' => '987654321',
+            'access_token' => 'test-token',
+            'is_active' => true,
+        ]);
+
+        $template = FestivalTemplate::first();
+
+        $response = $this->actingAs($user)->postJson(route('admin.festival-studio.quick-schedule'), [
+            'template_id' => $template->id,
+            'festival_id' => $template->festival_id,
+            'account_ids' => [$account->id],
+            'schedule_date' => now()->toDateString(),
+            'schedule_time' => '08:00',
+            'content' => 'Today festival greeting',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'template_id' => $template->id,
+            'posts_count' => 1,
+        ]);
+
+        $scheduledPost = ScheduledPost::where('user_id', $user->id)
+            ->where('account_id', $account->id)
+            ->first();
+
+        $this->assertNotNull($scheduledPost);
+        $this->assertTrue($scheduledPost->scheduled_at->isFuture());
     }
 }

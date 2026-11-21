@@ -34,6 +34,8 @@ class ScheduledPost extends Model
     protected $fillable = [
         'user_id',
         'account_id',
+        'festival_id',
+        'template_id',
         'platform',
         'post_type',
         'title',
@@ -235,6 +237,19 @@ class ScheduledPost extends Model
     {
         return $query->where('status', self::STATUS_SCHEDULED)
             ->where('scheduled_at', '<=', now());
+    }
+
+    /**
+     * Festival Studio Relationships
+     */
+    public function festival(): BelongsTo
+    {
+        return $this->belongsTo(Festival::class);
+    }
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(FestivalTemplate::class, 'template_id');
     }
 
     /**

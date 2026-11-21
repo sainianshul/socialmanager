@@ -74,6 +74,43 @@
     color: #0d9488 !important;
 }
 
+/* Scheduled Date Pill Distinction (Warm Amber / Light Yellow) */
+.fs-date-pill.is-scheduled {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+.fs-date-pill.is-scheduled:hover {
+    border-color: #d97706 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+.fs-date-pill.is-scheduled .text-secondary {
+    color: #b45309 !important;
+}
+.fs-date-pill.is-scheduled .badge.bg-primary-lt {
+    background: rgba(245, 158, 11, 0.25) !important;
+    color: #92400e !important;
+}
+.fs-date-pill.is-scheduled.active {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+    border-color: #f59e0b !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 2px #f59e0b, 0 6px 20px rgba(13, 148, 136, 0.35) !important;
+}
+.fs-date-pill.is-scheduled.active .text-secondary {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+[data-bs-theme="dark"] .fs-date-pill.is-scheduled {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    color: #fde68a !important;
+}
+[data-bs-theme="dark"] .fs-date-pill.is-scheduled .text-secondary {
+    color: rgba(253, 230, 138, 0.8) !important;
+}
+
 /* Template Card */
 .fs-template-card {
     border: 1px solid rgba(0, 0, 0, 0.07);
@@ -221,21 +258,30 @@
                         $isSelected = $selectedFestival && $selectedFestival->id === $festival->id;
                         $isToday = $festival->festival_date->isToday();
                         $daysAway = now()->startOfDay()->diffInDays($festival->festival_date->startOfDay(), false);
+                        $isScheduled = in_array($festival->id, $scheduledFestivalIds ?? []);
                     @endphp
                     <a href="{{ route('admin.festival-studio.index', ['festival_id' => $festival->id]) }}" 
-                       class="fs-date-pill {{ $isSelected ? 'active' : '' }}"
+                       class="fs-date-pill {{ $isSelected ? 'active' : '' }} {{ $isScheduled ? 'is-scheduled' : '' }}"
+                       id="date-pill-{{ $festival->id }}"
                        data-festival-id="{{ $festival->id }}">
                         <div class="d-flex align-items-center justify-content-between mb-1">
                             <span class="text-secondary small fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.04em;">
                                 {{ $festival->festival_date->format('D') }}
                             </span>
-                            @if($isToday)
-                                <span class="badge bg-danger text-white rounded-pill" style="font-size: 9px; padding: 2px 7px;">Today</span>
-                            @elseif($daysAway === 1)
-                                <span class="badge bg-warning text-dark rounded-pill" style="font-size: 9px; padding: 2px 7px;">Tomorrow</span>
-                            @elseif($daysAway > 1 && $daysAway <= 7)
-                                <span class="badge bg-primary-lt rounded-pill" style="font-size: 9px; padding: 2px 7px;">in {{ $daysAway }}d</span>
-                            @endif
+                            <div class="d-flex align-items-center gap-1" id="pill-badge-slot-{{ $festival->id }}">
+                                @if($isScheduled)
+                                    <span class="badge bg-warning text-dark rounded-pill fw-semibold" style="font-size: 9px; padding: 2px 7px;">
+                                        <i class="ti ti-check me-0.5"></i>Set
+                                    </span>
+                                @endif
+                                @if($isToday)
+                                    <span class="badge bg-danger text-white rounded-pill" style="font-size: 9px; padding: 2px 7px;">Today</span>
+                                @elseif($daysAway === 1)
+                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 9px; padding: 2px 7px;">Tomorrow</span>
+                                @elseif($daysAway > 1 && $daysAway <= 7 && !$isScheduled)
+                                    <span class="badge bg-primary-lt rounded-pill" style="font-size: 9px; padding: 2px 7px;">in {{ $daysAway }}d</span>
+                                @endif
+                            </div>
                         </div>
                         <div class="fw-bold fs-3 mb-1 lh-1">
                             {{ $festival->festival_date->format('d M') }}
@@ -417,6 +463,26 @@ document.addEventListener('DOMContentLoaded', function () {
         var inputDate = document.getElementById('qs-input-date');
         if (inputDate && festivalDate) inputDate.value = festivalDate;
 
+        // Dynamic Today vs Future time calculation
+        var isToday = trigger.getAttribute('data-is-today') === '1';
+        var targetTime = trigger.getAttribute('data-target-time') || (isToday ? '{{ now()->addMinutes(10)->format('H:i') }}' : '08:00');
+        var targetTimeFormatted = trigger.getAttribute('data-target-time-formatted') || (isToday ? '{{ now()->addMinutes(10)->format('h:i A') }}' : '08:00 AM');
+
+        var inputTime = document.getElementById('qs-input-time');
+        if (inputTime) inputTime.value = targetTime;
+
+        var timeBadge = document.getElementById('qs-modal-time-badge');
+        if (timeBadge) {
+            timeBadge.innerHTML = '<i class="ti ti-clock me-1 text-primary"></i>' + targetTimeFormatted;
+        }
+
+        var footerNote = document.getElementById('qs-modal-footer-note');
+        if (footerNote) {
+            footerNote.innerText = isToday 
+                ? 'Will publish today in 10 minutes (' + targetTimeFormatted + ')' 
+                : 'Will publish on festival day at 08:00 AM';
+        }
+
         var inputCaption = document.getElementById('qs-input-caption');
         if (inputCaption) inputCaption.value = caption;
 
@@ -542,6 +608,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 var actionEl = document.getElementById('card-action-' + templateId);
                 if (actionEl) {
                     actionEl.innerHTML = '<span class="badge bg-success text-white rounded-pill px-2.5 py-1 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
+                }
+
+                // Immediately update the festival date pill in the top horizontal bar
+                var targetFestId = result.data.festival_id || festivalId;
+                if (targetFestId) {
+                    var pillEl = document.getElementById('date-pill-' + targetFestId);
+                    if (pillEl) {
+                        pillEl.classList.add('is-scheduled');
+                        var badgeSlot = document.getElementById('pill-badge-slot-' + targetFestId);
+                        if (badgeSlot && !badgeSlot.querySelector('.badge.bg-warning')) {
+                            var setBadge = document.createElement('span');
+                            setBadge.className = 'badge bg-warning text-dark rounded-pill fw-semibold';
+                            setBadge.style.fontSize = '9px';
+                            setBadge.style.padding = '2px 7px';
+                            setBadge.innerHTML = '<i class="ti ti-check me-0.5"></i>Set';
+                            badgeSlot.prepend(setBadge);
+                        }
+                    }
                 }
 
                 // Show floating notification toast

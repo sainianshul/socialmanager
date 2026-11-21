@@ -33,7 +33,7 @@
                                 <span class="badge bg-primary-lt rounded-pill px-2.5 py-1" id="qs-modal-festival-badge">
                                     <i class="ti ti-calendar me-1"></i>Date
                                 </span>
-                                <span class="badge bg-light text-dark border rounded-pill px-2.5 py-1">
+                                <span class="badge bg-light text-dark border rounded-pill px-2.5 py-1" id="qs-modal-time-badge">
                                     <i class="ti ti-clock me-1 text-primary"></i>08:00 AM
                                 </span>
                             </div>
@@ -123,7 +123,7 @@
             <div class="modal-footer border-top py-3 px-4 bg-light-subtle d-flex align-items-center justify-content-between">
                 <div class="text-secondary small d-flex align-items-center gap-1.5">
                     <i class="ti ti-clock text-primary"></i>
-                    <span>Will publish on festival day at 08:00 AM</span>
+                    <span id="qs-modal-footer-note">Will publish on festival day at 08:00 AM</span>
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-outline-secondary rounded-pill px-3 py-2" data-bs-dismiss="modal">

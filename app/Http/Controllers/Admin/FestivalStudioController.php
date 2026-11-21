@@ -16,9 +16,9 @@ class FestivalStudioController extends Controller
     public function index(Request $request)
     {
         $upcomingFestivals = Festival::active()
-            ->where('festival_date', '>=', now()->subDays(14)->toDateString())
+            ->where('festival_date', '>=', now()->toDateString())
             ->orderBy('festival_date', 'asc')
-            ->take(20)
+            ->take(30)
             ->get();
 
         $todayFestival = $upcomingFestivals->first(fn($f) => $f->festival_date->isToday());
@@ -44,6 +44,29 @@ class FestivalStudioController extends Controller
 
         $templates = $templatesQuery->get();
 
+        $user = auth()->user();
+
+        // Get IDs of festivals and templates already scheduled by this user
+        $scheduledFestivalIds = [];
+        $scheduledTemplateIds = [];
+        if ($user) {
+            $scheduledPosts = ScheduledPost::where('user_id', $user->id)
+                ->whereIn('status', [ScheduledPost::STATUS_SCHEDULED, ScheduledPost::STATUS_PUBLISHED])
+                ->get();
+
+            $scheduledFestivalIds = $scheduledPosts->pluck('festival_id')->filter()->unique()->toArray();
+            $scheduledTemplateIds = $scheduledPosts->pluck('template_id')->filter()->unique()->toArray();
+
+            // Match by scheduled date for any posts scheduled on that festival date
+            $scheduledDates = $scheduledPosts->pluck('scheduled_at')->map(fn($d) => $d?->toDateString())->filter()->unique()->toArray();
+            foreach ($upcomingFestivals as $f) {
+                if (in_array($f->festival_date->toDateString(), $scheduledDates)) {
+                    $scheduledFestivalIds[] = $f->id;
+                }
+            }
+            $scheduledFestivalIds = array_values(array_unique($scheduledFestivalIds));
+        }
+
         // Support seamless AJAX date switching without full page refresh
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json([
@@ -51,16 +74,17 @@ class FestivalStudioController extends Controller
                 'festival_id' => $selectedFestival?->id,
                 'title' => $selectedFestival?->title,
                 'festival_date' => $selectedFestival?->festival_date?->format('d M Y'),
+                'is_today' => $selectedFestival?->festival_date?->isToday() ?? false,
                 'caption' => $selectedFestival?->ready_caption,
                 'hashtags' => $selectedFestival?->hashtags,
                 'html' => view('admin.festival_studio.partials._content', compact(
                     'selectedFestival',
-                    'templates'
+                    'templates',
+                    'scheduledTemplateIds'
                 ))->render(),
             ]);
         }
 
-        $user = auth()->user();
         $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;
         $parties = PoliticalParty::where('is_active', true)->get();
 
@@ -84,7 +108,9 @@ class FestivalStudioController extends Controller
             'userCutout',
             'parties',
             'partyFilter',
-            'accounts'
+            'accounts',
+            'scheduledFestivalIds',
+            'scheduledTemplateIds'
         ));
     }
 
@@ -127,11 +153,21 @@ class FestivalStudioController extends Controller
         $template = FestivalTemplate::findOrFail($validated['template_id']);
         $mediaUrls = [$template->template_image_path];
 
-        try {
-            $scheduledAt = Carbon::parse($validated['schedule_date'] . ' ' . $validated['schedule_time']);
-        } catch (\Throwable $e) {
-            $scheduledAt = Carbon::parse($validated['schedule_date'])->setTime(8, 0);
+        $isToday = Carbon::parse($validated['schedule_date'])->isToday();
+        if ($isToday) {
+            // For today's festival, schedule 10 minutes from current moment
+            $scheduledAt = now()->addMinutes(10);
+        } else {
+            // For upcoming future festivals, schedule at 08:00 AM morning
+            $timeString = !empty($validated['schedule_time']) ? $validated['schedule_time'] : '08:00';
+            try {
+                $scheduledAt = Carbon::parse($validated['schedule_date'] . ' ' . $timeString);
+            } catch (\Throwable $e) {
+                $scheduledAt = Carbon::parse($validated['schedule_date'])->setTime(8, 0);
+            }
         }
+
+        $festivalId = $validated['festival_id'] ?? $template->festival_id;
 
         $createdPosts = [];
         foreach ($accounts as $account) {
@@ -140,6 +176,8 @@ class FestivalStudioController extends Controller
             $scheduledPost = ScheduledPost::create([
                 'user_id'        => $user->id,
                 'account_id'     => $account->id,
+                'festival_id'    => $festivalId,
+                'template_id'    => $template->id,
                 'platform'       => $platform,
                 'post_type'      => ScheduledPost::TYPE_PHOTO,
                 'title'          => $template->title,
@@ -157,6 +195,7 @@ class FestivalStudioController extends Controller
             'success' => true,
             'message' => 'Poster scheduled successfully for ' . $scheduledAt->format('d M Y, h:i A') . ' across ' . count($createdPosts) . ' account(s).',
             'template_id' => $template->id,
+            'festival_id' => $festivalId,
             'scheduled_formatted' => $scheduledAt->format('d M, h:i A'),
             'posts_count' => count($createdPosts),
         ]);

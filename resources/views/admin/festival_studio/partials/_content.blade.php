@@ -29,6 +29,10 @@
                     'date' => $selectedFestival?->festival_date?->format('Y-m-d\T08:00'),
                     'caption' => $captionText,
                 ]);
+                $isToday = $selectedFestival?->festival_date?->isToday() ?? false;
+                $targetTime = $isToday ? now()->addMinutes(10)->format('H:i') : '08:00';
+                $targetTimeFormatted = $isToday ? now()->addMinutes(10)->format('h:i A') . ' (in 10 min)' : '08:00 AM';
+                $isScheduled = in_array($template->id, $scheduledTemplateIds ?? []);
             @endphp
             <div class="col" id="template-card-col-{{ $template->id }}">
                 <div class="fs-template-card h-100 d-flex flex-column" id="template-card-{{ $template->id }}">
@@ -42,6 +46,9 @@
                          data-festival-title="{{ $selectedFestival?->title }}"
                          data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
                          data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
+                         data-is-today="{{ $isToday ? '1' : '0' }}"
+                         data-target-time="{{ $targetTime }}"
+                         data-target-time-formatted="{{ $targetTimeFormatted }}"
                          data-caption="{{ $captionText }}"
                          data-composer-url="{{ $composerUrl }}">
                         
@@ -66,6 +73,9 @@
                                     data-festival-title="{{ $selectedFestival?->title }}"
                                     data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
                                     data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
+                                    data-is-today="{{ $isToday ? '1' : '0' }}"
+                                    data-target-time="{{ $targetTime }}"
+                                    data-target-time-formatted="{{ $targetTimeFormatted }}"
                                     data-caption="{{ $captionText }}"
                                     data-composer-url="{{ $composerUrl }}">
                                 <i class="ti ti-calendar-time me-1"></i>Quick Schedule
@@ -80,19 +90,28 @@
                             {{ $template->title }}
                         </span>
                         <div class="d-flex align-items-center gap-1.5 flex-shrink-0" id="card-action-{{ $template->id }}">
-                            <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1 fw-semibold btn-trigger-quick-schedule"
-                                    data-template-id="{{ $template->id }}"
-                                    data-template-title="{{ $template->title }}"
-                                    data-template-image="{{ $template->image_url }}"
-                                    data-festival-id="{{ $selectedFestival?->id }}"
-                                    data-festival-title="{{ $selectedFestival?->title }}"
-                                    data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
-                                    data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
-                                    data-caption="{{ $captionText }}"
-                                    data-composer-url="{{ $composerUrl }}"
-                                    title="Quick Schedule Poster">
-                                Use
-                            </button>
+                            @if($isScheduled)
+                                <span class="badge bg-success-lt text-success rounded-pill px-2.5 py-1 small fw-semibold">
+                                    <i class="ti ti-check me-1"></i>Scheduled
+                                </span>
+                            @else
+                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1 fw-semibold btn-trigger-quick-schedule"
+                                        data-template-id="{{ $template->id }}"
+                                        data-template-title="{{ $template->title }}"
+                                        data-template-image="{{ $template->image_url }}"
+                                        data-festival-id="{{ $selectedFestival?->id }}"
+                                        data-festival-title="{{ $selectedFestival?->title }}"
+                                        data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
+                                        data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
+                                        data-is-today="{{ $isToday ? '1' : '0' }}"
+                                        data-target-time="{{ $targetTime }}"
+                                        data-target-time-formatted="{{ $targetTimeFormatted }}"
+                                        data-caption="{{ $captionText }}"
+                                        data-composer-url="{{ $composerUrl }}"
+                                        title="Quick Schedule Poster">
+                                    Use
+                                </button>
+                            @endif
                         </div>
                     </div>
 
