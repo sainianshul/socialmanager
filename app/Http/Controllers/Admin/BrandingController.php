@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BrandingImage;
+use App\Models\LeaderStrip;
+use App\Models\PoliticalLeader;
 use App\Models\PoliticalParty;
 use App\Models\User;
 use App\Models\UserBranding;
@@ -39,12 +41,35 @@ class BrandingController extends Controller
             ?? ($user->profile_photo ? asset('storage/' . $user->profile_photo) : null)
             ?? 'https://ui-avatars.com/api/?name=' . urlencode($branding->display_name ?: $user->name) . '&background=1db8ab&color=fff&bold=true&size=180';
 
+        $selectedPartyId = old('party_id', $branding->party_id);
+
+        $userStrips = $user->leaderStrips()->with(['leaders', 'party'])->get();
+        $systemStrip = null;
+        if ($selectedPartyId) {
+            $systemStrip = LeaderStrip::where('party_id', $selectedPartyId)
+                ->where('is_system', true)
+                ->where('is_default', true)
+                ->with(['leaders' => function ($q) {
+                    $q->orderBy('leader_strip_items.order', 'asc');
+                }])
+                ->first();
+        }
+
+        $activeStrip = $user->defaultLeaderStrip ?? $systemStrip;
+        $partyLeaders = $selectedPartyId 
+            ? PoliticalLeader::where('party_id', $selectedPartyId)->where('is_active', true)->get() 
+            : collect();
+
         return view('admin.branding.index', compact(
             'branding',
             'parties',
             'defaultImage',
             'currentPhotoUrl',
-            'user'
+            'user',
+            'userStrips',
+            'systemStrip',
+            'activeStrip',
+            'partyLeaders'
         ));
     }
 

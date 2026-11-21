@@ -85,4 +85,31 @@ class PoliticalLeaderStripTest extends TestCase
         $this->assertEquals('Narendra Modi', $stripLeaders->last()->name);
         $this->assertEquals(2, $stripLeaders->last()->pivot->order);
     }
+
+    public function test_branding_studio_page_renders_with_nested_tabs_and_strips(): void
+    {
+        $this->seed(PoliticalPartySeeder::class);
+        $this->seed(PoliticalLeaderSeeder::class);
+
+        $user = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        $bjp = PoliticalParty::where('short_code', 'BJP')->first();
+        \App\Models\UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'display_name' => 'Dr. Test Leader',
+            'is_default' => true,
+        ]);
+
+        $response = $this->actingAs($user)->get(route('admin.branding.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('General Profile Information');
+        $response->assertSee('Political Party Affiliation');
+        $response->assertSee('Profile Photo');
+        $response->assertSee('Leadership Header Strips');
+        $response->assertSee('Narendra Modi');
+    }
 }
