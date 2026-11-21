@@ -120,6 +120,10 @@
     background: #ffffff;
     flex-shrink: 0;
 }
+.bs-upload-thumb.transparent-bg {
+    background-image: repeating-conic-gradient(#cbd5e1 0% 25%, #ffffff 0% 50%) !important;
+    background-size: 12px 12px !important;
+}
 </style>
 @endpush
 
@@ -275,14 +279,32 @@
                             </div>
                         </div>
 
-                        {{-- Section 3: Choose Image --}}
+                        {{-- Section 3: Choose Image with Auto Cutout --}}
                         <div class="mb-4 p-3.5 rounded-3 border bg-light-subtle">
                             <label class="bs-label mb-2">
                                 <i class="ti ti-photo text-primary"></i>Choose Image
                             </label>
                             <div class="d-flex align-items-center gap-3">
                                 <img id="upload-preview-thumb" src="{{ $currentPhotoUrl }}" alt="Photo" class="bs-upload-thumb">
-                                <input type="file" name="branding_image" id="input-branding-image" class="form-control bs-input" accept="image/png,image/jpeg,image/webp">
+                                <div class="flex-grow-1">
+                                    <input type="file" name="branding_image" id="input-branding-image" class="form-control bs-input" accept="image/png,image/jpeg,image/webp">
+                                </div>
+                            </div>
+
+                            {{-- Cutout Option Box (Appears after user selects image) --}}
+                            <div id="bg-remove-box" class="mt-3 p-3 rounded-3 bg-white border d-none">
+                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-primary-lt rounded-pill px-2.5 py-1">
+                                            <i class="ti ti-sparkles me-1"></i>AI Cutout
+                                        </span>
+                                        <span class="small text-dark fw-semibold">Remove photo background to create transparent cutout?</span>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 shadow-xs" id="btn-remove-bg">
+                                        <i class="ti ti-wand me-1"></i>Remove Background
+                                    </button>
+                                </div>
+                                <div id="bg-remove-status" class="mt-2 d-none"></div>
                             </div>
                         </div>
 
@@ -480,18 +502,118 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Image Upload Preview
+    // Image Upload & AI Background Removal
     var imageInput = document.getElementById('input-branding-image');
     var previewThumb = document.getElementById('upload-preview-thumb');
+    var bgRemoveBox = document.getElementById('bg-remove-box');
+    var btnRemoveBg = document.getElementById('btn-remove-bg');
+    var bgStatus = document.getElementById('bg-remove-status');
+
+    var originalFile = null;
+    var originalThumbUrl = null;
 
     if (imageInput && previewThumb) {
         imageInput.addEventListener('change', function () {
             if (imageInput.files && imageInput.files[0]) {
+                originalFile = imageInput.files[0];
                 var reader = new FileReader();
                 reader.onload = function (e) {
+                    originalThumbUrl = e.target.result;
                     previewThumb.src = e.target.result;
+                    previewThumb.classList.remove('transparent-bg');
                 };
-                reader.readAsDataURL(imageInput.files[0]);
+                reader.readAsDataURL(originalFile);
+
+                // Reveal background removal option box
+                if (bgRemoveBox) {
+                    bgRemoveBox.classList.remove('d-none');
+                }
+                if (btnRemoveBg) {
+                    btnRemoveBg.classList.remove('d-none');
+                    btnRemoveBg.disabled = false;
+                }
+                if (bgStatus) {
+                    bgStatus.classList.add('d-none');
+                    bgStatus.innerHTML = '';
+                }
+            }
+        });
+    }
+
+    // AI Background Removal Trigger
+    if (btnRemoveBg) {
+        btnRemoveBg.addEventListener('click', async function () {
+            if (!originalFile) return;
+
+            btnRemoveBg.disabled = true;
+            if (bgStatus) {
+                bgStatus.classList.remove('d-none');
+                bgStatus.innerHTML = '<div class="d-flex align-items-center gap-2 text-primary small py-1">' +
+                    '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>' +
+                    '<span>AI is removing background... (1-3 seconds)</span>' +
+                '</div>';
+            }
+
+            try {
+                // Dynamically import in-browser AI model bundle
+                var module = await import('https://unpkg.com/@imgly/background-removal@1.4.5/dist/index.mjs');
+                var removeBackground = module.default;
+
+                var config = {
+                    publicPath: 'https://unpkg.com/@imgly/background-removal-data@1.4.5/dist/'
+                };
+
+                var blob = await removeBackground(originalFile, config);
+                var transparentUrl = URL.createObjectURL(blob);
+
+                // Update thumbnail with transparent background pattern
+                if (previewThumb) {
+                    previewThumb.src = transparentUrl;
+                    previewThumb.classList.add('transparent-bg');
+                }
+
+                // Place transparent PNG file into the file input
+                var cutoutFile = new File([blob], 'cutout_' + Date.now() + '.png', { type: 'image/png' });
+                var dt = new DataTransfer();
+                dt.items.add(cutoutFile);
+                imageInput.files = dt.files;
+
+                btnRemoveBg.classList.add('d-none');
+
+                if (bgStatus) {
+                    bgStatus.innerHTML = '<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 text-success small py-1">' +
+                        '<span class="d-flex align-items-center gap-1.5 fw-semibold">' +
+                            '<i class="ti ti-circle-check fs-2 text-success"></i>Background removed! Transparent cutout ready.' +
+                        '</span>' +
+                        '<button type="button" class="btn btn-sm btn-link text-secondary p-0" id="btn-revert-bg">Revert to original</button>' +
+                    '</div>';
+
+                    var btnRevert = document.getElementById('btn-revert-bg');
+                    if (btnRevert) {
+                        btnRevert.addEventListener('click', function () {
+                            if (originalFile && imageInput) {
+                                var dtOrig = new DataTransfer();
+                                dtOrig.items.add(originalFile);
+                                imageInput.files = dtOrig.files;
+                            }
+                            if (previewThumb && originalThumbUrl) {
+                                previewThumb.src = originalThumbUrl;
+                                previewThumb.classList.remove('transparent-bg');
+                            }
+                            btnRemoveBg.classList.remove('d-none');
+                            btnRemoveBg.disabled = false;
+                            bgStatus.innerHTML = '<span class="text-secondary small">Reverted to original photo.</span>';
+                        });
+                    }
+                }
+            } catch (err) {
+                console.error('Auto background removal error:', err);
+                if (bgStatus) {
+                    bgStatus.innerHTML = '<div class="text-warning small py-1">' +
+                        '<i class="ti ti-alert-triangle me-1"></i>Could not remove background automatically. Your original photo will be used.' +
+                    '</div>';
+                }
+                btnRemoveBg.disabled = false;
             }
         });
     }
