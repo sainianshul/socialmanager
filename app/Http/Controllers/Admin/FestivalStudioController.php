@@ -149,9 +149,11 @@ class FestivalStudioController extends Controller
             'festival_id'   => 'nullable|exists:festivals,id',
             'account_ids'   => 'required|array|min:1',
             'account_ids.*' => 'integer|exists:accounts,id',
-            'schedule_date' => 'required|date',
-            'schedule_time' => 'required|string',
-            'content'       => 'nullable|string|max:5000',
+            'schedule_date'  => 'required|date',
+            'schedule_time'  => 'required|string',
+            'content'        => 'nullable|string|max:5000',
+            'composed_image' => 'nullable|string',
+            'include_strip'  => 'nullable|boolean',
         ]);
 
         $user = auth()->user();
@@ -175,8 +177,25 @@ class FestivalStudioController extends Controller
             }
         }
 
-        $template = FestivalTemplate::findOrFail($validated['template_id']);
-        $mediaUrls = [$template->template_image_path];
+        $template = FestivalTemplate::with('party')->findOrFail($validated['template_id']);
+
+        if (!empty($validated['composed_image'])) {
+            $mediaUrls = [$validated['composed_image']];
+        } else {
+            try {
+                $composer = app(\App\Services\PosterComposer::class);
+                $branding = $user->defaultBranding ?? $user->brandings()->first();
+                $strip = $user->defaultLeaderStrip;
+                $includeStrip = $request->boolean('include_strip', true);
+
+                $composed = $composer->composeToFile($template, $branding, $strip, [
+                    'include_strip' => $includeStrip,
+                ]);
+                $mediaUrls = [$composed['relative_path']];
+            } catch (\Throwable $e) {
+                $mediaUrls = [$template->template_image_path];
+            }
+        }
 
         $isToday = Carbon::parse($validated['schedule_date'])->isToday();
         if ($isToday) {

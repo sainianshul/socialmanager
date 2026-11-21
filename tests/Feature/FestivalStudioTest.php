@@ -113,6 +113,14 @@ class FestivalStudioTest extends TestCase
             'content' => 'Samvidhan Diwas Shubhkaamna message',
             'status' => ScheduledPost::STATUS_SCHEDULED,
         ]);
+
+        $scheduledPost = ScheduledPost::where('user_id', $user->id)
+            ->where('account_id', $account->id)
+            ->first();
+
+        $this->assertNotNull($scheduledPost);
+        $this->assertNotEmpty($scheduledPost->media_urls);
+        $this->assertStringContainsString('posters/', $scheduledPost->media_urls[0]);
     }
 
     public function test_quick_schedule_for_today_sets_time_10_minutes_ahead(): void

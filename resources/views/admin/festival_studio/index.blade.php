@@ -628,7 +628,60 @@ document.addEventListener('DOMContentLoaded', function () {
             var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
             modal.show();
         }
+
+        // Trigger Live Server-Side Poster Composition
+        var toggleStrip = document.getElementById('qs-modal-toggle-strip');
+        var includeStrip = toggleStrip ? toggleStrip.checked : true;
+        composeModalPoster(templateId, includeStrip);
     });
+
+    // Helper: Compose High-Res Branded Poster via API
+    function composeModalPoster(templateId, includeStrip) {
+        var spinner = document.getElementById('qs-modal-spinner');
+        var imgEl = document.getElementById('qs-modal-img');
+        var btnDownload = document.getElementById('qs-modal-btn-download');
+        var inputComposed = document.getElementById('qs-input-composed-image');
+
+        if (spinner) spinner.classList.remove('d-none');
+        if (btnDownload) {
+            btnDownload.classList.add('disabled');
+            btnDownload.href = '#';
+        }
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        fetch('{{ route('admin.festival-studio.compose') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({
+                template_id: parseInt(templateId),
+                include_strip: !!includeStrip
+            })
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (data.success && data.image_url) {
+                if (imgEl) imgEl.src = data.image_url;
+                if (btnDownload) {
+                    btnDownload.href = data.image_url;
+                    btnDownload.classList.remove('disabled');
+                }
+                if (inputComposed) {
+                    inputComposed.value = data.relative_path;
+                }
+            }
+        })
+        .catch(function (err) {
+            console.error('Poster composition failed:', err);
+        })
+        .finally(function () {
+            if (spinner) spinner.classList.add('d-none');
+        });
+    }
 
     // Account row toggle on checkbox change or row click
     document.addEventListener('change', function (e) {
@@ -684,6 +737,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (btnText) btnText.innerText = 'Scheduling...';
             if (alertBox) alertBox.classList.add('d-none');
 
+            var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
+            var includeStrip = document.getElementById('qs-modal-toggle-strip')?.checked ?? true;
+
             fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
                 method: 'POST',
                 headers: {
@@ -698,7 +754,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     account_ids: selectedAccountIds,
                     schedule_date: scheduleDate,
                     schedule_time: scheduleTime,
-                    content: content
+                    content: content,
+                    composed_image: composedImage,
+                    include_strip: includeStrip
                 })
             })
             .then(function (res) {
@@ -835,16 +893,12 @@ document.addEventListener('DOMContentLoaded', function () {
             } catch (err) {}
         }
 
-        // 2. Header Strip Toggle inside Quick Schedule Modal
+        // 2. Header Strip Toggle inside Quick Schedule Modal (Re-composes live poster)
         if (e.target && e.target.id === 'qs-modal-toggle-strip') {
             var isModalChecked = e.target.checked;
-            var modalStrip = document.getElementById('qs-modal-header-strip');
-            if (modalStrip) {
-                if (isModalChecked) {
-                    modalStrip.classList.remove('d-none');
-                } else {
-                    modalStrip.classList.add('d-none');
-                }
+            var currentTplId = document.getElementById('qs-input-template-id')?.value;
+            if (currentTplId) {
+                composeModalPoster(currentTplId, isModalChecked);
             }
         }
     });

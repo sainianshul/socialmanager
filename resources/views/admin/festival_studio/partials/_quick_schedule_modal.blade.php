@@ -26,48 +26,27 @@
                             <div style="padding-top: 100%; position: relative;">
                                 <img id="qs-modal-img" src="" alt="Poster Preview" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover;">
 
-                                {{-- Header Strip Overlay in Modal --}}
-                                @if(isset($activeStrip) && $activeStrip && $activeStrip->leaders->isNotEmpty())
-                                    <div class="qs-modal-header-strip fs-strip-overlay" id="qs-modal-header-strip">
-                                        <div class="d-flex align-items-center gap-1.5 overflow-hidden">
-                                            @foreach($activeStrip->leaders->take(6) as $leader)
-                                                <div class="fs-strip-chip" title="{{ $leader->name }}">
-                                                    <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}">
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                        @if($activeStrip->party && $activeStrip->party->symbol_logo && file_exists(public_path($activeStrip->party->symbol_logo)))
-                                            <img src="{{ asset($activeStrip->party->symbol_logo) }}" alt="{{ $activeStrip->party->name }}" style="width: 28px; height: 28px; border-radius: 50%; object-fit: contain; background: #fff; padding: 2px; border: 1px solid rgba(255, 255, 255, 0.8);">
-                                        @endif
-                                    </div>
-                                @endif
-
-                                {{-- Bottom Branding Overlay in Modal --}}
-                                @if(isset($userBranding) && $userBranding)
-                                    <div class="qs-modal-bottom-branding" id="qs-modal-bottom-branding">
-                                        <div class="fs-branding-badge">
-                                            <div class="fs-branding-name text-truncate">{{ $userBranding->display_name }}</div>
-                                            @if($userBranding->designation)
-                                                <div class="fs-branding-desig text-truncate">{{ $userBranding->designation }}</div>
-                                            @endif
-                                        </div>
-                                        @if(isset($userCutout) && $userCutout)
-                                            <img src="{{ $userCutout }}" alt="{{ $userBranding->display_name }}" class="fs-branding-cutout">
-                                        @endif
-                                    </div>
-                                @endif
+                                {{-- Live Composition Loading Spinner Overlay --}}
+                                <div id="qs-modal-spinner" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-75 text-white" style="backdrop-filter: blur(4px); transition: opacity 0.2s ease;">
+                                    <div class="spinner-border text-primary mb-2" role="status" style="width: 2.2rem; height: 2.2rem;"></div>
+                                    <div class="small fw-semibold" style="font-size: 12px; letter-spacing: 0.2px;">Composing Branded Poster...</div>
+                                    <div class="text-white-50" style="font-size: 10px;">Applying your photo, name & party branding</div>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Quick Controls under Modal Preview --}}
-                        @if(isset($activeStrip) && $activeStrip && $activeStrip->leaders->isNotEmpty())
-                            <div class="mt-2.5 d-flex align-items-center justify-content-center">
-                                <label class="form-check form-switch m-0 d-flex align-items-center gap-1.5 cursor-pointer">
-                                    <input class="form-check-input" type="checkbox" id="qs-modal-toggle-strip" checked>
-                                    <span class="small text-secondary fw-semibold">Include Header Strip</span>
-                                </label>
-                            </div>
-                        @endif
+                        {{-- Quick Controls & Download under Modal Preview --}}
+                        <div class="mt-2.5 d-flex flex-column align-items-center gap-2">
+                            <label class="form-check form-switch m-0 d-flex align-items-center gap-1.5 cursor-pointer">
+                                <input class="form-check-input" type="checkbox" id="qs-modal-toggle-strip" checked>
+                                <span class="small text-secondary fw-semibold">Include Senior Leaders Strip</span>
+                            </label>
+
+                            <a href="#" id="qs-modal-btn-download" target="_blank" download="festival-poster.jpg" class="btn btn-xs btn-outline-secondary rounded-pill px-3 py-1 shadow-xs d-inline-flex align-items-center gap-1.5 disabled" title="Download original high-resolution poster for WhatsApp or print">
+                                <i class="ti ti-download fs-4"></i>
+                                <span>Download High-Res (1080p)</span>
+                            </a>
+                        </div>
 
                         <div class="mt-2 text-center">
                             <div class="fw-semibold text-dark small text-truncate" id="qs-modal-poster-title"></div>
@@ -90,6 +69,7 @@
                             <input type="hidden" name="festival_id" id="qs-input-festival-id" value="">
                             <input type="hidden" name="schedule_date" id="qs-input-date" value="">
                             <input type="hidden" name="schedule_time" id="qs-input-time" value="08:00">
+                            <input type="hidden" name="composed_image" id="qs-input-composed-image" value="">
 
                             {{-- Alert Box for Dynamic Errors --}}
                             <div id="qs-alert" class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" role="alert"></div>
