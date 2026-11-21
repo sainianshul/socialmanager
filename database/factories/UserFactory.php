@@ -28,6 +28,7 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'phone' => fake()->unique()->phoneNumber(),
             'role' => \App\Models\User::ROLE_USER,
+            'client_type' => \App\Models\User::CLIENT_TYPE_POLITICIAN,
             'status' => \App\Models\User::STATUS_ACTIVE,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

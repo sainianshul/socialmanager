@@ -21,6 +21,10 @@ class User extends Authenticatable
     const STATUS_BLOCKED = 2;
     const STATUS_SUSPENDED = 3;
 
+    const CLIENT_TYPE_POLITICIAN = 'politician';
+    const CLIENT_TYPE_BUSINESS = 'business';
+    const CLIENT_TYPE_PERSONAL = 'personal';
+
     const CREATED_BY_SELF = 0;
     const CREATED_BY_ADMIN = 1;
 
@@ -32,6 +36,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'client_type',
         'profile_photo',
         'status',
         'created_by',
@@ -75,6 +80,30 @@ class User extends Authenticatable
             self::ROLE_MANAGER => 'Manager',
             self::ROLE_USER => 'User',
         ];
+    }
+
+    public static function getClientTypeList(): array
+    {
+        return [
+            self::CLIENT_TYPE_POLITICIAN => 'Politician / Leader',
+            self::CLIENT_TYPE_BUSINESS => 'Business / Enterprise',
+            self::CLIENT_TYPE_PERSONAL => 'Creator / Personal',
+        ];
+    }
+
+    public function getClientTypeNameAttribute(): string
+    {
+        return self::getClientTypeList()[$this->client_type] ?? ucfirst($this->client_type ?? self::CLIENT_TYPE_POLITICIAN);
+    }
+
+    public function getClientTypeBadgeColorAttribute(): string
+    {
+        return match ($this->client_type) {
+            self::CLIENT_TYPE_POLITICIAN => 'orange',
+            self::CLIENT_TYPE_BUSINESS => 'teal',
+            self::CLIENT_TYPE_PERSONAL => 'purple',
+            default => 'secondary',
+        };
     }
 
     public function getRoleNameAttribute(): string

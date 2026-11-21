@@ -46,7 +46,11 @@ class UserDataTable extends DataTable
                     User::ROLE_MANAGER => 'azure',
                     default => 'blue',
                 };
-                return '<span class="badge bg-' . $color . '-lt">' . e($user->role_name) . '</span>';
+                $typeBadge = '';
+                if (!empty($user->client_type)) {
+                    $typeBadge = '<span class="badge bg-' . $user->client_type_badge_color . '-lt ms-1">' . e($user->client_type_name) . '</span>';
+                }
+                return '<span class="badge bg-' . $color . '-lt">' . e($user->role_name) . '</span>' . $typeBadge;
             })
 
             // ── Status ───────────────────────────────────────────────

@@ -41,11 +41,53 @@ class UserManagementTest extends TestCase
             'name' => 'New Test Admin Attempt',
             'email' => 'hacker_admin@example.com',
             'password' => 'secret123',
+            'client_type' => User::CLIENT_TYPE_POLITICIAN,
             'role' => User::ROLE_ADMIN,
             'status' => User::STATUS_ACTIVE,
         ]);
 
         $response->assertSessionHasErrors('role');
+    }
+
+    public function test_user_store_requires_client_type(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        if (!$admin) {
+            $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        }
+
+        $response = $this->actingAs($admin)->post(route('admin.users.store'), [
+            'name' => 'John Doe',
+            'email' => 'johndoe@example.com',
+            'password' => 'secret123',
+            'role' => User::ROLE_USER,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $response->assertSessionHasErrors('client_type');
+    }
+
+    public function test_user_store_succeeds_with_client_type(): void
+    {
+        $admin = User::where('role', User::ROLE_ADMIN)->first();
+        if (!$admin) {
+            $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        }
+
+        $response = $this->actingAs($admin)->post(route('admin.users.store'), [
+            'name' => 'Politician Leader',
+            'email' => 'leader@example.com',
+            'password' => 'secret123',
+            'client_type' => User::CLIENT_TYPE_POLITICIAN,
+            'role' => User::ROLE_USER,
+            'status' => User::STATUS_ACTIVE,
+        ]);
+
+        $response->assertRedirect(route('admin.users.index'));
+        $this->assertDatabaseHas('users', [
+            'email' => 'leader@example.com',
+            'client_type' => User::CLIENT_TYPE_POLITICIAN,
+        ]);
     }
 
     public function test_user_datatable_ajax_returns_email_column_and_cleans_name_column(): void

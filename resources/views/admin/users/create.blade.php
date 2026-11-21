@@ -57,7 +57,20 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
+                        <label class="form-label required">Client / Account Type</label>
+                        <select name="client_type" class="form-select @error('client_type') is-invalid @enderror" required>
+                            @foreach (\App\Models\User::getClientTypeList() as $val => $label)
+                                <option value="{{ $val }}" {{ old('client_type', \App\Models\User::CLIENT_TYPE_POLITICIAN) === $val ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        <small class="form-hint">Defines branding and festival templates profile.</small>
+                        @error('client_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="col-md-4">
                         <label class="form-label required">Role</label>
                         <select name="role" class="form-select @error('role') is-invalid @enderror" required>
                             @foreach (\App\Models\User::getRoleList() as $val => $label)
@@ -71,7 +84,7 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label class="form-label required">Status</label>
                         <select name="status" class="form-select @error('status') is-invalid @enderror" required>
                             @foreach (\App\Models\User::getStatusList() as $val => $label)

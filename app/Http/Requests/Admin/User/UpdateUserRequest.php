@@ -22,6 +22,7 @@ class UpdateUserRequest extends FormRequest
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
             'password' => ['nullable', 'string', 'min:6'],
             'phone' => ['nullable', 'string', 'max:20', Rule::unique('users', 'phone')->ignore($userId)],
+            'client_type' => ['required', 'string', Rule::in(array_keys(User::getClientTypeList()))],
             'role' => ['nullable', 'integer', Rule::in(array_keys(User::getRoleList()))],
             'status' => ['required', 'integer', Rule::in(array_keys(User::getStatusList()))],
         ];
