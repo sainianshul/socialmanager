@@ -155,7 +155,7 @@ class FestivalStudioTest extends TestCase
         $this->assertTrue($scheduledPost->scheduled_at->isFuture());
     }
 
-    public function test_festival_studio_renders_with_active_leadership_strip_overlay(): void
+    public function test_festival_studio_renders_clean_templates_without_card_overlays(): void
     {
         $this->seed(FestivalSeeder::class);
         $this->seed(\Database\Seeders\PoliticalPartySeeder::class);
@@ -174,8 +174,8 @@ class FestivalStudioTest extends TestCase
         $response = $this->actingAs($user)->get(route('admin.festival-studio.index'));
 
         $response->assertStatus(200);
-        $response->assertSee('Header Strip:');
-        $response->assertSee('fs-strip-overlay');
-        $response->assertSee('Dr. Leader Test');
+        $response->assertDontSee('id="fs-toggle-header-strip"');
+        $response->assertSee('fs-template-preview-img');
+        $response->assertSee('Festival Studio');
     }
 }
