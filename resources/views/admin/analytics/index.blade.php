@@ -42,7 +42,7 @@
 
         {{-- 1. Positive Sentiment --}}
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 p-md-3.5">
                     <div class="row g-2 align-items-center stat-row">
                         <div class="col-auto stat-icon-col">
@@ -51,20 +51,11 @@
                             </span>
                         </div>
                         <div class="col stat-content-col">
-                            <div class="text-uppercase text-secondary fw-bold stat-label">POSITIVE SENTIMENT</div>
-                            <div class="d-flex align-items-baseline gap-1.5">
+                            <div class="text-uppercase text-secondary fw-semibold stat-label">POSITIVE SENTIMENT</div>
+                            <div class="d-flex align-items-baseline gap-2 mt-0.5">
                                 <span class="h1 mb-0 fw-bold text-success stat-value" style="letter-spacing: -0.03em;">{{ number_format($positiveSentimentCount) }}</span>
                                 <span class="text-secondary small fw-medium">({{ $positivePercent }}%)</span>
                             </div>
-                            <div class="text-secondary small d-flex align-items-center gap-1 mt-1 text-truncate d-none d-sm-flex">
-                                <span class="badge bg-success p-1 rounded-circle" style="width: 5px; height: 5px;"></span>
-                                <span class="text-truncate">Appreciation & praise</span>
-                            </div>
-                        </div>
-                        <div class="col-auto text-end stat-badge-col">
-                            <span class="badge bg-success-lt fw-semibold stat-badge">
-                                <i class="ti ti-thumb-up me-1 d-none d-sm-inline"></i>Positive
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -73,7 +64,7 @@
 
         {{-- 2. Negative Sentiment --}}
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 p-md-3.5">
                     <div class="row g-2 align-items-center stat-row">
                         <div class="col-auto stat-icon-col">
@@ -82,20 +73,11 @@
                             </span>
                         </div>
                         <div class="col stat-content-col">
-                            <div class="text-uppercase text-secondary fw-bold stat-label">NEGATIVE SENTIMENT</div>
-                            <div class="d-flex align-items-baseline gap-1.5">
+                            <div class="text-uppercase text-secondary fw-semibold stat-label">NEGATIVE SENTIMENT</div>
+                            <div class="d-flex align-items-baseline gap-2 mt-0.5">
                                 <span class="h1 mb-0 fw-bold text-danger stat-value" style="letter-spacing: -0.03em;">{{ number_format($negativeSentimentCount) }}</span>
                                 <span class="text-secondary small fw-medium">({{ $negativePercent }}%)</span>
                             </div>
-                            <div class="text-secondary small d-flex align-items-center gap-1 mt-1 text-truncate d-none d-sm-flex">
-                                <span class="badge bg-danger p-1 rounded-circle" style="width: 5px; height: 5px;"></span>
-                                <span class="text-truncate">Critical & issues</span>
-                            </div>
-                        </div>
-                        <div class="col-auto text-end stat-badge-col">
-                            <span class="badge bg-danger-lt fw-semibold stat-badge">
-                                <i class="ti ti-thumb-down me-1 d-none d-sm-inline"></i>Negative
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -104,7 +86,7 @@
 
         {{-- 3. Neutral & Inquiries --}}
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 p-md-3.5">
                     <div class="row g-2 align-items-center stat-row">
                         <div class="col-auto stat-icon-col">
@@ -113,20 +95,11 @@
                             </span>
                         </div>
                         <div class="col stat-content-col">
-                            <div class="text-uppercase text-secondary fw-bold stat-label">NEUTRAL & INQUIRIES</div>
-                            <div class="d-flex align-items-baseline gap-1.5">
+                            <div class="text-uppercase text-secondary fw-semibold stat-label">NEUTRAL & INQUIRIES</div>
+                            <div class="d-flex align-items-baseline gap-2 mt-0.5">
                                 <span class="h1 mb-0 fw-bold text-azure stat-value" style="letter-spacing: -0.03em;">{{ number_format($neutralSentimentCount) }}</span>
                                 <span class="text-secondary small fw-medium">({{ $neutralPercent }}%)</span>
                             </div>
-                            <div class="text-secondary small d-flex align-items-center gap-1 mt-1 text-truncate d-none d-sm-flex">
-                                <span class="badge bg-azure p-1 rounded-circle" style="width: 5px; height: 5px;"></span>
-                                <span class="text-truncate">Questions & feedback</span>
-                            </div>
-                        </div>
-                        <div class="col-auto text-end stat-badge-col">
-                            <span class="badge bg-azure-lt fw-semibold stat-badge">
-                                <i class="ti ti-message-dots me-1 d-none d-sm-inline"></i>Neutral
-                            </span>
                         </div>
                     </div>
                 </div>
@@ -135,7 +108,7 @@
 
         {{-- 4. Overall Sentiment Pulse --}}
         <div class="col-6 col-lg-3">
-            <div class="card border-0 shadow-sm" style="border-radius: 14px; background: #ffffff;">
+            <div class="card border-0 shadow-sm" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 p-md-3.5">
                     <div class="row g-2 align-items-center stat-row">
                         <div class="col-auto stat-icon-col">
@@ -144,20 +117,10 @@
                             </span>
                         </div>
                         <div class="col stat-content-col">
-                            <div class="text-uppercase text-secondary fw-bold stat-label">OVERALL SENTIMENT</div>
-                            <div class="d-flex align-items-baseline gap-1.5">
+                            <div class="text-uppercase text-secondary fw-semibold stat-label">OVERALL SENTIMENT</div>
+                            <div class="d-flex align-items-baseline gap-2 mt-0.5">
                                 <span class="h1 mb-0 fw-bold text-dark stat-value" style="letter-spacing: -0.03em;">{{ $favorRatio }}%</span>
-                                <span class="text-secondary small fw-medium">Pulse</span>
                             </div>
-                            <div class="text-secondary small d-flex align-items-center gap-1 mt-1 text-truncate d-none d-sm-flex">
-                                <span class="badge bg-primary p-1 rounded-circle" style="width: 5px; height: 5px;"></span>
-                                <span class="text-truncate">{{ number_format($totalComments) }} total comments</span>
-                            </div>
-                        </div>
-                        <div class="col-auto text-end stat-badge-col">
-                            <span class="badge bg-{{ $favorRatio >= 50 ? 'success' : 'warning' }}-lt fw-semibold stat-badge">
-                                <i class="ti ti-heart-rate-monitor me-1 d-none d-sm-inline"></i>{{ $favorRatio >= 50 ? 'Positive' : 'Caution' }}
-                            </span>
                         </div>
                     </div>
                 </div>
