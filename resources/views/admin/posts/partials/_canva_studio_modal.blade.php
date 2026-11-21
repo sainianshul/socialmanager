@@ -5,7 +5,7 @@
             {{-- Modal Header: Spacious, clean, no overlapping badges or crosses --}}
             <div class="modal-header border-0 pb-1 pt-4 px-4 bg-white d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2.5">
-                    <span class="d-inline-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-xs" style="width: 32px; height: 32px; background: linear-gradient(135deg, #00c4cc, #7d2ae8); font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-style: italic; font-size: 18px; line-height: 1;">
+                    <span class="avatar avatar-sm rounded-circle bg-dark text-white fw-bold" style="width: 32px; height: 32px; font-size: 14px;">
                         C
                     </span>
                     <h5 class="modal-title fw-bold text-dark mb-0" id="modalCanvaStudioLabel" style="font-size: 1.15rem; letter-spacing: -0.2px;">Canva Design Studio</h5>
@@ -106,12 +106,12 @@
 
                 {{-- Direct Import from Canva --}}
                 <div class="pt-3 border-top mt-2" style="border-color: #f1f5f9 !important;">
-                    <label class="form-label text-dark fw-semibold small mb-2" for="canva-design-id-input">Import Finished Design</label>
+                    <label class="form-label text-dark fw-semibold small mb-2" for="canva-design-id-input">Import from Canva</label>
                     <div class="input-group">
-                        <input type="text" id="canva-design-id-input" class="form-control" placeholder="Paste Canva link or Design ID..." style="border-radius: 10px 0 0 10px; border-color: #d1d5db; font-size: 0.9rem; height: 44px;">
-                        <button type="button" id="btn-import-canva-design" class="btn btn-primary px-4 fw-medium" style="border-radius: 0 10px 10px 0; font-size: 0.9rem;">
+                        <input type="text" id="canva-design-id-input" class="form-control" placeholder="Paste Canva link or Design ID..." style="border-radius: 10px 0 0 10px; border-color: #d1d5db; font-size: 0.9rem; height: 42px;">
+                        <button type="button" id="btn-import-canva-design" class="btn btn-dark px-4 fw-medium" style="border-radius: 0 10px 10px 0; font-size: 0.9rem;">
                             <span class="spinner-border spinner-border-sm me-1 d-none" id="canva-import-spinner"></span>
-                            Import to Post
+                            Import
                         </button>
                     </div>
                     <div id="canva-import-feedback" class="mt-2 small d-none"></div>
@@ -134,14 +134,14 @@
     </div>
 </div>
 
-{{-- Dedicated YouTube Thumbnail Studio Modal --}}
+{{-- Dedicated YouTube Thumbnail Studio Modal (Human-Crafted Minimal) --}}
 <div class="modal fade" id="modal-canva-thumbnail" tabindex="-1" aria-labelledby="modalCanvaThumbnailLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 580px;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 540px;">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 18px; overflow: hidden;">
             {{-- Modal Header --}}
             <div class="modal-header border-0 pb-1 pt-4 px-4 bg-white d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-2.5">
-                    <span class="d-inline-flex align-items-center justify-content-center text-white fw-bold rounded-circle shadow-xs" style="width: 32px; height: 32px; background: linear-gradient(135deg, #00c4cc, #7d2ae8); font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-style: italic; font-size: 18px; line-height: 1;">
+                    <span class="avatar avatar-sm rounded-circle bg-dark text-white fw-bold" style="width: 32px; height: 32px; font-size: 14px;">
                         C
                     </span>
                     <h5 class="modal-title fw-bold text-dark mb-0" id="modalCanvaThumbnailLabel" style="font-size: 1.15rem; letter-spacing: -0.2px;">YouTube Thumbnail Studio</h5>
@@ -154,42 +154,31 @@
             {{-- Modal Body --}}
             <div class="modal-body px-4 pt-3 pb-3 bg-white">
                 {{-- Format Hero Card --}}
-                <div class="card p-3 border mb-3" style="border-radius: 14px; background: #ffffff;">
+                <div class="card p-3 canva-format-card border mb-3" style="border-radius: 14px;">
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
                         <div class="d-flex align-items-center gap-3">
-                            <div class="d-inline-flex align-items-center justify-content-center rounded-3" style="width: 44px; height: 44px; background: #fef2f2; border: 1px solid #fee2e2; color: #dc2626;">
-                                <i class="ti ti-brand-youtube fs-1"></i>
+                            <div class="d-inline-flex align-items-center justify-content-center rounded-3 format-icon-box" style="width: 38px; height: 38px; background: #f8fafc; border: 1px solid #e2e8f0; color: #0f172a;">
+                                <i class="ti ti-brand-youtube fs-2"></i>
                             </div>
                             <div>
-                                <div class="fw-bold text-dark" style="font-size: 1rem;">Video Thumbnail Canvas</div>
-                                <div class="text-secondary" style="font-size: 12px;">1280 &times; 720 px &bull; High Resolution</div>
+                                <div class="fw-semibold text-dark" style="font-size: 0.95rem;">YouTube Thumbnail</div>
+                                <div class="text-secondary" style="font-size: 11.5px;">1280 &times; 720 &bull; 16:9</div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <button type="button" class="btn btn-canva-brand rounded-pill px-3.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5 shadow-xs" id="btn-create-yt-thumbnail-api" style="font-size: 0.85rem;">
-                                <i class="ti ti-brand-canva"></i>
-                                <span>Open in Canva</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mt-3 pt-2.5 border-top d-flex align-items-center justify-content-between flex-wrap gap-2" style="border-color: #f1f5f9 !important;">
-                        <span class="text-secondary small" style="font-size: 11.5px;">Need ready-made thumbnail inspiration?</span>
-                        <a href="https://www.canva.com/create/youtube-thumbnails/" target="_blank" class="text-decoration-none small fw-semibold text-primary d-inline-flex align-items-center gap-1" style="font-size: 12px;">
-                            <i class="ti ti-template"></i>
-                            <span>Browse Canva Thumbnail Templates</span>
-                            <i class="ti ti-external-link" style="font-size: 11px;"></i>
-                        </a>
+                        <button type="button" class="btn btn-sm btn-white border rounded-pill px-3.5 py-1.5 fw-medium shadow-xs format-action-btn" id="btn-create-yt-thumbnail-api">
+                            Design in Canva
+                        </button>
                     </div>
                 </div>
 
                 {{-- Direct Import from Canva --}}
                 <div class="pt-2 border-top mt-3" style="border-color: #f1f5f9 !important;">
-                    <label class="form-label text-dark fw-semibold small mb-2" for="canva-thumbnail-id-input">Import Finished Thumbnail</label>
+                    <label class="form-label text-dark fw-semibold small mb-2" for="canva-thumbnail-id-input">Import from Canva</label>
                     <div class="input-group">
-                        <input type="text" id="canva-thumbnail-id-input" class="form-control" placeholder="Paste Canva link or Design ID (e.g. DAFVztcvd9z)..." style="border-radius: 10px 0 0 10px; border-color: #d1d5db; font-size: 0.9rem; height: 44px;">
-                        <button type="button" id="btn-import-canva-thumbnail" class="btn btn-primary px-4 fw-medium" style="border-radius: 0 10px 10px 0; font-size: 0.9rem;">
+                        <input type="text" id="canva-thumbnail-id-input" class="form-control" placeholder="Paste Canva link or Design ID..." style="border-radius: 10px 0 0 10px; border-color: #d1d5db; font-size: 0.9rem; height: 42px;">
+                        <button type="button" id="btn-import-canva-thumbnail" class="btn btn-dark px-4 fw-medium" style="border-radius: 0 10px 10px 0; font-size: 0.9rem;">
                             <span class="spinner-border spinner-border-sm me-1 d-none" id="canva-thumb-import-spinner"></span>
-                            Import to Thumbnail
+                            Import
                         </button>
                     </div>
                     <div id="canva-thumbnail-feedback" class="mt-2 small d-none"></div>
