@@ -216,6 +216,40 @@
     font-size: 0.68rem;
     color: #64748b;
 }
+
+/* Custom Strip Cards & Stacks */
+.bs-strip-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px 20px;
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+.bs-strip-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+}
+.bs-strip-card.active-default {
+    border: 1.5px solid #0d9488;
+    background: #f0fdfa;
+}
+.bs-mini-avatar-stack {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+}
+.bs-strip-badge-default {
+    background-color: #0d9488;
+    color: #ffffff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.25rem 0.65rem;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+}
 </style>
 @endpush
 
@@ -605,45 +639,182 @@
                         </div>
 
                         {{-- ======================================================================
-                             TAB PANE 4: HEADER STRIPS (PREVIEW & STATUS)
+                             TAB PANE 4: HEADER STRIPS (MANAGEMENT & PREVIEW)
                              ====================================================================== --}}
                         <div class="tab-pane fade p-4 p-md-5" id="pane-strips" role="tabpanel" aria-labelledby="tab-strips-btn">
-                            <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+                            {{-- Header with Create Strip Button --}}
+                            <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom flex-wrap gap-2">
                                 <div>
                                     <h3 class="fw-bold text-dark mb-1" style="font-size: 1.25rem;">Leadership Header Strips</h3>
-                                    <p class="text-secondary small mb-0">The top leadership banner displayed at the head of your political and festival posters.</p>
+                                    <p class="text-secondary small mb-0">Manage the top leadership banners displayed at the head of your political and festival posters.</p>
                                 </div>
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1">Active Strip</span>
+                                <button type="button" class="btn btn-primary rounded-pill px-3.5 py-1.5 shadow-sm" id="btn-create-strip-modal">
+                                    <i class="ti ti-plus me-1.5"></i>Create New Strip
+                                </button>
                             </div>
 
+                            {{-- Dynamic AJAX Status Alerts --}}
+                            <div id="strip-alert-container"></div>
+
+                            {{-- Section 1: Active Default Strip --}}
                             @if($activeStrip)
-                                <div class="card border border-light-subtle rounded-3 p-3 mb-4 shadow-xs">
-                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                <div class="card border border-teal-subtle rounded-3 p-3.5 mb-4 shadow-xs" style="background: linear-gradient(to right, #f0fdfa, #ffffff);" id="active-strip-banner">
+                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-success-lt px-2 py-1 rounded-pill">Active Default</span>
-                                            <span class="fw-bold text-dark">{{ $activeStrip->name }}</span>
+                                            <span class="badge bg-teal text-white rounded-pill px-2.5 py-1">
+                                                <i class="ti ti-check me-1"></i>Active Poster Strip
+                                            </span>
+                                            <span class="fw-bold text-dark fs-4" id="active-strip-title">{{ $activeStrip->name }}</span>
+                                            @if($activeStrip->is_system)
+                                                <span class="badge bg-secondary-lt rounded-pill">Party Official</span>
+                                            @else
+                                                <span class="badge bg-primary-lt rounded-pill">Custom Strip</span>
+                                            @endif
                                         </div>
-                                        <span class="text-secondary small">{{ $activeStrip->leaders->count() }} Leaders Included</span>
+                                        <div class="text-secondary small">
+                                            <i class="ti ti-users me-1 text-primary"></i><span id="active-strip-leader-count">{{ $activeStrip->leaders->count() }}</span> Leaders Included
+                                        </div>
                                     </div>
 
-                                    {{-- Strip Visual Preview --}}
+                                    {{-- Strip Visual Preview Chips --}}
                                     <div class="bs-strip-preview-bar">
                                         @forelse($activeStrip->leaders as $leader)
                                             <div class="bs-strip-leader-chip">
                                                 <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}">
                                                 <span class="leader-name">{{ Str::limit($leader->name, 14) }}</span>
-                                                <span class="leader-order">Order #{{ $leader->pivot->order ?? $loop->iteration }}</span>
+                                                <span class="leader-order">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
                                             </div>
                                         @empty
                                             <span class="text-secondary small">No leaders in this strip.</span>
                                         @endforelse
                                     </div>
                                 </div>
+                            @else
+                                <div class="alert alert-info rounded-3 mb-4">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="ti ti-info-circle fs-2"></i>
+                                        <span>No leadership strip selected. Please choose your political party in the Political Party tab to link default leadership strips.</span>
+                                    </div>
+                                </div>
+                            @endif
 
-                                {{-- Nested Table of Leaders in the Active Strip --}}
+                            {{-- Section 2: My Custom Strips --}}
+                            <div class="mb-4">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <h4 class="fw-bold text-dark mb-0" style="font-size: 1rem;">
+                                        <i class="ti ti-bookmarks me-1.5 text-primary"></i>My Custom Strips
+                                    </h4>
+                                    <span class="text-secondary small" id="user-strips-counter">{{ $userStrips->count() }} Saved</span>
+                                </div>
+
+                                @if($userStrips->isNotEmpty())
+                                    <div class="row g-3" id="user-strips-list">
+                                        @foreach($userStrips as $strip)
+                                            <div class="col-12" id="strip-card-{{ $strip->id }}">
+                                                <div class="bs-strip-card {{ $strip->is_default ? 'active-default' : '' }}">
+                                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            <span class="fw-bold text-dark fs-4">{{ $strip->name }}</span>
+                                                            @if($strip->is_default)
+                                                                <span class="bs-strip-badge-default" id="badge-default-{{ $strip->id }}">
+                                                                    <i class="ti ti-check me-1"></i>Default
+                                                                </span>
+                                                            @else
+                                                                <span class="badge bg-light text-secondary border d-none" id="badge-default-{{ $strip->id }}">
+                                                                    Default
+                                                                </span>
+                                                            @endif
+                                                        </div>
+                                                        <div class="d-flex align-items-center gap-1.5">
+                                                            @if(!$strip->is_default)
+                                                                <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-3 btn-make-default" data-id="{{ $strip->id }}">
+                                                                    <i class="ti ti-check me-1"></i>Set as Default
+                                                                </button>
+                                                            @endif
+                                                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-edit-strip" data-id="{{ $strip->id }}" data-name="{{ $strip->name }}">
+                                                                <i class="ti ti-pencil me-1"></i>Edit
+                                                            </button>
+                                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 btn-delete-strip" data-id="{{ $strip->id }}" title="Delete strip">
+                                                                <i class="ti ti-trash"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- Mini Leaders Avatars Stack --}}
+                                                    <div class="bs-mini-avatar-stack">
+                                                        @foreach($strip->leaders as $leader)
+                                                            <div class="d-flex align-items-center gap-1 bg-white border rounded-pill px-2 py-0.5" title="{{ $leader->name }} (#{{ $leader->pivot->order ?? $loop->iteration }})">
+                                                                <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                                                <span class="small fw-semibold text-dark" style="font-size: 0.78rem;">{{ Str::limit($leader->name, 12) }}</span>
+                                                                <span class="text-secondary small" style="font-size: 0.7rem;">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="p-4 rounded-3 border border-dashed text-center bg-light-subtle mb-3" id="no-user-strips-notice">
+                                        <i class="ti ti-layout-navbar fs-1 text-secondary mb-2 d-block"></i>
+                                        <div class="fw-bold text-dark">No custom leadership strips yet</div>
+                                        <p class="text-secondary small mb-3">You can create custom strips with your preferred leaders hierarchy, or use the official party default strip below.</p>
+                                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" id="btn-create-first-strip">
+                                            <i class="ti ti-plus me-1"></i>Create Your First Strip
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
+
+                            {{-- Section 3: Official Ready-Made Party Strip --}}
+                            @if($systemStrip)
                                 <div class="mb-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="fw-bold text-dark mb-0" style="font-size: 1rem;">
+                                            <i class="ti ti-flag me-1.5 text-warning"></i>Official {{ $systemStrip->party?->name ?? 'Party' }} Strip
+                                        </h4>
+                                        <span class="badge bg-secondary-lt rounded-pill">System Default</span>
+                                    </div>
+
+                                    <div class="bs-strip-card {{ (!$userStrips->contains('is_default', true) && $activeStrip?->id === $systemStrip->id) ? 'active-default' : '' }}">
+                                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                            <div>
+                                                <span class="fw-bold text-dark fs-4">{{ $systemStrip->name }}</span>
+                                                <span class="text-secondary small ms-2">({{ $systemStrip->leaders->count() }} Top Leaders)</span>
+                                            </div>
+                                            <div>
+                                                @if($activeStrip?->id === $systemStrip->id && !$userStrips->contains('is_default', true))
+                                                    <span class="bs-strip-badge-default">
+                                                        <i class="ti ti-check me-1"></i>Active Default
+                                                    </span>
+                                                @else
+                                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-make-default" data-id="{{ $systemStrip->id }}">
+                                                        <i class="ti ti-copy me-1"></i>Activate as My Strip
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                        {{-- Mini Leaders Stack --}}
+                                        <div class="bs-mini-avatar-stack">
+                                            @foreach($systemStrip->leaders as $leader)
+                                                <div class="d-flex align-items-center gap-1 bg-white border rounded-pill px-2 py-0.5" title="{{ $leader->name }} (#{{ $leader->pivot->order ?? $loop->iteration }})">
+                                                    <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" style="width: 24px; height: 24px; border-radius: 50%;">
+                                                    <span class="small fw-semibold text-dark" style="font-size: 0.78rem;">{{ Str::limit($leader->name, 12) }}</span>
+                                                    <span class="text-secondary small" style="font-size: 0.7rem;">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Section 4: Leadership Hierarchy Table --}}
+                            @if($activeStrip && $activeStrip->leaders->isNotEmpty())
+                                <div class="mb-2">
                                     <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <h5 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Strip Leadership Hierarchy</h5>
+                                        <h5 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Active Strip Hierarchy Details</h5>
+                                        <span class="badge bg-light text-secondary border">Order 1 to {{ $activeStrip->leaders->count() }}</span>
                                     </div>
                                     <div class="table-responsive rounded-3 border">
                                         <table class="table table-vcenter table-hover mb-0">
@@ -678,25 +849,7 @@
                                         </table>
                                     </div>
                                 </div>
-                            @else
-                                <div class="alert alert-info rounded-3 mb-4">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <i class="ti ti-info-circle fs-2"></i>
-                                        <span>No leadership strip selected. Please select your political party in the Political Party tab to link default leadership strips.</span>
-                                    </div>
-                                </div>
                             @endif
-
-                            {{-- Notice for Next Step --}}
-                            <div class="p-3.5 rounded-3 bg-light border border-light-subtle d-flex align-items-center justify-content-between flex-wrap gap-3">
-                                <div>
-                                    <div class="fw-bold text-dark">Custom Header Strip Builder</div>
-                                    <div class="text-secondary small">Custom strip creation, drag-and-drop leader ordering, and search will be activated in the next step.</div>
-                                </div>
-                                <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" disabled>
-                                    <i class="ti ti-plus me-1"></i>Create Custom Strip (Next Step)
-                                </button>
-                            </div>
                         </div>
 
                     </div>
@@ -880,6 +1033,109 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
+    // Header Strips: AJAX Status Alert Helper
+    function showStripAlert(message, type) {
+        var alertContainer = document.getElementById('strip-alert-container');
+        if (!alertContainer) return;
+        var alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+        var iconClass = type === 'success' ? 'ti-circle-check' : 'ti-alert-circle';
+        alertContainer.innerHTML = '<div class="alert ' + alertClass + ' alert-dismissible fade show rounded-3 shadow-xs mb-3" role="alert">' +
+            '<div class="d-flex align-items-center gap-2">' +
+                '<i class="ti ' + iconClass + ' fs-2"></i>' +
+                '<span class="fw-semibold">' + message + '</span>' +
+            '</div>' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+        '</div>';
+    }
+
+    // Header Strips: Set as Default Action
+    document.addEventListener('click', async function (e) {
+        var target = e.target.closest('.btn-make-default');
+        if (!target) return;
+
+        var stripId = target.getAttribute('data-id');
+        if (!stripId) return;
+
+        target.disabled = true;
+        var originalHtml = target.innerHTML;
+        target.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Setting...';
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        try {
+            var response = await fetch('/admin/leader-strips/' + stripId + '/default', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            var result = await response.json();
+            if (result.success) {
+                showStripAlert(result.message || 'Default leadership strip updated.', 'success');
+                setTimeout(function () {
+                    window.location.hash = '#pane-strips';
+                    window.location.reload();
+                }, 500);
+            } else {
+                showStripAlert(result.message || 'Could not set default strip.', 'danger');
+                target.disabled = false;
+                target.innerHTML = originalHtml;
+            }
+        } catch (err) {
+            console.error('Make default strip error:', err);
+            showStripAlert('An error occurred while updating default strip.', 'danger');
+            target.disabled = false;
+            target.innerHTML = originalHtml;
+        }
+    });
+
+    // Header Strips: Delete Action
+    document.addEventListener('click', async function (e) {
+        var target = e.target.closest('.btn-delete-strip');
+        if (!target) return;
+
+        var stripId = target.getAttribute('data-id');
+        if (!stripId) return;
+
+        if (!confirm('Are you sure you want to delete this custom leadership strip?')) {
+            return;
+        }
+
+        target.disabled = true;
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        try {
+            var response = await fetch('/admin/leader-strips/' + stripId, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            var result = await response.json();
+            if (result.success) {
+                var stripCard = document.getElementById('strip-card-' + stripId);
+                if (stripCard) {
+                    stripCard.style.transition = 'opacity 0.3s ease';
+                    stripCard.style.opacity = '0';
+                    setTimeout(function () {
+                        stripCard.remove();
+                    }, 300);
+                }
+                showStripAlert(result.message || 'Strip deleted successfully.', 'success');
+            } else {
+                showStripAlert(result.message || 'Could not delete strip.', 'danger');
+                target.disabled = false;
+            }
+        } catch (err) {
+            console.error('Delete strip error:', err);
+            showStripAlert('An error occurred while deleting strip.', 'danger');
+            target.disabled = false;
+        }
+    });
 });
 </script>
 @endpush

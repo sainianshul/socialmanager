@@ -43,7 +43,13 @@ class BrandingController extends Controller
 
         $selectedPartyId = old('party_id', $branding->party_id);
 
-        $userStrips = $user->leaderStrips()->with(['leaders', 'party'])->get();
+        $userStrips = $user->leaderStrips()
+            ->with(['leaders' => function ($q) {
+                $q->orderBy('leader_strip_items.order', 'asc');
+            }, 'party'])
+            ->orderByDesc('is_default')
+            ->latest()
+            ->get();
         $systemStrip = null;
         if ($selectedPartyId) {
             $systemStrip = LeaderStrip::where('party_id', $selectedPartyId)
