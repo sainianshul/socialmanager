@@ -1,0 +1,198 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\LeaderStrip;
+use App\Models\PoliticalLeader;
+use App\Models\PoliticalParty;
+use App\Models\User;
+use Database\Seeders\PoliticalLeaderSeeder;
+use Database\Seeders\PoliticalPartySeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class LeaderStripControllerTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private User $user;
+    private PoliticalParty $bjp;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->seed(PoliticalPartySeeder::class);
+        $this->seed(PoliticalLeaderSeeder::class);
+
+        $this->user = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+        ]);
+
+        $this->bjp = PoliticalParty::where('short_code', 'BJP')->first();
+    }
+
+    public function test_can_list_strips_including_system_and_user_strips(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->getJson(route('admin.leader-strips.index', ['party_id' => $this->bjp->id]));
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+
+        $data = $response->json();
+        $this->assertNotEmpty($data['system_strips']);
+        $this->assertEquals('BJP Uttar Pradesh & Central Leadership', $data['system_strips'][0]['name']);
+        $this->assertNotNull($data['active_strip']);
+    }
+
+    public function test_can_fetch_leaders_with_search_and_filter(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->getJson(route('admin.leader-strips.leaders', [
+                'party_id' => $this->bjp->id,
+                'search' => 'Modi',
+            ]));
+
+        $response->assertStatus(200);
+        $data = $response->json();
+        $this->assertTrue($data['success']);
+        $this->assertCount(1, $data['leaders']);
+        $this->assertEquals('Narendra Modi', $data['leaders'][0]['name']);
+    }
+
+    public function test_can_create_custom_strip_with_ordered_leaders(): void
+    {
+        $modi = PoliticalLeader::where('name', 'Narendra Modi')->first();
+        $yogi = PoliticalLeader::where('name', 'Yogi Adityanath')->first();
+
+        $payload = [
+            'name' => 'My UP & National Strip',
+            'party_id' => $this->bjp->id,
+            'is_default' => true,
+            'items' => [
+                ['leader_id' => $yogi->id, 'order' => 1],
+                ['leader_id' => $modi->id, 'order' => 2],
+            ],
+        ];
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('admin.leader-strips.store'), $payload);
+
+        $response->assertStatus(201);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Header strip created successfully.',
+        ]);
+
+        $stripId = $response->json('strip.id');
+        $this->assertDatabaseHas('leader_strips', [
+            'id' => $stripId,
+            'user_id' => $this->user->id,
+            'name' => 'My UP & National Strip',
+            'is_default' => true,
+        ]);
+
+        $this->assertDatabaseHas('leader_strip_items', [
+            'leader_strip_id' => $stripId,
+            'political_leader_id' => $yogi->id,
+            'order' => 1,
+        ]);
+
+        $this->assertDatabaseHas('leader_strip_items', [
+            'leader_strip_id' => $stripId,
+            'political_leader_id' => $modi->id,
+            'order' => 2,
+        ]);
+    }
+
+    public function test_can_update_custom_strip(): void
+    {
+        $modi = PoliticalLeader::where('name', 'Narendra Modi')->first();
+        $yogi = PoliticalLeader::where('name', 'Yogi Adityanath')->first();
+
+        $strip = LeaderStrip::create([
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'name' => 'Initial Strip',
+            'is_default' => false,
+            'is_system' => false,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->putJson(route('admin.leader-strips.update', $strip->id), [
+                'name' => 'Updated Custom Strip',
+                'is_default' => true,
+                'leader_ids' => [$modi->id, $yogi->id],
+            ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Header strip updated successfully.',
+        ]);
+
+        $this->assertDatabaseHas('leader_strips', [
+            'id' => $strip->id,
+            'name' => 'Updated Custom Strip',
+            'is_default' => true,
+        ]);
+    }
+
+    public function test_can_toggle_default_strip(): void
+    {
+        $strip1 = LeaderStrip::create([
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'name' => 'Strip 1',
+            'is_default' => true,
+            'is_system' => false,
+        ]);
+
+        $strip2 = LeaderStrip::create([
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'name' => 'Strip 2',
+            'is_default' => false,
+            'is_system' => false,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('admin.leader-strips.default', $strip2->id));
+
+        $response->assertStatus(200);
+        $this->assertTrue($strip2->fresh()->is_default);
+        $this->assertFalse($strip1->fresh()->is_default);
+    }
+
+    public function test_can_delete_custom_strip(): void
+    {
+        $strip = LeaderStrip::create([
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'name' => 'To Delete',
+            'is_default' => false,
+            'is_system' => false,
+        ]);
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('admin.leader-strips.destroy', $strip->id));
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('leader_strips', ['id' => $strip->id]);
+    }
+
+    public function test_cannot_delete_system_strip(): void
+    {
+        $systemStrip = LeaderStrip::where('is_system', true)->first();
+        $this->assertNotNull($systemStrip);
+
+        $response = $this->actingAs($this->user)
+            ->deleteJson(route('admin.leader-strips.destroy', $systemStrip->id));
+
+        $response->assertStatus(404);
+        $this->assertDatabaseHas('leader_strips', ['id' => $systemStrip->id]);
+    }
+}
