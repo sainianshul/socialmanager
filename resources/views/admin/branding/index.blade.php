@@ -291,17 +291,12 @@
                                 </div>
                             </div>
 
-                            {{-- Cutout Option Box (Appears after user selects image) --}}
+                            {{-- Background Removal Action (Appears after photo selection) --}}
                             <div id="bg-remove-box" class="mt-3 p-3 rounded-3 bg-white border d-none">
-                                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
-                                    <div class="d-flex align-items-center gap-2">
-                                        <span class="badge bg-primary-lt rounded-pill px-2.5 py-1">
-                                            <i class="ti ti-sparkles me-1"></i>AI Cutout
-                                        </span>
-                                        <span class="small text-dark fw-semibold">Remove photo background to create transparent cutout?</span>
-                                    </div>
-                                    <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1.5 shadow-xs" id="btn-remove-bg">
-                                        <i class="ti ti-wand me-1"></i>Remove Background
+                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                    <span class="small text-dark fw-semibold">Remove background from this photo?</span>
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1" id="btn-remove-bg">
+                                        <i class="ti ti-cut me-1"></i>Remove Background
                                     </button>
                                 </div>
                                 <div id="bg-remove-status" class="mt-2 d-none"></div>
@@ -540,7 +535,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // AI Background Removal Trigger
+    // Background Removal Trigger
     if (btnRemoveBg) {
         btnRemoveBg.addEventListener('click', async function () {
             if (!originalFile) return;
@@ -550,20 +545,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 bgStatus.classList.remove('d-none');
                 bgStatus.innerHTML = '<div class="d-flex align-items-center gap-2 text-primary small py-1">' +
                     '<div class="spinner-border spinner-border-sm text-primary" role="status"></div>' +
-                    '<span>AI is removing background... (1-3 seconds)</span>' +
+                    '<span>Removing background...</span>' +
                 '</div>';
             }
 
             try {
-                // Dynamically import in-browser AI model bundle
-                var module = await import('https://unpkg.com/@imgly/background-removal@1.4.5/dist/index.mjs');
-                var removeBackground = module.default;
+                // Dynamic import of self-contained browser bundle
+                var imgly = await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal/+esm');
+                var removeBackground = imgly.removeBackground;
 
-                var config = {
-                    publicPath: 'https://unpkg.com/@imgly/background-removal-data@1.4.5/dist/'
-                };
+                var blob = await removeBackground(originalFile, {
+                    model: 'small',
+                    device: 'cpu'
+                });
 
-                var blob = await removeBackground(originalFile, config);
                 var transparentUrl = URL.createObjectURL(blob);
 
                 // Update thumbnail with transparent background pattern
@@ -583,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (bgStatus) {
                     bgStatus.innerHTML = '<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 text-success small py-1">' +
                         '<span class="d-flex align-items-center gap-1.5 fw-semibold">' +
-                            '<i class="ti ti-circle-check fs-2 text-success"></i>Background removed! Transparent cutout ready.' +
+                            '<i class="ti ti-circle-check fs-2 text-success"></i>Background removed.' +
                         '</span>' +
                         '<button type="button" class="btn btn-sm btn-link text-secondary p-0" id="btn-revert-bg">Revert to original</button>' +
                     '</div>';
@@ -607,12 +602,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
             } catch (err) {
-                console.error('Auto background removal error:', err);
+                console.error('Background removal error:', err);
                 if (bgStatus) {
-                    bgStatus.innerHTML = '<div class="text-warning small py-1">' +
-                        '<i class="ti ti-alert-triangle me-1"></i>Could not remove background automatically. Your original photo will be used.' +
+                    bgStatus.innerHTML = '<div class="text-secondary small py-1">' +
+                        'Could not remove background. Your original photo will be used.' +
                     '</div>';
                 }
+                btnRemoveBg.classList.remove('d-none');
                 btnRemoveBg.disabled = false;
             }
         });
