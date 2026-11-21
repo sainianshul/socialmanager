@@ -31,6 +31,7 @@ Route::prefix('admin')->group(function () {
             // Festival Studio (Auto Poster & Scheduler)
             Route::prefix('festival-studio')->name('festival-studio.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'index'])->name('index');
+                Route::post('/quick-schedule', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'quickSchedule'])->name('quick-schedule');
             });
 
             // Connected Social Accounts (Meta / Facebook & Instagram)

@@ -144,6 +144,53 @@
     pointer-events: none;
     user-select: none;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
+.qs-account-row {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+.qs-account-row:hover {
+    border-color: #1db8ab !important;
+    background: rgba(29, 184, 171, 0.04) !important;
+}
+.qs-account-row.active {
+    border-color: #1db8ab !important;
+    background: rgba(29, 184, 171, 0.08) !important;
+}
+.qs-account-row .qs-check-icon {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.qs-account-row.active .qs-check-icon {
+    opacity: 1;
+}
+
+/* Floating Clean Notification Toast */
+.fs-floating-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 10px 22px;
+    border-radius: 9999px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    font-size: 0.88rem;
+    font-weight: 500;
+    z-index: 1090;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+.fs-floating-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
 </style>
 @endpush
 
@@ -207,6 +254,15 @@
         @include('admin.festival_studio.partials._content')
     </div>
 
+    {{-- Minimal Quick Schedule Modal --}}
+    @include('admin.festival_studio.partials._quick_schedule_modal')
+
+    {{-- Clean Floating Feedback Toast --}}
+    <div id="fs-floating-toast" class="fs-floating-toast d-flex align-items-center gap-2">
+        <i class="ti ti-check text-success fs-3"></i>
+        <span id="fs-toast-message">Poster scheduled successfully.</span>
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -214,6 +270,21 @@
 document.addEventListener('DOMContentLoaded', function () {
     var contentArea = document.getElementById('festival-content-area');
     var activeAbortController = null;
+
+    // Toast Notification Helper
+    var toastEl = document.getElementById('fs-floating-toast');
+    var toastMsg = document.getElementById('fs-toast-message');
+    var toastTimeout = null;
+
+    function showStudioToast(message) {
+        if (!toastEl) return;
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastMsg.innerText = message || 'Poster scheduled successfully.';
+        toastEl.classList.add('show');
+        toastTimeout = setTimeout(function () {
+            toastEl.classList.remove('show');
+        }, 3500);
+    }
 
     // Delegate Date Pill Click to switch festival dynamically
     document.addEventListener('click', function (e) {
@@ -309,6 +380,184 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.reload();
         }
     });
+
+    // Delegated Quick Schedule Modal Opener
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest('.btn-trigger-quick-schedule');
+        if (!trigger) return;
+
+        var templateId = trigger.getAttribute('data-template-id');
+        var templateTitle = trigger.getAttribute('data-template-title') || '';
+        var templateImage = trigger.getAttribute('data-template-image') || '';
+        var festivalId = trigger.getAttribute('data-festival-id') || '';
+        var festivalTitle = trigger.getAttribute('data-festival-title') || '';
+        var festivalDate = trigger.getAttribute('data-festival-date') || '';
+        var festivalDateFormatted = trigger.getAttribute('data-festival-date-formatted') || '';
+        var caption = trigger.getAttribute('data-caption') || '';
+        var composerUrl = trigger.getAttribute('data-composer-url') || '#';
+
+        var imgEl = document.getElementById('qs-modal-img');
+        if (imgEl) imgEl.src = templateImage;
+
+        var titleEl = document.getElementById('qs-modal-poster-title');
+        if (titleEl) titleEl.innerText = templateTitle;
+
+        var badgeEl = document.getElementById('qs-modal-festival-badge');
+        if (badgeEl) badgeEl.innerText = festivalDateFormatted;
+
+        var subEl = document.getElementById('qs-modal-subheading');
+        if (subEl) subEl.innerText = festivalTitle;
+
+        var inputTpl = document.getElementById('qs-input-template-id');
+        if (inputTpl) inputTpl.value = templateId;
+
+        var inputFest = document.getElementById('qs-input-festival-id');
+        if (inputFest) inputFest.value = festivalId;
+
+        var inputDate = document.getElementById('qs-input-date');
+        if (inputDate && festivalDate) inputDate.value = festivalDate;
+
+        var inputCaption = document.getElementById('qs-input-caption');
+        if (inputCaption) inputCaption.value = caption;
+
+        var composerLink = document.getElementById('qs-link-full-composer');
+        if (composerLink) composerLink.href = composerUrl;
+
+        var alertBox = document.getElementById('qs-alert');
+        if (alertBox) {
+            alertBox.classList.add('d-none');
+            alertBox.innerText = '';
+        }
+
+        // Reset account checkboxes to checked & active
+        document.querySelectorAll('.qs-account-cb').forEach(function (cb) {
+            cb.checked = true;
+            var row = cb.closest('.qs-account-row');
+            if (row) row.classList.add('active');
+        });
+
+        var modalEl = document.getElementById('quickScheduleModal');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+    });
+
+    // Account row toggle on checkbox change or row click
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('qs-account-cb')) {
+            var row = e.target.closest('.qs-account-row');
+            if (row) {
+                if (e.target.checked) {
+                    row.classList.add('active');
+                } else {
+                    row.classList.remove('active');
+                }
+            }
+        }
+    });
+
+    // Quick Schedule AJAX Submit
+    var submitBtn = document.getElementById('btn-submit-quick-schedule');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function () {
+            var btnText = document.getElementById('btn-submit-text');
+            var alertBox = document.getElementById('qs-alert');
+
+            // Gather selected account IDs
+            var selectedAccountIds = [];
+            document.querySelectorAll('.qs-account-cb:checked').forEach(function (cb) {
+                selectedAccountIds.push(parseInt(cb.value));
+            });
+
+            if (selectedAccountIds.length === 0) {
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    alertBox.innerText = 'Please select at least one social media channel to schedule.';
+                }
+                return;
+            }
+
+            var templateId = document.getElementById('qs-input-template-id').value;
+            var festivalId = document.getElementById('qs-input-festival-id').value;
+            var scheduleDate = document.getElementById('qs-input-date').value;
+            var scheduleTime = document.getElementById('qs-input-time').value;
+            var content = document.getElementById('qs-input-caption').value;
+
+            if (!scheduleDate || !scheduleTime) {
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    alertBox.innerText = 'Please provide both a schedule date and time.';
+                }
+                return;
+            }
+
+            // Button loading state
+            submitBtn.disabled = true;
+            if (btnText) btnText.innerText = 'Scheduling...';
+            if (alertBox) alertBox.classList.add('d-none');
+
+            fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    template_id: templateId,
+                    festival_id: festivalId,
+                    account_ids: selectedAccountIds,
+                    schedule_date: scheduleDate,
+                    schedule_time: scheduleTime,
+                    content: content
+                })
+            })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { status: res.status, ok: res.ok, data: data };
+                });
+            })
+            .then(function (result) {
+                submitBtn.disabled = false;
+                if (btnText) btnText.innerText = 'Schedule Post';
+
+                if (!result.ok) {
+                    if (alertBox) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerText = result.data.message || 'Scheduling failed. Please try again.';
+                    }
+                    return;
+                }
+
+                // Close modal
+                var modalEl = document.getElementById('quickScheduleModal');
+                if (modalEl) {
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+
+                // Update card action area on page to show Scheduled badge
+                var actionEl = document.getElementById('card-action-' + templateId);
+                if (actionEl) {
+                    actionEl.innerHTML = '<span class="badge bg-success text-white rounded-pill px-2.5 py-1 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
+                }
+
+                // Show floating notification toast
+                showStudioToast(result.data.message || 'Poster scheduled successfully.');
+            })
+            .catch(function (err) {
+                submitBtn.disabled = false;
+                if (btnText) btnText.innerText = 'Schedule Post';
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    alertBox.innerText = 'Network error. Please try again.';
+                }
+                console.error('Quick schedule error:', err);
+            });
+        });
+    }
 
     // Delegated Copy Caption Button Handler
     document.addEventListener('click', function (e) {

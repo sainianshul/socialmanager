@@ -24,16 +24,27 @@
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-4 g-3 mb-4">
         @foreach($templates as $template)
             @php
-                $scheduleUrl = route('admin.posts.create', [
+                $captionText = ($selectedFestival?->ready_caption ?? '') . ($selectedFestival?->hashtags ? "\n\n" . $selectedFestival->hashtags : '');
+                $composerUrl = route('admin.posts.create', [
                     'date' => $selectedFestival?->festival_date?->format('Y-m-d\T08:00'),
-                    'caption' => ($selectedFestival?->ready_caption ?? '') . ($selectedFestival?->hashtags ? "\n\n" . $selectedFestival->hashtags : ''),
+                    'caption' => $captionText,
                 ]);
             @endphp
-            <div class="col">
-                <div class="fs-template-card h-100 d-flex flex-column">
+            <div class="col" id="template-card-col-{{ $template->id }}">
+                <div class="fs-template-card h-100 d-flex flex-column" id="template-card-{{ $template->id }}">
                     
                     {{-- 1:1 Aspect Ratio Poster Container --}}
-                    <div class="fs-template-preview-wrapper">
+                    <div class="fs-template-preview-wrapper cursor-pointer btn-trigger-quick-schedule"
+                         data-template-id="{{ $template->id }}"
+                         data-template-title="{{ $template->title }}"
+                         data-template-image="{{ $template->image_url }}"
+                         data-festival-id="{{ $selectedFestival?->id }}"
+                         data-festival-title="{{ $selectedFestival?->title }}"
+                         data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
+                         data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
+                         data-caption="{{ $captionText }}"
+                         data-composer-url="{{ $composerUrl }}">
+                        
                         <img src="{{ $template->image_url }}" alt="{{ $template->title }}" class="fs-template-preview-img" loading="lazy">
                         
                         {{-- Top Party Badge --}}
@@ -47,27 +58,41 @@
 
                         {{-- Hover Actions Overlay --}}
                         <div class="fs-template-overlay">
-                            <a href="{{ $scheduleUrl }}" class="btn btn-primary rounded-pill px-3 py-2 w-100 shadow-sm text-decoration-none">
-                                <i class="ti ti-wand me-1"></i>Use This Poster
-                            </a>
-                            <a href="{{ $scheduleUrl }}" class="btn btn-outline-light rounded-pill px-3 py-1.5 w-100 text-decoration-none small">
-                                <i class="ti ti-calendar-time me-1"></i>Schedule for Festival
-                            </a>
+                            <button type="button" class="btn btn-primary rounded-pill px-3 py-2 w-100 shadow-sm btn-trigger-quick-schedule"
+                                    data-template-id="{{ $template->id }}"
+                                    data-template-title="{{ $template->title }}"
+                                    data-template-image="{{ $template->image_url }}"
+                                    data-festival-id="{{ $selectedFestival?->id }}"
+                                    data-festival-title="{{ $selectedFestival?->title }}"
+                                    data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
+                                    data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
+                                    data-caption="{{ $captionText }}"
+                                    data-composer-url="{{ $composerUrl }}">
+                                <i class="ti ti-calendar-time me-1"></i>Quick Schedule
+                            </button>
+                            <span class="text-white-50 small mt-1" style="font-size: 11px;">1-Click Auto Post</span>
                         </div>
                     </div>
 
                     {{-- Minimal Card Footer --}}
                     <div class="p-2.5 d-flex align-items-center justify-content-between">
-                        <span class="small fw-semibold text-dark text-truncate me-2" title="{{ $template->title }}">
+                        <span class="small fw-semibold text-dark text-truncate me-2" title="{{ $template->title }}" id="card-title-{{ $template->id }}">
                             {{ $template->title }}
                         </span>
-                        <div class="d-flex gap-1 flex-shrink-0">
-                            <a href="{{ $scheduleUrl }}" class="btn btn-xs btn-outline-primary rounded-pill px-2.5" title="Use Poster">
+                        <div class="d-flex align-items-center gap-1.5 flex-shrink-0" id="card-action-{{ $template->id }}">
+                            <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-3 py-1 fw-semibold btn-trigger-quick-schedule"
+                                    data-template-id="{{ $template->id }}"
+                                    data-template-title="{{ $template->title }}"
+                                    data-template-image="{{ $template->image_url }}"
+                                    data-festival-id="{{ $selectedFestival?->id }}"
+                                    data-festival-title="{{ $selectedFestival?->title }}"
+                                    data-festival-date="{{ $selectedFestival?->festival_date?->format('Y-m-d') }}"
+                                    data-festival-date-formatted="{{ $selectedFestival?->festival_date?->format('d M Y') }}"
+                                    data-caption="{{ $captionText }}"
+                                    data-composer-url="{{ $composerUrl }}"
+                                    title="Quick Schedule Poster">
                                 Use
-                            </a>
-                            <a href="{{ $scheduleUrl }}" class="btn btn-xs btn-ghost-secondary rounded-pill px-2" title="Schedule">
-                                <i class="ti ti-calendar"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
 
