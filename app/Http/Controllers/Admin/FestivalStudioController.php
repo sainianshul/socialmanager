@@ -64,7 +64,9 @@ class FestivalStudioController extends Controller
         $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;
         $parties = PoliticalParty::where('is_active', true)->get();
 
-        $accountsQuery = Account::query()->where('is_active', true);
+        $accountsQuery = Account::query()
+            ->where('is_active', true)
+            ->whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM]);
         if ($user && !$user->isAdmin()) {
             $accountsQuery->where('user_id', $user->id);
         }
