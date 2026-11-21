@@ -324,11 +324,13 @@ class SchedulePostController extends Controller
         $privacyStatus = 'public';
         $content = '';
         $postType = 'photo';
+        $firstComment = $request->input('first_comment');
 
         if ($isYouTube) {
             $validated = $request->validate([
                 'title'          => 'required|string|max:100',
                 'description'    => 'nullable|string|max:5000',
+                'first_comment'  => 'nullable|string|max:2200',
                 'video_file'     => 'nullable|file|mimes:mp4,mov,webm,avi,mkv|max:102400',
                 'thumbnail'      => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240',
                 'tags'           => 'nullable|string|max:500',
@@ -374,6 +376,7 @@ class SchedulePostController extends Controller
             $validated = $request->validate([
                 'post_type'     => 'required|in:photo,video,reel,carousel',
                 'content'       => 'nullable|string|max:2200',
+                'first_comment' => 'nullable|string|max:2200',
                 'media_files'   => 'nullable|array',
                 'media_files.*' => 'file|mimes:jpeg,jpg,png,webp,mp4,mov|max:51200',
                 'publish_mode'  => 'required|in:now,schedule,draft',
@@ -409,6 +412,7 @@ class SchedulePostController extends Controller
             $validated = $request->validate([
                 'post_type'     => 'nullable|in:text,photo,video,reel,carousel',
                 'content'       => 'nullable|string|max:5000',
+                'first_comment' => 'nullable|string|max:2200',
                 'media_files'   => 'nullable|array',
                 'media_files.*' => 'file|mimes:jpeg,jpg,png,webp,mp4,mov|max:51200',
                 'publish_mode'  => 'required|in:now,schedule,draft',
@@ -482,6 +486,7 @@ class SchedulePostController extends Controller
                 'title'          => $title,
                 'description'    => $description,
                 'content'        => $content,
+                'first_comment'  => $firstComment,
                 'media_urls'     => $mediaUrls,
                 'thumbnail_path' => $thumbnailPath,
                 'tags'           => $tags,
@@ -634,6 +639,7 @@ class SchedulePostController extends Controller
             $validated = $request->validate([
                 'title'          => 'required|string|max:100',
                 'description'    => 'nullable|string|max:5000',
+                'first_comment'  => 'nullable|string|max:2200',
                 'video_file'     => 'nullable|file|mimes:mp4,mov,webm,avi,mkv|max:102400',
                 'thumbnail'      => 'nullable|image|mimes:jpeg,jpg,png,webp|max:10240',
                 'tags'           => 'nullable|string|max:500',
@@ -694,6 +700,7 @@ class SchedulePostController extends Controller
             $validated = $request->validate([
                 'post_type'     => 'required|in:photo,video,reel,carousel',
                 'content'       => 'nullable|string|max:2200',
+                'first_comment' => 'nullable|string|max:2200',
                 'media_files'   => 'nullable|array',
                 'media_files.*' => 'file|mimes:jpeg,jpg,png,webp,mp4,mov|max:51200',
                 'publish_mode'  => 'required|in:now,schedule,draft',
@@ -740,6 +747,7 @@ class SchedulePostController extends Controller
             $validated = $request->validate([
                 'post_type'     => 'required|in:text,photo,video,reel,carousel',
                 'content'       => 'nullable|string|max:5000',
+                'first_comment' => 'nullable|string|max:2200',
                 'media_files'   => 'nullable|array',
                 'media_files.*' => 'file|mimes:jpeg,jpg,png,webp,mp4,mov|max:51200',
                 'publish_mode'  => 'required|in:now,schedule,draft',
@@ -780,6 +788,8 @@ class SchedulePostController extends Controller
             $scheduledPost->content = $validated['content'] ?? '';
             $scheduledPost->media_urls = $mediaUrls;
         }
+
+        $scheduledPost->first_comment = $request->input('first_comment');
 
         // Determine schedule time & status
         if ($publishMode === 'schedule') {

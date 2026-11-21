@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\ScheduledPost;
 use Illuminate\Support\Facades\Http;
@@ -50,7 +51,7 @@ class MetaPublishingService
                 ]);
 
                 // Sync into local posts feed for immediate visibility
-                Post::firstOrCreate(
+                $localPost = Post::firstOrCreate(
                     [
                         'account_id' => $account->id,
                         'meta_post_id' => $metaPostId,
@@ -62,6 +63,11 @@ class MetaPublishingService
                         'published_at' => now(),
                     ]
                 );
+
+                // Automatically publish First Comment if set (e.g. hashtags, links)
+                if (!empty($scheduledPost->first_comment)) {
+                    $this->publishFirstComment($scheduledPost, $account, $metaPostId, $localPost);
+                }
 
                 return ['success' => true, 'meta_post_id' => $metaPostId, 'message' => 'Post published successfully on Meta.'];
             } else {
@@ -263,6 +269,50 @@ class MetaPublishingService
         }
 
         return ['success' => true, 'meta_post_id' => $publishRes['id'] ?? null];
+    }
+
+    /**
+     * Automatically publish the First Comment on Facebook or Instagram right after post goes live.
+     */
+    protected function publishFirstComment(ScheduledPost $scheduledPost, Account $account, string $metaPostId, ?Post $localPost = null): void
+    {
+        if (empty($scheduledPost->first_comment) || empty($account->access_token)) {
+            return;
+        }
+
+        try {
+            $apiBase = config('services.meta.graph_url', 'https://graph.facebook.com/v20.0');
+            $commentUrl = "{$apiBase}/{$metaPostId}/comments";
+
+            $response = Http::timeout(20)->post($commentUrl, [
+                'message'      => $scheduledPost->first_comment,
+                'access_token' => $account->access_token,
+            ])->json();
+
+            if (isset($response['id'])) {
+                $metaCommentId = (string) $response['id'];
+                Log::info("First comment successfully published on post #{$scheduledPost->id} (Meta ID {$metaPostId}): {$metaCommentId}");
+
+                if ($localPost) {
+                    Comment::create([
+                        'post_id'             => $localPost->id,
+                        'account_id'          => $account->id,
+                        'meta_comment_id'     => $metaCommentId,
+                        'commenter_name'      => $account->name,
+                        'commenter_photo_url' => $account->profile_pic_url,
+                        'message'             => $scheduledPost->first_comment,
+                        'status'              => Comment::STATUS_REPLIED,
+                        'replied_at'          => now(),
+                        'commented_at'        => now(),
+                    ]);
+                }
+            } else {
+                $errorMsg = $response['error']['message'] ?? 'Unknown error';
+                Log::warning("First comment publish failed for post #{$scheduledPost->id}: {$errorMsg}", $response ?? []);
+            }
+        } catch (\Throwable $e) {
+            Log::error("First comment exception for post #{$scheduledPost->id}: {$e->getMessage()}");
+        }
     }
 
     /**

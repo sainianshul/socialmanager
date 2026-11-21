@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Account;
+use App\Models\Comment;
 use App\Models\Post;
 use App\Models\ScheduledPost;
 use Carbon\Carbon;
@@ -63,7 +64,7 @@ class YouTubePublishingService
                 ]);
 
                 // Create or update local post record
-                Post::updateOrCreate(
+                $localPost = Post::updateOrCreate(
                     [
                         'account_id'   => $account->id,
                         'meta_post_id' => $videoId,
@@ -81,6 +82,11 @@ class YouTubePublishingService
                         'published_at'   => now(),
                     ]
                 );
+
+                // Auto-publish First Comment on video if set
+                if (!empty($scheduledPost->first_comment)) {
+                    $this->publishFirstComment($scheduledPost, $account, $videoId, $accessToken, $localPost);
+                }
 
                 return ['success' => true, 'video_id' => $videoId, 'message' => 'Video uploaded to YouTube successfully.'];
             } else {
@@ -270,6 +276,56 @@ class YouTubePublishingService
                 ->post("https://www.googleapis.com/upload/youtube/v3/thumbnails/set?videoId={$videoId}");
         } catch (\Throwable $e) {
             Log::warning("Thumbnail upload notice for video {$videoId}: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Automatically publish the First Comment on YouTube Video right after upload.
+     */
+    protected function publishFirstComment(ScheduledPost $scheduledPost, Account $account, string $videoId, string $accessToken, ?Post $localPost = null): void
+    {
+        if (empty($scheduledPost->first_comment) || empty($accessToken)) {
+            return;
+        }
+
+        try {
+            $url = 'https://www.googleapis.com/youtube/v3/commentThreads?part=snippet';
+            $response = Http::withToken($accessToken)
+                ->timeout(20)
+                ->post($url, [
+                    'snippet' => [
+                        'videoId' => $videoId,
+                        'topLevelComment' => [
+                            'snippet' => [
+                                'textOriginal' => $scheduledPost->first_comment,
+                            ],
+                        ],
+                    ],
+                ])->json();
+
+            if (isset($response['id'])) {
+                $metaCommentId = (string) $response['id'];
+                Log::info("First comment successfully published on YouTube video #{$scheduledPost->id} ({$videoId}): {$metaCommentId}");
+
+                if ($localPost) {
+                    Comment::create([
+                        'post_id'             => $localPost->id,
+                        'account_id'          => $account->id,
+                        'meta_comment_id'     => $metaCommentId,
+                        'commenter_name'      => $account->name,
+                        'commenter_photo_url' => $account->profile_pic_url,
+                        'message'             => $scheduledPost->first_comment,
+                        'status'              => Comment::STATUS_REPLIED,
+                        'replied_at'          => now(),
+                        'commented_at'        => now(),
+                    ]);
+                }
+            } else {
+                $errorMsg = $response['error']['message'] ?? 'Unknown error';
+                Log::warning("YouTube first comment failed for video {$videoId}: {$errorMsg}", $response ?? []);
+            }
+        } catch (\Throwable $e) {
+            Log::error("YouTube first comment exception for video {$videoId}: {$e->getMessage()}");
         }
     }
 }

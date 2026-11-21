@@ -865,7 +865,7 @@
                     </div>
                 </div>
 
-                <!-- Card 2: Unified Content Scheduler -->
+                <!-- Card 2: Unified Content Scheduler & First Comment -->
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="apple-bento-card">
                         <div class="apple-feature-icon-lg apple-icon-schedule">
@@ -873,7 +873,7 @@
                         </div>
                         <h3 class="apple-bento-title">Unified Multi-Platform Content Scheduler</h3>
                         <p class="apple-bento-desc">
-                            Auto-queue posts and videos at peak audience engagement times.
+                            Schedule multi-platform posts and auto-drop hashtags or links in the first comment for clean, aesthetic captions.
                         </p>
                     </div>
                 </div>

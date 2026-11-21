@@ -38,6 +38,7 @@ class ScheduledPost extends Model
         'post_type',
         'title',
         'content',
+        'first_comment',
         'description',
         'media_urls',
         'tags',

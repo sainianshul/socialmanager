@@ -950,4 +950,73 @@ class SchedulePostManagementTest extends TestCase
         $this->assertStringStartsWith('https://socialmanager.rezel.online/storage/posts/instagram_converted/', $jpegUrl);
         $this->assertStringEndsWith('.jpg', $jpegUrl);
     }
+
+    public function test_schedule_posts_store_with_first_comment(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_123',
+            'name' => 'Brand Page',
+            'access_token' => 'mock_token',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('admin.posts.schedule.store'), [
+            'account_id'    => $account->id,
+            'post_type'     => 'text',
+            'content'       => 'Check out our clean caption without messy hashtags!',
+            'first_comment' => '#branding #marketing #socialmedia https://example.com/link',
+            'publish_mode'  => 'schedule',
+            'scheduled_at'  => now()->addDay()->format('Y-m-d\TH:i'),
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id'    => $account->id,
+            'first_comment' => '#branding #marketing #socialmedia https://example.com/link',
+        ]);
+    }
+
+    public function test_publish_now_with_first_comment_publishes_to_meta_comments(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_999',
+            'name' => 'Fashion Brand',
+            'access_token' => 'mock_token',
+            'is_active' => true,
+        ]);
+
+        Http::fake([
+            'https://graph.facebook.com/v20.0/fb_page_999/feed*' => Http::response(['id' => 'fb_page_999_post_111'], 200),
+            'https://graph.facebook.com/v20.0/fb_page_999_post_111/comments*' => Http::response(['id' => 'meta_comment_555'], 200),
+        ]);
+
+        $response = $this->actingAs($user)->post(route('admin.posts.schedule.store'), [
+            'account_ids'   => [$account->id],
+            'account_id'    => $account->id,
+            'post_type'     => 'text',
+            'content'       => 'Summer collection launched today!',
+            'first_comment' => '#summer #outfits #trending link in bio',
+            'publish_mode'  => 'now',
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+        $response->assertSessionHas('success');
+
+        $this->assertDatabaseHas('scheduled_posts', [
+            'account_id'    => $account->id,
+            'meta_post_id'  => 'fb_page_999_post_111',
+            'status'        => ScheduledPost::STATUS_PUBLISHED,
+            'first_comment' => '#summer #outfits #trending link in bio',
+        ]);
+
+        $this->assertDatabaseHas('comments', [
+            'meta_comment_id' => 'meta_comment_555',
+            'message'         => '#summer #outfits #trending link in bio',
+        ]);
+    }
 }
