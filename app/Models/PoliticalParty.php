@@ -14,6 +14,7 @@ class PoliticalParty extends Model
 
     protected $fillable = [
         'name',
+        'hindi_name',
         'short_code',
         'symbol_logo',
         'top_leaders_strip',

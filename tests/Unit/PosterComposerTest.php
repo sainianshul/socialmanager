@@ -34,8 +34,8 @@ class PosterComposerTest extends TestCase
 
         $this->assertIsArray($preset);
         $this->assertEquals(1080, $preset['canvas']['width']);
-        $this->assertEquals('party_group_cutout', $preset['header']['mode']);
-        $this->assertEquals('dual_ribbon', $preset['footer']['style']);
+        $this->assertEquals('individual_chips', $preset['header']['mode']);
+        $this->assertEquals('standard_political', $preset['footer']['style']);
 
         $royalPreset = $this->composer->getDefaultPresetConfig('leader_tribute_royal');
         $this->assertEquals('royal_bar', $royalPreset['footer']['style']);
@@ -58,6 +58,7 @@ class PosterComposerTest extends TestCase
             ['short_code' => 'BJP'],
             [
                 'name' => 'Bharatiya Janata Party',
+                'hindi_name' => 'भारतीय जनता पार्टी',
                 'primary_color' => '#FF9933',
                 'secondary_color' => '#00873E',
                 'group_cutout_image' => 'images/parties/bjp-group-cutout.png',
@@ -187,5 +188,149 @@ class PosterComposerTest extends TestCase
 
         $this->assertInstanceOf(ImageInterface::class, $image);
         $this->assertEquals(1080, $image->width());
+    }
+
+    public function test_composer_renders_group_cutout_classic_preset(): void
+    {
+        $party = PoliticalParty::firstOrCreate(
+            ['short_code' => 'BJP'],
+            [
+                'name' => 'Bharatiya Janata Party',
+                'group_cutout_image' => 'images/parties/bjp-group-cutout.png',
+                'symbol_logo' => 'images/parties/bjp.jpeg',
+                'is_active' => true,
+            ]
+        );
+
+        $user = User::factory()->create();
+
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $party->id,
+            'display_name' => 'पिनाकिन शुक्ला',
+            'designation' => 'सदस्य महिसागर जिला परिषद',
+            'is_default' => true,
+        ]);
+
+        $image = $this->composer->compose(
+            'images/templates/gopashtami.jpg',
+            $branding,
+            null,
+            ['preset_key' => 'group_cutout_classic']
+        );
+
+        $this->assertInstanceOf(ImageInterface::class, $image);
+        $this->assertEquals(1080, $image->width());
+    }
+
+    public function test_composer_renders_circle_badge_right_preset(): void
+    {
+        $party = PoliticalParty::firstOrCreate(
+            ['short_code' => 'BJP'],
+            ['name' => 'Bharatiya Janata Party', 'is_active' => true]
+        );
+
+        $user = User::factory()->create();
+
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $party->id,
+            'display_name' => 'अनिल कुमार',
+            'designation' => 'प्रदेश सचिव',
+            'is_default' => true,
+        ]);
+
+        $image = $this->composer->compose(
+            'images/templates/gopashtami.jpg',
+            $branding,
+            null,
+            ['preset_key' => 'circle_badge_right']
+        );
+
+        $this->assertInstanceOf(ImageInterface::class, $image);
+        $this->assertEquals(1080, $image->width());
+    }
+
+    public function test_composer_renders_candidate_left_classic_preset(): void
+    {
+        $party = PoliticalParty::firstOrCreate(
+            ['short_code' => 'BJP'],
+            ['name' => 'Bharatiya Janata Party', 'is_active' => true]
+        );
+
+        $user = User::factory()->create();
+
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $party->id,
+            'display_name' => 'राजेश वर्मा',
+            'designation' => 'मंडल अध्यक्ष',
+            'is_default' => true,
+        ]);
+
+        $image = $this->composer->compose(
+            'images/templates/gopashtami.jpg',
+            $branding,
+            null,
+            ['preset_key' => 'candidate_left_classic']
+        );
+
+        $this->assertInstanceOf(ImageInterface::class, $image);
+        $this->assertEquals(1080, $image->width());
+    }
+
+    public function test_composer_renders_circle_badge_center_preset(): void
+    {
+        $party = PoliticalParty::firstOrCreate(
+            ['short_code' => 'BJP'],
+            ['name' => 'Bharatiya Janata Party', 'is_active' => true]
+        );
+
+        $user = User::factory()->create();
+
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $party->id,
+            'display_name' => 'सुमित सिंह',
+            'is_default' => true,
+        ]);
+
+        $image = $this->composer->compose(
+            'images/templates/gopashtami.jpg',
+            $branding,
+            null,
+            ['preset_key' => 'circle_badge_center']
+        );
+
+        $this->assertInstanceOf(ImageInterface::class, $image);
+        $this->assertEquals(1080, $image->width());
+    }
+
+    public function test_composer_available_presets_returns_all_styles(): void
+    {
+        $presets = $this->composer->getAvailablePresets();
+
+        $this->assertIsArray($presets);
+        $this->assertGreaterThanOrEqual(7, count($presets));
+
+        $keys = array_column($presets, 'key');
+        $this->assertContains('classic_political_right', $keys);
+        $this->assertContains('candidate_left_classic', $keys);
+        $this->assertContains('circle_badge_right', $keys);
+        $this->assertContains('circle_badge_center', $keys);
+        $this->assertContains('leader_tribute_royal', $keys);
+        $this->assertContains('group_cutout_classic', $keys);
+        $this->assertContains('clean_no_leaders', $keys);
+    }
+
+    public function test_composer_standard_political_footer_is_default(): void
+    {
+        $defaultConfig = $this->composer->getDefaultPresetConfig('classic_political_right');
+        $this->assertEquals('standard_political', $defaultConfig['footer']['style']);
+        $this->assertEquals('individual_chips', $defaultConfig['header']['mode']);
+        $this->assertEquals(95, $defaultConfig['header']['chip_size']);
+        $this->assertEquals(420, $defaultConfig['candidate']['max_width']);
+        $this->assertEquals(480, $defaultConfig['candidate']['max_height']);
+        $this->assertEquals(1080, $defaultConfig['candidate']['anchor_bottom_y']);
     }
 }

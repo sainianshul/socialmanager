@@ -51,19 +51,31 @@ class PosterComposer
         // 1. Base Canvas & Background
         $canvas = $this->createBaseCanvas($bgPath, $canvasWidth, $canvasHeight);
 
-        // 2. Leadership Header Section
+        // 2. Leadership Header Section (Top Senior Leaders)
         $includeStrip = $options['include_strip'] ?? true;
         if ($includeStrip && ($config['header']['enabled'] ?? true)) {
             $this->renderHeaderSection($canvas, $config['header'] ?? [], $party, $strip);
         }
 
-        // 3. Candidate Cutout Photo
-        $this->renderCandidatePhoto($canvas, $config['candidate'] ?? [], $branding, $options);
-
-        // 4. Political Footer Branding Frame (Name, Designation, Socials)
+        // 3. Political Footer Branding Frame (Drawn first so candidate sits naturally over footer background)
         if ($branding) {
-            $this->renderFooterFrame($canvas, $config['footer'] ?? [], $branding, $party);
+            $this->renderFooterFrame(
+                $canvas,
+                $config['footer'] ?? [],
+                $branding,
+                $party,
+                $config['candidate'] ?? []
+            );
         }
+
+        // 4. Candidate Cutout / Circular Photo (Rendered in front of footer background)
+        $this->renderCandidatePhoto(
+            $canvas,
+            $config['candidate'] ?? [],
+            $branding,
+            $options,
+            $config['footer'] ?? []
+        );
 
         return $canvas;
     }
@@ -118,8 +130,15 @@ class PosterComposer
         return $canvas;
     }
 
+    // ================================================================
+    // HEADER SECTION — Top Leadership Strip
+    // ================================================================
+
     /**
-     * Render Top Leadership Header (Group Cutout, Individual Chips, or None)
+     * Render Top Leadership Header.
+     * Mode A: party_group_cutout — transparent PNG group photo at top-left
+     * Mode B: individual_chips — evenly-spaced circle avatars across full width (Dr. Dharam Singh style)
+     * Mode C: none — no header
      */
     protected function renderHeaderSection(
         ImageInterface $canvas,
@@ -129,7 +148,7 @@ class PosterComposer
     ): void {
         $mode = $headerConfig['mode'] ?? 'party_group_cutout';
 
-        // A) Group Cutout Mode (Image 1 & 2 Style)
+        // A) Group Cutout Mode (Ram Navami Style)
         if ($mode === 'party_group_cutout') {
             $cutoutPath = $party?->group_cutout_image ?: 'images/parties/bjp-group-cutout.png';
             $resolvedCutout = $this->resolveFilePath($cutoutPath);
@@ -149,35 +168,36 @@ class PosterComposer
             }
         }
 
-        // B) Individual Leader Chips Mode
+        // B) Individual Leader Circle Chips Mode — Reference Gold Standard
+        // Layout: 6-7 circle avatars with saffron-orange border, evenly spaced across full 1080px width
         elseif ($mode === 'individual_chips') {
-            $leaders = $strip ? $strip->leaders->take(6) : ($party?->leaders()->take(6)->get() ?? collect());
+            $leaders = $strip ? $strip->leaders->take(7) : ($party?->leaders()->take(7)->get() ?? collect());
             if ($leaders->isNotEmpty()) {
-                $startX = $headerConfig['chips_start_x'] ?? 30;
-                $startY = $headerConfig['chips_start_y'] ?? 25;
-                $chipSize = $headerConfig['chip_size'] ?? 52;
-                $gap = $headerConfig['chip_gap'] ?? 10;
+                $chipSize = $headerConfig['chip_size'] ?? 95;
+                $borderWidth = $headerConfig['chip_border_width'] ?? 4;
+                $borderColor = $headerConfig['chip_border_color'] ?? '#FF9933';
                 $shape = $headerConfig['chip_shape'] ?? 'circle';
+                $stripY = $headerConfig['chips_start_y'] ?? 10;
+                $leaderCount = $leaders->count();
 
-                // Optional frosted background bar
-                if (!empty($headerConfig['bar_bg'])) {
-                    $barW = ($chipSize * $leaders->count()) + ($gap * ($leaders->count() - 1)) + 24;
-                    $canvas->drawRectangle($startX - 12, $startY - 6, function ($rect) use ($barW, $chipSize, $headerConfig) {
-                        $rect->size($barW, $chipSize + 12);
-                        $rect->background($headerConfig['bar_bg']);
-                    });
-                }
+                // Calculate even spacing across full canvas width
+                $canvasW = 1080;
+                $totalChipWidth = $leaderCount * $chipSize;
+                $totalGaps = $leaderCount + 1;
+                $gap = (int) (($canvasW - $totalChipWidth) / $totalGaps);
+                if ($gap < 8) $gap = 8;
 
-                $currX = $startX;
+                $currX = $gap;
+
                 foreach ($leaders as $leader) {
                     $leaderImgPath = $this->resolveFilePath($leader->image);
                     if ($leaderImgPath && file_exists($leaderImgPath)) {
                         try {
                             $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
                             if ($shape === 'circle') {
-                                $avatar = $this->makeCircularAvatar($avatar, $chipSize);
+                                $avatar = $this->makeCircularAvatar($avatar, $chipSize, $borderColor, $borderWidth);
                             }
-                            $canvas->place($avatar, 'top-left', $currX, $startY);
+                            $canvas->place($avatar, 'top-left', $currX, $stripY);
                         } catch (\Throwable $e) {
                             // Skip leader on error
                         }
@@ -187,8 +207,8 @@ class PosterComposer
             }
         }
 
-        // Top Right Party Official Logo
-        if ($headerConfig['show_party_logo'] ?? true) {
+        // Top Right Party Official Logo (only for group_cutout mode — chips mode already fills top)
+        if ($mode === 'party_group_cutout' && ($headerConfig['show_party_logo'] ?? true)) {
             $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
             $resolvedLogo = $this->resolveFilePath($logoPath);
             if ($resolvedLogo && file_exists($resolvedLogo)) {
@@ -207,14 +227,23 @@ class PosterComposer
         }
     }
 
+    // ================================================================
+    // CANDIDATE PHOTO — Cutout (Large) or Circular Framed Avatar
+    // ================================================================
+
     /**
-     * Render Candidate Cutout Photo Anchored to Corner/Bottom
+     * Render Candidate Photo.
+     * Supports:
+     *   - Shape: 'cutout' (large transparent portrait chest-to-head, anchored to bottom)
+     *   - Shape: 'circle' (circular framed portrait with customizable border and shadow)
+     *   - Position: 'bottom-right' | 'bottom-left' | 'bottom-center'
      */
     protected function renderCandidatePhoto(
         ImageInterface $canvas,
         array $candidateConfig,
         ?UserBranding $branding,
-        array $options
+        array $options,
+        array $footerConfig = []
     ): void {
         $photoPath = $options['cutout_url']
             ?? $branding?->defaultImage?->cutout_image_path
@@ -232,25 +261,78 @@ class PosterComposer
 
         try {
             $photoImg = $this->manager->read($resolvedPhoto);
-            $maxW = $candidateConfig['max_width'] ?? 340;
-            $maxH = $candidateConfig['max_height'] ?? 420;
-            $photoImg->scaleDown(width: $maxW, height: $maxH);
-
+            $shape = $candidateConfig['shape'] ?? 'cutout';
             $position = $candidateConfig['position'] ?? 'bottom-right';
-            $offsetBottom = $candidateConfig['offset_bottom'] ?? 30;
+
+            // ====================================================
+            // 1. CIRCULAR AVATAR MODE
+            // ====================================================
+            if ($shape === 'circle') {
+                $circleSize = $candidateConfig['circle_size'] ?? 240;
+                $borderColor = $candidateConfig['circle_border_color'] ?? '#ffffff';
+                $borderWidth = $candidateConfig['circle_border_width'] ?? 5;
+
+                $avatar = $this->makeCircularAvatar($photoImg, $circleSize, $borderColor, $borderWidth);
+
+                $footerTopY = $candidateConfig['footer_top_y'] ?? 910;
+                $overlap = $candidateConfig['footer_overlap'] ?? 30;
+
+                if ($position === 'bottom-right') {
+                    $x = 1080 - $circleSize - ($candidateConfig['offset_right'] ?? 30);
+                    $y = $footerTopY - $circleSize + $overlap;
+                } elseif ($position === 'bottom-left') {
+                    $x = $candidateConfig['offset_left'] ?? 30;
+                    $y = $footerTopY - $circleSize + $overlap;
+                } else { // bottom-center
+                    $x = (int) ((1080 - $circleSize) / 2);
+                    $y = $footerTopY - $circleSize + $overlap;
+                }
+
+                $canvas->place($avatar, 'top-left', $x, $y);
+                return;
+            }
+
+            // ====================================================
+            // 2. TRANSPARENT CUTOUT MODE (Dr. Dharam Singh Gold Standard)
+            // ====================================================
+            $maxW = $candidateConfig['max_width'] ?? 420;
+            $maxH = $candidateConfig['max_height'] ?? 480;
+
+            $origW = $photoImg->width();
+            $origH = $photoImg->height();
+
+            // Sizing: upscale smaller cutouts so candidate has commanding presence
+            $targetH = min($maxH, 460);
+            $scale = $targetH / $origH;
+
+            // Ensure width doesn't exceed maxW
+            if (($origW * $scale) > $maxW) {
+                $scale = $maxW / $origW;
+            }
+
+            $newW = (int) ($origW * $scale);
+            $newH = (int) ($origH * $scale);
+            $photoImg->resize($newW, $newH);
 
             $pw = $photoImg->width();
             $ph = $photoImg->height();
 
+            // Candidate bottom edge touches the very bottom of the poster (y: 1080) so shoulders/kurta extend grounded
+            $anchorBottomY = $candidateConfig['anchor_bottom_y'] ?? 1080;
+            $y = $anchorBottomY - $ph;
+
             if ($position === 'bottom-right') {
-                $x = 1080 - $pw - ($candidateConfig['offset_right'] ?? 20);
-                $y = 1080 - $ph - $offsetBottom;
+                $x = 1080 - $pw - ($candidateConfig['offset_right'] ?? 10);
             } elseif ($position === 'bottom-left') {
-                $x = $candidateConfig['offset_left'] ?? 20;
-                $y = 1080 - $ph - $offsetBottom;
+                $x = $candidateConfig['offset_left'] ?? 10;
             } else { // bottom-center
                 $x = (int) ((1080 - $pw) / 2);
-                $y = 1080 - $ph - $offsetBottom;
+            }
+
+            // Ensure candidate doesn't cover top leader strip
+            $minY = $candidateConfig['min_y'] ?? 115;
+            if ($y < $minY) {
+                $y = $minY;
             }
 
             $canvas->place($photoImg, 'top-left', $x, $y);
@@ -259,27 +341,206 @@ class PosterComposer
         }
     }
 
+    // ================================================================
+    // FOOTER SECTION — Political Branding
+    // ================================================================
+
     /**
-     * Render Political Footer Frame (Dual Ribbon or Royal Bar + Socials)
+     * Render Political Footer Frame (Standard Political, Dual Ribbon, or Royal Bar)
      */
     protected function renderFooterFrame(
         ImageInterface $canvas,
         array $footerConfig,
         UserBranding $branding,
-        ?PoliticalParty $party
+        ?PoliticalParty $party,
+        array $candidateConfig = []
     ): void {
-        $style = $footerConfig['style'] ?? 'dual_ribbon';
+        $style = $footerConfig['style'] ?? 'standard_political';
 
         if ($style === 'royal_bar') {
             $this->renderRoyalBarFooter($canvas, $footerConfig, $branding, $party);
-        } else {
+        } elseif ($style === 'dual_ribbon') {
             $this->renderDualRibbonFooter($canvas, $footerConfig, $branding, $party);
+        } else {
+            $this->renderStandardPoliticalFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         }
     }
 
     /**
-     * Style A: Dual Ribbon Footer (Image 2 Ram Navami Style)
-     * Green Designation Bar + Saffron Name Box + Clean Social Row
+     * Style: Standard Political Footer — MATCHES REFERENCE EXACTLY
+     * Layout (1080x1080 canvas):
+     *   y: 910–975  → Main bar: Left=BJP Lotus + Party Name, Center/Right=Candidate Name + Designation
+     *   y: 975–980  → Decorative tricolor line (saffron-white-green)
+     *   y: 980–1080 → Social handles bar (white bg, icons + handles)
+     */
+    protected function renderStandardPoliticalFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $footerTop = $footerConfig['footer_top_y'] ?? 910;
+        $mainBarHeight = $footerConfig['main_bar_height'] ?? 65;
+        $tricolorHeight = 5;
+        $socialBarHeight = $footerConfig['social_bar_height'] ?? 45;
+
+        $candidatePos = $candidateConfig['position'] ?? 'bottom-right';
+        $isCandidateLeft = ($candidatePos === 'bottom-left');
+
+        // ---- 1. Main Bar Background (warm light cream) ----
+        $mainBarBg = $footerConfig['main_bar_bg'] ?? '#f8f5ee';
+        $canvas->drawRectangle(0, $footerTop, function ($rect) use ($mainBarBg, $mainBarHeight) {
+            $rect->size(1080, $mainBarHeight);
+            $rect->background($mainBarBg);
+        });
+
+        // ---- 2. Party Logo & Name Placement ----
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $partyName = $this->shapeDevanagari($party?->hindi_name ?: ($party?->name ?: 'भारतीय जनता पार्टी'));
+        $logoSize = $footerConfig['footer_logo_size'] ?? 52;
+
+        if (!$isCandidateLeft) {
+            // Standard: Party Logo on Left (x: 20)
+            $partyTextX = 25;
+            if ($resolvedLogo && file_exists($resolvedLogo)) {
+                try {
+                    $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                    $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                    $logoY = $footerTop + (int)(($mainBarHeight - $logoSize) / 2);
+                    $canvas->place($logoImg, 'top-left', 20, $logoY);
+                    $partyTextX = 20 + $logoSize + 12;
+                } catch (\Throwable $e) {}
+            }
+
+            $partyNameY = $footerTop + (int)($mainBarHeight / 2) + 8;
+            $canvas->text($partyName, $partyTextX, $partyNameY, function ($font) use ($fontHindiBold) {
+                $font->file($fontHindiBold);
+                $font->size(22);
+                $font->color('#2d3748');
+            });
+
+            // Candidate Name in Middle (x: 400 to 720, candidate photo is at 720+)
+            $nameX = $footerConfig['name_x'] ?? 420;
+            $nameY = $footerTop + 32;
+            $nameSize = $footerConfig['name_font_size'] ?? 30;
+            $nameColor = $footerConfig['name_color'] ?? '#c0392b';
+
+            $displayName = $this->shapeDevanagari($branding->display_name);
+            $canvas->text($displayName, $nameX, $nameY, function ($font) use ($fontHindiBold, $nameSize, $nameColor) {
+                $font->file($fontHindiBold);
+                $font->size($nameSize);
+                $font->color($nameColor);
+            });
+
+            if (!empty($branding->designation)) {
+                $desigText = $this->shapeDevanagari($branding->designation);
+                $desigY = $nameY + 28;
+                $canvas->text($desigText, $nameX, $desigY, function ($font) use ($fontHindiRegular) {
+                    $font->file($fontHindiRegular);
+                    $font->size(17);
+                    $font->color('#4a5568');
+                });
+            }
+        } else {
+            // Reverse: Candidate on Left -> Party Logo on Right
+            if ($resolvedLogo && file_exists($resolvedLogo)) {
+                try {
+                    $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                    $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                    $logoX = 1080 - $logoSize - 20;
+                    $logoY = $footerTop + (int)(($mainBarHeight - $logoSize) / 2);
+                    $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+                } catch (\Throwable $e) {}
+            }
+
+            // Candidate Name (x: 420)
+            $nameX = 420;
+            $nameY = $footerTop + 32;
+            $displayName = $this->shapeDevanagari($branding->display_name);
+            $canvas->text($displayName, $nameX, $nameY, function ($font) use ($fontHindiBold) {
+                $font->file($fontHindiBold);
+                $font->size(30);
+                $font->color('#c0392b');
+            });
+
+            if (!empty($branding->designation)) {
+                $desigText = $this->shapeDevanagari($branding->designation);
+                $canvas->text($desigText, $nameX, $nameY + 28, function ($font) use ($fontHindiRegular) {
+                    $font->file($fontHindiRegular);
+                    $font->size(17);
+                    $font->color('#4a5568');
+                });
+            }
+        }
+
+        // ---- 3. Tricolor Decorative Line ----
+        $triY = $footerTop + $mainBarHeight;
+        $thirdWidth = 360;
+
+        $canvas->drawRectangle(0, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
+            $rect->size($thirdWidth, $tricolorHeight);
+            $rect->background('#FF9933'); // Saffron
+        });
+        $canvas->drawRectangle($thirdWidth, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
+            $rect->size($thirdWidth, $tricolorHeight);
+            $rect->background('#ffffff'); // White
+        });
+        $canvas->drawRectangle($thirdWidth * 2, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
+            $rect->size($thirdWidth, $tricolorHeight);
+            $rect->background('#138808'); // Green
+        });
+
+        // ---- 4. Social Handles Bar ----
+        $socialBarY = $triY + $tricolorHeight;
+        $canvas->drawRectangle(0, $socialBarY, function ($rect) use ($socialBarHeight) {
+            $rect->size(1080, $socialBarHeight);
+            $rect->background('#ffffff');
+        });
+
+        $startX = 25;
+        $socialTextY = $socialBarY + 30;
+
+        // Facebook
+        if ($branding->facebook_handle) {
+            $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'fb', '#1877F2');
+            $canvas->text($branding->facebook_handle, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
+                $font->file($fontEngRegular);
+                $font->size(14);
+                $font->color('#444444');
+            });
+            $startX += 290;
+        }
+
+        // Instagram
+        if ($branding->instagram_handle) {
+            $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'ig', '#E4405F');
+            $canvas->text($branding->instagram_handle, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
+                $font->file($fontEngRegular);
+                $font->size(14);
+                $font->color('#444444');
+            });
+            $startX += 290;
+        }
+
+        // WhatsApp / Phone
+        if ($branding->phone_number) {
+            $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'wa', '#25D366');
+            $canvas->text($branding->phone_number, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
+                $font->file($fontEngRegular);
+                $font->size(14);
+                $font->color('#444444');
+            });
+        }
+    }
+
+    /**
+     * Style A: Dual Ribbon Footer (saffron name + green designation style)
      */
     protected function renderDualRibbonFooter(
         ImageInterface $canvas,
@@ -294,14 +555,14 @@ class PosterComposer
         $desigColor = $footerConfig['desig_bg'] ?? ($party?->secondary_color ?: '#00873E');
         $nameColor = $footerConfig['name_bg'] ?? ($party?->primary_color ?: '#FF9933');
 
-        // 1. Designation Ribbon (Left Bottom Box: y: 940 to 985)
+        // 1. Designation Ribbon
         if (!empty($branding->designation)) {
             $canvas->drawRectangle(0, 942, function ($rect) use ($desigColor) {
                 $rect->size(540, 48);
                 $rect->background($desigColor);
             });
 
-            $desigText = Str::limit($branding->designation, 42);
+            $desigText = $this->shapeDevanagari(Str::limit($branding->designation, 42));
             $canvas->text($desigText, 25, 974, function ($font) use ($fontHindiRegular) {
                 $font->file($fontHindiRegular);
                 $font->size(20);
@@ -309,7 +570,7 @@ class PosterComposer
             });
         }
 
-        // 2. Name Ribbon (Saffron Box: y: 885 to 940)
+        // 2. Name Ribbon
         $nameBoxW = 520;
         $nameBoxH = 55;
         $nameX = 540;
@@ -318,23 +579,22 @@ class PosterComposer
             $rect->background($nameColor);
         });
 
-        $canvas->text($branding->display_name, $nameX + 30, 972, function ($font) use ($fontHindiBold) {
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $canvas->text($displayName, $nameX + 30, 972, function ($font) use ($fontHindiBold) {
             $font->file($fontHindiBold);
             $font->size(26);
             $font->color('#ffffff');
         });
 
-        // 3. Social Media Handle Bar (y: 990 to 1080)
+        // 3. Social Media Handle Bar
         $canvas->drawRectangle(0, 990, function ($rect) {
             $rect->size(1080, 90);
             $rect->background('#ffffff');
         });
 
-        // Social Icons and Handles
         $startX = 30;
         $socialY = 1045;
 
-        // Facebook
         if ($branding->facebook_handle) {
             $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'fb', '#1877F2');
             $canvas->text($branding->facebook_handle, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
@@ -345,7 +605,6 @@ class PosterComposer
             $startX += 280;
         }
 
-        // Instagram
         if ($branding->instagram_handle) {
             $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'ig', '#E4405F');
             $canvas->text($branding->instagram_handle, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
@@ -356,11 +615,9 @@ class PosterComposer
             $startX += 280;
         }
 
-        // WhatsApp / Phone
-        $phone = $branding->phone_number;
-        if ($phone) {
+        if ($branding->phone_number) {
             $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'wa', '#25D366');
-            $canvas->text($phone, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
+            $canvas->text($branding->phone_number, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
                 $font->file($fontEngRegular);
                 $font->size(17);
                 $font->color('#333333');
@@ -369,8 +626,7 @@ class PosterComposer
     }
 
     /**
-     * Style B: Royal Bar Footer (Image 3 Modi 11-Years Style)
-     * Maroon/Red Bar with circular BJP logo on left, Name & Subtitle in Gold/White
+     * Style B: Royal Bar Footer (Maroon/Red Bar with Gold text)
      */
     protected function renderRoyalBarFooter(
         ImageInterface $canvas,
@@ -382,16 +638,16 @@ class PosterComposer
         $fontHindiRegular = $this->getFontPath('hindi_regular');
         $fontEngRegular = $this->getFontPath('english_regular');
 
-        $barBg = $footerConfig['bar_bg'] ?? '#7A0C0E'; // Deep Maroon
+        $barBg = $footerConfig['bar_bg'] ?? '#7A0C0E';
         $goldColor = '#FFE57F';
 
-        // 1. Deep Colored Maroon Main Bar (y: 890 to 1030)
+        // 1. Deep Colored Maroon Main Bar
         $canvas->drawRectangle(0, 890, function ($rect) use ($barBg) {
             $rect->size(1080, 140);
             $rect->background($barBg);
         });
 
-        // 2. Circular Party Logo on Left (inside maroon bar)
+        // 2. Circular Party Logo on Left
         $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
         $resolvedLogo = $this->resolveFilePath($logoPath);
         $textStartX = 180;
@@ -410,15 +666,16 @@ class PosterComposer
         }
 
         // 3. Name Text in Gold
-        $canvas->text($branding->display_name, $textStartX, 955, function ($font) use ($fontHindiBold, $goldColor) {
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $canvas->text($displayName, $textStartX, 955, function ($font) use ($fontHindiBold, $goldColor) {
             $font->file($fontHindiBold);
             $font->size(34);
             $font->color($goldColor);
         });
 
-        // 4. Designation Text in White Subtitle
+        // 4. Designation Text
         if (!empty($branding->designation)) {
-            $desigFormatted = '(' . $branding->designation . ')';
+            $desigFormatted = $this->shapeDevanagari('(' . $branding->designation . ')');
             $canvas->text($desigFormatted, $textStartX, 995, function ($font) use ($fontHindiRegular) {
                 $font->file($fontHindiRegular);
                 $font->size(22);
@@ -426,7 +683,7 @@ class PosterComposer
             });
         }
 
-        // 5. Clean White Bottom Strip with Social Handles (y: 1030 to 1080)
+        // 5. Clean White Bottom Strip with Social Handles
         $canvas->drawRectangle(0, 1030, function ($rect) {
             $rect->size(1080, 50);
             $rect->background('#ffffff');
@@ -465,6 +722,26 @@ class PosterComposer
         }
     }
 
+    // ================================================================
+    // HELPER METHODS
+    // ================================================================
+
+    /**
+     * Shape Devanagari text for GD FreeType rendering.
+     * Moves pre-base matra \u093F (chhoti ee) before its consonant cluster.
+     */
+    protected function shapeDevanagari(?string $text): string
+    {
+        if (empty($text)) {
+            return '';
+        }
+
+        $matraI = mb_chr(0x093F, 'UTF-8');
+        $pattern = "/([\x{0915}-\x{0939}](?:\x{094D}[\x{0915}-\x{0939}])*)\x{093F}/u";
+
+        return preg_replace($pattern, $matraI . '$1', $text);
+    }
+
     /**
      * Draw small circular social media platform badge (FB, IG, WA)
      */
@@ -493,40 +770,61 @@ class PosterComposer
 
     /**
      * Circular avatar cropper using GD alpha transparency.
+     * FIXED: Uses $image->core()->native() compatible with Intervention Image v3 GD Driver.
      */
     protected function makeCircularAvatar(ImageInterface $image, int $size, string $borderColor = '#ffffff', int $borderWidth = 0): ImageInterface
     {
         $image->cover($size, $size);
-        $srcGd = $image->toGdImage();
+        $srcGd = $image->core()->native();
 
-        $destGd = imagecreatetruecolor($size, $size);
+        $totalSize = $size;
+        $innerSize = $size - ($borderWidth * 2);
+        if ($innerSize < 10) $innerSize = $size;
+
+        $destGd = imagecreatetruecolor($totalSize, $totalSize);
         imagealphablending($destGd, false);
         imagesavealpha($destGd, true);
         $transparent = imagecolorallocatealpha($destGd, 0, 0, 0, 127);
         imagefill($destGd, 0, 0, $transparent);
 
-        $radius = $size / 2;
-        for ($x = 0; $x < $size; $x++) {
-            for ($y = 0; $y < $size; $y++) {
-                $dx = $x - $radius + 0.5;
-                $dy = $y - $radius + 0.5;
-                if (($dx * $dx + $dy * $dy) <= ($radius * $radius)) {
-                    $color = imagecolorat($srcGd, $x, $y);
-                    imagesetpixel($destGd, $x, $y, $color);
+        $radius = $totalSize / 2;
+
+        // Draw border circle first
+        if ($borderWidth > 0) {
+            $br = hexdec(substr($borderColor, 1, 2));
+            $bg = hexdec(substr($borderColor, 3, 2));
+            $bb = hexdec(substr($borderColor, 5, 2));
+            $borderAlloc = imagecolorallocate($destGd, $br, $bg, $bb);
+
+            imagealphablending($destGd, true);
+            for ($x = 0; $x < $totalSize; $x++) {
+                for ($y = 0; $y < $totalSize; $y++) {
+                    $dx = $x - $radius + 0.5;
+                    $dy = $y - $radius + 0.5;
+                    if (($dx * $dx + $dy * $dy) <= ($radius * $radius)) {
+                        imagesetpixel($destGd, $x, $y, $borderAlloc);
+                    }
                 }
             }
         }
 
-        // Draw border if requested
-        if ($borderWidth > 0) {
-            // Allocate border color
-            $r = hexdec(substr($borderColor, 1, 2));
-            $g = hexdec(substr($borderColor, 3, 2));
-            $b = hexdec(substr($borderColor, 5, 2));
-            $borderAlloc = imagecolorallocate($destGd, $r, $g, $b);
-            imagesetthickness($destGd, $borderWidth);
-            imageellipse($destGd, (int) $radius, (int) $radius, $size - $borderWidth, $size - $borderWidth, $borderAlloc);
+        // Draw inner image circle
+        $innerRadius = $innerSize / 2;
+        $innerGd = imagecreatetruecolor($innerSize, $innerSize);
+        imagecopyresampled($innerGd, $srcGd, 0, 0, 0, 0, $innerSize, $innerSize, $size, $size);
+
+        for ($x = 0; $x < $innerSize; $x++) {
+            for ($y = 0; $y < $innerSize; $y++) {
+                $dx = $x - $innerRadius + 0.5;
+                $dy = $y - $innerRadius + 0.5;
+                if (($dx * $dx + $dy * $dy) <= ($innerRadius * $innerRadius)) {
+                    $color = imagecolorat($innerGd, $x, $y);
+                    imagesetpixel($destGd, $x + $borderWidth, $y + $borderWidth, $color);
+                }
+            }
         }
+
+        imagedestroy($innerGd);
 
         $result = $this->manager->read($destGd);
         imagedestroy($destGd);
@@ -551,7 +849,6 @@ class PosterComposer
             return $path;
         }
 
-        // Fallback to any available font
         foreach ($map as $candidate) {
             if (file_exists($candidate)) {
                 return $candidate;
@@ -599,12 +896,53 @@ class PosterComposer
         return [
             [
                 'key'                => 'classic_political_right',
-                'name'               => 'Classic Political Right (Ram Navami Style)',
-                'description'        => 'Official top-left leaders group cutout, top-right party logo, candidate cutout on bottom-right, dual-color saffron & green footer bar with social handles.',
-                'badge'              => 'Dual Ribbon',
+                'name'               => 'Classic Political (Dr. Dharam Singh Style)',
+                'description'        => '6-7 circle leaders at top with saffron border, large candidate cutout bottom-right, standard political footer with BJP logo + name + social handles.',
+                'badge'              => 'Standard Right',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'standard_political',
+            ],
+            [
+                'key'                => 'candidate_left_classic',
+                'name'               => 'Classic Political Left (Artwork on Right)',
+                'description'        => 'Leaders at top, large candidate cutout anchored to bottom-left, footer with party logo on right and name on left.',
+                'badge'              => 'Standard Left',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-left',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'standard_political',
+            ],
+            [
+                'key'                => 'circle_badge_right',
+                'name'               => 'Circle Photo Frame (Bottom-Right)',
+                'description'        => 'Circular candidate photo frame on bottom-right with crisp white/gold border, perfect when non-cutout photos are uploaded.',
+                'badge'              => 'Circle Badge',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'circle',
+                'footer_style'       => 'standard_political',
+            ],
+            [
+                'key'                => 'circle_badge_center',
+                'name'               => 'Centered Circle Avatar (Announcement / Greeting)',
+                'description'        => 'Centered circular candidate photo with balanced borders, ideal for personal wishes and greetings.',
+                'badge'              => 'Circle Center',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-center',
+                'candidate_shape'    => 'circle',
+                'footer_style'       => 'standard_political',
+            ],
+            [
+                'key'                => 'group_cutout_classic',
+                'name'               => 'Group Cutout (Ram Navami Style)',
+                'description'        => 'Transparent group photo top-left, party logo top-right, candidate bottom-right, standard political footer.',
+                'badge'              => 'Group Cutout',
                 'leadership_mode'    => 'party_group_cutout',
                 'candidate_position' => 'bottom-right',
-                'footer_style'       => 'dual_ribbon',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'standard_political',
             ],
             [
                 'key'                => 'leader_tribute_royal',
@@ -613,48 +951,123 @@ class PosterComposer
                 'badge'              => 'Royal Bar',
                 'leadership_mode'    => 'none',
                 'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
                 'footer_style'       => 'royal_bar',
-            ],
-            [
-                'key'                => 'individual_circle_strip',
-                'name'               => 'Custom 6-Leader Circle Strip',
-                'description'        => 'Frosted top banner displaying up to 6 custom circular leaders with crisp borders, party logo top-right, dual ribbon footer with social handles.',
-                'badge'              => 'Circle Chips',
-                'leadership_mode'    => 'individual_chips',
-                'candidate_position' => 'bottom-right',
-                'footer_style'       => 'dual_ribbon',
             ],
             [
                 'key'                => 'clean_no_leaders',
                 'name'               => 'Clean Minimal (Festival Focus)',
-                'description'        => 'No top senior leadership strip, focuses on festival greeting with candidate cutout on bottom and modern dark ribbon.',
+                'description'        => 'No top senior leadership strip, focuses on festival greeting with candidate cutout on bottom and standard footer.',
                 'badge'              => 'Minimal',
                 'leadership_mode'    => 'none',
                 'candidate_position' => 'bottom-right',
-                'footer_style'       => 'dual_ribbon',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'standard_political',
             ],
         ];
     }
 
     /**
      * Built-in Presets Catalog ensuring 10+ years stability & zero math for admin.
+     * All pixel values tuned to reference Dr. Dharam Singh poster measurements.
      */
     public function getDefaultPresetConfig(string $key): array
     {
         return match ($key) {
-            // Style 2: Royal Maroon / Gold Bar (Modi 11 Years style)
+            // Style: Candidate on Left (when artwork / deity is on right)
+            'candidate_left_classic' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-left',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_left'      => 15,
+                    'anchor_bottom_y'  => 1035,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'standard_political',
+                ],
+            ],
+
+            // Style: Circular Photo Badge on Right (For non-cutout or framed templates)
+            'circle_badge_right' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'               => 'circle',
+                    'circle_size'         => 240,
+                    'circle_border_color' => '#ffffff',
+                    'circle_border_width' => 5,
+                    'position'            => 'bottom-right',
+                    'offset_right'        => 30,
+                    'footer_top_y'        => 910,
+                    'footer_overlap'      => 30,
+                ],
+                'footer' => [
+                    'style' => 'standard_political',
+                ],
+            ],
+
+            // Style: Centered Circular Avatar
+            'circle_badge_center' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'               => 'circle',
+                    'circle_size'         => 220,
+                    'circle_border_color' => '#ffffff',
+                    'circle_border_width' => 5,
+                    'position'            => 'bottom-center',
+                    'footer_top_y'        => 910,
+                    'footer_overlap'      => 30,
+                ],
+                'footer' => [
+                    'style' => 'standard_political',
+                ],
+            ],
+
+            // Style: Royal Maroon / Gold Bar (Modi 11 Years style)
             'leader_tribute_royal' => [
                 'canvas' => ['width' => 1080, 'height' => 1080],
                 'header' => [
-                    'enabled' => false, // Tribute poster has main leader art
+                    'enabled' => false,
                     'mode'    => 'none',
                 ],
                 'candidate' => [
-                    'position'      => 'bottom-right',
-                    'max_width'     => 330,
-                    'max_height'    => 400,
-                    'offset_bottom' => 35,
-                    'offset_right'  => 15,
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1030,
+                    'min_y'            => 100,
                 ],
                 'footer' => [
                     'style'  => 'royal_bar',
@@ -662,36 +1075,33 @@ class PosterComposer
                 ],
             ],
 
-            // Style 3: Individual 6 Circle Leaders Strip on Top
-            'individual_circle_strip' => [
+            // Style: Group Cutout at top-left (Ram Navami style)
+            'group_cutout_classic' => [
                 'canvas' => ['width' => 1080, 'height' => 1080],
                 'header' => [
-                    'enabled'          => true,
-                    'mode'             => 'individual_chips',
-                    'chip_shape'       => 'circle',
-                    'chip_size'        => 54,
-                    'chip_gap'         => 10,
-                    'chips_start_x'    => 35,
-                    'chips_start_y'    => 25,
-                    'bar_bg'           => 'rgba(255, 255, 255, 0.90)',
-                    'show_party_logo'  => true,
-                    'logo_size'        => 70,
+                    'enabled'             => true,
+                    'mode'                => 'party_group_cutout',
+                    'group_cutout_width'  => 360,
+                    'group_cutout_x'      => 10,
+                    'group_cutout_y'      => 10,
+                    'show_party_logo'     => true,
+                    'logo_size'           => 70,
                 ],
                 'candidate' => [
-                    'position'      => 'bottom-right',
-                    'max_width'     => 320,
-                    'max_height'    => 380,
-                    'offset_bottom' => 50,
-                    'offset_right'  => 20,
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1035,
+                    'min_y'            => 110,
                 ],
                 'footer' => [
-                    'style'    => 'dual_ribbon',
-                    'desig_bg' => '#00873E',
-                    'name_bg'  => '#FF9933',
+                    'style'  => 'standard_political',
                 ],
             ],
 
-            // Style 4: Minimal Clean (No Top Leaders)
+            // Style: Minimal Clean (No Top Leaders)
             'clean_no_leaders' => [
                 'canvas' => ['width' => 1080, 'height' => 1080],
                 'header' => [
@@ -699,42 +1109,42 @@ class PosterComposer
                     'mode'    => 'none',
                 ],
                 'candidate' => [
-                    'position'      => 'bottom-right',
-                    'max_width'     => 340,
-                    'max_height'    => 400,
-                    'offset_bottom' => 45,
-                    'offset_right'  => 20,
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1035,
+                    'min_y'            => 50,
                 ],
                 'footer' => [
-                    'style'    => 'dual_ribbon',
-                    'desig_bg' => '#0d9488',
-                    'name_bg'  => '#1e293b',
+                    'style' => 'standard_political',
                 ],
             ],
 
-            // Default Style 1: Classic Political Right (Ram Navami Style)
+            // DEFAULT: Classic Political Right — Dr. Dharam Singh Gold Standard
             default => [
                 'canvas' => ['width' => 1080, 'height' => 1080],
                 'header' => [
-                    'enabled'             => true,
-                    'mode'                => 'party_group_cutout', // Top-left transparent group cutout
-                    'group_cutout_width'  => 360,
-                    'group_cutout_x'      => 30,
-                    'group_cutout_y'      => 25,
-                    'show_party_logo'     => true,
-                    'logo_size'           => 75,
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
                 ],
                 'candidate' => [
-                    'position'      => 'bottom-right',
-                    'max_width'     => 330,
-                    'max_height'    => 400,
-                    'offset_bottom' => 40,
-                    'offset_right'  => 20,
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
                 ],
                 'footer' => [
-                    'style'    => 'dual_ribbon',
-                    'desig_bg' => '#00873E', // Party Green
-                    'name_bg'  => '#FF9933', // Saffron
+                    'style' => 'standard_political',
                 ],
             ],
         };
