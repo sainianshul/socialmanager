@@ -229,31 +229,6 @@
                         </div>
 
                         <textarea name="content" id="composer-content" class="form-control" rows="5" placeholder="Write caption...">{{ old('content') }}</textarea>
-
-                        {{-- First Comment Option (Instagram & Facebook Auto-Drop) --}}
-                        <div class="mt-2.5 pt-2 border-top" id="first-comment-container" style="border-color: #f1f5f9 !important;">
-                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                <label class="form-check form-switch m-0 cursor-pointer d-flex align-items-center">
-                                    <input class="form-check-input me-2" type="checkbox" id="check-enable-first-comment" {{ old('first_comment') ? 'checked' : '' }}>
-                                    <span class="form-check-label fw-semibold text-dark d-flex align-items-center gap-1.5" style="font-size: 0.875rem;">
-                                        <i class="ti ti-message-circle-plus text-primary"></i>
-                                        <span>Add to First Comment</span>
-                                    </span>
-                                </label>
-                                <span class="text-secondary small" style="font-size: 11.5px;">Auto-drop hashtags or links in 1st comment</span>
-                            </div>
-                            <div id="first-comment-input-box" class="mt-2 {{ old('first_comment') ? '' : 'd-none' }}">
-                                <div class="position-relative">
-                                    <textarea name="first_comment" id="composer-first-comment" class="form-control" rows="2" placeholder="Write first comment (e.g. #hashtags, website link, or extra details)...">{{ old('first_comment') }}</textarea>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1">
-                                    <small class="text-secondary" style="font-size: 11px;">Automatically published as the very first comment once live.</small>
-                                    <button type="button" class="btn btn-link btn-xs text-primary text-decoration-none p-0 fw-medium" id="btn-move-hashtags-to-comment" title="Cut hashtags from caption and paste into first comment">
-                                        <i class="ti ti-arrows-transfer-down me-0.5"></i>Move Hashtags from Caption
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     {{-- Meta Media Upload Area --}}
@@ -290,7 +265,33 @@
                         <div id="canva-imported-media-container"></div>
                     </div>
 
-                    {{-- Cross-Posting Section (Directly under Media Attachment) --}}
+                    {{-- First Comment Option (Placed directly above Cross-Posting for perfect consistency) --}}
+                    <div id="first-comment-container" class="card card-sm border bg-light-subtle p-3 mb-3">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                            <label class="form-check form-switch m-0 d-flex align-items-center cursor-pointer">
+                                <input class="form-check-input me-2" type="checkbox" id="check-enable-first-comment" {{ old('first_comment') ? 'checked' : '' }}>
+                                <span class="form-check-label fw-bold text-dark d-flex align-items-center gap-1.5">
+                                    <i class="ti ti-message-circle text-primary fs-2"></i> Add to First Comment
+                                </span>
+                            </label>
+                            <span class="text-secondary small" style="font-size: 11.5px;">Auto-drop hashtags or links in 1st comment</span>
+                        </div>
+
+                        {{-- First Comment Input Box (expands when switch is checked) --}}
+                        <div id="first-comment-input-box" class="mt-3 ps-4 {{ old('first_comment') ? '' : 'd-none' }}">
+                            <div class="position-relative">
+                                <textarea name="first_comment" id="composer-first-comment" class="form-control" rows="2" placeholder="Write first comment (e.g. #hashtags, website link, or extra details)...">{{ old('first_comment') }}</textarea>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-1.5">
+                                <small class="text-secondary" style="font-size: 11px;">Automatically published as the very first comment once live.</small>
+                                <button type="button" class="btn btn-link btn-xs text-primary text-decoration-none p-0 fw-medium" id="btn-move-hashtags-to-comment" title="Cut hashtags from caption and paste into first comment">
+                                    <i class="ti ti-arrows-transfer-down me-0.5"></i>Move Hashtags from Caption
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Cross-Posting Section (Directly under First Comment) --}}
                     <div id="cross-posting-section" class="mb-4">
                         {{-- 1. When on Facebook: "Also Post to Instagram" --}}
                         <div id="cross-post-to-ig-container" class="card card-sm border bg-light-subtle p-3">
@@ -777,6 +778,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#meta-post-types-section').removeClass('d-none');
             $('#meta-content-section').removeClass('d-none');
             $('#meta-media-section').removeClass('d-none');
+            $('#first-comment-container').removeClass('d-none');
             $('#youtube-fields-section').addClass('d-none');
             $('#youtube-title').prop('required', false);
             $('#youtube-video-file').prop('required', false);
@@ -817,6 +819,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#meta-post-types-section').removeClass('d-none');
             $('#meta-content-section').removeClass('d-none');
             $('#meta-media-section').removeClass('d-none');
+            $('#first-comment-container').removeClass('d-none');
             $('#youtube-fields-section').addClass('d-none');
             $('#youtube-title').prop('required', false);
             $('#youtube-video-file').prop('required', false);
@@ -858,6 +861,7 @@ document.addEventListener('DOMContentLoaded', function () {
             $('#meta-post-types-section').addClass('d-none');
             $('#meta-content-section').addClass('d-none');
             $('#meta-media-section').addClass('d-none');
+            $('#first-comment-container').addClass('d-none');
             $('#cross-posting-section').addClass('d-none');
 
             // Show YouTube sections
