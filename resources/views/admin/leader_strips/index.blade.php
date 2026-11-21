@@ -108,54 +108,19 @@
     opacity: 0.5;
 }
 
-/* Builder Modal Specifics */
-.bs-strip-preview-bar {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    overflow-x: auto;
-    padding: 10px 4px;
-}
-.bs-strip-leader-chip {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-width: 72px;
-    position: relative;
-    flex-shrink: 0;
-}
-.bs-strip-leader-chip img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid #0d9488;
-    object-fit: cover;
-    background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-.bs-strip-leader-chip .leader-name {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: #1e293b;
-    margin-top: 5px;
-    white-space: nowrap;
-}
-.bs-strip-leader-chip .leader-order {
-    font-size: 0.65rem;
-    color: #64748b;
-}
+/* Compact Strip Builder Specifics */
 .bs-builder-leader-row {
-    padding: 8px 10px;
+    padding: 7px 10px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 10px;
     background: #ffffff;
     border: 1px solid #e2e8f0;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     transition: all 0.15s ease;
     cursor: pointer;
+    user-select: none;
 }
 .bs-builder-leader-row:hover {
     background: #f8fafc;
@@ -165,29 +130,68 @@
     background: #f0fdfa;
     border-color: #0d9488;
 }
-.bs-order-item {
-    padding: 8px 12px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 6px;
-    transition: all 0.15s ease;
-}
-.bs-order-badge {
-    width: 24px;
-    height: 24px;
+.bs-builder-order-badge {
+    width: 22px;
+    height: 22px;
     border-radius: 50%;
     background: #0d9488;
     color: #ffffff;
-    font-size: 0.72rem;
+    font-size: 10px;
     font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+}
+.bs-builder-unselected-circle {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1.5px dashed #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.bs-mini-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #ffffff;
+    border: 1px solid #0d9488;
+    border-radius: 20px;
+    padding: 3px 8px 3px 4px;
+    flex-shrink: 0;
+}
+.bs-mini-chip img {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+.bs-mini-chip .chip-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #1e293b;
+    max-width: 80px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bs-mini-chip .chip-order {
+    font-size: 10px;
+    font-weight: 700;
+    color: #0d9488;
+}
+.bs-mini-chip .chip-remove {
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1;
+    transition: color 0.15s ease;
+}
+.bs-mini-chip .chip-remove:hover {
+    color: #ef4444;
 }
 </style>
 @endpush
@@ -350,135 +354,84 @@
     </div>
 
     {{-- ======================================================================
-         INTERACTIVE STRIP BUILDER MODAL
+         INTERACTIVE STRIP BUILDER MODAL (COMPACT & SIMPLE)
          ====================================================================== --}}
     <div class="modal fade" id="stripBuilderModal" tabindex="-1" aria-labelledby="stripBuilderModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
             <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
                 
                 {{-- Modal Header --}}
-                <div class="modal-header bg-white py-3 px-4 border-bottom">
-                    <div class="d-flex align-items-center gap-2.5">
-                        <div class="avatar avatar-md rounded-3 bg-teal-lt text-teal">
-                            <i class="ti ti-layout-navbar fs-2"></i>
-                        </div>
-                        <div>
-                            <h4 class="modal-title fw-bold text-dark mb-0" id="stripBuilderModalLabel">
-                                Leadership Strip Builder
-                            </h4>
-                            <p class="text-secondary small mb-0">Select party leaders and arrange their sequence from left to right for poster headers.</p>
-                        </div>
-                    </div>
+                <div class="modal-header bg-white py-3 px-4 border-bottom d-flex align-items-center justify-content-between">
+                    <h5 class="modal-title fw-bold text-dark mb-0" id="stripBuilderModalLabel">
+                        Create Strip
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
 
                 {{-- Modal Body --}}
-                <div class="modal-body p-4 bg-light-subtle">
+                <div class="modal-body p-3 p-md-4">
                     
-                    {{-- Row 1: Strip Name, Party Select & Default Toggle --}}
-                    <div class="card border-0 shadow-xs rounded-3 p-3 mb-3 bg-white">
-                        <div class="row g-3 align-items-center">
-                            <div class="col-md-5">
-                                <label class="form-label fw-bold small text-dark mb-1">
-                                    <i class="ti ti-tag text-primary me-1"></i>Strip Name <span class="text-danger">*</span>
+                    {{-- Form Fields: Name, Party, Default Status --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold small text-dark mb-1" for="builder-strip-name">
+                            Strip Name <span class="text-danger">*</span>
+                        </label>
+                        <input type="text" id="builder-strip-name" class="form-control rounded-2" placeholder="e.g. My Campaign Strip" maxlength="150" required>
+                        <input type="hidden" id="builder-strip-id" value="">
+                    </div>
+
+                    <div class="row g-2 mb-3 align-items-center">
+                        <div class="col-7">
+                            <label class="form-label fw-semibold small text-dark mb-1" for="builder-party-id">
+                                Political Party <span class="text-danger">*</span>
+                            </label>
+                            <select id="builder-party-id" class="form-select rounded-2">
+                                <option value="">Select Party</option>
+                                @foreach($parties as $party)
+                                    <option value="{{ $party->id }}" {{ ($currentPartyId == $party->id) ? 'selected' : '' }}>
+                                        {{ $party->name }} ({{ $party->short_code ?: 'General' }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-5 pt-3">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="builder-is-default" checked>
+                                <label class="form-check-label small fw-medium text-dark" for="builder-is-default">
+                                    Set as default
                                 </label>
-                                <input type="text" id="builder-strip-name" class="form-control" placeholder="e.g. My UP Leadership Strip" maxlength="150" required>
-                                <input type="hidden" id="builder-strip-id" value="">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold small text-dark mb-1">
-                                    <i class="ti ti-flag text-warning me-1"></i>Political Party <span class="text-danger">*</span>
-                                </label>
-                                <select id="builder-party-id" class="form-select">
-                                    <option value="">Select Party</option>
-                                    @foreach($parties as $party)
-                                        <option value="{{ $party->id }}" {{ ($currentPartyId == $party->id) ? 'selected' : '' }}>
-                                            {{ $party->name }} ({{ $party->short_code ?: 'General' }})
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label fw-bold small text-dark mb-1">
-                                    <i class="ti ti-star text-warning me-1"></i>Default Status
-                                </label>
-                                <div class="form-check form-switch mt-1">
-                                    <input class="form-check-input" type="checkbox" id="builder-is-default" checked>
-                                    <label class="form-check-label fw-semibold text-dark small" for="builder-is-default">
-                                        Set as active default
-                                    </label>
-                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {{-- Row 2: Live Poster Header Strip Preview --}}
-                    <div class="card border-0 shadow-xs rounded-3 p-3 mb-3 bg-white">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="small fw-bold text-dark">
-                                <i class="ti ti-eye text-primary me-1"></i>Live Header Strip Preview
-                            </span>
-                            <span class="badge bg-teal-lt rounded-pill px-2.5 py-0.5" id="builder-preview-count" style="font-size: 11px;">
-                                0 Leaders Selected
+                    {{-- Selected Preview Strip (Compact Horizontal Rail) --}}
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center justify-content-between mb-1.5">
+                            <span class="small fw-semibold text-dark">Selected Sequence</span>
+                            <span class="badge bg-teal-lt rounded-pill px-2 py-0.5" id="builder-preview-count" style="font-size: 11px;">
+                                0 / 12 Selected
                             </span>
                         </div>
-                        <div class="bs-strip-preview-bar bg-light rounded-3 py-2.5 px-3" id="builder-preview-bar" style="min-height: 88px;">
-                            <div class="text-secondary small text-center w-100 py-3" id="builder-preview-empty">
-                                Select leaders from the list below to preview the leadership strip banner.
+                        <div class="border rounded-3 p-2 bg-light-subtle d-flex align-items-center gap-1.5 overflow-x-auto" id="builder-preview-bar" style="min-height: 48px;">
+                            <div class="text-secondary small text-center w-100 py-1" id="builder-preview-empty">
+                                Click leaders below to add them to your strip.
                             </div>
                         </div>
                     </div>
 
-                    {{-- Row 3: 2-Column Selection & Hierarchy Reordering --}}
-                    <div class="row g-3">
-                        
-                        {{-- Left Column: Available Leaders with Search --}}
-                        <div class="col-lg-6">
-                            <div class="card border-0 shadow-xs rounded-3 p-3 bg-white h-100">
-                                <div class="d-flex align-items-center justify-content-between mb-2.5">
-                                    <h5 class="fw-bold text-dark mb-0 fs-4">
-                                        <i class="ti ti-users me-1 text-primary"></i>Available Leaders
-                                    </h5>
-                                    <span class="text-secondary small" id="builder-available-count">0 Leaders</span>
-                                </div>
-
-                                {{-- Search Input --}}
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text bg-white border-end-0 text-muted">
-                                        <i class="ti ti-search"></i>
-                                    </span>
-                                    <input type="text" id="builder-search-input" class="form-control border-start-0 ps-0" placeholder="Search by name or designation...">
-                                </div>
-
-                                {{-- Scrollable Leaders Checkbox List --}}
-                                <div class="overflow-auto border rounded-3 p-2 bg-light-subtle" id="builder-leaders-list" style="max-height: 340px;">
-                                    <div class="text-center py-4 text-muted small">Loading party leaders...</div>
-                                </div>
-                            </div>
+                    {{-- Search Input --}}
+                    <div class="mb-2">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white border-end-0 text-muted">
+                                <i class="ti ti-search"></i>
+                            </span>
+                            <input type="text" id="builder-search-input" class="form-control border-start-0 ps-0" placeholder="Search leader by name or designation...">
                         </div>
+                    </div>
 
-                        {{-- Right Column: Selected Sequence & Reordering --}}
-                        <div class="col-lg-6">
-                            <div class="card border-0 shadow-xs rounded-3 p-3 bg-white h-100">
-                                <div class="d-flex align-items-center justify-content-between mb-2.5">
-                                    <h5 class="fw-bold text-dark mb-0 fs-4">
-                                        <i class="ti ti-arrows-sort me-1 text-primary"></i>Hierarchy & Sequence
-                                    </h5>
-                                    <span class="badge bg-primary-lt" id="builder-selected-counter">0 / 12 Max</span>
-                                </div>
-                                <p class="text-secondary small mb-2.5" style="font-size: 0.78rem;">
-                                    Leaders will appear on the poster in this order (Order #1 is leftmost).
-                                </p>
-
-                                {{-- Selected Items Orderable List --}}
-                                <div class="overflow-auto border rounded-3 p-2 bg-light-subtle" id="builder-selected-list" style="max-height: 340px; min-height: 200px;">
-                                    <div class="text-center py-5 text-muted small" id="builder-selected-empty">
-                                        <i class="ti ti-arrow-left me-1"></i>Check leaders on the left to add them here.
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
+                    {{-- Single Scrollable Leaders List (Click to select/unselect in order) --}}
+                    <div class="overflow-auto border rounded-3 p-1.5 bg-white" id="builder-leaders-list" style="max-height: 250px;">
+                        <div class="text-center py-4 text-muted small">Loading party leaders...</div>
                     </div>
 
                     {{-- Modal Alert Box --}}
@@ -488,11 +441,11 @@
 
                 {{-- Modal Footer --}}
                 <div class="modal-footer bg-white py-2.5 px-4 border-top d-flex align-items-center justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" data-bs-dismiss="modal">
                         Cancel
                     </button>
-                    <button type="button" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm" id="btn-save-strip">
-                        <i class="ti ti-device-floppy me-1.5 fs-2"></i>Save Header Strip
+                    <button type="button" class="btn btn-sm btn-primary rounded-pill px-4 fw-bold" id="btn-save-strip">
+                        <i class="ti ti-device-floppy me-1"></i>Save Strip
                     </button>
                 </div>
 
@@ -613,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ======================================================================
-    // INTERACTIVE STRIP BUILDER JAVASCRIPT LOGIC
+    // INTERACTIVE STRIP BUILDER JAVASCRIPT LOGIC (SIMPLE & COMPACT)
     // ======================================================================
     var stripBuilderModalEl = document.getElementById('stripBuilderModal');
     var stripBuilderModal = stripBuilderModalEl ? bootstrap.Modal.getOrCreateInstance(stripBuilderModalEl) : null;
@@ -631,11 +584,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var checkIsDefault = document.getElementById('builder-is-default');
     var inputSearch = document.getElementById('builder-search-input');
     var elAvailableList = document.getElementById('builder-leaders-list');
-    var elSelectedList = document.getElementById('builder-selected-list');
     var elPreviewBar = document.getElementById('builder-preview-bar');
     var elPreviewCount = document.getElementById('builder-preview-count');
-    var elAvailableCount = document.getElementById('builder-available-count');
-    var elSelectedCounter = document.getElementById('builder-selected-counter');
     var elModalAlert = document.getElementById('builder-modal-alert');
     var btnSaveStrip = document.getElementById('btn-save-strip');
 
@@ -700,9 +650,9 @@ document.addEventListener('DOMContentLoaded', function () {
         var modalTitle = document.getElementById('stripBuilderModalLabel');
 
         if (stripId) {
-            if (modalTitle) modalTitle.textContent = 'Edit Leadership Strip';
+            if (modalTitle) modalTitle.textContent = 'Edit Strip';
         } else {
-            if (modalTitle) modalTitle.textContent = 'Create New Leadership Strip';
+            if (modalTitle) modalTitle.textContent = 'Create Strip';
             if (inputStripName) inputStripName.value = '';
             if (checkIsDefault) checkIsDefault.checked = true;
         }
@@ -739,15 +689,14 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             await fetchLeadersForParty(stripBuilderState.partyId);
-            renderSelectedLeaders();
-            renderLivePreview();
+            renderPreviewBar();
         } catch (err) {
             console.error('Error initializing strip builder:', err);
             showModalAlert('Failed to load strip details. Please try again.', 'danger');
         }
     }
 
-    // Render Available Leaders List with Search
+    // Render Available Leaders List
     function renderAvailableLeaders(filterQuery) {
         if (!elAvailableList) return;
 
@@ -762,10 +711,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        if (elAvailableCount) {
-            elAvailableCount.textContent = leaders.length + ' Available';
-        }
-
         if (leaders.length === 0) {
             elAvailableList.innerHTML = '<div class="text-center py-4 text-muted small">No leaders found matching search.</div>';
             return;
@@ -773,89 +718,51 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var html = '';
         leaders.forEach(function (leader) {
-            var isSelected = stripBuilderState.selectedLeaders.some(function (sl) { return sl.id === leader.id; });
+            var selectedIdx = stripBuilderState.selectedLeaders.findIndex(function (sl) { return sl.id === leader.id; });
+            var isSelected = (selectedIdx !== -1);
+
             html += '<div class="bs-builder-leader-row ' + (isSelected ? 'selected' : '') + '" data-id="' + leader.id + '">' +
-                '<input type="checkbox" class="form-check-input mt-0 leader-select-check" ' + (isSelected ? 'checked' : '') + ' data-id="' + leader.id + '">' +
-                '<img src="' + leader.image_url + '" alt="' + leader.name + '" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;">' +
+                (isSelected
+                    ? '<div class="bs-builder-order-badge">#' + (selectedIdx + 1) + '</div>'
+                    : '<div class="bs-builder-unselected-circle"><i class="ti ti-plus text-muted" style="font-size: 11px;"></i></div>') +
+                '<img src="' + leader.image_url + '" alt="' + leader.name + '" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid ' + (isSelected ? '#0d9488' : '#e2e8f0') + ';">' +
                 '<div class="flex-grow-1 min-w-0">' +
-                    '<div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;">' + leader.name + '</div>' +
-                    '<div class="text-secondary small text-truncate" style="font-size: 0.72rem;">' + (leader.designation || leader.state || '') + '</div>' +
+                    '<div class="fw-bold text-dark text-truncate" style="font-size: 0.84rem;">' + leader.name + '</div>' +
+                    '<div class="text-secondary text-truncate" style="font-size: 0.72rem;">' + (leader.designation || leader.state || '') + '</div>' +
                 '</div>' +
-                (leader.state ? '<span class="badge bg-light text-secondary border" style="font-size: 10px;">' + leader.state + '</span>' : '') +
+                (isSelected
+                    ? '<span class="badge bg-teal-lt text-teal px-2 py-0.5 rounded-pill" style="font-size: 10px;">Selected</span>'
+                    : '<span class="text-muted small" style="font-size: 11px;">Add</span>') +
             '</div>';
         });
 
         elAvailableList.innerHTML = html;
     }
 
-    // Render Selected Leaders Hierarchy
-    function renderSelectedLeaders() {
-        if (!elSelectedList) return;
-
-        var selected = stripBuilderState.selectedLeaders;
-
-        if (elSelectedCounter) {
-            elSelectedCounter.textContent = selected.length + ' / 12 Max';
-        }
-
-        if (selected.length === 0) {
-            elSelectedList.innerHTML = '<div class="text-center py-5 text-muted small" id="builder-selected-empty">' +
-                '<i class="ti ti-arrow-left me-1"></i>Check leaders on the left to add them here.' +
-            '</div>';
-            return;
-        }
-
-        var html = '';
-        selected.forEach(function (leader, idx) {
-            var isFirst = idx === 0;
-            var isLast = idx === selected.length - 1;
-
-            html += '<div class="bs-order-item" data-id="' + leader.id + '" data-index="' + idx + '">' +
-                '<div class="bs-order-badge">#' + (idx + 1) + '</div>' +
-                '<img src="' + leader.image_url + '" alt="' + leader.name + '" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;">' +
-                '<div class="flex-grow-1 min-w-0">' +
-                    '<div class="fw-bold text-dark text-truncate" style="font-size: 0.85rem;">' + leader.name + '</div>' +
-                '</div>' +
-                '<div class="d-flex align-items-center gap-1">' +
-                    '<button type="button" class="btn btn-sm btn-icon btn-outline-secondary rounded-circle btn-move-leader" data-index="' + idx + '" data-dir="-1" ' + (isFirst ? 'disabled' : '') + ' title="Move Left / Higher">' +
-                        '<i class="ti ti-arrow-up"></i>' +
-                    '</button>' +
-                    '<button type="button" class="btn btn-sm btn-icon btn-outline-secondary rounded-circle btn-move-leader" data-index="' + idx + '" data-dir="1" ' + (isLast ? 'disabled' : '') + ' title="Move Right / Lower">' +
-                        '<i class="ti ti-arrow-down"></i>' +
-                    '</button>' +
-                    '<button type="button" class="btn btn-sm btn-icon btn-ghost-danger rounded-circle btn-remove-leader ms-1" data-id="' + leader.id + '" title="Remove from strip">' +
-                        '<i class="ti ti-x"></i>' +
-                    '</button>' +
-                '</div>' +
-            '</div>';
-        });
-
-        elSelectedList.innerHTML = html;
-    }
-
-    // Render Real-Time Strip Visual Preview
-    function renderLivePreview() {
+    // Render Mini Preview Bar of Selected Sequence
+    function renderPreviewBar() {
         if (!elPreviewBar) return;
 
         var selected = stripBuilderState.selectedLeaders;
 
         if (elPreviewCount) {
-            elPreviewCount.textContent = selected.length + ' Leaders Selected';
+            elPreviewCount.textContent = selected.length + ' / 12 Selected';
         }
 
         if (selected.length === 0) {
-            elPreviewBar.innerHTML = '<div class="text-secondary small text-center w-100 py-3" id="builder-preview-empty">' +
-                'Select leaders from the list below to preview the leadership strip banner.' +
+            elPreviewBar.innerHTML = '<div class="text-secondary small text-center w-100 py-1" id="builder-preview-empty">' +
+                'Click leaders below to add them to your strip.' +
             '</div>';
             return;
         }
 
         var html = '';
         selected.forEach(function (leader, idx) {
-            html += '<div class="bs-strip-leader-chip">' +
+            html += '<div class="bs-mini-chip" title="Order #' + (idx + 1) + ' - Click X to remove">' +
+                '<span class="chip-order">#' + (idx + 1) + '</span>' +
                 '<img src="' + leader.image_url + '" alt="' + leader.name + '">' +
-                '<span class="leader-name">' + (leader.name.length > 14 ? leader.name.substring(0, 14) + '...' : leader.name) + '</span>' +
-                '<span class="leader-order">#' + (idx + 1) + '</span>' +
+                '<span class="chip-name">' + leader.name + '</span>' +
+                '<i class="ti ti-x chip-remove" data-id="' + leader.id + '"></i>' +
             '</div>';
         });
 
@@ -873,7 +780,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             // Select (Max 12)
             if (stripBuilderState.selectedLeaders.length >= 12) {
-                showModalAlert('Maximum 12 leaders can be added to a header strip.', 'warning');
+                showModalAlert('Maximum 12 leaders can be added to a strip.', 'warning');
                 return;
             }
             var leader = stripBuilderState.availableLeaders.find(function (l) { return l.id === id; });
@@ -890,8 +797,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         hideModalAlert();
         renderAvailableLeaders(inputSearch ? inputSearch.value : '');
-        renderSelectedLeaders();
-        renderLivePreview();
+        renderPreviewBar();
     }
 
     // Search Input Listener
@@ -901,7 +807,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Click handler for Available Leaders List
+    // Click handler for Leaders List
     if (elAvailableList) {
         elAvailableList.addEventListener('click', function (e) {
             var row = e.target.closest('.bs-builder-leader-row');
@@ -913,33 +819,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Click handler for Move Up, Move Down, and Remove in Selected Leaders List
-    if (elSelectedList) {
-        elSelectedList.addEventListener('click', function (e) {
-            var btnMove = e.target.closest('.btn-move-leader');
-            if (btnMove) {
-                var idx = parseInt(btnMove.getAttribute('data-index'), 10);
-                var dir = parseInt(btnMove.getAttribute('data-dir'), 10);
-                var targetIdx = idx + dir;
-
-                if (targetIdx >= 0 && targetIdx < stripBuilderState.selectedLeaders.length) {
-                    var temp = stripBuilderState.selectedLeaders[idx];
-                    stripBuilderState.selectedLeaders[idx] = stripBuilderState.selectedLeaders[targetIdx];
-                    stripBuilderState.selectedLeaders[targetIdx] = temp;
-
-                    renderSelectedLeaders();
-                    renderLivePreview();
-                }
-                return;
-            }
-
-            var btnRemove = e.target.closest('.btn-remove-leader');
-            if (btnRemove) {
-                var leaderId = btnRemove.getAttribute('data-id');
-                if (leaderId) {
-                    toggleLeader(leaderId);
-                }
-                return;
+    // Click handler for removing leader from preview bar
+    if (elPreviewBar) {
+        elPreviewBar.addEventListener('click', function (e) {
+            var btnRemove = e.target.closest('.chip-remove');
+            if (!btnRemove) return;
+            var leaderId = btnRemove.getAttribute('data-id');
+            if (leaderId) {
+                toggleLeader(leaderId);
             }
         });
     }
