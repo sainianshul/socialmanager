@@ -165,14 +165,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.branding.*') ? 'active' : '' }}" href="{{ route('admin.branding.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Branding Settings">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
-                                <i class="ti ti-id fs-2"></i>
-                            </span>
-                            <span class="nav-link-title">Branding Studio</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.posts.instagram') ? 'active' : '' }}" href="{{ route('admin.posts.instagram') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Instagram Posts">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-pink">
                                 <i class="ti ti-brand-instagram fs-2"></i>

@@ -56,7 +56,7 @@ class BrandingController extends Controller
         $validated = $request->validate([
             'display_name'     => 'required|string|max:150',
             'designation'      => 'nullable|string|max:150',
-            'client_type'      => 'required|in:politician,business,personal',
+            'client_type'      => 'nullable|in:politician,business,personal',
             'party_id'         => 'nullable|exists:political_parties,id',
             'phone_number'     => 'nullable|string|max:30',
             'facebook_handle'  => 'nullable|string|max:100',
@@ -75,10 +75,12 @@ class BrandingController extends Controller
             $branding->is_default = true;
         }
 
+        $clientType = $validated['client_type'] ?? $branding->client_type ?? $user->client_type ?? User::CLIENT_TYPE_POLITICIAN;
+
         $branding->display_name = $validated['display_name'];
         $branding->designation = $validated['designation'] ?? null;
-        $branding->client_type = $validated['client_type'];
-        $branding->party_id = $validated['client_type'] === 'politician' ? ($validated['party_id'] ?? null) : null;
+        $branding->client_type = $clientType;
+        $branding->party_id = $validated['party_id'] ?? null;
         $branding->phone_number = $validated['phone_number'] ?? null;
         $branding->facebook_handle = $validated['facebook_handle'] ?? null;
         $branding->instagram_handle = $validated['instagram_handle'] ?? null;
@@ -86,8 +88,8 @@ class BrandingController extends Controller
         $branding->save();
 
         // Keep User's client_type synced
-        if ($user->client_type !== $validated['client_type']) {
-            $user->update(['client_type' => $validated['client_type']]);
+        if ($user->client_type !== $clientType) {
+            $user->update(['client_type' => $clientType]);
         }
 
         // Process image upload

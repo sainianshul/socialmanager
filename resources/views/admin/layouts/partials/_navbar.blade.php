@@ -20,8 +20,19 @@
             </nav>
         </div>
 
-        {{-- Right: Theme Toggle & User Info --}}
+        {{-- Right: Branding Studio, Theme Toggle & User Info --}}
         <div class="navbar-nav flex-row order-md-last ms-auto align-items-center">
+            <div class="nav-item me-2">
+                <a href="{{ route('admin.branding.index') }}" 
+                   class="btn btn-icon btn-ghost-secondary rounded-circle {{ request()->routeIs('admin.branding.*') ? 'active text-primary bg-primary-lt' : '' }}" 
+                   title="Branding Studio" 
+                   data-bs-toggle="tooltip" 
+                   data-bs-placement="bottom"
+                   aria-label="Branding Studio"
+                   style="width: 36px; height: 36px;">
+                    <i class="ti ti-user-circle fs-2"></i>
+                </a>
+            </div>
             <div class="nav-item d-none d-md-flex me-3">
                 <a href="javascript:void(0)" class="nav-link px-0 hide-theme-dark btn-theme-toggle" title="Enable dark mode" data-bs-toggle="tooltip"
 		   data-bs-placement="bottom" data-theme="dark">

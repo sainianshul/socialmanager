@@ -32,7 +32,7 @@ class BrandingTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Branding Studio');
         $response->assertSee('Bharatiya Janata Party');
-        $response->assertSee('Profile Category');
+        $response->assertSee('Political Party');
     }
 
     public function test_user_can_update_branding_profile_without_image(): void
@@ -47,7 +47,6 @@ class BrandingTest extends TestCase
         $payload = [
             'display_name'     => 'डॉ. धर्म सिंह सैनी',
             'designation'      => 'पूर्व मंत्री (उत्तर प्रदेश)',
-            'client_type'      => 'politician',
             'party_id'         => $party->id,
             'phone_number'     => '9876543210',
             'facebook_handle'  => 'Dharam.singhsaini',
@@ -64,7 +63,6 @@ class BrandingTest extends TestCase
             'user_id'          => $user->id,
             'display_name'     => 'डॉ. धर्म सिंह सैनी',
             'designation'      => 'पूर्व मंत्री (उत्तर प्रदेश)',
-            'client_type'      => 'politician',
             'party_id'         => $party->id,
             'phone_number'     => '9876543210',
             'facebook_handle'  => 'Dharam.singhsaini',
@@ -83,7 +81,6 @@ class BrandingTest extends TestCase
         $payload = [
             'display_name'   => 'Leader Name',
             'designation'    => 'MLA',
-            'client_type'    => 'politician',
             'branding_image' => $fakeImage,
         ];
 
@@ -106,32 +103,15 @@ class BrandingTest extends TestCase
         Storage::disk('public')->assertExists($brandingImage->original_image_path);
     }
 
-    public function test_party_id_is_null_when_client_type_is_business(): void
+    public function test_navbar_contains_branding_studio_icon(): void
     {
-        $this->seed(PoliticalPartySeeder::class);
         $user = User::factory()->create(['role' => User::ROLE_USER]);
-        $party = PoliticalParty::where('short_code', 'BJP')->first();
 
-        $payload = [
-            'display_name'     => 'Acme Enterprises',
-            'designation'      => 'Founder & CEO',
-            'client_type'      => 'business',
-            'party_id'         => $party->id, // Provided but should be cleared for non-politicians
-            'phone_number'     => '9876543210',
-        ];
+        $response = $this->actingAs($user)->get(route('admin.branding.index'));
 
-        $response = $this->actingAs($user)->post(route('admin.branding.update'), $payload);
-
-        $response->assertRedirect(route('admin.branding.index'));
-
-        $this->assertDatabaseHas('user_brandings', [
-            'user_id'      => $user->id,
-            'display_name' => 'Acme Enterprises',
-            'client_type'  => 'business',
-            'party_id'     => null,
-        ]);
-
-        $this->assertEquals('business', $user->fresh()->client_type);
+        $response->assertStatus(200);
+        $response->assertSee(route('admin.branding.index'));
+        $response->assertSee('ti-user-circle');
     }
 
     public function test_validation_fails_on_missing_display_name(): void
@@ -140,7 +120,6 @@ class BrandingTest extends TestCase
 
         $payload = [
             'display_name' => '',
-            'client_type'  => 'politician',
         ];
 
         $response = $this->actingAs($user)->post(route('admin.branding.update'), $payload);
