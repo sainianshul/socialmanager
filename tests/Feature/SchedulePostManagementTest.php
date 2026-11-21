@@ -1019,4 +1019,40 @@ class SchedulePostManagementTest extends TestCase
             'message'         => '#summer #outfits #trending link in bio',
         ]);
     }
+
+    public function test_post_creator_and_edit_render_preview_button_and_modal(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_preview',
+            'name' => 'Preview Page',
+            'access_token' => 'mock_token',
+            'is_active' => true,
+        ]);
+
+        $scheduledPost = ScheduledPost::create([
+            'user_id' => $user->id,
+            'account_id' => $account->id,
+            'post_type' => 'text',
+            'content' => 'Scheduled preview test content',
+            'scheduled_at' => now()->addDay(),
+            'status' => ScheduledPost::STATUS_SCHEDULED,
+        ]);
+
+        // 1. Create Post Page
+        $createResponse = $this->actingAs($user)->get(route('admin.posts.create'));
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('id="btn-open-post-preview"', false);
+        $createResponse->assertSee('id="modal-post-preview"', false);
+        $createResponse->assertSee('Post Live Preview');
+
+        // 2. Edit Scheduled Post Page
+        $editResponse = $this->actingAs($user)->get(route('admin.posts.schedule.edit', $scheduledPost->id));
+        $editResponse->assertStatus(200);
+        $editResponse->assertSee('id="btn-open-post-preview"', false);
+        $editResponse->assertSee('id="modal-post-preview"', false);
+        $editResponse->assertSee('Post Live Preview');
+    }
 }

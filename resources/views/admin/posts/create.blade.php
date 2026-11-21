@@ -483,9 +483,15 @@
 
             <div class="card-footer d-flex justify-content-between align-items-center py-3 px-4" id="composer-card-footer">
                 <a href="{{ route('admin.posts.schedule') }}" class="btn btn-outline-secondary">Cancel</a>
-                <button type="submit" class="btn btn-primary px-4" id="btn-submit-post">
-                    <i class="ti ti-calendar-check me-1.5"></i>Schedule Post
-                </button>
+                <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1.5" id="btn-open-post-preview" title="Preview how this post will look when live">
+                        <i class="ti ti-eye"></i>
+                        <span>Preview</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary px-4" id="btn-submit-post">
+                        <i class="ti ti-calendar-check me-1.5"></i>Schedule Post
+                    </button>
+                </div>
             </div>
         </form>
     </div>
@@ -495,6 +501,9 @@
 
     {{-- Canva Design Studio Modal --}}
     @include('admin.posts.partials._canva_studio_modal')
+
+    {{-- Live Platform Post Preview Modal --}}
+    @include('admin.posts.partials._post_preview_modal')
 
 @endsection
 
@@ -1132,4 +1141,5 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 @include('admin.posts.partials._ai_caption_script')
 @include('admin.posts.partials._canva_studio_script')
+@include('admin.posts.partials._post_preview_script')
 @endpush

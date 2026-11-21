@@ -400,6 +400,10 @@
                 </a>
 
                 <div class="d-flex align-items-center gap-2">
+                    <button type="button" class="btn btn-outline-secondary d-inline-flex align-items-center gap-1.5" id="btn-open-post-preview" title="Preview how this post will look when live">
+                        <i class="ti ti-eye"></i>
+                        <span>Preview</span>
+                    </button>
                     <button type="submit" class="btn btn-primary px-4" id="btn-submit-post">
                         <i class="ti ti-check me-1.5"></i>Update Scheduled Post
                     </button>
@@ -407,6 +411,9 @@
             </div>
         </form>
     </div>
+
+    {{-- Live Platform Post Preview Modal --}}
+    @include('admin.posts.partials._post_preview_modal')
 
     {{-- MODAL: Delete Post Confirmation --}}
     <div class="modal modal-blur fade" id="modal-delete-post" tabindex="-1" role="dialog" aria-hidden="true">
@@ -651,5 +658,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 @include('admin.posts.partials._ai_caption_script')
 @include('admin.posts.partials._canva_studio_script')
+@include('admin.posts.partials._post_preview_script')
 @endpush
 
