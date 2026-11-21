@@ -89,6 +89,7 @@
             @method('PUT')
             <input type="hidden" name="platform" id="selected-platform" value="{{ $platform }}">
             <input type="hidden" name="post_type" id="selected-post-type" value="{{ old('post_type', $scheduledPost->post_type) }}">
+            <div id="canva-imported-media-container"></div>
 
             <div class="card-body p-4">
 
@@ -183,12 +184,7 @@
 
                         {{-- Thumbnail (Current preview + Replacement option) --}}
                         <div class="col-md-6">
-                            <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                <label class="form-label fw-bold text-dark m-0">Custom Thumbnail</label>
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5" style="font-size: 11px;" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                    <i class="ti ti-brand-canva me-1"></i>Canva Thumbnail
-                                </button>
-                            </div>
+                            <label class="form-label fw-bold text-dark mb-1.5">Custom Thumbnail</label>
 
                             @if($scheduledPost->thumbnail_path)
                                 @php
@@ -208,9 +204,21 @@
                                 </div>
                             @endif
 
-                            <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control" accept="image/jpeg,image/png,image/webp">
-                            <div class="form-text small text-secondary">
-                                <i class="ti ti-help-circle me-1"></i>Upload a new image only to replace the current thumbnail.
+                            <div class="d-flex align-items-center gap-2">
+                                <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control" accept="image/jpeg,image/png,image/webp">
+                                <button type="button" class="btn btn-canva-brand flex-shrink-0 d-inline-flex align-items-center gap-1.5 px-3 py-2" data-bs-toggle="modal" data-bs-target="#modal-canva-thumbnail" title="Design YouTube Thumbnail on Canva">
+                                    <i class="ti ti-brand-canva"></i>
+                                    <span>Design on Canva</span>
+                                </button>
+                            </div>
+                            <div class="text-secondary small mt-1.5" style="font-size: 12px;">1280 &times; 720 px recommended &bull; Upload a new image or design to replace current</div>
+                            <div id="youtube-thumbnail-preview-box" class="mt-2.5 d-none">
+                                <div class="position-relative d-inline-block">
+                                    <img id="youtube-thumbnail-preview" src="" class="rounded border shadow-xs" style="max-height: 90px; width: auto; object-fit: cover;" alt="Thumbnail preview">
+                                    <button type="button" class="btn btn-sm btn-icon btn-dark bg-opacity-75 position-absolute top-0 end-0 m-1.5 rounded-circle border-0 text-white" id="btn-remove-youtube-thumbnail" title="Remove thumbnail" style="width: 24px; height: 24px; line-height: 1;">
+                                        <i class="ti ti-x" style="font-size: 11px;"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -24,20 +24,20 @@ $(document).ready(function() {
 
     function updateCanvaUI(data) {
         if (data.is_connected) {
-            $('#canva-status-dot').removeClass('bg-secondary bg-warning').addClass('bg-success');
-            $('#canva-status-text').html('<span class="text-success fw-medium">Connected to Canva</span>');
-            $('#btn-connect-canva').addClass('d-none');
-            $('#btn-disconnect-canva').removeClass('d-none');
+            $('#canva-status-dot, .canva-status-dot').removeClass('bg-secondary bg-warning').addClass('bg-success');
+            $('#canva-status-text, .canva-status-text').html('<span class="text-success fw-medium">Connected to Canva</span>');
+            $('#btn-connect-canva, .btn-connect-canva').addClass('d-none');
+            $('#btn-disconnect-canva, .btn-disconnect-canva').removeClass('d-none');
         } else {
-            $('#canva-status-dot').removeClass('bg-success bg-warning').addClass('bg-secondary');
-            $('#canva-status-text').html('<span class="text-muted">Not connected</span>');
-            $('#btn-connect-canva').removeClass('d-none');
-            $('#btn-disconnect-canva').addClass('d-none');
+            $('#canva-status-dot, .canva-status-dot').removeClass('bg-success bg-warning').addClass('bg-secondary');
+            $('#canva-status-text, .canva-status-text').html('<span class="text-muted">Not connected</span>');
+            $('#btn-connect-canva, .btn-connect-canva').removeClass('d-none');
+            $('#btn-disconnect-canva, .btn-disconnect-canva').addClass('d-none');
         }
     }
 
     // Check status whenever modal opens
-    $('#modal-canva-studio').on('show.bs.modal', function () {
+    $('#modal-canva-studio, #modal-canva-thumbnail').on('show.bs.modal', function () {
         checkCanvaStatus();
     });
 
@@ -331,9 +331,137 @@ $(document).ready(function() {
             reader.onload = function(e) {
                 $('#youtube-thumbnail-preview').attr('src', e.target.result);
                 $('#youtube-thumbnail-preview-box').removeClass('d-none');
+                $('input[name="canva_thumbnail"]').remove();
             };
             reader.readAsDataURL(this.files[0]);
         }
+    });
+
+    // Remove YouTube Thumbnail
+    $(document).on('click', '#btn-remove-youtube-thumbnail', function(e) {
+        e.preventDefault();
+        $('#youtube-thumbnail-preview').attr('src', '');
+        $('#youtube-thumbnail-preview-box').addClass('d-none');
+        $('input[name="canva_thumbnail"]').remove();
+        let thumbFileInput = document.getElementById('youtube-thumbnail');
+        if (thumbFileInput) thumbFileInput.value = '';
+    });
+
+    // Dedicated YouTube Thumbnail Canva Launcher
+    $('#btn-create-yt-thumbnail-api').on('click', function(e) {
+        e.preventDefault();
+        let btn = $(this);
+        let width = 1280;
+        let height = 720;
+        let videoTitle = $('#youtube-title').val() ? $('#youtube-title').val().trim() : '';
+        let title = (videoTitle ? videoTitle.substring(0, 40) + ' - ' : '') + 'YouTube Thumbnail';
+
+        if (!canvaConnected) {
+            window.open('https://www.canva.com/create/youtube-thumbnails/', '_blank');
+            return;
+        }
+
+        let originalHtml = btn.html();
+        btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span> Opening...');
+
+        $.ajax({
+            url: "{{ route('admin.canva.create-design') }}",
+            type: "POST",
+            data: {
+                _token: csrfToken,
+                title: title,
+                width: width,
+                height: height,
+                preset: 'youtube_thumbnail'
+            },
+            success: function(res) {
+                btn.prop('disabled', false).html(originalHtml);
+                if (res.success && res.edit_url) {
+                    $('#canva-thumbnail-id-input').val(res.design_id);
+                    $('#canva-thumbnail-feedback')
+                        .removeClass('d-none text-danger')
+                        .addClass('text-success')
+                        .html('<i class="ti ti-check me-1"></i>Thumbnail editor opened in Canva! Finish editing, then click <b>Import to Thumbnail</b> below.');
+                    window.open(res.edit_url, '_blank');
+                } else {
+                    alert(res.message || 'Could not launch Canva editor.');
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false).html(originalHtml);
+                let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Canva API request failed.';
+                alert(msg);
+            }
+        });
+    });
+
+    // Dedicated YouTube Thumbnail Importer
+    $('#btn-import-canva-thumbnail').on('click', function() {
+        let inputVal = $('#canva-thumbnail-id-input').val().trim();
+        if (!inputVal) {
+            alert('Please enter a valid Canva Design ID or URL.');
+            return;
+        }
+
+        let designId = inputVal;
+        let urlMatch = inputVal.match(/design\/([a-zA-Z0-9_-]+)/);
+        if (urlMatch && urlMatch[1]) {
+            designId = urlMatch[1];
+        }
+
+        let btn = $(this);
+        let spinner = $('#canva-thumb-import-spinner');
+        let feedback = $('#canva-thumbnail-feedback');
+
+        btn.prop('disabled', true);
+        spinner.removeClass('d-none');
+        feedback.removeClass('d-none text-danger text-success').addClass('text-primary').html('<i class="ti ti-loader me-1"></i>Exporting thumbnail from Canva...');
+
+        $.ajax({
+            url: "{{ route('admin.canva.export-design') }}",
+            type: "POST",
+            data: {
+                _token: csrfToken,
+                design_id: designId,
+                format: 'jpg'
+            },
+            success: function(res) {
+                btn.prop('disabled', false);
+                spinner.addClass('d-none');
+
+                if (res.success && res.image_url) {
+                    feedback.removeClass('text-primary text-danger').addClass('text-success').html('<i class="ti ti-check me-1"></i>Thumbnail attached successfully!');
+
+                    // Populate thumbnail preview
+                    $('#youtube-thumbnail-preview').attr('src', res.image_url);
+                    $('#youtube-thumbnail-preview-box').removeClass('d-none');
+
+                    // Reset raw file input so Canva thumbnail takes precedence
+                    let thumbFileInput = document.getElementById('youtube-thumbnail');
+                    if (thumbFileInput) thumbFileInput.value = '';
+
+                    // Ensure hidden input is set for form submission
+                    $('input[name="canva_thumbnail"]').remove();
+                    if ($('#canva-imported-media-container').length === 0) {
+                        $('#form-create-post, #form-edit-post').append('<div id="canva-imported-media-container"></div>');
+                    }
+                    $('#canva-imported-media-container').append(`<input type="hidden" name="canva_thumbnail" value="${res.relative_path}">`);
+
+                    setTimeout(function() {
+                        let modal = bootstrap.Modal.getInstance(document.getElementById('modal-canva-thumbnail'));
+                        if (modal) modal.hide();
+                    }, 1000);
+                } else {
+                    feedback.removeClass('text-primary text-success').addClass('text-danger').text(res.message || 'Export failed.');
+                }
+            },
+            error: function(xhr) {
+                btn.prop('disabled', false);
+                spinner.addClass('d-none');
+                let msg = xhr.responseJSON ? xhr.responseJSON.message : 'Failed to export design from Canva.';
+                feedback.removeClass('text-primary text-success').addClass('text-danger').text(msg);
+            }
+        });
     });
 
     // Initial check

@@ -111,18 +111,44 @@ class CanvaService
     /**
      * Create a new design in Canva and return its edit URL.
      */
-    public function createDesign(string $accessToken, string $title = 'SocialManager Graphic', int $width = 1080, int $height = 1080): array
+    public function createDesign(string $accessToken, string $title = 'SocialManager Graphic', int $width = 1080, int $height = 1080, ?string $preset = null): array
     {
+        $payload = [
+            'title' => Str::limit($title, 100),
+        ];
+
+        if ($preset) {
+            $payload['design_type'] = [
+                'type' => 'preset',
+                'name' => $preset,
+            ];
+        } else {
+            $payload['design_type'] = [
+                'type'   => 'custom',
+                'width'  => max(40, min(8000, $width)),
+                'height' => max(40, min(8000, $height)),
+            ];
+        }
+
         $response = Http::withToken($accessToken)
             ->timeout(20)
-            ->post('https://api.canva.com/rest/v1/designs', [
+            ->post('https://api.canva.com/rest/v1/designs', $payload);
+
+        // If preset request fails, fallback safely to custom dimensions
+        if (!$response->successful() && $preset) {
+            Log::warning('Canva preset failed (' . $preset . '), falling back to custom dimensions: ' . $response->body());
+            $fallbackPayload = [
+                'title' => Str::limit($title, 100),
                 'design_type' => [
                     'type'   => 'custom',
                     'width'  => max(40, min(8000, $width)),
                     'height' => max(40, min(8000, $height)),
                 ],
-                'title' => Str::limit($title, 100),
-            ]);
+            ];
+            $response = Http::withToken($accessToken)
+                ->timeout(20)
+                ->post('https://api.canva.com/rest/v1/designs', $fallbackPayload);
+        }
 
         if (!$response->successful()) {
             Log::error('Canva Create Design Failed: ' . $response->body());

@@ -111,6 +111,7 @@ class CanvaController extends Controller
             'title'  => 'nullable|string|max:100',
             'width'  => 'nullable|integer|min:40|max:8000',
             'height' => 'nullable|integer|min:40|max:8000',
+            'preset' => 'nullable|string|max:50',
         ]);
 
         $userId = auth()->id() ?? 'guest';
@@ -129,8 +130,9 @@ class CanvaController extends Controller
             $title = $request->input('title', 'Social Post - ' . date('Y-m-d'));
             $width = (int) ($request->input('width', 1080));
             $height = (int) ($request->input('height', 1080));
+            $preset = $request->input('preset');
 
-            $result = $this->canvaService->createDesign($token, $title, $width, $height);
+            $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
 
             $design = $result['design'] ?? [];
 

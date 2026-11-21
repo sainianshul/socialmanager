@@ -392,22 +392,21 @@
                                 <input type="file" name="video_file" id="youtube-video-file" class="form-control" accept="video/mp4,video/quicktime,video/webm">
                             </div>
                             <div class="col-md-6 mb-4">
-                                <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                    <label class="form-label fw-bold text-dark m-0">Thumbnail</label>
-                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-0.5" style="font-size: 11px;" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                        <i class="ti ti-brand-canva me-1"></i>Canva Thumbnail (16:9)
+                                <label class="form-label fw-bold text-dark mb-1.5">Thumbnail</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control" accept="image/jpeg,image/png">
+                                    <button type="button" class="btn btn-canva-brand flex-shrink-0 d-inline-flex align-items-center gap-1.5 px-3 py-2" data-bs-toggle="modal" data-bs-target="#modal-canva-thumbnail" title="Design YouTube Thumbnail on Canva">
+                                        <i class="ti ti-brand-canva"></i>
+                                        <span>Design on Canva</span>
                                     </button>
                                 </div>
-                                <div class="p-2.5 rounded border bg-light-subtle">
-                                    <input type="file" name="thumbnail" id="youtube-thumbnail" class="form-control form-control-sm mb-2" accept="image/jpeg,image/png">
-                                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                                        <span class="text-secondary" style="font-size: 11px;">1280 &times; 720 px (16:9 recommended)</span>
-                                        <button type="button" class="btn btn-xs btn-outline-danger rounded-pill px-2.5 py-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                            <i class="ti ti-sparkles me-1"></i>Create in Canva
+                                <div class="text-secondary small mt-1.5" style="font-size: 12px;">1280 &times; 720 px recommended</div>
+                                <div id="youtube-thumbnail-preview-box" class="mt-2.5 d-none">
+                                    <div class="position-relative d-inline-block">
+                                        <img id="youtube-thumbnail-preview" src="" class="rounded border shadow-xs" style="max-height: 90px; width: auto; object-fit: cover;" alt="Thumbnail preview">
+                                        <button type="button" class="btn btn-sm btn-icon btn-dark bg-opacity-75 position-absolute top-0 end-0 m-1.5 rounded-circle border-0 text-white" id="btn-remove-youtube-thumbnail" title="Remove thumbnail" style="width: 24px; height: 24px; line-height: 1;">
+                                            <i class="ti ti-x" style="font-size: 11px;"></i>
                                         </button>
-                                    </div>
-                                    <div id="youtube-thumbnail-preview-box" class="mt-2 d-none">
-                                        <img id="youtube-thumbnail-preview" src="" class="rounded border shadow-xs" style="max-height: 85px; width: auto; object-fit: cover;" alt="Thumbnail preview">
                                     </div>
                                 </div>
                             </div>
