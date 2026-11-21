@@ -134,35 +134,7 @@
     pointer-events: auto;
 }
 
-/* Filter Pills */
-.fs-pill-filter {
-    padding: 6px 14px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 500;
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    background: var(--tblr-card-bg, #ffffff);
-    color: var(--tblr-body-color, #475569);
-    text-decoration: none !important;
-    transition: all 0.15s ease;
-}
-.fs-pill-filter:hover {
-    border-color: #1db8ab;
-    color: #1db8ab;
-}
-.fs-pill-filter.active {
-    background: #1db8ab;
-    color: #ffffff !important;
-    border-color: #1db8ab;
-}
-[data-bs-theme="dark"] .fs-pill-filter {
-    border-color: rgba(255, 255, 255, 0.1);
-}
-[data-bs-theme="dark"] .fs-pill-filter.active {
-    background: #1db8ab;
-    color: #ffffff !important;
-    border-color: #1db8ab;
-}
+
 </style>
 @endpush
 
@@ -238,25 +210,7 @@
                     <div id="festival-caption-text" class="d-none">{{ $selectedFestival->ready_caption }}{{ !empty($selectedFestival->hashtags) ? "\n\n" . $selectedFestival->hashtags : '' }}</div>
                 @endif
 
-                {{-- Filter Pills --}}
-                <div class="d-flex gap-1 align-items-center ms-md-2">
-                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $selectedFestival->id, 'party' => 'all']) }}" 
-                       class="fs-pill-filter {{ $partyFilter === 'all' ? 'active' : '' }}">
-                        All
-                    </a>
-                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $selectedFestival->id, 'party' => 'bjp']) }}" 
-                       class="fs-pill-filter {{ $partyFilter === 'bjp' ? 'active' : '' }}">
-                        BJP
-                    </a>
-                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $selectedFestival->id, 'party' => 'inc']) }}" 
-                       class="fs-pill-filter {{ $partyFilter === 'inc' ? 'active' : '' }}">
-                        Congress
-                    </a>
-                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $selectedFestival->id, 'party' => 'aap']) }}" 
-                       class="fs-pill-filter {{ $partyFilter === 'aap' ? 'active' : '' }}">
-                        AAP
-                    </a>
-                </div>
+
             </div>
         </div>
     @endif
