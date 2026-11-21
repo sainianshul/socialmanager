@@ -218,6 +218,21 @@ class User extends Authenticatable
         return $this->hasMany(AutoDmRule::class);
     }
 
+    public function brandings(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(UserBranding::class);
+    }
+
+    public function defaultBranding(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(UserBranding::class)->where('is_default', true);
+    }
+
+    public function brandingImages(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(BrandingImage::class);
+    }
+
     // ─── API Response ────────────────────────
 
     public function toApiResponse(): array
