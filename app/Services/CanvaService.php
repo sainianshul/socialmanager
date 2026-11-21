@@ -163,14 +163,27 @@ class CanvaService
      */
     public function exportAndDownloadDesign(string $accessToken, string $designId, string $format = 'jpg'): array
     {
+        $normalizedFormat = in_array(strtolower($format), ['png', 'jpg', 'jpeg']) ? strtolower($format) : 'jpg';
+        if ($normalizedFormat === 'jpeg') {
+            $normalizedFormat = 'jpg';
+        }
+
+        $formatConfig = [
+            'type'           => $normalizedFormat,
+            'export_quality' => 'regular',
+        ];
+
+        // Canva Connect API requires an integer quality (1-100) when format is jpg
+        if ($normalizedFormat === 'jpg') {
+            $formatConfig['quality'] = 90;
+        }
+
         // 1. Initiate export job
         $jobResponse = Http::withToken($accessToken)
             ->timeout(15)
             ->post('https://api.canva.com/rest/v1/exports', [
                 'design_id' => $designId,
-                'format'    => [
-                    'type' => in_array($format, ['png', 'jpg']) ? $format : 'jpg',
-                ],
+                'format'    => $formatConfig,
             ]);
 
         if (!$jobResponse->successful()) {
@@ -225,7 +238,28 @@ class CanvaService
             throw new \RuntimeException('Failed to download exported image file.');
         }
 
-        $fileName = 'canva_' . Str::random(20) . '.' . $format;
+        // If Canva returned a ZIP for a multi-page design, extract the first image
+        if (substr($fileContents, 0, 4) === "PK\x03\x04" && class_exists('\ZipArchive')) {
+            $zip = new \ZipArchive();
+            $tempZip = tempnam(sys_get_temp_dir(), 'canva_zip_');
+            file_put_contents($tempZip, $fileContents);
+            if ($zip->open($tempZip) === true) {
+                for ($idx = 0; $idx < $zip->numFiles; $idx++) {
+                    $entryName = $zip->getNameIndex($idx);
+                    if (preg_match('/\.(jpe?g|png)$/i', $entryName)) {
+                        $extracted = $zip->getFromIndex($idx);
+                        if (!empty($extracted)) {
+                            $fileContents = $extracted;
+                            break;
+                        }
+                    }
+                }
+                $zip->close();
+            }
+            @unlink($tempZip);
+        }
+
+        $fileName = 'canva_' . Str::random(20) . '.' . $normalizedFormat;
         $relativePath = 'posts/canva/' . $fileName;
 
         Storage::disk('public')->put($relativePath, $fileContents);

@@ -208,6 +208,14 @@ class CanvaIntegrationTest extends TestCase
         $this->assertNotEmpty($relativePath);
         $this->assertStringEndsWith('.jpg', $relativePath);
         Storage::disk('public')->assertExists($relativePath);
+
+        Http::assertSent(function ($request) {
+            if ($request->url() === 'https://api.canva.com/rest/v1/exports') {
+                return ($request['format']['type'] ?? null) === 'jpg'
+                    && ($request['format']['quality'] ?? null) === 90;
+            }
+            return true;
+        });
     }
 
     public function test_post_create_view_renders_canva_button_and_modal(): void
