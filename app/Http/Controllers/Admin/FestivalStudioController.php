@@ -46,11 +46,16 @@ class FestivalStudioController extends Controller
         $userBranding = $user ? ($user->defaultBranding ?? $user->brandings()->first()) : null;
         $parties = PoliticalParty::where('is_active', true)->get();
 
+        $userCutout = $userBranding?->defaultImage?->cutout_url 
+            ?? ($user?->profile_photo ? asset('storage/' . $user->profile_photo) : null)
+            ?? 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'User') . '&background=1db8ab&color=fff&bold=true&size=128';
+
         return view('admin.festival_studio.index', compact(
             'upcomingFestivals',
             'selectedFestival',
             'templates',
             'userBranding',
+            'userCutout',
             'parties',
             'partyFilter'
         ));

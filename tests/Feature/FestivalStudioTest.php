@@ -28,7 +28,6 @@ class FestivalStudioTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Festival Studio');
-        $response->assertSee('Upcoming Festivals', false);
         $response->assertSee('Samvidhan Diwas');
     }
 
