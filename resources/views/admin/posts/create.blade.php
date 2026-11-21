@@ -258,10 +258,6 @@
                             </button>
                         </div>
 
-                        <div class="form-text small text-secondary mb-2" id="media-attachment-help-text">
-                            Attach photos or videos (JPG, PNG, MP4, MOV up to 50MB) from your computer or create graphics with Canva.
-                        </div>
-
                         {{-- Live Attachments Grid --}}
                         <div class="row g-2 d-none mt-1" id="composer-media-preview-grid"></div>
 
