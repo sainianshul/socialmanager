@@ -17,7 +17,7 @@ class LeaderStripController extends Controller
     /**
      * List all custom strips for authenticated user plus system strips for their party
      */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): mixed
     {
         $user = auth()->user();
         $partyId = $request->query('party_id') ?? $user->defaultBranding?->party_id;
@@ -37,12 +37,21 @@ class LeaderStripController extends Controller
             ?? $systemStrips->firstWhere('is_default', true) 
             ?? $systemStrips->first();
 
-        return response()->json([
-            'success' => true,
-            'user_strips' => $userStrips,
-            'system_strips' => $systemStrips,
-            'active_strip' => $activeStrip,
-        ]);
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'user_strips' => $userStrips,
+                'system_strips' => $systemStrips,
+                'active_strip' => $activeStrip,
+            ]);
+        }
+
+        $parties = PoliticalParty::where('is_active', true)->orderBy('name')->get();
+        $partyLeaders = $partyId ? PoliticalLeader::where('party_id', $partyId)->where('is_active', true)->orderBy('name')->get() : collect();
+        $branding = $user->defaultBranding;
+        $currentPartyId = $partyId;
+
+        return view('admin.leader_strips.index', compact('userStrips', 'systemStrips', 'activeStrip', 'parties', 'partyLeaders', 'branding', 'currentPartyId'));
     }
 
     /**

@@ -195,4 +195,15 @@ class LeaderStripControllerTest extends TestCase
         $response->assertStatus(404);
         $this->assertDatabaseHas('leader_strips', ['id' => $systemStrip->id]);
     }
+
+    public function test_can_render_leader_strips_web_page(): void
+    {
+        $response = $this->actingAs($this->user)
+            ->get(route('admin.leader-strips.index'));
+
+        $response->assertStatus(200);
+        $response->assertViewIs('admin.leader_strips.index');
+        $response->assertSee('Leadership Strips');
+        $response->assertSee('Create Strip');
+    }
 }

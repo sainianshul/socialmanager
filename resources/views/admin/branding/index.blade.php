@@ -694,9 +694,14 @@
                                     <h3 class="fw-bold text-dark mb-1" style="font-size: 1.25rem;">Leadership Header Strips</h3>
                                     <p class="text-secondary small mb-0">Manage the top leadership banners displayed at the head of your political and festival posters.</p>
                                 </div>
-                                <button type="button" class="btn btn-primary rounded-pill px-3.5 py-1.5 shadow-sm" id="btn-create-strip-modal">
-                                    <i class="ti ti-plus me-1.5"></i>Create New Strip
-                                </button>
+                                <div class="d-flex align-items-center gap-2">
+                                    <a href="{{ route('admin.leader-strips.index') }}" class="btn btn-outline-primary rounded-pill px-3 py-1.5 shadow-sm">
+                                        <i class="ti ti-external-link me-1"></i>Manage Strips Hub
+                                    </a>
+                                    <button type="button" class="btn btn-primary rounded-pill px-3.5 py-1.5 shadow-sm" id="btn-create-strip-modal">
+                                        <i class="ti ti-plus me-1.5"></i>Create New Strip
+                                    </button>
+                                </div>
                             </div>
 
                             {{-- Dynamic AJAX Status Alerts --}}
@@ -855,47 +860,6 @@
                                 </div>
                             @endif
 
-                            {{-- Section 4: Leadership Hierarchy Table --}}
-                            @if($activeStrip && $activeStrip->leaders->isNotEmpty())
-                                <div class="mb-2">
-                                    <div class="d-flex align-items-center justify-content-between mb-2">
-                                        <h5 class="fw-bold text-dark mb-0" style="font-size: 0.95rem;">Active Strip Hierarchy Details</h5>
-                                        <span class="badge bg-light text-secondary border">Order 1 to {{ $activeStrip->leaders->count() }}</span>
-                                    </div>
-                                    <div class="table-responsive rounded-3 border">
-                                        <table class="table table-vcenter table-hover mb-0">
-                                            <thead class="bg-light">
-                                                <tr>
-                                                    <th style="width: 80px;">Order</th>
-                                                    <th style="width: 70px;">Photo</th>
-                                                    <th>Leader Name</th>
-                                                    <th>Designation</th>
-                                                    <th>Scope</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($activeStrip->leaders as $leader)
-                                                    <tr>
-                                                        <td>
-                                                            <span class="badge bg-light text-dark border">
-                                                                #{{ $leader->pivot->order ?? $loop->iteration }}
-                                                            </span>
-                                                        </td>
-                                                        <td>
-                                                            <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1px solid #cbd5e1;">
-                                                        </td>
-                                                        <td class="fw-bold text-dark">{{ $leader->name }}</td>
-                                                        <td class="text-secondary">{{ $leader->designation ?: '--' }}</td>
-                                                        <td>
-                                                            <span class="badge bg-primary-lt">{{ $leader->state ?: 'National' }}</span>
-                                                        </td>
-                                                    </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            @endif
                         </div>
 
                     </div>

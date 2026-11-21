@@ -145,6 +145,25 @@
                         </a>
                     </li>
 
+                    {{-- BRANDING & IDENTITY --}}
+                    <li class="nav-section-title">Branding & Identity</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.branding.*') ? 'active' : '' }}" href="{{ route('admin.branding.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Branding Studio">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
+                                <i class="ti ti-palette fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Branding Studio</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.leader-strips.*') ? 'active' : '' }}" href="{{ route('admin.leader-strips.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Leadership Strips">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
+                                <i class="ti ti-layout-navbar fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Leadership Strips</span>
+                        </a>
+                    </li>
+
                     {{-- CONTENT --}}
                     <li class="nav-section-title">Content</li>
                     <li class="nav-item">
