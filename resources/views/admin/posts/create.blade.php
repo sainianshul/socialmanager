@@ -247,14 +247,14 @@
                         <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple>
 
                         {{-- Two Distinct Action Buttons: Upload From Device & Design on Canva --}}
-                        <div class="d-flex align-items-center gap-2.5 flex-wrap mb-2">
+                        <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 12px;">
                             <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" id="btn-trigger-file-browser">
                                 <i class="ti ti-device-laptop fs-2 text-secondary"></i>
                                 <span>Upload From Device</span>
                             </button>
-                            <button type="button" class="btn btn-outline-primary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
-                                <i class="ti ti-brand-canva fs-2 text-primary"></i>
-                                <span>Design on Canva</span>
+                            <button type="button" class="btn btn-canva-brand rounded-2 px-3.5 py-2 fw-semibold d-inline-flex align-items-center gap-2 ms-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                                <i class="ti ti-brand-canva fs-2 text-white"></i>
+                                <span class="text-white">Design on Canva</span>
                             </button>
                         </div>
 
@@ -593,6 +593,23 @@
         background: #1e293b !important;
         border-color: rgba(255, 255, 255, 0.25) !important;
         color: #f8fafc !important;
+    }
+    .btn-canva-brand {
+        background: linear-gradient(135deg, #00c4cc 0%, #7d2ae8 100%) !important;
+        color: #ffffff !important;
+        border: none !important;
+        box-shadow: 0 2px 8px rgba(125, 42, 232, 0.25) !important;
+        transition: all 0.2s ease !important;
+    }
+    .btn-canva-brand:hover {
+        background: linear-gradient(135deg, #00b3ba 0%, #6e24cf 100%) !important;
+        color: #ffffff !important;
+        box-shadow: 0 4px 14px rgba(125, 42, 232, 0.35) !important;
+        transform: translateY(-1px);
+    }
+    .btn-canva-brand:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 4px rgba(125, 42, 232, 0.2) !important;
     }
 </style>
 @endpush
