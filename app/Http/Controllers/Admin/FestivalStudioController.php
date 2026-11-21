@@ -13,14 +13,13 @@ class FestivalStudioController extends Controller
     public function index(Request $request)
     {
         $upcomingFestivals = Festival::active()
-            ->upcoming()
-            ->with(['templates' => function ($query) {
-                $query->where('is_active', true);
-            }])
-            ->take(15)
+            ->where('festival_date', '>=', now()->subDays(14)->toDateString())
+            ->orderBy('festival_date', 'asc')
+            ->take(20)
             ->get();
 
-        $selectedFestivalId = $request->query('festival_id', $upcomingFestivals->first()?->id);
+        $todayFestival = $upcomingFestivals->first(fn($f) => $f->festival_date->isToday());
+        $selectedFestivalId = $request->query('festival_id', $todayFestival?->id ?? $upcomingFestivals->first()?->id);
         $selectedFestival = $upcomingFestivals->firstWhere('id', $selectedFestivalId) ?? $upcomingFestivals->first();
 
         $partyFilter = $request->query('party', 'all');
