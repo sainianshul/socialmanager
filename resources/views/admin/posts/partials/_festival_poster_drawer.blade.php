@@ -1,5 +1,5 @@
 {{-- Festival Poster Right-Side Drawer (Offcanvas) --}}
-<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="drawer-festival-posters" aria-labelledby="drawer-festival-posters-label" style="width: 450px; border-left: 1px solid rgba(0, 0, 0, 0.08);">
+<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="drawer-festival-posters" aria-labelledby="drawer-festival-posters-label" style="width: 460px; max-width: 90vw; border-left: 1px solid rgba(0, 0, 0, 0.08);">
     {{-- Drawer Header --}}
     <div class="offcanvas-header border-bottom py-3 px-4 bg-white d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2.5">
@@ -8,7 +8,7 @@
             </span>
             <div>
                 <h4 class="offcanvas-title fw-bold mb-0 text-dark" id="drawer-festival-posters-label" style="font-size: 1.05rem; letter-spacing: -0.2px;">
-                    Festival Posters
+                    Festival & Campaign Posters
                 </h4>
                 <div class="text-secondary small" style="font-size: 11.5px;">Ready-to-use celebration & event templates</div>
             </div>
@@ -31,27 +31,46 @@
         </div>
 
         {{-- Category Filter Pills --}}
-        <div class="d-flex align-items-center gap-1.5 flex-wrap mb-4" id="festival-category-pills">
+        <div class="d-flex align-items-center gap-1.5 flex-wrap mb-3" id="festival-category-pills">
             <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-semibold btn-dark">All</button>
-            <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">Upcoming</button>
-            <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">National</button>
-            <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">Religious</button>
+            <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">Upcoming Festivals</button>
+            <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">Elections & Political</button>
+            <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">National Days</button>
             <button type="button" class="btn btn-xs rounded-pill px-2.5 py-1 fw-medium btn-light border text-secondary">Branding</button>
         </div>
 
-        {{-- Drawer Content Placeholder / Library Container --}}
-        <div id="festival-posters-list-container">
-            <div class="text-center py-5 px-3 border rounded-3 bg-light-subtle">
-                <div class="avatar avatar-md rounded-circle bg-white shadow-xs text-warning mx-auto mb-3">
-                    <i class="ti ti-sparkles fs-1"></i>
+        {{-- Sample Template Image Concept Card (Image 2) --}}
+        <div class="card border rounded-3 overflow-hidden shadow-xs mb-3">
+            <div class="card-header bg-light-subtle py-2.5 px-3 d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-1.5">
+                    <i class="ti ti-template text-primary"></i>
+                    <span class="fw-semibold text-dark small">Pre-Made Poster Templates</span>
                 </div>
-                <h5 class="fw-bold text-dark mb-1">Festival Templates Ready</h5>
-                <p class="text-secondary small mb-3" style="max-width: 300px; margin: 0 auto; font-size: 12px; line-height: 1.5;">
-                    Select pre-made festive posters with custom placeholders for your brand logo, name, and details.
-                </p>
-                <span class="badge bg-white border text-secondary rounded-pill px-3 py-1.5 fw-medium" style="font-size: 11px;">
-                    Drawer Loaded & Ready
+                <span class="badge bg-warning-lt text-warning rounded-pill px-2 py-0.5" style="font-size: 10.5px;">
+                    Sample Preview
                 </span>
+            </div>
+
+            <div class="position-relative bg-light p-2">
+                <img src="{{ asset('images/festival-templates-sample.jpg') }}" class="img-fluid rounded-2 w-100 border shadow-xs" alt="Campaign and Festival Poster Templates Sample" style="display: block;">
+            </div>
+
+            <div class="card-body p-3 bg-white">
+                <div class="small fw-semibold text-dark mb-1">Customizable Template Layouts:</div>
+                <ul class="list-unstyled small text-secondary mb-0" style="font-size: 12px; line-height: 1.6;">
+                    <li class="d-flex align-items-center gap-1.5 mb-1">
+                        <i class="ti ti-check text-success"></i>
+                        <span><strong>Empty Face / Photo Slots:</strong> Instant replace with user photo (ADD IMAGE)</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-1.5 mb-1">
+                        <i class="ti ti-check text-success"></i>
+                        <span><strong>Branding & Logo Slots:</strong> Party, business or campaign logo placement</span>
+                    </li>
+                    <li class="d-flex align-items-center gap-1.5">
+                        <i class="ti ti-check text-success"></i>
+                        <span><strong>Direct Composer Sync:</strong> Click to attach poster directly to post</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
@@ -59,7 +78,7 @@
     {{-- Drawer Footer --}}
     <div class="offcanvas-footer border-top p-3 bg-white mt-auto d-flex align-items-center justify-content-between">
         <span class="text-secondary small" style="font-size: 11px;">
-            <i class="ti ti-info-circle me-1"></i>Clicking a poster will attach it to your post.
+            <i class="ti ti-info-circle me-1"></i>Select any festival template to attach to post.
         </span>
         <button type="button" class="btn btn-light rounded-pill px-3.5 py-1.5 text-secondary" data-bs-dismiss="offcanvas" style="font-size: 0.85rem;">
             Close
