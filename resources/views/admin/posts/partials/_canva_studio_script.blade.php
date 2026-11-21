@@ -25,12 +25,12 @@ $(document).ready(function() {
     function updateCanvaUI(data) {
         if (data.is_connected) {
             $('#canva-status-dot').removeClass('bg-secondary bg-warning').addClass('bg-success');
-            $('#canva-status-text').html('<span class="text-success fw-bold">Canva Connected</span> &bull; Direct Sync Enabled');
+            $('#canva-status-text').html('<span class="text-success fw-semibold">Connected</span>');
             $('#btn-connect-canva').addClass('d-none');
             $('#btn-disconnect-canva').removeClass('d-none');
         } else {
             $('#canva-status-dot').removeClass('bg-success bg-warning').addClass('bg-secondary');
-            $('#canva-status-text').text('Canva Connect Ready');
+            $('#canva-status-text').html('<span class="text-muted">Not Connected</span>');
             $('#btn-connect-canva').removeClass('d-none');
             $('#btn-disconnect-canva').addClass('d-none');
         }
