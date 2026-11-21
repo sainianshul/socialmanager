@@ -34,6 +34,12 @@ Route::prefix('admin')->group(function () {
                 Route::post('/quick-schedule', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'quickSchedule'])->name('quick-schedule');
             });
 
+            // Branding Studio (Leader/Business Branding Strip Profile)
+            Route::prefix('branding')->name('branding.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Admin\BrandingController::class, 'index'])->name('index');
+                Route::post('/', [\App\Http\Controllers\Admin\BrandingController::class, 'update'])->name('update');
+            });
+
             // Connected Social Accounts (Meta / Facebook & Instagram)
             Route::prefix('accounts')->name('accounts.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\AccountController::class, 'index'])->name('index');

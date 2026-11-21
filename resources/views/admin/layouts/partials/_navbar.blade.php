@@ -44,6 +44,9 @@
                     <a href="{{ route('admin.profile.index') }}" class="dropdown-item">
                         <i class="ti ti-user me-2"></i> Profile
                     </a>
+                    <a href="{{ route('admin.branding.index') }}" class="dropdown-item">
+                        <i class="ti ti-id me-2"></i> Branding Studio
+                    </a>
                     <div class="dropdown-divider"></div>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

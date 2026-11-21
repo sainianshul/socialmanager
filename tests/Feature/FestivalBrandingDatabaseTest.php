@@ -34,12 +34,12 @@ class FestivalBrandingDatabaseTest extends TestCase
     {
         $this->seed(FestivalSeeder::class);
 
-        $this->assertDatabaseHas('festivals', ['title' => 'Dr. B.R. Ambedkar Jayanti']);
-        $this->assertDatabaseHas('festivals', ['title' => 'Ram Navami']);
+        $this->assertDatabaseHas('festivals', ['title' => 'Diwali - Deepawali Mahaparv']);
+        $this->assertDatabaseHas('festivals', ['title' => 'Samvidhan Diwas (Constitution Day)']);
 
-        $fest = Festival::where('title', 'Ram Navami')->first();
+        $fest = Festival::where('title', 'Diwali - Deepawali Mahaparv')->first();
         $this->assertNotNull($fest);
-        $this->assertStringContainsString('जय श्री राम', $fest->ready_caption);
+        $this->assertStringContainsString('दीपावली', $fest->ready_caption);
     }
 
     public function test_user_branding_and_images_relationships(): void
