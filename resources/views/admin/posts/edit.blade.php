@@ -321,7 +321,7 @@
                                 <i class="ti ti-device-laptop fs-2 text-secondary"></i>
                                 <span>Upload From Device</span>
                             </button>
-                            <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" id="btn-festival-poster" title="Choose from pre-designed festival templates">
+                            <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" id="btn-festival-poster" data-bs-toggle="offcanvas" data-bs-target="#drawer-festival-posters" aria-controls="drawer-festival-posters" title="Choose from pre-designed festival templates">
                                 <i class="ti ti-sparkles fs-2 text-warning"></i>
                                 <span>Festival Poster</span>
                             </button>
@@ -410,6 +410,9 @@
             </div>
         </form>
     </div>
+
+    {{-- Festival Poster Drawer --}}
+    @include('admin.posts.partials._festival_poster_drawer')
 
     {{-- MODAL: Delete Post Confirmation --}}
     <div class="modal modal-blur fade" id="modal-delete-post" tabindex="-1" role="dialog" aria-hidden="true">
