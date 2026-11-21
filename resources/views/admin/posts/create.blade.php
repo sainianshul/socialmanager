@@ -246,13 +246,17 @@
                         {{-- Hidden real file input --}}
                         <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple>
 
-                        {{-- Two Distinct Action Buttons: Upload From Device & Design on Canva --}}
+                        {{-- Action Buttons: Upload From Device, Festival Poster & Design on Canva --}}
                         <div class="d-flex align-items-center flex-wrap mb-2" style="gap: 12px;">
                             <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" id="btn-trigger-file-browser">
                                 <i class="ti ti-device-laptop fs-2 text-secondary"></i>
                                 <span>Upload From Device</span>
                             </button>
-                            <button type="button" class="btn btn-canva-brand rounded-2 px-3.5 py-2 fw-semibold d-inline-flex align-items-center gap-2 ms-1" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
+                            <button type="button" class="btn btn-outline-secondary rounded-2 px-3.5 py-2 fw-medium d-inline-flex align-items-center gap-2 shadow-xs" id="btn-festival-poster" title="Choose from pre-designed festival templates">
+                                <i class="ti ti-sparkles fs-2 text-warning"></i>
+                                <span>Festival Poster</span>
+                            </button>
+                            <button type="button" class="btn btn-canva-brand rounded-2 px-3.5 py-2 fw-semibold d-inline-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modal-canva-studio">
                                 <i class="ti ti-brand-canva fs-2 text-white"></i>
                                 <span class="text-white">Design on Canva</span>
                             </button>
