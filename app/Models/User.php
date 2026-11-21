@@ -233,6 +233,16 @@ class User extends Authenticatable
         return $this->hasMany(BrandingImage::class);
     }
 
+    public function leaderStrips(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(LeaderStrip::class);
+    }
+
+    public function defaultLeaderStrip(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(LeaderStrip::class)->where('is_default', true);
+    }
+
     // ─── API Response ────────────────────────
 
     public function toApiResponse(): array

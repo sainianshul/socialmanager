@@ -27,3 +27,6 @@ frankenphp
 frankenphp-worker.php
 *.zip
 *.log
+hopewell-v1.0.0/
+party_images/
+*.avif

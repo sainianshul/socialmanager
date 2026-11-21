@@ -39,6 +39,21 @@ class PoliticalParty extends Model
         return $this->hasMany(FestivalTemplate::class, 'party_id');
     }
 
+    public function leaders(): HasMany
+    {
+        return $this->hasMany(PoliticalLeader::class, 'party_id')->where('is_active', true);
+    }
+
+    public function strips(): HasMany
+    {
+        return $this->hasMany(LeaderStrip::class, 'party_id');
+    }
+
+    public function defaultStrip()
+    {
+        return $this->hasOne(LeaderStrip::class, 'party_id')->where('is_system', true)->where('is_default', true);
+    }
+
     public function getSymbolLogoUrlAttribute(): ?string
     {
         if (empty($this->symbol_logo)) {
