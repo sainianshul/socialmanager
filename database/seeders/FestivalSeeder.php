@@ -146,6 +146,7 @@ class FestivalSeeder extends Seeder
                 'is_active' => true,
                 'primary_template' => 'images/templates/khatu-shyam-janmotsav.jpg',
                 'primary_title' => 'Khatu Shyam Ji Janmotsav Grand Edition',
+                'preset_key' => 'leader_tribute_royal',
             ],
             [
                 'title' => 'Devotthan Ekadashi',
@@ -156,6 +157,7 @@ class FestivalSeeder extends Seeder
                 'is_active' => true,
                 'primary_template' => 'images/templates/devotthan-ekadashi.jpg',
                 'primary_title' => 'Devotthan Ekadashi Sacred Frame',
+                'preset_key' => 'classic_political_right',
             ],
             [
                 'title' => 'Gopashtami (Gau Pujan)',
@@ -166,6 +168,7 @@ class FestivalSeeder extends Seeder
                 'is_active' => true,
                 'primary_template' => 'images/templates/gopashtami.jpg',
                 'primary_title' => 'Gopashtami Gau Pujan Royal Edition',
+                'preset_key' => 'classic_political_right',
             ],
             [
                 'title' => 'Samvidhan Diwas (Constitution Day)',
@@ -174,6 +177,9 @@ class FestivalSeeder extends Seeder
                 'ready_caption' => "समस्त देशवासियों को संविधान दिवस की हार्दिक शुभकामनाएं!\n\nविश्व के सबसे बड़े और जीवंत लोकतंत्र के आधार स्तंभ भारत के संविधान के शिल्पकारों को कोटि-कोटि नमन। आइए हम अपने मौलिक कर्तव्यों के पालन का संकल्प लें। जय हिन्द!",
                 'hashtags' => '#ConstitutionDay #SamvidhanDiwas #IndianConstitution #JaiHind',
                 'is_active' => true,
+                'primary_template' => 'images/templates/samvidhan-diwas.jpg',
+                'primary_title' => 'Samvidhan Diwas National Tribute',
+                'preset_key' => 'clean_no_leaders',
             ],
             [
                 'title' => 'Guru Nanak Jayanti (Prakash Parv)',
@@ -215,8 +221,9 @@ class FestivalSeeder extends Seeder
         foreach ($festivals as $fest) {
             $primaryTemplate = $fest['primary_template'] ?? null;
             $primaryTitle = $fest['primary_title'] ?? null;
+            $presetKey = $fest['preset_key'] ?? 'classic_political_right';
 
-            unset($fest['primary_template'], $fest['primary_title']);
+            unset($fest['primary_template'], $fest['primary_title'], $fest['preset_key']);
 
             $festival = Festival::updateOrCreate(
                 ['title' => $fest['title'], 'festival_date' => $fest['festival_date']],
@@ -235,7 +242,7 @@ class FestivalSeeder extends Seeder
                         'title' => $primaryTitle ?: ($festival->title . ' Authentic Special'),
                         'thumbnail_path' => $primaryTemplate,
                         'photo_position' => 'bottom-right',
-                        'preset_key' => 'classic_political_right',
+                        'preset_key' => $presetKey,
                         'is_active' => true,
                     ]
                 );
