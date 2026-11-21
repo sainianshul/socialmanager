@@ -110,6 +110,9 @@ class PoliticalLeaderStripTest extends TestCase
         $response->assertSee('Political Party Affiliation');
         $response->assertSee('Profile Photo');
         $response->assertSee('Leadership Header Strips');
-        $response->assertSee('Narendra Modi');
+
+        $stripsResponse = $this->actingAs($user)->get(route('admin.leader-strips.index'));
+        $stripsResponse->assertStatus(200);
+        $stripsResponse->assertSee('Narendra Modi');
     }
 }
