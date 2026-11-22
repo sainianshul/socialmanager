@@ -58,25 +58,67 @@ class PosterComposer
             $this->renderHeaderSection($canvas, $config['header'] ?? [], $party, $strip);
         }
 
-        // 3. Political Footer Branding Frame (Drawn first so candidate sits naturally over footer background)
-        if ($branding) {
-            $this->renderFooterFrame(
+        // 3. Unified Branding Kit Layer (Candidate Photo + Footer Frame)
+        $footerStyle = $config['footer']['style'] ?? 'standard_political';
+
+        if ($footerStyle === 'dual_ribbon_badge' || $footerStyle === 'dual_ribbon') {
+            // Layer 1 (Bhai Dooj Style): Candidate Photo is rendered first, then the Angled Ribbon Badge sits OVER candidate lower chest!
+            $this->renderCandidatePhoto(
                 $canvas,
-                $config['footer'] ?? [],
+                $config['candidate'] ?? [],
                 $branding,
-                $party,
-                $config['candidate'] ?? []
+                $options,
+                $config['footer'] ?? []
+            );
+
+            if ($branding) {
+                $this->renderDualRibbonBadgeFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+        } elseif ($footerStyle === 'solid_white_banner') {
+            // Layer 2 (Milkha Singh Style): Solid white card + ethnic pattern, then candidate photo
+            if ($branding) {
+                $this->renderSolidWhiteBannerFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+        } else {
+            // Default standard political footer
+            if ($branding) {
+                $this->renderFooterFrame(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
             );
         }
-
-        // 4. Candidate Cutout / Circular Photo (Rendered in front of footer background)
-        $this->renderCandidatePhoto(
-            $canvas,
-            $config['candidate'] ?? [],
-            $branding,
-            $options,
-            $config['footer'] ?? []
-        );
 
         return $canvas;
     }
@@ -369,12 +411,322 @@ class PosterComposer
     ): void {
         $style = $footerConfig['style'] ?? 'standard_political';
 
-        if ($style === 'royal_bar') {
+        if ($style === 'dual_ribbon_badge') {
+            $this->renderDualRibbonBadgeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'solid_white_banner') {
+            $this->renderSolidWhiteBannerFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'royal_bar') {
             $this->renderRoyalBarFooter($canvas, $footerConfig, $branding, $party);
         } elseif ($style === 'dual_ribbon') {
             $this->renderDualRibbonFooter($canvas, $footerConfig, $branding, $party);
         } else {
             $this->renderStandardPoliticalFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        }
+    }
+
+    /**
+     * Layer 1: Dual Ribbon Badge (Bhai Dooj Reference Style - Image 2)
+     * - Candidate cutout sits anchored to bottom-right.
+     * - Left side: Party secondary color ribbon (Green) with Lotus Logo + Party Hindi Name in white.
+     * - Right side: Party primary color ribbon (Saffron) with angled cut sitting OVER candidate lower chest,
+     *   containing Candidate Name in crisp White bold and Designation in warm golden yellow.
+     * - Bottom: Clean white social strip.
+     */
+    protected function renderDualRibbonBadgeFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $partyPrimary = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF9933');
+        $partySecondary = $footerConfig['secondary_color'] ?? ($party?->secondary_color ?: '#00873E');
+
+        $nativeGd = $canvas->core()->native();
+
+        // 1. Left Party Ribbon (Green Bar)
+        // y: 948 to 1025, from x: 20 to x: 550
+        $partyBarY = 948;
+        $partyBarH = 75;
+        $partyBarW = 525;
+
+        $canvas->drawRectangle(20, $partyBarY, function ($rect) use ($partySecondary, $partyBarW, $partyBarH) {
+            $rect->size($partyBarW, $partyBarH);
+            $rect->background($partySecondary);
+        });
+
+        // Party Logo on left of party strip
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = 56;
+        $partyTextX = 30;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                $logoY = $partyBarY + (int)(($partyBarH - $logoSize) / 2);
+                $canvas->place($logoImg, 'top-left', 30, $logoY);
+                $partyTextX = 30 + $logoSize + 12;
+            } catch (\Throwable $e) {}
+        }
+
+        $partyName = $this->shapeDevanagari($party?->hindi_name ?: ($party?->name ?: 'भारतीय जनता पार्टी'));
+        $partyNameY = $partyBarY + (int)($partyBarH / 2) + 8;
+        $canvas->text($partyName, $partyTextX, $partyNameY, function ($font) use ($fontHindiBold) {
+            $font->file($fontHindiBold);
+            $font->size(23);
+            $font->color('#ffffff');
+        });
+
+        // 2. Right Candidate Name Badge (Saffron Angled Box placed OVER candidate photo)
+        $badgeTopY = 925;
+        $badgeBottomY = 1025;
+        $badgeStartX = 535;
+        $badgeAngleX = 575; // Angled top-left
+
+        $sHex = ltrim($partyPrimary, '#');
+        $sr = hexdec(substr($sHex, 0, 2));
+        $sg = hexdec(substr($sHex, 2, 2));
+        $sb = hexdec(substr($sHex, 4, 2));
+        $saffronAlloc = imagecolorallocate($nativeGd, $sr, $sg, $sb);
+
+        imagefilledpolygon($nativeGd, [
+            $badgeAngleX, $badgeTopY,     // Top left (slanted inward)
+            1080, $badgeTopY,            // Top right
+            1080, $badgeBottomY,         // Bottom right
+            $badgeStartX, $badgeBottomY  // Bottom left
+        ], $saffronAlloc);
+
+        // Thin white top accent line for the badge
+        $whiteAlloc = imagecolorallocate($nativeGd, 255, 255, 255);
+        imageline($nativeGd, $badgeAngleX, $badgeTopY, 1080, $badgeTopY, $whiteAlloc);
+        imageline($nativeGd, $badgeAngleX, $badgeTopY + 1, 1080, $badgeTopY + 1, $whiteAlloc);
+
+        // Candidate Name in crisp White bold font
+        $nameTextX = $badgeAngleX + 25;
+        $nameTextY = $badgeTopY + 45;
+        $maxNameW = 1080 - $nameTextX - 20;
+
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $nameTextX,
+            $nameTextY,
+            $maxNameW,
+            32,
+            18,
+            $fontHindiBold,
+            '#ffffff',
+            'left'
+        );
+
+        // Candidate Designation
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameTextY + 34;
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $nameTextX,
+                $desigY,
+                $maxNameW,
+                19,
+                12,
+                $fontHindiRegular,
+                '#FFE57F', // Warm Golden Yellow
+                'left'
+            );
+        }
+
+        // 3. Bottom Clean White Social Handles Strip (y: 1025 to 1080)
+        $socialY = 1025;
+        $socialH = 55;
+        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH);
+            $rect->background('#ffffff');
+        });
+
+        $grayAlloc = imagecolorallocate($nativeGd, 226, 232, 240);
+        imageline($nativeGd, 0, $socialY, 1080, $socialY, $grayAlloc);
+
+        $this->renderSocialIconsRow($canvas, $branding, 30, $socialY + 14, $socialY + 34, $fontEngRegular);
+    }
+
+    /**
+     * Layer 2: Solid White Card Banner (Milkha Singh Reference Style - Image 3)
+     * - Full-width solid white card from y: 910 to 1080.
+     * - Ethnic geometric motif along the top border line (y: 900 to 910).
+     * - Left side: Circular lotus logo flanked by tricolor wave flags.
+     * - Candidate Name in bold Saffron/Party primary color + dark grey designation.
+     * - Candidate cutout sits grounded on bottom-right.
+     * - Bottom: Micro social handles strip.
+     */
+    protected function renderSolidWhiteBannerFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $partyPrimary = $footerConfig['name_color'] ?? ($party?->primary_color ?: '#E65100');
+        $nativeGd = $canvas->core()->native();
+
+        $footerTop = 910;
+        $footerHeight = 170;
+
+        // 1. Full White Card Background
+        $canvas->drawRectangle(0, $footerTop, function ($rect) use ($footerHeight) {
+            $rect->size(1080, $footerHeight);
+            $rect->background('#ffffff');
+        });
+
+        // 2. Ethnic Ornamental Geometric Motif along the top edge (y: 900 to 910)
+        $canvas->drawRectangle(0, 900, function ($rect) {
+            $rect->size(1080, 10);
+            $rect->background('#fbf8f2');
+        });
+
+        $saffronAlloc = imagecolorallocate($nativeGd, 255, 153, 51);
+        $greenAlloc = imagecolorallocate($nativeGd, 19, 136, 8);
+        $redAlloc = imagecolorallocate($nativeGd, 217, 83, 79);
+
+        imageline($nativeGd, 0, 900, 1080, 900, $saffronAlloc);
+        imageline($nativeGd, 0, 901, 1080, 901, $saffronAlloc);
+
+        // Repeated ornamental motif ticks (diamonds / small chevrons every 16px)
+        for ($px = 8; $px < 1075; $px += 16) {
+            imagesetpixel($nativeGd, $px, 905, $greenAlloc);
+            imagesetpixel($nativeGd, $px + 1, 904, $saffronAlloc);
+            imagesetpixel($nativeGd, $px + 1, 906, $saffronAlloc);
+            imagesetpixel($nativeGd, $px + 2, 905, $redAlloc);
+        }
+
+        imageline($nativeGd, 0, 910, 1080, 910, $greenAlloc);
+        imageline($nativeGd, 0, 911, 1080, 911, $greenAlloc);
+
+        // 3. Left Party Logo with Tricolor Wave Flag Accents
+        $logoX = 35;
+        $logoY = 926;
+        $logoSize = 72;
+
+        $canvas->drawRectangle($logoX - 10, $logoY + 20, function ($rect) {
+            $rect->size(10, 32);
+            $rect->background('#FF9933'); // Saffron flag wave
+        });
+        $canvas->drawRectangle($logoX + $logoSize, $logoY + 20, function ($rect) {
+            $rect->size(10, 32);
+            $rect->background('#138808'); // Green flag wave
+        });
+
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 3);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        // 4. Candidate Name & Designation (Left of candidate photo)
+        $nameX = $logoX + $logoSize + 25;
+        $nameY = 968;
+        $maxNameW = 460;
+
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $nameX,
+            $nameY,
+            $maxNameW,
+            34,
+            18,
+            $fontHindiBold,
+            $partyPrimary,
+            'left'
+        );
+
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $nameX,
+                $nameY + 32,
+                $maxNameW,
+                18,
+                12,
+                $fontHindiRegular,
+                '#4a5568',
+                'left'
+            );
+        }
+
+        // 5. Bottom Social Media Strip with Orange Dividing Line (y: 1040 to 1080)
+        $socialY = 1040;
+        $socialH = 40;
+
+        imageline($nativeGd, 0, $socialY, 1080, $socialY, $saffronAlloc);
+
+        $canvas->drawRectangle(0, $socialY + 1, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH - 1);
+            $rect->background('#fffaf5');
+        });
+
+        $this->renderSocialIconsRow($canvas, $branding, 25, $socialY + 8, $socialY + 26, $fontEngRegular);
+    }
+
+    /**
+     * Render bottom row of social media icons (FB, IG, WA/Phone).
+     */
+    protected function renderSocialIconsRow(
+        ImageInterface $canvas,
+        UserBranding $branding,
+        int $startX,
+        int $pillY,
+        int $textY,
+        string $fontPath
+    ): void {
+        $currX = $startX;
+
+        if ($branding->facebook_handle) {
+            $this->drawSocialIconPill($canvas, $currX, $pillY, 'fb', '#1877F2');
+            $canvas->text($branding->facebook_handle, $currX + 28, $textY, function ($font) use ($fontPath) {
+                $font->file($fontPath);
+                $font->size(14);
+                $font->color('#333333');
+            });
+            $currX += 290;
+        }
+
+        if ($branding->instagram_handle) {
+            $this->drawSocialIconPill($canvas, $currX, $pillY, 'ig', '#E4405F');
+            $canvas->text($branding->instagram_handle, $currX + 28, $textY, function ($font) use ($fontPath) {
+                $font->file($fontPath);
+                $font->size(14);
+                $font->color('#333333');
+            });
+            $currX += 290;
+        }
+
+        if ($branding->phone_number) {
+            $this->drawSocialIconPill($canvas, $currX, $pillY, 'wa', '#25D366');
+            $canvas->text($branding->phone_number, $currX + 28, $textY, function ($font) use ($fontPath) {
+                $font->file($fontPath);
+                $font->size(14);
+                $font->color('#333333');
+            });
         }
     }
 
@@ -1114,6 +1466,26 @@ class PosterComposer
     {
         return [
             [
+                'key'                => 'dual_ribbon_badge',
+                'name'               => 'Layer 1: Dual Ribbon Badge (Orange & Green Box over Photo)',
+                'description'        => 'Angled saffron ribbon badge across candidate photo with bold white text + green party strip on left + bottom social strip. Matches Bhai Dooj reference.',
+                'badge'              => 'Layer 1 - Ribbon Badge',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'dual_ribbon_badge',
+            ],
+            [
+                'key'                => 'solid_white_banner',
+                'name'               => 'Layer 2: Solid White Banner (Ethnic Motif & Saffron Text)',
+                'description'        => 'Full-width solid white card with ornamental ethnic top border, saffron bold name, flag logo. Matches Milkha Singh reference.',
+                'badge'              => 'Layer 2 - White Card',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'solid_white_banner',
+            ],
+            [
                 'key'                => 'classic_political_right',
                 'name'               => 'Classic Political (Dr. Dharam Singh Style)',
                 'description'        => '6-7 circle leaders at top with saffron border, large candidate cutout bottom-right, standard political footer with BJP logo + name + social handles.',
@@ -1213,6 +1585,58 @@ class PosterComposer
     public function getDefaultPresetConfig(string $key): array
     {
         return match ($key) {
+            // Layer 1: Dual Ribbon Badge (Bhai Dooj Reference Style - Image 2)
+            'dual_ribbon_badge' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'dual_ribbon_badge',
+                ],
+            ],
+
+            // Layer 2: Solid White Card Banner (Milkha Singh Reference Style - Image 3)
+            'solid_white_banner' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'solid_white_banner',
+                ],
+            ],
+
             // Style: Modern Political (Rounded Square Leaders)
             'classic_political_rounded_square' => [
                 'canvas' => ['width' => 1080, 'height' => 1080],

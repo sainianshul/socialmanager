@@ -104,6 +104,9 @@ class FestivalTemplateController extends Controller
             $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
         }
+        if ($request->filled('footer_style')) {
+            $layoutConfig['footer']['style'] = $request->input('footer_style');
+        }
         if ($request->filled('name_color')) {
             $layoutConfig['footer']['name_color'] = $request->input('name_color');
         }
@@ -159,6 +162,9 @@ class FestivalTemplateController extends Controller
             $layoutConfig['header']['chip_shape'] = $request->input('leader_shape', 'circle');
             $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('footer_style')) {
+            $layoutConfig['footer']['style'] = $request->input('footer_style');
         }
         if ($request->filled('name_color')) {
             $layoutConfig['footer']['name_color'] = $request->input('name_color');
@@ -242,6 +248,9 @@ class FestivalTemplateController extends Controller
         }
         if ($request->has('show_top_strip')) {
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('footer_style')) {
+            $layoutConfig['footer']['style'] = $request->input('footer_style');
         }
         if ($request->filled('name_color')) {
             $layoutConfig['footer']['name_color'] = $request->input('name_color');

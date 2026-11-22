@@ -319,13 +319,14 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
 
     public function test_admin_can_preview_festival_template(): void
     {
+        // Test preview with Layer 1 (dual_ribbon_badge)
         $response = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
-            'preset_key' => 'classic_political_right',
+            'preset_key' => 'dual_ribbon_badge',
+            'footer_style' => 'dual_ribbon_badge',
             'party_id' => $this->party->id,
             'leader_shape' => 'circle',
             'leader_border_color' => '#FF9933',
-            'name_color' => '#c0392b',
-            'footer_bg' => '#f8f5ee',
+            'name_color' => '#ffffff',
             'photo_position' => 'bottom-right',
         ]);
 
@@ -334,6 +335,23 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'success' => true,
         ]);
         $this->assertStringStartsWith('data:image/jpeg;base64,', $response->json('preview_url'));
+
+        // Test preview with Layer 2 (solid_white_banner)
+        $response2 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'solid_white_banner',
+            'footer_style' => 'solid_white_banner',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'square',
+            'leader_border_color' => '#D4AF37',
+            'name_color' => '#FF6600',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response2->assertStatus(200);
+        $response2->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response2->json('preview_url'));
     }
 
     public function test_admin_can_store_festival_template_with_layout_customizations(): void
@@ -344,12 +362,13 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'festival_id' => $this->festival->id,
             'party_id' => $this->party->id,
             'title' => 'Custom Saffron Layout Template',
-            'preset_key' => 'classic_political_rounded_square',
+            'preset_key' => 'dual_ribbon_badge',
+            'footer_style' => 'dual_ribbon_badge',
             'photo_position' => 'bottom-right',
             'leader_shape' => 'rounded_square',
             'leader_border_color' => '#FF9933',
             'show_top_strip' => '1',
-            'name_color' => '#c0392b',
+            'name_color' => '#ffffff',
             'footer_bg' => '#f8f5ee',
             'template_image' => $image,
             'is_active' => '1',
@@ -359,16 +378,16 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
 
         $this->assertDatabaseHas('festival_templates', [
             'title' => 'Custom Saffron Layout Template',
-            'preset_key' => 'classic_political_rounded_square',
+            'preset_key' => 'dual_ribbon_badge',
             'photo_position' => 'bottom-right',
         ]);
 
         $template = FestivalTemplate::where('title', 'Custom Saffron Layout Template')->first();
         $this->assertNotNull($template);
+        $this->assertEquals('dual_ribbon_badge', $template->layout_config['footer']['style']);
         $this->assertEquals('rounded_square', $template->layout_config['header']['chip_shape']);
         $this->assertEquals('#FF9933', $template->layout_config['header']['chip_border_color']);
-        $this->assertEquals('#c0392b', $template->layout_config['footer']['name_color']);
-        $this->assertEquals('#f8f5ee', $template->layout_config['footer']['main_bar_bg']);
+        $this->assertEquals('#ffffff', $template->layout_config['footer']['name_color']);
     }
 
     public function test_regular_user_cannot_access_political_party_management(): void

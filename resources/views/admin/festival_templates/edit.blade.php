@@ -19,6 +19,7 @@
 
 @php
     $layoutConfig = $festivalTemplate->layout_config ?? [];
+    $footerStyle = $layoutConfig['footer']['style'] ?? ($festivalTemplate->preset_key === 'solid_white_banner' ? 'solid_white_banner' : 'dual_ribbon_badge');
     $leaderShape = $layoutConfig['header']['chip_shape'] ?? 'circle';
     $leaderBorder = $layoutConfig['header']['chip_border_color'] ?? '#FF9933';
     $showStrip = isset($layoutConfig['header']['enabled']) ? ($layoutConfig['header']['enabled'] ? '1' : '0') : '1';
@@ -86,6 +87,17 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label required fw-bold text-primary">
+                                <i class="ti ti-layout-bottombar me-1"></i> Branding Frame Layer (Footer Style)
+                            </label>
+                            <select name="footer_style" class="form-select border-primary fw-bold" id="field-footer-style">
+                                <option value="dual_ribbon_badge" {{ $footerStyle === 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
+                                <option value="solid_white_banner" {{ $footerStyle === 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
+                            </select>
+                            <small class="form-hint">Choose between Layer 1 (Photo under angled ribbon badge) or Layer 2 (Clean full white card with decorative motif).</small>
+                        </div>
+
                         <div class="col-md-6">
                             <label class="form-label required">Base Poster Preset</label>
                             <select name="preset_key" class="form-select @error('preset_key') is-invalid @enderror" id="field-preset" required>
@@ -244,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const templateId = document.getElementById('field-template-id') ? document.getElementById('field-template-id').value : '';
     const fieldImage = document.getElementById('field-image');
+    const fieldFooterStyle = document.getElementById('field-footer-style');
     const fieldPreset = document.getElementById('field-preset');
     const fieldParty = document.getElementById('field-party');
     const fieldPhotoPos = document.getElementById('field-photo-position');
@@ -265,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData();
         formData.append('_token', csrfToken);
         if (templateId) formData.append('template_id', templateId);
+        if (fieldFooterStyle) formData.append('footer_style', fieldFooterStyle.value);
         formData.append('preset_key', fieldPreset.value);
         if (fieldParty.value) formData.append('party_id', fieldParty.value);
         formData.append('photo_position', fieldPhotoPos.value);
@@ -302,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
         debounceTimer = setTimeout(updatePreview, 300);
     }
 
-    [fieldPreset, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder, fieldShowStrip, fieldNameColor, fieldFooterBg].forEach(el => {
+    [fieldFooterStyle, fieldPreset, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder, fieldShowStrip, fieldNameColor, fieldFooterBg].forEach(el => {
         if (el) el.addEventListener('change', schedulePreview);
     });
 
