@@ -183,15 +183,6 @@
                             <span class="nav-link-title">Card Templates</span>
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.festival-studio.*') ? 'active' : '' }}" href="{{ route('admin.festival-studio.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Poster Studio (Composer & Preview)">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
-                                <i class="ti ti-photo-edit fs-2"></i>
-                            </span>
-                            <span class="nav-link-title">Poster Studio</span>
-                            <span class="badge bg-teal-lt ms-auto">Preview</span>
-                        </a>
-                    </li>
                 @endif
 
                 {{-- CLIENT SOCIAL ACCOUNTS, CONTENT & ENGAGEMENT (Only for Regular Users / Non-Admin) --}}

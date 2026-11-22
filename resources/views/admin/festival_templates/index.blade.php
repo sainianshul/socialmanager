@@ -9,10 +9,7 @@
             <div class="page-pretitle">Poster & Templates</div>
             <h2 class="page-title">Festival Templates</h2>
         </div>
-        <div class="col-auto ms-auto d-print-none d-flex gap-2">
-            <a href="{{ route('admin.festival-studio.index') }}" class="btn btn-outline-secondary">
-                <i class="ti ti-photo-edit me-1"></i> Open Studio
-            </a>
+        <div class="col-auto ms-auto d-print-none">
             <a href="{{ route('admin.festival-templates.create') }}" class="btn btn-primary">
                 <i class="ti ti-plus me-1"></i> Add Festival Template
             </a>
@@ -142,13 +139,10 @@
                         <span class="badge bg-purple-lt small">{{ $tpl->photo_position ?? 'bottom-right' }}</span>
                     </div>
                     <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
-                        <a href="{{ route('admin.festival-studio.index') }}" class="btn btn-sm btn-outline-secondary" title="Preview / Test">
-                            <i class="ti ti-eye me-1"></i> Preview
+                        <a href="{{ route('admin.festival-templates.edit', $tpl) }}" class="btn btn-sm btn-outline-secondary">
+                            <i class="ti ti-edit me-1"></i> Edit
                         </a>
-                        <div class="d-flex gap-1">
-                            <a href="{{ route('admin.festival-templates.edit', $tpl) }}" class="btn btn-icon btn-sm btn-ghost-primary" title="Edit Template" data-bs-toggle="tooltip">
-                                <i class="ti ti-edit fs-2"></i>
-                            </a>
+                        <div>
                             <form action="{{ route('admin.festival-templates.destroy', $tpl) }}" method="POST" onsubmit="return confirm('Delete this template?');" class="d-inline">
                                 @csrf
                                 @method('DELETE')

@@ -70,7 +70,7 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $response->assertSee('Festivals');
         $response->assertSee('Festival Templates');
         $response->assertSee('Card Templates');
-        $response->assertSee('Poster Studio');
+        $response->assertDontSee('Poster Studio');
     }
 
     public function test_admin_can_list_political_parties(): void
