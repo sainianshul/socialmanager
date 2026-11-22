@@ -100,8 +100,10 @@
                                 <option value="modern_capsule_dock" {{ $footerStyle === 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
                                 <option value="circular_medallion_badge" {{ $footerStyle === 'circular_medallion_badge' ? 'selected' : '' }}>Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
                                 <option value="saffron_wave_banner" {{ $footerStyle === 'saffron_wave_banner' ? 'selected' : '' }}>Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
+                                <option value="tricolor_angled_blade" {{ $footerStyle === 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
+                                <option value="royal_maroon_heritage" {{ $footerStyle === 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
                             </select>
-                            <small class="form-hint">Choose among 8 professional branding layouts (Ribbon badges, Ethnic cards, Floating minimalist, Royal midnight, Left-aligned, Capsule dock, Medallion frame, or Saffron wave).</small>
+                            <small class="form-hint">Choose among 10 professional branding layouts (Ribbon badges, Ethnic cards, Floating minimalist, Royal midnight, Left-aligned, Capsule dock, Medallion frame, Saffron wave, Tricolor blade, or Maroon heritage).</small>
                         </div>
 
                         <div class="col-md-6">

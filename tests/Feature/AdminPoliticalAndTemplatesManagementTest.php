@@ -458,6 +458,43 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'success' => true,
         ]);
         $this->assertStringStartsWith('data:image/jpeg;base64,', $response8->json('preview_url'));
+
+        // Test preview with Layer 9 (tricolor_angled_blade)
+        $response9 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'tricolor_angled_blade',
+            'footer_style' => 'tricolor_angled_blade',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#FF9933',
+            'show_top_strip' => '1',
+            'name_color' => '#ffffff',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response9->assertStatus(200);
+        $response9->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response9->json('preview_url'));
+
+        // Test preview with Layer 10 (royal_maroon_heritage)
+        $response10 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'royal_maroon_heritage',
+            'footer_style' => 'royal_maroon_heritage',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#D4AF37',
+            'show_top_strip' => '1',
+            'name_color' => '#FFE66D',
+            'footer_bg' => '#6B0F1A',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response10->assertStatus(200);
+        $response10->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response10->json('preview_url'));
     }
 
     public function test_admin_can_store_festival_template_with_layout_customizations(): void

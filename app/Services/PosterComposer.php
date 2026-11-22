@@ -227,6 +227,44 @@ class PosterComposer
                     $config['candidate'] ?? []
                 );
             }
+        } elseif ($footerStyle === 'tricolor_angled_blade') {
+            // Layer 9 (Tricolor Angled Blade): Candidate photo rendered first, then dynamic angled 3-tier tricolor sash over lower torso
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+
+            if ($branding) {
+                $this->renderTricolorAngledBladeFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+        } elseif ($footerStyle === 'royal_maroon_heritage') {
+            // Layer 10 (Royal Maroon Heritage): Deep temple maroon & 24K gold filigree card first, then candidate photo over card
+            if ($branding) {
+                $this->renderRoyalMaroonHeritageFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
         } else {
             // Default standard political footer
             if ($branding) {
@@ -561,6 +599,10 @@ class PosterComposer
             $this->renderCircularMedallionBadgeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'saffron_wave_banner') {
             $this->renderSaffronWaveBannerFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'tricolor_angled_blade') {
+            $this->renderTricolorAngledBladeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'royal_maroon_heritage') {
+            $this->renderRoyalMaroonHeritageFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'royal_bar') {
             $this->renderRoyalBarFooter($canvas, $footerConfig, $branding, $party);
         } elseif ($style === 'dual_ribbon') {
@@ -1663,6 +1705,288 @@ class PosterComposer
     }
 
     /**
+     * Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)
+     * - Slanted 3-tier tricolor ribbon blade across lower torso.
+     * - Top Saffron polygon with candidate Name in pure bold white.
+     * - Middle White polygon with candidate Designation in deep navy blue.
+     * - Bottom Green band providing the tricolor completion.
+     * - Clean crisp white bottom social strip with branded icons.
+     * - Circular party logo on left at x: 24, y: 914.
+     */
+    protected function renderTricolorAngledBladeFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $saffronColor = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF8800');
+        $nameColor = $footerConfig['name_color'] ?? '#ffffff';
+        $desigColor = $footerConfig['desig_color'] ?? '#0A2540'; // Deep Royal Navy for stark contrast on white
+
+        $nativeGd = $canvas->core()->native();
+
+        // 1. Top Saffron Angled Blade Polygon
+        $sHex = ltrim($saffronColor, '#');
+        $sr = hexdec(substr($sHex, 0, 2));
+        $sg = hexdec(substr($sHex, 2, 2));
+        $sb = hexdec(substr($sHex, 4, 2));
+        $saffronAlloc = imagecolorallocate($nativeGd, $sr, $sg, $sb);
+
+        // Blade slopes across candidate chest
+        $saffronPoints = [
+            0, 904,
+            775, 920,
+            730, 966,
+            0, 966,
+        ];
+        imagefilledpolygon($nativeGd, $saffronPoints, $saffronAlloc);
+
+        // Top Gold Highlight Line on Saffron Blade
+        $goldHiAlloc = imagecolorallocate($nativeGd, 255, 215, 0);
+        imageline($nativeGd, 0, 904, 775, 920, $goldHiAlloc);
+        imageline($nativeGd, 0, 905, 775, 921, $goldHiAlloc);
+
+        // 2. Middle Pure White Angled Blade Polygon
+        $whiteAlloc = imagecolorallocate($nativeGd, 255, 255, 255);
+        $whitePoints = [
+            0, 966,
+            730, 966,
+            685, 1014,
+            0, 1014,
+        ];
+        imagefilledpolygon($nativeGd, $whitePoints, $whiteAlloc);
+
+        // Angled right edge highlight on white blade
+        $saffEdge = imagecolorallocatealpha($nativeGd, $sr, $sg, $sb, 40);
+        imageline($nativeGd, 730, 966, 685, 1014, $saffEdge);
+
+        // 3. Bottom Emerald Green Ribbon
+        $greenAlloc = imagecolorallocate($nativeGd, 19, 136, 8); // India Green #138808
+        imagefilledrectangle($nativeGd, 0, 1014, 1080, 1040, $greenAlloc);
+
+        // Thin gold separator between green & white
+        $goldSepAlloc = imagecolorallocate($nativeGd, 255, 215, 0);
+        imageline($nativeGd, 0, 1014, 685, 1014, $goldSepAlloc);
+
+        // 4. Circular Party Logo on Left (Anchored across Saffron & White blade)
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 68;
+        $logoX = 24;
+        $logoY = 918;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 3);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 16;
+        $maxTextW = 560;
+
+        // 5. Candidate Name on Saffron Band (Bold Crisp White)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = 948;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 32;
+
+        // Subtle dark shadow for 3D punch
+        $shadowAlloc = imagecolorallocatealpha($nativeGd, 40, 20, 0, 60);
+        imagettftext($nativeGd, $nameFontSize, 0, $textStartX + 2, $nameY + 2, $shadowAlloc, $fontHindiBold, $displayName);
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            18,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 6. Designation on White Band (Deep Navy Bold)
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = 998;
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                20,
+                13,
+                $fontHindiBold,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 7. Clean Social Media Row at Bottom (y: 1040 to 1080)
+        $canvas->drawRectangle(0, 1040, function ($rect) {
+            $rect->size(1080, 40);
+            $rect->background('#ffffff');
+        });
+
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            24,
+            1048,
+            1066,
+            $fontEngRegular,
+            '#1e293b'
+        );
+    }
+
+    /**
+     * Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)
+     * - Auspicious temple maroon card (y: 915 to 1080).
+     * - Intricate 24K gold filigree jewel border along top edge (interspaced diamond & bead pattern).
+     * - Circular party emblem with dual gold ring border on left.
+     * - Candidate Name in 24K Gilded Champagne Gold with 3D embossed shadow.
+     * - Designation in Pearl Ivory.
+     * - Bottom velvet maroon social strip with 1px gold separator and bright champagne icons.
+     */
+    protected function renderRoyalMaroonHeritageFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $goldColor = '#D4AF37'; // 24K Antique Gold
+        $cardBg = $footerConfig['card_bg'] ?? '#6B0F1A'; // Sacred Temple Maroon
+        $nameColor = $footerConfig['name_color'] ?? '#FFE66D';
+        $desigColor = $footerConfig['desig_color'] ?? '#F5EBE1'; // Pearl Ivory
+
+        $cardTopY = 915;
+        $cardHeight = 165;
+        $nativeGd = $canvas->core()->native();
+
+        // 1. Solid Deep Temple Maroon Card
+        $canvas->drawRectangle(0, $cardTopY, function ($rect) use ($cardBg, $cardHeight) {
+            $rect->size(1080, $cardHeight);
+            $rect->background($cardBg);
+        });
+
+        // 2. 24K Gold Filigree Jewel Top Border
+        $goldAlloc = imagecolorallocate($nativeGd, 212, 175, 55);       // #D4AF37
+        $brightGoldAlloc = imagecolorallocate($nativeGd, 255, 230, 109); // #FFE66D
+
+        // Top solid gold line (3px)
+        imagefilledrectangle($nativeGd, 0, $cardTopY, 1080, $cardTopY + 2, $goldAlloc);
+
+        // Filigree jewel row (interspaced diamonds & beads)
+        for ($x = 8; $x < 1075; $x += 18) {
+            $diamondPoints = [
+                $x, $cardTopY + 6,
+                $x + 4, $cardTopY + 3,
+                $x + 8, $cardTopY + 6,
+                $x + 4, $cardTopY + 9,
+            ];
+            imagefilledpolygon($nativeGd, $diamondPoints, $brightGoldAlloc);
+            imagefilledellipse($nativeGd, $x + 13, $cardTopY + 6, 2, 2, $goldAlloc);
+        }
+
+        // Secondary gold line (2px)
+        imagefilledrectangle($nativeGd, 0, $cardTopY + 11, 1080, $cardTopY + 12, $goldAlloc);
+
+        // 3. Circular Party Emblem with Dual Gold Ring
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 68;
+        $logoX = 28;
+        $logoY = $cardTopY + 20;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#D4AF37', 3);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 18;
+        $maxTextW = 550;
+
+        // 4. Candidate Name (24K Gilded Gold with 3D Embossed Effect)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = $cardTopY + 56;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 34;
+
+        // Dark maroon drop shadow for 3D gold embossed appearance
+        $maroonShadowAlloc = imagecolorallocate($nativeGd, 50, 4, 8);
+        imagettftext($nativeGd, $nameFontSize, 0, $textStartX + 2, $nameY + 2, $maroonShadowAlloc, $fontHindiBold, $displayName);
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            18,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 5. Designation (Pearl Ivory)
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameY + 30;
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                18,
+                12,
+                $fontHindiRegular,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 6. Deep Velvet Maroon Social Bar at Bottom (y: 1032 to 1080)
+        $socialY = 1032;
+        $socialH = 1080 - $socialY;
+
+        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH);
+            $rect->background('#3D050E');
+        });
+
+        // 1px gold separator line
+        imagefilledrectangle($nativeGd, 0, $socialY, 1080, $socialY, $goldAlloc);
+
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            28,
+            $socialY + 9,
+            $socialY + 27,
+            $fontEngRegular,
+            '#FFE66D'
+        );
+    }
+
+    /**
      * Render bottom row of social media icons (FB, IG, WA/Phone).
      */
     protected function renderSocialIconsRow(
@@ -2529,6 +2853,26 @@ class PosterComposer
                 'footer_style'       => 'saffron_wave_banner',
             ],
             [
+                'key'                => 'tricolor_angled_blade',
+                'name'               => 'Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)',
+                'description'        => 'Dynamic 3-tier angled tricolor sash sloping across candidate torso, crisp navy designation, and clean bottom social strip. High-energy patriotic aesthetic.',
+                'badge'              => 'Layer 9 - Tricolor Blade',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'tricolor_angled_blade',
+            ],
+            [
+                'key'                => 'royal_maroon_heritage',
+                'name'               => 'Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)',
+                'description'        => 'Auspicious temple maroon card with intricate 24K gold filigree jewel border, gilded gold 3D typography, and velvet social dock. Supreme sacred festival elegance.',
+                'badge'              => 'Layer 10 - Maroon Heritage',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'royal_maroon_heritage',
+            ],
+            [
                 'key'                => 'classic_political_right',
                 'name'               => 'Classic Political (Dr. Dharam Singh Style)',
                 'description'        => '6-7 circle leaders at top with saffron border, large candidate cutout bottom-right, standard political footer with BJP logo + name + social handles.',
@@ -2834,6 +3178,58 @@ class PosterComposer
                 ],
                 'footer' => [
                     'style' => 'saffron_wave_banner',
+                ],
+            ],
+
+            // Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)
+            'tricolor_angled_blade' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'tricolor_angled_blade',
+                ],
+            ],
+
+            // Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)
+            'royal_maroon_heritage' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#D4AF37',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'royal_maroon_heritage',
                 ],
             ],
 
