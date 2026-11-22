@@ -671,16 +671,28 @@ document.addEventListener('DOMContentLoaded', function () {
             if (pane2) pane2.classList.add('d-none');
             if (actions1) actions1.classList.remove('d-none');
             if (actions2) actions2.classList.add('d-none');
-            if (ind1) ind1.className = 'badge bg-primary px-3 py-1.5 rounded-pill';
-            if (ind2) ind2.className = 'badge bg-secondary-lt text-secondary px-3 py-1.5 rounded-pill';
+            if (ind1) {
+                ind1.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
+                ind1.innerHTML = '<i class="ti ti-palette me-1"></i> 1. Poster Style';
+            }
+            if (ind2) {
+                ind2.className = 'badge bg-transparent text-secondary px-3 py-1.5 rounded-pill fw-semibold';
+                ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
+            }
             if (footerText) footerText.innerText = 'Step 1 of 2: Choose poster design styles';
         } else if (step === 2) {
             if (pane1) pane1.classList.add('d-none');
             if (pane2) pane2.classList.remove('d-none');
             if (actions1) actions1.classList.add('d-none');
             if (actions2) actions2.classList.remove('d-none');
-            if (ind1) ind1.className = 'badge bg-success text-white px-3 py-1.5 rounded-pill';
-            if (ind2) ind2.className = 'badge bg-primary px-3 py-1.5 rounded-pill';
+            if (ind1) {
+                ind1.className = 'badge bg-success text-white px-3 py-1.5 rounded-pill fw-semibold';
+                ind1.innerHTML = '<i class="ti ti-check me-1"></i> 1. Poster Ready';
+            }
+            if (ind2) {
+                ind2.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
+                ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
+            }
             if (footerText) footerText.innerText = 'Step 2 of 2: Review schedule time, accounts & caption';
 
             // Sync hidden inputs for final submission
