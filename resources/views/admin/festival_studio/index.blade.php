@@ -548,7 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Delegated Quick Schedule Modal Opener
+    // Delegated Quick Schedule Modal Opener (Step 1 -> Step 2 Multi-Step Wizard)
     document.addEventListener('click', function (e) {
         var trigger = e.target.closest('.btn-trigger-quick-schedule');
         if (!trigger) return;
@@ -561,19 +561,17 @@ document.addEventListener('DOMContentLoaded', function () {
         var festivalDate = trigger.getAttribute('data-festival-date') || '';
         var festivalDateFormatted = trigger.getAttribute('data-festival-date-formatted') || '';
         var caption = trigger.getAttribute('data-caption') || '';
-        var composerUrl = trigger.getAttribute('data-composer-url') || '#';
+        var footerStyle = trigger.getAttribute('data-footer-style') || 'dual_ribbon_badge';
+        var headerLayout = trigger.getAttribute('data-header-layout') || 'full_width_strip';
+
+        // 1. Reset Wizard to Step 1
+        showWizardStep(1);
 
         var imgEl = document.getElementById('qs-modal-img');
         if (imgEl) imgEl.src = templateImage;
 
-        var titleEl = document.getElementById('qs-modal-poster-title');
-        if (titleEl) titleEl.innerText = templateTitle;
-
-        var badgeEl = document.getElementById('qs-modal-festival-badge');
-        if (badgeEl) badgeEl.innerText = festivalDateFormatted;
-
         var subEl = document.getElementById('qs-modal-subheading');
-        if (subEl) subEl.innerText = festivalTitle;
+        if (subEl) subEl.innerText = festivalTitle + (festivalDateFormatted ? ' (' + festivalDateFormatted + ')' : '');
 
         var inputTpl = document.getElementById('qs-input-template-id');
         if (inputTpl) inputTpl.value = templateId;
@@ -584,31 +582,25 @@ document.addEventListener('DOMContentLoaded', function () {
         var inputDate = document.getElementById('qs-input-date');
         if (inputDate && festivalDate) inputDate.value = festivalDate;
 
-        // Dynamic Today vs Future time calculation
+        var displayDate = document.getElementById('qs-display-date');
+        if (displayDate) displayDate.value = (festivalDateFormatted || festivalDate) + ' - ' + festivalTitle;
+
+        // Dynamic target time
         var isToday = trigger.getAttribute('data-is-today') === '1';
         var targetTime = trigger.getAttribute('data-target-time') || (isToday ? '{{ now()->addMinutes(10)->format('H:i') }}' : '08:00');
-        var targetTimeFormatted = trigger.getAttribute('data-target-time-formatted') || (isToday ? '{{ now()->addMinutes(10)->format('h:i A') }}' : '08:00 AM');
 
         var inputTime = document.getElementById('qs-input-time');
         if (inputTime) inputTime.value = targetTime;
 
-        var timeBadge = document.getElementById('qs-modal-time-badge');
-        if (timeBadge) {
-            timeBadge.innerHTML = '<i class="ti ti-clock me-1 text-primary"></i>' + targetTimeFormatted;
-        }
-
-        var footerNote = document.getElementById('qs-modal-footer-note');
-        if (footerNote) {
-            footerNote.innerText = isToday 
-                ? 'Will publish today in 10 minutes (' + targetTimeFormatted + ')' 
-                : 'Will publish on festival day at 08:00 AM';
-        }
-
         var inputCaption = document.getElementById('qs-input-caption');
         if (inputCaption) inputCaption.value = caption;
 
-        var composerLink = document.getElementById('qs-link-full-composer');
-        if (composerLink) composerLink.href = composerUrl;
+        // Set style dropdowns to template defaults
+        var selectFooter = document.getElementById('qs-modal-footer-style');
+        if (selectFooter) selectFooter.value = footerStyle;
+
+        var selectHeader = document.getElementById('qs-modal-header-layout');
+        if (selectHeader) selectHeader.value = headerLayout;
 
         var alertBox = document.getElementById('qs-alert');
         if (alertBox) {
@@ -629,14 +621,78 @@ document.addEventListener('DOMContentLoaded', function () {
             modal.show();
         }
 
-        // Trigger Live Server-Side Poster Composition
-        var toggleStrip = document.getElementById('qs-modal-toggle-strip');
-        var includeStrip = toggleStrip ? toggleStrip.checked : true;
-        composeModalPoster(templateId, includeStrip);
+        // Trigger Live Server-Side Poster Composition for Step 1
+        composeModalPoster(templateId, footerStyle, headerLayout);
     });
 
+    // Wizard Step Navigation
+    function showWizardStep(step) {
+        var pane1 = document.getElementById('qs-step-pane-1');
+        var pane2 = document.getElementById('qs-step-pane-2');
+        var actions1 = document.getElementById('qs-actions-step-1');
+        var actions2 = document.getElementById('qs-actions-step-2');
+        var ind1 = document.getElementById('qs-step-indicator-1');
+        var ind2 = document.getElementById('qs-step-indicator-2');
+        var footerText = document.getElementById('qs-footer-info-text');
+
+        if (step === 1) {
+            if (pane1) pane1.classList.remove('d-none');
+            if (pane2) pane2.classList.add('d-none');
+            if (actions1) actions1.classList.remove('d-none');
+            if (actions2) actions2.classList.add('d-none');
+            if (ind1) ind1.className = 'badge bg-primary px-3 py-1.5 rounded-pill';
+            if (ind2) ind2.className = 'badge bg-secondary-lt text-secondary px-3 py-1.5 rounded-pill';
+            if (footerText) footerText.innerText = 'Step 1 of 2: Choose poster design styles';
+        } else if (step === 2) {
+            if (pane1) pane1.classList.add('d-none');
+            if (pane2) pane2.classList.remove('d-none');
+            if (actions1) actions1.classList.add('d-none');
+            if (actions2) actions2.classList.remove('d-none');
+            if (ind1) ind1.className = 'badge bg-success text-white px-3 py-1.5 rounded-pill';
+            if (ind2) ind2.className = 'badge bg-primary px-3 py-1.5 rounded-pill';
+            if (footerText) footerText.innerText = 'Step 2 of 2: Review schedule time, accounts & caption';
+
+            // Sync hidden inputs for final submission
+            var selectFooter = document.getElementById('qs-modal-footer-style');
+            var selectHeader = document.getElementById('qs-modal-header-layout');
+            var inputFooter = document.getElementById('qs-input-footer-style');
+            var inputHeader = document.getElementById('qs-input-header-layout');
+            if (inputFooter && selectFooter) inputFooter.value = selectFooter.value;
+            if (inputHeader && selectHeader) inputHeader.value = selectHeader.value;
+        }
+    }
+
+    var btnNextStep = document.getElementById('qs-btn-next-step');
+    if (btnNextStep) {
+        btnNextStep.addEventListener('click', function () {
+            showWizardStep(2);
+        });
+    }
+
+    var btnBackStep = document.getElementById('qs-btn-back-step');
+    if (btnBackStep) {
+        btnBackStep.addEventListener('click', function () {
+            showWizardStep(1);
+        });
+    }
+
+    // Live Composition on Style Dropdown Change (Step 1)
+    var selectFooterStyle = document.getElementById('qs-modal-footer-style');
+    var selectHeaderLayout = document.getElementById('qs-modal-header-layout');
+
+    function onStyleChange() {
+        var tplId = document.getElementById('qs-input-template-id')?.value;
+        if (!tplId) return;
+        var fStyle = selectFooterStyle ? selectFooterStyle.value : 'dual_ribbon_badge';
+        var hLayout = selectHeaderLayout ? selectHeaderLayout.value : 'full_width_strip';
+        composeModalPoster(tplId, fStyle, hLayout);
+    }
+
+    if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
+    if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
+
     // Helper: Compose High-Res Branded Poster via API
-    function composeModalPoster(templateId, includeStrip) {
+    function composeModalPoster(templateId, footerStyle, headerLayout) {
         var spinner = document.getElementById('qs-modal-spinner');
         var imgEl = document.getElementById('qs-modal-img');
         var btnDownload = document.getElementById('qs-modal-btn-download');
@@ -650,6 +706,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
+        var payload = {
+            template_id: parseInt(templateId),
+            footer_style: footerStyle || selectFooterStyle?.value,
+            header_layout: headerLayout || selectHeaderLayout?.value,
+            include_strip: (headerLayout !== 'none')
+        };
+
         fetch('{{ route('admin.festival-studio.compose') }}', {
             method: 'POST',
             headers: {
@@ -657,10 +720,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': csrfToken
             },
-            body: JSON.stringify({
-                template_id: parseInt(templateId),
-                include_strip: !!includeStrip
-            })
+            body: JSON.stringify(payload)
         })
         .then(function (res) { return res.json(); })
         .then(function (data) {
@@ -683,6 +743,62 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Share Handlers in Modal (WhatsApp & Native Share)
+    var btnShareWa = document.getElementById('qs-modal-btn-share-wa');
+    if (btnShareWa) {
+        btnShareWa.addEventListener('click', function () {
+            var imgEl = document.getElementById('qs-modal-img');
+            var caption = document.getElementById('qs-input-caption')?.value || '';
+            var shareUrl = imgEl ? imgEl.src : window.location.href;
+            var text = caption + '\n\n' + shareUrl;
+            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
+        });
+    }
+
+    var btnShareNative = document.getElementById('qs-modal-btn-share-native');
+    if (btnShareNative) {
+        btnShareNative.addEventListener('click', function () {
+            var imgEl = document.getElementById('qs-modal-img');
+            var caption = document.getElementById('qs-input-caption')?.value || '';
+            var shareUrl = imgEl ? imgEl.src : window.location.href;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Festival Greeting Poster',
+                    text: caption,
+                    url: shareUrl
+                }).catch(function () {});
+            } else {
+                navigator.clipboard.writeText(shareUrl).then(function () {
+                    showStudioToast('Poster link copied to clipboard!');
+                }).catch(function () {
+                    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(caption + '\n' + shareUrl), '_blank');
+                });
+            }
+        });
+    }
+
+    // Delegated Share Button Handler on Grid Cards
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-trigger-share');
+        if (!btn) return;
+
+        var imgUrl = btn.getAttribute('data-template-image') || window.location.href;
+        var caption = btn.getAttribute('data-caption') || '';
+        var title = btn.getAttribute('data-festival-title') || 'Festival Greeting Poster';
+
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: caption,
+                url: imgUrl
+            }).catch(function () {});
+        } else {
+            var textToShare = (caption ? caption + '\n\n' : '') + imgUrl;
+            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(textToShare), '_blank');
+        }
+    });
+
     // Account row toggle on checkbox change or row click
     document.addEventListener('change', function (e) {
         if (e.target.classList.contains('qs-account-cb')) {
@@ -697,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Quick Schedule AJAX Submit
+    // Quick Schedule AJAX Submit (Step 2)
     var submitBtn = document.getElementById('btn-submit-quick-schedule');
     if (submitBtn) {
         submitBtn.addEventListener('click', function () {
@@ -723,6 +839,9 @@ document.addEventListener('DOMContentLoaded', function () {
             var scheduleDate = document.getElementById('qs-input-date').value;
             var scheduleTime = document.getElementById('qs-input-time').value;
             var content = document.getElementById('qs-input-caption').value;
+            var footerStyle = document.getElementById('qs-input-footer-style')?.value || selectFooterStyle?.value;
+            var headerLayout = document.getElementById('qs-input-header-layout')?.value || selectHeaderLayout?.value;
+            var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
 
             if (!scheduleDate || !scheduleTime) {
                 if (alertBox) {
@@ -736,9 +855,6 @@ document.addEventListener('DOMContentLoaded', function () {
             submitBtn.disabled = true;
             if (btnText) btnText.innerText = 'Scheduling...';
             if (alertBox) alertBox.classList.add('d-none');
-
-            var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
-            var includeStrip = document.getElementById('qs-modal-toggle-strip')?.checked ?? true;
 
             fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
                 method: 'POST',
@@ -756,7 +872,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     schedule_time: scheduleTime,
                     content: content,
                     composed_image: composedImage,
-                    include_strip: includeStrip
+                    footer_style: footerStyle,
+                    header_layout: headerLayout,
+                    include_strip: (headerLayout !== 'none')
                 })
             })
             .then(function (res) {
@@ -786,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Update card action area on page to show Scheduled badge
                 var actionEl = document.getElementById('card-action-' + templateId);
                 if (actionEl) {
-                    actionEl.innerHTML = '<span class="badge bg-success text-white rounded-pill px-2.5 py-1 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
+                    actionEl.innerHTML = '<span class="badge bg-success text-white rounded-pill px-3 py-1.5 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
                 }
 
                 // Immediately update the festival date pill in the top horizontal bar
@@ -883,23 +1001,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            var modalToggle = document.getElementById('qs-modal-toggle-strip');
-            if (modalToggle) {
-                modalToggle.checked = isChecked;
-            }
-
             try {
                 localStorage.setItem('socialmanager_header_strip_enabled', isChecked ? '1' : '0');
             } catch (err) {}
-        }
-
-        // 2. Header Strip Toggle inside Quick Schedule Modal (Re-composes live poster)
-        if (e.target && e.target.id === 'qs-modal-toggle-strip') {
-            var isModalChecked = e.target.checked;
-            var currentTplId = document.getElementById('qs-input-template-id')?.value;
-            if (currentTplId) {
-                composeModalPoster(currentTplId, isModalChecked);
-            }
         }
     });
 

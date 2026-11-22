@@ -179,6 +179,9 @@ class FestivalStudioController extends Controller
 
         $template = FestivalTemplate::with('party')->findOrFail($validated['template_id']);
 
+        $footerStyle = $request->input('footer_style');
+        $headerLayout = $request->input('header_layout');
+
         if (!empty($validated['composed_image'])) {
             $mediaUrls = [$validated['composed_image']];
         } else {
@@ -188,27 +191,43 @@ class FestivalStudioController extends Controller
                 $strip = $user->defaultLeaderStrip;
                 $includeStrip = $request->boolean('include_strip', true);
 
-                $composed = $composer->composeToFile($template, $branding, $strip, [
+                $options = [
                     'include_strip' => $includeStrip,
-                ]);
+                    'layout_config' => [],
+                ];
+
+                if (!empty($footerStyle)) {
+                    $options['layout_config']['footer']['style'] = $footerStyle;
+                }
+                if (!empty($headerLayout)) {
+                    if ($headerLayout === 'none') {
+                        $options['include_strip'] = false;
+                        $options['layout_config']['header']['enabled'] = false;
+                    } else {
+                        $options['include_strip'] = true;
+                        $options['layout_config']['header']['enabled'] = true;
+                        $options['layout_config']['header']['layout'] = $headerLayout;
+                        $options['layout_config']['header']['mode'] = ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
+                    }
+                }
+
+                $composed = $composer->composeToFile($template, $branding, $strip, $options);
                 $mediaUrls = [$composed['relative_path']];
             } catch (\Throwable $e) {
                 $mediaUrls = [$template->template_image_path];
             }
         }
 
-        $isToday = Carbon::parse($validated['schedule_date'])->isToday();
-        if ($isToday) {
-            // For today's festival, schedule 10 minutes from current moment
-            $scheduledAt = now()->addMinutes(10);
-        } else {
-            // For upcoming future festivals, schedule at 08:00 AM morning
-            $timeString = !empty($validated['schedule_time']) ? $validated['schedule_time'] : '08:00';
-            try {
-                $scheduledAt = Carbon::parse($validated['schedule_date'] . ' ' . $timeString);
-            } catch (\Throwable $e) {
-                $scheduledAt = Carbon::parse($validated['schedule_date'])->setTime(8, 0);
-            }
+        $timeString = !empty($validated['schedule_time']) ? $validated['schedule_time'] : '08:00';
+        try {
+            $scheduledAt = Carbon::parse($validated['schedule_date'] . ' ' . $timeString);
+        } catch (\Throwable $e) {
+            $scheduledAt = Carbon::parse($validated['schedule_date'])->setTime(8, 0);
+        }
+
+        // If scheduled for today and time already passed, schedule 5 minutes from now
+        if ($scheduledAt->isPast()) {
+            $scheduledAt = now()->addMinutes(5);
         }
 
         $festivalId = $validated['festival_id'] ?? $template->festival_id;
@@ -227,6 +246,7 @@ class FestivalStudioController extends Controller
                 'title'          => $template->title,
                 'content'        => $validated['content'] ?? '',
                 'media_urls'     => $mediaUrls,
+                'thumbnail_path' => $mediaUrls[0] ?? null,
                 'scheduled_at'   => $scheduledAt,
                 'status'         => ScheduledPost::STATUS_SCHEDULED,
                 'privacy_status' => 'public',

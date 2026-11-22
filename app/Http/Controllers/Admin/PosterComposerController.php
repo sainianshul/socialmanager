@@ -82,7 +82,29 @@ class PosterComposerController extends Controller
             'preset_key'    => $validated['preset_key'] ?? $template->preset_key,
             'include_strip' => $request->has('include_strip') ? $request->boolean('include_strip') : true,
             'cutout_url'    => $validated['cutout_url'] ?? null,
+            'layout_config' => [],
         ];
+
+        if ($request->filled('footer_style')) {
+            $options['layout_config']['footer']['style'] = $request->input('footer_style');
+        }
+
+        if ($request->filled('header_layout')) {
+            $hLayout = $request->input('header_layout');
+            if ($hLayout === 'none') {
+                $options['include_strip'] = false;
+                $options['layout_config']['header']['enabled'] = false;
+            } else {
+                $options['include_strip'] = true;
+                $options['layout_config']['header']['enabled'] = true;
+                $options['layout_config']['header']['layout'] = $hLayout;
+                $options['layout_config']['header']['mode'] = ($hLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
+            }
+        }
+
+        if ($request->filled('layout_config') && is_array($request->input('layout_config'))) {
+            $options['layout_config'] = array_replace_recursive($options['layout_config'], $request->input('layout_config'));
+        }
 
         try {
             $result = $this->composer->composeToFile(
