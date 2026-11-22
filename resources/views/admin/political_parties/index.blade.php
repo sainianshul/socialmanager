@@ -56,13 +56,11 @@
         <table class="table table-vcenter card-table table-striped table-hover">
             <thead>
                 <tr>
-                    <th style="width: 80px;">Symbol</th>
+                    <th style="width: 70px;">Symbol</th>
                     <th>Party Name</th>
                     <th>Hindi Name</th>
                     <th>Short Code</th>
-                    <th>Brand Colors</th>
                     <th>Leaders</th>
-                    <th>Templates</th>
                     <th>Header Cutout</th>
                     <th>Status</th>
                     <th class="w-1 text-end">Actions</th>
@@ -72,13 +70,18 @@
                 @forelse($parties as $party)
                     <tr>
                         <td>
-                            @if($party->symbol_logo_url)
-                                <img src="{{ $party->symbol_logo_url }}" alt="{{ $party->name }}" class="rounded shadow-sm" style="width: 44px; height: 44px; object-fit: contain; background: #fff; padding: 2px;">
-                            @else
-                                <div class="avatar rounded text-white fw-bold" style="background-color: {{ $party->primary_color }}; width: 44px; height: 44px;">
-                                    {{ $party->short_code }}
-                                </div>
-                            @endif
+                            <div class="d-flex align-items-center">
+                                @if($party->symbol_logo_url)
+                                    <img src="{{ $party->symbol_logo_url }}" alt="{{ $party->name }}" class="rounded border p-1" style="width: 42px; height: 42px; object-fit: contain; background: #fff;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div class="avatar rounded text-white fw-bold" style="display: none; background-color: {{ $party->primary_color }}; width: 42px; height: 42px; font-size: 13px;">
+                                        {{ $party->short_code }}
+                                    </div>
+                                @else
+                                    <div class="avatar rounded text-white fw-bold" style="background-color: {{ $party->primary_color }}; width: 42px; height: 42px; font-size: 13px;">
+                                        {{ $party->short_code }}
+                                    </div>
+                                @endif
+                            </div>
                         </td>
                         <td>
                             <div class="font-weight-medium">{{ $party->name }}</div>
@@ -87,22 +90,11 @@
                             {{ $party->hindi_name ?? '-' }}
                         </td>
                         <td>
-                            <span class="badge bg-blue-lt fw-bold">{{ $party->short_code }}</span>
+                            <span class="badge badge-outline text-primary fw-bold">{{ $party->short_code }}</span>
                         </td>
                         <td>
-                            <div class="d-flex align-items-center gap-1">
-                                <span class="badge rounded-circle p-2 border" style="background-color: {{ $party->primary_color }}; width: 22px; height: 22px;" title="Primary: {{ $party->primary_color }}" data-bs-toggle="tooltip"></span>
-                                <span class="badge rounded-circle p-2 border" style="background-color: {{ $party->secondary_color ?? '#ffffff' }}; width: 22px; height: 22px;" title="Secondary: {{ $party->secondary_color }}" data-bs-toggle="tooltip"></span>
-                            </div>
-                        </td>
-                        <td>
-                            <a href="{{ route('admin.political-leaders.index', ['party_id' => $party->id]) }}" class="badge bg-azure-lt text-decoration-none">
+                            <a href="{{ route('admin.political-leaders.index', ['party_id' => $party->id]) }}" class="badge badge-outline text-azure text-decoration-none">
                                 <i class="ti ti-users me-1"></i> {{ $party->leaders_count }} Leaders
-                            </a>
-                        </td>
-                        <td>
-                            <a href="{{ route('admin.festival-templates.index', ['party_id' => $party->id]) }}" class="badge bg-teal-lt text-decoration-none">
-                                <i class="ti ti-sparkles me-1"></i> {{ $party->templates_count }} Templates
                             </a>
                         </td>
                         <td>
@@ -114,9 +106,13 @@
                         </td>
                         <td>
                             @if($party->is_active)
-                                <span class="badge bg-success-lt">Active</span>
+                                <span class="badge badge-outline text-success">
+                                    <i class="ti ti-check me-1"></i>Active
+                                </span>
                             @else
-                                <span class="badge bg-secondary-lt">Inactive</span>
+                                <span class="badge badge-outline text-secondary">
+                                    <i class="ti ti-x me-1"></i>Inactive
+                                </span>
                             @endif
                         </td>
                         <td class="text-end">
@@ -136,7 +132,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="10" class="text-center py-4 text-muted">
+                        <td colspan="8" class="text-center py-4 text-muted">
                             <i class="ti ti-flag-off fs-1 d-block mb-2"></i>
                             No political parties found. Click "Add Party" to create one.
                         </td>

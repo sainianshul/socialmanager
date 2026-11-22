@@ -61,9 +61,17 @@ class PoliticalParty extends Model
         if (empty($this->symbol_logo)) {
             return null;
         }
-        return filter_var($this->symbol_logo, FILTER_VALIDATE_URL)
-            ? $this->symbol_logo
-            : asset('storage/' . $this->symbol_logo);
+        if (filter_var($this->symbol_logo, FILTER_VALIDATE_URL)) {
+            return $this->symbol_logo;
+        }
+        $cleanPath = ltrim($this->symbol_logo, '/\\');
+        if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+        if (str_starts_with($cleanPath, 'images/')) {
+            return asset($cleanPath);
+        }
+        return asset('storage/' . $cleanPath);
     }
 
     public function getTopLeadersStripUrlAttribute(): ?string
@@ -71,9 +79,17 @@ class PoliticalParty extends Model
         if (empty($this->top_leaders_strip)) {
             return null;
         }
-        return filter_var($this->top_leaders_strip, FILTER_VALIDATE_URL)
-            ? $this->top_leaders_strip
-            : asset('storage/' . $this->top_leaders_strip);
+        if (filter_var($this->top_leaders_strip, FILTER_VALIDATE_URL)) {
+            return $this->top_leaders_strip;
+        }
+        $cleanPath = ltrim($this->top_leaders_strip, '/\\');
+        if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+        if (str_starts_with($cleanPath, 'images/')) {
+            return asset($cleanPath);
+        }
+        return asset('storage/' . $cleanPath);
     }
 
     public function getGroupCutoutUrlAttribute(): ?string
@@ -86,6 +102,9 @@ class PoliticalParty extends Model
         }
         $cleanPath = ltrim($this->group_cutout_image, '/\\');
         if (file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+        if (str_starts_with($cleanPath, 'images/')) {
             return asset($cleanPath);
         }
         return asset('storage/' . $this->group_cutout_image);
