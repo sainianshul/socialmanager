@@ -392,6 +392,37 @@
             width: 60px;
             height: 72px;
         }
+
+        /* Minimalist Modal UI Enhancements */
+        #quickScheduleModal .modal-content {
+            border-radius: 20px !important;
+            border: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+        }
+        #quickScheduleModal .form-select,
+        #quickScheduleModal .form-control {
+            border-color: #e2e8f0;
+            font-size: 0.88rem;
+            transition: all 0.2s ease;
+        }
+        #quickScheduleModal .form-select:focus,
+        #quickScheduleModal .form-control:focus {
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+        }
+        .qs-account-row {
+            transition: all 0.18s ease;
+            border: 1.5px solid #e2e8f0 !important;
+            background: #ffffff !important;
+        }
+        .qs-account-row:hover {
+            border-color: #0d9488 !important;
+            transform: translateY(-1px);
+        }
+        .qs-account-row.active {
+            border-color: #0d9488 !important;
+            background: #f0fdfa !important;
+        }
     </style>
 @endpush
 
