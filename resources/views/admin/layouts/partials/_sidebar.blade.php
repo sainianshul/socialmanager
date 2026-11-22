@@ -160,6 +160,14 @@
                     {{-- POSTER & TEMPLATES (Admin / Manager) --}}
                     <li class="nav-section-title">Poster Templates</li>
                     <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.festivals.*') ? 'active' : '' }}" href="{{ route('admin.festivals.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Festivals & Special Days">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-cyan">
+                                <i class="ti ti-calendar-event fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Festivals</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.festival-templates.*') ? 'active' : '' }}" href="{{ route('admin.festival-templates.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Festival Templates">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-yellow">
                                 <i class="ti ti-sparkles fs-2"></i>

@@ -44,4 +44,26 @@ class Festival extends Model
         return $query->where('festival_date', '>=', now()->toDateString())
             ->orderBy('festival_date', 'asc');
     }
+
+    public function getCategoryLabelAttribute(): string
+    {
+        return match ($this->category) {
+            'religious_festival' => 'Religious Festival',
+            'national_day' => 'National Day',
+            'jayanti_punyatithi' => 'Jayanti / Memorial',
+            'international_day' => 'International Day',
+            default => 'General',
+        };
+    }
+
+    public function getCategoryBadgeColorAttribute(): string
+    {
+        return match ($this->category) {
+            'religious_festival' => 'text-primary',
+            'national_day' => 'text-success',
+            'jayanti_punyatithi' => 'text-warning',
+            'international_day' => 'text-azure',
+            default => 'text-secondary',
+        };
+    }
 }

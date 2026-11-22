@@ -67,6 +67,7 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $response->assertSee('Political Leaders');
         $response->assertSee('Leader Strips');
         $response->assertSee('Poster Templates');
+        $response->assertSee('Festivals');
         $response->assertSee('Festival Templates');
         $response->assertSee('Card Templates');
         $response->assertSee('Poster Studio');
@@ -257,6 +258,63 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $delResponse = $this->actingAs($this->admin)->delete(route('admin.card-templates.destroy', $card));
         $delResponse->assertRedirect(route('admin.card-templates.index'));
         $this->assertDatabaseMissing('card_templates', ['id' => $card->id]);
+    }
+
+    public function test_admin_can_create_and_manage_festivals(): void
+    {
+        // 1. Create festival
+        $createResponse = $this->actingAs($this->admin)->post(route('admin.festivals.store'), [
+            'title' => 'Khatu Shyam Janmotsav',
+            'festival_date' => '2026-11-21',
+            'category' => 'religious_festival',
+            'ready_caption' => 'Jai Shri Shyam Ji Mahaparv Greetings',
+            'hashtags' => '#KhatuShyam #ShyamBaba #KhatuDham',
+            'is_active' => '1',
+        ]);
+
+        $createResponse->assertRedirect(route('admin.festivals.index'));
+        $this->assertDatabaseHas('festivals', [
+            'title' => 'Khatu Shyam Janmotsav',
+            'category' => 'religious_festival',
+            'is_active' => true,
+        ]);
+
+        $festival = Festival::where('title', 'Khatu Shyam Janmotsav')->first();
+        $this->assertNotNull($festival);
+        $this->assertEquals('2026-11-21', $festival->festival_date->format('Y-m-d'));
+
+        // 2. Index listing
+        $indexResponse = $this->actingAs($this->admin)->get(route('admin.festivals.index'));
+        $indexResponse->assertStatus(200);
+        $indexResponse->assertSee('Festivals & Special Days');
+        $indexResponse->assertSee('Khatu Shyam Janmotsav');
+
+        // 3. Edit view
+        $editViewResponse = $this->actingAs($this->admin)->get(route('admin.festivals.edit', $festival));
+        $editViewResponse->assertStatus(200);
+        $editViewResponse->assertSee('Edit Festival: Khatu Shyam Janmotsav');
+
+        // 4. Update festival
+        $updateResponse = $this->actingAs($this->admin)->put(route('admin.festivals.update', $festival), [
+            'title' => 'Khatu Shyam Janmotsav Grand Edition',
+            'festival_date' => '2026-11-22',
+            'category' => 'religious_festival',
+            'ready_caption' => 'Updated Greeting Caption',
+            'hashtags' => '#KhatuShyam2026',
+            'is_active' => '1',
+        ]);
+
+        $updateResponse->assertRedirect(route('admin.festivals.index'));
+        $this->assertDatabaseHas('festivals', [
+            'id' => $festival->id,
+            'title' => 'Khatu Shyam Janmotsav Grand Edition',
+        ]);
+        $this->assertEquals('2026-11-22', $festival->fresh()->festival_date->format('Y-m-d'));
+
+        // 5. Delete festival
+        $deleteResponse = $this->actingAs($this->admin)->delete(route('admin.festivals.destroy', $festival));
+        $deleteResponse->assertRedirect(route('admin.festivals.index'));
+        $this->assertDatabaseMissing('festivals', ['id' => $festival->id]);
     }
 
     public function test_regular_user_cannot_access_political_party_management(): void
