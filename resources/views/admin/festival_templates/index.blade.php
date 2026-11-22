@@ -134,9 +134,25 @@
                     <h4 class="card-title mb-2 text-truncate" title="{{ $tpl->title }}">
                         {{ $tpl->title }}
                     </h4>
-                    <div class="d-flex align-items-center gap-1 mb-3">
-                        <span class="badge bg-blue-lt small text-truncate" style="max-width: 140px;">{{ $tpl->preset_key ?? 'classic_political_right' }}</span>
-                        <span class="badge bg-purple-lt small">{{ $tpl->photo_position ?? 'bottom-right' }}</span>
+                    @php
+                        $styleKey = $tpl->layout_config['footer']['style'] ?? ($tpl->preset_key ?? 'dual_ribbon_badge');
+                        $cleanStyle = ucwords(str_replace(['_badge', '_banner', '_dock', '_blade', '_heritage'], '', str_replace('_', ' ', $styleKey)));
+                        $isFixed = !empty($tpl->layout_config['footer']['is_fixed']);
+                    @endphp
+                    <div class="d-flex align-items-center flex-wrap gap-1 mb-3">
+                        <span class="badge badge-outline text-secondary" title="Strip Style">
+                            <i class="ti ti-layout-bottombar me-1"></i>{{ $cleanStyle }}
+                        </span>
+                        @if($tpl->festival?->festival_date)
+                            <span class="badge badge-outline text-secondary" title="Festival Date">
+                                <i class="ti ti-calendar me-1"></i>{{ $tpl->festival->festival_date->format('d M') }}
+                            </span>
+                        @endif
+                        @if($isFixed)
+                            <span class="badge badge-outline text-danger" title="Strip Locked by Admin">
+                                <i class="ti ti-lock me-1"></i>Fixed
+                            </span>
+                        @endif
                     </div>
                     <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
                         <a href="{{ route('admin.festival-templates.edit', $tpl) }}" class="btn btn-sm btn-outline-secondary">
