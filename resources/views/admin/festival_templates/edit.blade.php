@@ -94,8 +94,10 @@
                             <select name="footer_style" class="form-select border-primary fw-bold" id="field-footer-style">
                                 <option value="dual_ribbon_badge" {{ $footerStyle === 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
                                 <option value="solid_white_banner" {{ $footerStyle === 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
+                                <option value="floating_tricolor_badge" {{ $footerStyle === 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
+                                <option value="royal_gold_dock" {{ $footerStyle === 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
                             </select>
-                            <small class="form-hint">Choose between Layer 1 (Photo under angled ribbon badge) or Layer 2 (Clean full white card with decorative motif).</small>
+                            <small class="form-hint">Choose among Layer 1 (Angled ribbon), Layer 2 (Solid white card), Layer 3 (Floating minimalist tricolor), or Layer 4 (Royal gold card).</small>
                         </div>
 
                         <div class="col-md-6">

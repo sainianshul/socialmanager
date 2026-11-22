@@ -352,6 +352,40 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'success' => true,
         ]);
         $this->assertStringStartsWith('data:image/jpeg;base64,', $response2->json('preview_url'));
+
+        // Test preview with Layer 3 (floating_tricolor_badge)
+        $response3 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'floating_tricolor_badge',
+            'footer_style' => 'floating_tricolor_badge',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'rounded_square',
+            'leader_border_color' => '#FF9933',
+            'name_color' => '#ffffff',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response3->assertStatus(200);
+        $response3->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response3->json('preview_url'));
+
+        // Test preview with Layer 4 (royal_gold_dock)
+        $response4 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'royal_gold_dock',
+            'footer_style' => 'royal_gold_dock',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'square',
+            'leader_border_color' => '#D4AF37',
+            'name_color' => '#ffffff',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response4->assertStatus(200);
+        $response4->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response4->json('preview_url'));
     }
 
     public function test_admin_can_store_festival_template_with_layout_customizations(): void

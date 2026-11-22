@@ -99,6 +99,44 @@ class PosterComposer
                 $options,
                 $config['footer'] ?? []
             );
+        } elseif ($footerStyle === 'floating_tricolor_badge') {
+            // Layer 3 (Diwali Reference Style): Candidate photo rendered first, floating logo + name + tricolor line over it
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+
+            if ($branding) {
+                $this->renderFloatingTricolorBadgeFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+        } elseif ($footerStyle === 'royal_gold_dock') {
+            // Layer 4 (Royal Gold Style): Midnight card first, candidate photo grounded over card
+            if ($branding) {
+                $this->renderRoyalGoldDockFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
         } else {
             // Default standard political footer
             if ($branding) {
@@ -421,6 +459,10 @@ class PosterComposer
             $this->renderDualRibbonBadgeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'solid_white_banner') {
             $this->renderSolidWhiteBannerFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'floating_tricolor_badge') {
+            $this->renderFloatingTricolorBadgeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'royal_gold_dock') {
+            $this->renderRoyalGoldDockFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'royal_bar') {
             $this->renderRoyalBarFooter($canvas, $footerConfig, $branding, $party);
         } elseif ($style === 'dual_ribbon') {
@@ -694,6 +736,278 @@ class PosterComposer
     }
 
     /**
+     * Layer 3: Floating Tricolor Badge (Diwali Reference Style - Image 1)
+     * - Transparent/Floating layout directly on festival artwork (no big card blocking background art).
+     * - Subtle bottom gradient protection so white/colored text is crisp on any background.
+     * - Left side: Circular party logo badge with white backdrop and thin border.
+     * - Next to logo: Candidate Name in bold bright color (auto-fit with Devanagari shaping).
+     * - Under Name: Indian Tricolor ribbon line (Saffron #FF9933, White #FFFFFF, Green #138808).
+     * - Under Tricolor: Designation in crisp white text with subtle shadow.
+     * - Candidate cutout: Anchored to bottom right.
+     * - Very bottom: Sleek white/light-tint social strip (y: 1042-1080) with social pills.
+     */
+    protected function renderFloatingTricolorBadgeFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $nameColor = $footerConfig['name_color'] ?? '#ffffff';
+        $partyPrimary = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF9933');
+
+        // 1. Subtle dark vignette / gradient at bottom for contrast so text always pops
+        $gradientH = 200;
+        $startY = 1080 - $gradientH;
+        $nativeGd = $canvas->core()->native();
+        imagealphablending($nativeGd, true);
+        for ($i = 0; $i < $gradientH; $i++) {
+            $alpha = (int) (127 - ($i / $gradientH) * 85);
+            if ($alpha > 127) $alpha = 127;
+            if ($alpha < 0) $alpha = 0;
+            $color = imagecolorallocatealpha($nativeGd, 0, 0, 0, $alpha);
+            imageline($nativeGd, 0, $startY + $i, 1080, $startY + $i, $color);
+        }
+
+        // 2. Circular Party Logo on bottom left
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 76;
+        $logoX = 25;
+        $logoY = 920;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 3);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 15;
+        $maxTextW = 550;
+
+        // 3. Candidate Name (Bold Auto-Fit with shadow for high contrast)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = 942;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 34;
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX + 2,
+            $nameY + 2,
+            $maxTextW,
+            $nameFontSize,
+            18,
+            $fontHindiBold,
+            '#000000',
+            'left'
+        );
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            18,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 4. Indian Tricolor Ribbon Underline under Name
+        $triY = $nameY + 14;
+        $triWidth = min(380, $maxTextW);
+        $segW = (int) ($triWidth / 3);
+
+        $canvas->drawRectangle($textStartX, $triY, function ($rect) use ($segW) {
+            $rect->size($segW, 5);
+            $rect->background('#FF9933'); // Saffron
+        });
+        $canvas->drawRectangle($textStartX + $segW, $triY, function ($rect) use ($segW) {
+            $rect->size($segW, 5);
+            $rect->background('#ffffff'); // White
+        });
+        $canvas->drawRectangle($textStartX + ($segW * 2), $triY, function ($rect) use ($segW) {
+            $rect->size($segW, 5);
+            $rect->background('#138808'); // Green
+        });
+
+        // 5. Designation Text (Under Tricolor Line)
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $triY + 28;
+            $desigColor = $footerConfig['desig_color'] ?? '#ffffff';
+
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX + 1,
+                $desigY + 1,
+                $maxTextW,
+                19,
+                12,
+                $fontHindiRegular,
+                '#000000',
+                'left'
+            );
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                19,
+                12,
+                $fontHindiRegular,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 6. Sleek Bottom Social Handles Bar (y: 1042-1080)
+        $socialY = 1042;
+        $socialH = 38;
+        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH);
+            $rect->background('#ffffff');
+        });
+
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            25,
+            $socialY + 7,
+            $socialY + 25,
+            $fontEngRegular,
+            '#333333'
+        );
+    }
+
+    /**
+     * Layer 4: Royal Gold Banner (Deep Midnight Card with Dual Gold Borders)
+     * - Deep obsidian/navy card at bottom (y: 915 to 1080).
+     * - Dual parallel golden accent lines along top edge (#D4AF37).
+     * - Gold-ring circular party emblem on left.
+     * - Pure white/champagne-gold bold auto-fit candidate name.
+     * - Warm gold designation text.
+     * - Dark luxury social handles bar with white text.
+     */
+    protected function renderRoyalGoldDockFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $goldColor = '#D4AF37'; // Antique Gold
+        $cardBg = $footerConfig['card_bg'] ?? '#0f172a'; // Deep Midnight Slate
+        $nameColor = $footerConfig['name_color'] ?? '#ffffff';
+        $desigColor = $footerConfig['desig_color'] ?? '#E5C158'; // Champagne Gold
+
+        $cardTopY = 915;
+        $cardHeight = 165;
+
+        // 1. Solid Deep Midnight Card
+        $canvas->drawRectangle(0, $cardTopY, function ($rect) use ($cardBg, $cardHeight) {
+            $rect->size(1080, $cardHeight);
+            $rect->background($cardBg);
+        });
+
+        // 2. Dual Golden Accent Lines along Top Edge
+        $canvas->drawRectangle(0, $cardTopY, function ($rect) use ($goldColor) {
+            $rect->size(1080, 3);
+            $rect->background($goldColor);
+        });
+        $canvas->drawRectangle(0, $cardTopY + 5, function ($rect) use ($goldColor) {
+            $rect->size(1080, 1);
+            $rect->background($goldColor);
+        });
+
+        // 3. Circular Party Emblem with Gold Ring
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 64;
+        $logoX = 30;
+        $logoY = $cardTopY + 16;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, $goldColor, 3);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 16;
+        $maxTextW = 540;
+
+        // 4. Candidate Name (Bold White Auto-Fit)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = $cardTopY + 48;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 32;
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            16,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 5. Designation (Champagne Gold Auto-Fit)
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameY + 28;
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                18,
+                12,
+                $fontHindiRegular,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 6. Thin Gold Divider Line above Social Row
+        $socialTopY = 1032;
+        $canvas->drawRectangle(0, $socialTopY, function ($rect) {
+            $rect->size(1080, 1);
+            $rect->background('#334155');
+        });
+
+        // 7. Dark Luxury Social Row
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            30,
+            $socialTopY + 8,
+            $socialTopY + 27,
+            $fontEngRegular,
+            '#e2e8f0'
+        );
+    }
+
+    /**
      * Render bottom row of social media icons (FB, IG, WA/Phone).
      */
     protected function renderSocialIconsRow(
@@ -702,36 +1016,37 @@ class PosterComposer
         int $startX,
         int $pillY,
         int $textY,
-        string $fontPath
+        string $fontPath,
+        string $textColor = '#333333'
     ): void {
         $currX = $startX;
 
         if ($branding->facebook_handle) {
             $this->drawSocialIconPill($canvas, $currX, $pillY, 'fb', '#1877F2');
-            $canvas->text($branding->facebook_handle, $currX + 28, $textY, function ($font) use ($fontPath) {
+            $canvas->text($branding->facebook_handle, $currX + 28, $textY, function ($font) use ($fontPath, $textColor) {
                 $font->file($fontPath);
                 $font->size(14);
-                $font->color('#333333');
+                $font->color($textColor);
             });
             $currX += 290;
         }
 
         if ($branding->instagram_handle) {
             $this->drawSocialIconPill($canvas, $currX, $pillY, 'ig', '#E4405F');
-            $canvas->text($branding->instagram_handle, $currX + 28, $textY, function ($font) use ($fontPath) {
+            $canvas->text($branding->instagram_handle, $currX + 28, $textY, function ($font) use ($fontPath, $textColor) {
                 $font->file($fontPath);
                 $font->size(14);
-                $font->color('#333333');
+                $font->color($textColor);
             });
             $currX += 290;
         }
 
         if ($branding->phone_number) {
             $this->drawSocialIconPill($canvas, $currX, $pillY, 'wa', '#25D366');
-            $canvas->text($branding->phone_number, $currX + 28, $textY, function ($font) use ($fontPath) {
+            $canvas->text($branding->phone_number, $currX + 28, $textY, function ($font) use ($fontPath, $textColor) {
                 $font->file($fontPath);
                 $font->size(14);
-                $font->color('#333333');
+                $font->color($textColor);
             });
         }
     }
@@ -1499,6 +1814,26 @@ class PosterComposer
                 'footer_style'       => 'solid_white_banner',
             ],
             [
+                'key'                => 'floating_tricolor_badge',
+                'name'               => 'Layer 3: Floating Tricolor Badge (Minimalist & Indian Flag Accent)',
+                'description'        => 'Floating transparent branding directly on festival art with circular logo, bold text, tricolor divider, and bottom social strip. Matches Diwali reference.',
+                'badge'              => 'Layer 3 - Floating Tricolor',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'floating_tricolor_badge',
+            ],
+            [
+                'key'                => 'royal_gold_dock',
+                'name'               => 'Layer 4: Royal Gold Banner (Deep Midnight Card & Gold Borders)',
+                'description'        => 'Deep midnight card with dual golden filigree borders, circular party crest, gold typography, and luxury social strip. Perfect for Jayantis & official state posters.',
+                'badge'              => 'Layer 4 - Royal Gold',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'royal_gold_dock',
+            ],
+            [
                 'key'                => 'classic_political_right',
                 'name'               => 'Classic Political (Dr. Dharam Singh Style)',
                 'description'        => '6-7 circle leaders at top with saffron border, large candidate cutout bottom-right, standard political footer with BJP logo + name + social handles.',
@@ -1647,6 +1982,58 @@ class PosterComposer
                 ],
                 'footer' => [
                     'style' => 'solid_white_banner',
+                ],
+            ],
+
+            // Layer 3: Floating Tricolor Badge (Diwali Reference Style - Image 1)
+            'floating_tricolor_badge' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'rounded_square',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'floating_tricolor_badge',
+                ],
+            ],
+
+            // Layer 4: Royal Gold Banner (Deep Midnight Card with Gold Borders)
+            'royal_gold_dock' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'square',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 3,
+                    'chip_border_color'    => '#D4AF37',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'royal_gold_dock',
                 ],
             ],
 
