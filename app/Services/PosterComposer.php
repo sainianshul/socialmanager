@@ -137,6 +137,48 @@ class PosterComposer
                 $options,
                 $config['footer'] ?? []
             );
+        } elseif ($footerStyle === 'candidate_left_ribbon') {
+            // Layer 5 (Candidate Left Ribbon): Candidate on left, photo first, angled badge over chest
+            $leftCandConfig = array_merge($config['candidate'] ?? [], [
+                'position' => 'bottom-left',
+                'offset_left' => 10,
+            ]);
+            $this->renderCandidatePhoto(
+                $canvas,
+                $leftCandConfig,
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+
+            if ($branding) {
+                $this->renderCandidateLeftRibbonFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $leftCandConfig
+                );
+            }
+        } elseif ($footerStyle === 'modern_capsule_dock') {
+            // Layer 6 (Modern Capsule Dock): Floating dock card first, candidate grounded over card
+            if ($branding) {
+                $this->renderModernCapsuleDockFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
         } else {
             // Default standard political footer
             if ($branding) {
@@ -463,6 +505,10 @@ class PosterComposer
             $this->renderFloatingTricolorBadgeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'royal_gold_dock') {
             $this->renderRoyalGoldDockFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'candidate_left_ribbon') {
+            $this->renderCandidateLeftRibbonFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'modern_capsule_dock') {
+            $this->renderModernCapsuleDockFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'royal_bar') {
             $this->renderRoyalBarFooter($canvas, $footerConfig, $branding, $party);
         } elseif ($style === 'dual_ribbon') {
@@ -1005,6 +1051,303 @@ class PosterComposer
             $fontEngRegular,
             '#e2e8f0'
         );
+    }
+
+    /**
+     * Layer 5: Candidate Left Ribbon (Mirrored Angled Badge for Right-Focused Artwork)
+     * - Candidate cutout sits anchored to bottom-left (x: 10 to 420).
+     * - Middle/Right: Saffron angled ribbon badge sitting over candidate's right lower chest/arm.
+     * - Far Right: Party secondary color strip (Green) with circular party logo and Hindi name.
+     * - Bottom: Full-width clean white social handles strip.
+     */
+    protected function renderCandidateLeftRibbonFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $partyPrimary = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF9933');
+        $partySecondary = $footerConfig['secondary_color'] ?? ($party?->secondary_color ?: '#00873E');
+
+        $nativeGd = $canvas->core()->native();
+
+        // 1. Right Party Ribbon (Green Bar)
+        // y: 948 to 1025, from x: 530 to 1060
+        $partyBarY = 948;
+        $partyBarH = 75;
+        $partyBarW = 530;
+        $partyBarX = 530;
+
+        $canvas->drawRectangle($partyBarX, $partyBarY, function ($rect) use ($partySecondary, $partyBarW, $partyBarH) {
+            $rect->size($partyBarW, $partyBarH);
+            $rect->background($partySecondary);
+        });
+
+        // Party Logo on far right
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = 56;
+        $logoX = 1080 - $logoSize - 25;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                $logoY = $partyBarY + (int)(($partyBarH - $logoSize) / 2);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        // Party Hindi Name next to logo
+        $partyName = $this->shapeDevanagari($party?->hindi_name ?: ($party?->name ?: 'भारतीय जनता पार्टी'));
+        $partyNameY = $partyBarY + (int)($partyBarH / 2) + 8;
+        $canvas->text($partyName, $partyBarX + 25, $partyNameY, function ($font) use ($fontHindiBold) {
+            $font->file($fontHindiBold);
+            $font->size(22);
+            $font->color('#ffffff');
+        });
+
+        // 2. Candidate Name Angled Badge (Saffron Polygon over Candidate's right chest)
+        // From x: 260 to x: 680, with angled right side
+        $badgeTopY = 925;
+        $badgeBottomY = 1025;
+        $badgeStartX = 260;
+        $badgeEndX = 680;
+        $badgeAngleX = 640;
+
+        $sHex = ltrim($partyPrimary, '#');
+        $sr = hexdec(substr($sHex, 0, 2));
+        $sg = hexdec(substr($sHex, 2, 2));
+        $sb = hexdec(substr($sHex, 4, 2));
+        $badgeAlloc = imagecolorallocate($nativeGd, $sr, $sg, $sb);
+
+        $badgePoints = [
+            $badgeStartX, $badgeTopY,
+            $badgeEndX, $badgeTopY,
+            $badgeAngleX, $badgeBottomY,
+            $badgeStartX, $badgeBottomY,
+        ];
+        imagefilledpolygon($nativeGd, $badgePoints, $badgeAlloc);
+
+        // Subtle top shadow border
+        $whiteBorder = imagecolorallocatealpha($nativeGd, 255, 255, 255, 70);
+        imageline($nativeGd, $badgeStartX, $badgeTopY, $badgeEndX, $badgeTopY, $whiteBorder);
+
+        // Candidate Name & Designation inside Saffron Badge
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameX = $badgeStartX + 25;
+        $nameY = $badgeTopY + 36;
+        $maxNameW = $badgeAngleX - $nameX - 20;
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $nameX,
+            $nameY,
+            $maxNameW,
+            27,
+            16,
+            $fontHindiBold,
+            '#ffffff',
+            'left'
+        );
+
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameY + 28;
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $nameX,
+                $desigY,
+                $maxNameW,
+                17,
+                12,
+                $fontHindiRegular,
+                '#FFF275',
+                'left'
+            );
+        }
+
+        // 3. Clean White Social Media Strip at Bottom (y: 1035 to 1080)
+        $socialY = 1035;
+        $socialH = 45;
+
+        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH);
+            $rect->background('#ffffff');
+        });
+
+        // Thin separator line
+        $separatorAlloc = imagecolorallocate($nativeGd, 230, 230, 230);
+        imageline($nativeGd, 0, $socialY, 1080, $socialY, $separatorAlloc);
+
+        $this->renderSocialIconsRow($canvas, $branding, 25, $socialY + 10, $socialY + 28, $fontEngRegular, '#333333');
+    }
+
+    /**
+     * Layer 6: Modern Capsule Dock (Floating Rounded Pill Card with Inset Socials)
+     * - Floating rounded card inset from edges (x: 25 to 1055, y: 920 to 1060).
+     * - Smooth rounded corners (radius: 20px).
+     * - Top border accent in party primary color.
+     * - Circular party emblem on left.
+     * - Candidate name & designation in crisp auto-fit typography.
+     * - Embedded social row inside the card.
+     * - Candidate photo stands on bottom-right naturally overlapping the dock.
+     */
+    protected function renderModernCapsuleDockFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $primaryColor = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF9933');
+        $cardBg = $footerConfig['card_bg'] ?? '#ffffff';
+        $nameColor = $footerConfig['name_color'] ?? '#1e293b';
+
+        $nativeGd = $canvas->core()->native();
+        imagealphablending($nativeGd, true);
+
+        $dockX = 25;
+        $dockY = 920;
+        $dockW = 1030;
+        $dockH = 142;
+        $radius = 20;
+
+        // 1. Draw subtle soft shadow behind rounded dock
+        $shadowColor = imagecolorallocatealpha($nativeGd, 0, 0, 0, 110);
+        $this->drawRoundedCard($nativeGd, $dockX, $dockY + 3, $dockW, $dockH, $radius, $shadowColor);
+
+        // 2. Draw solid white/light rounded card
+        $cHex = ltrim($cardBg, '#');
+        $cr = hexdec(substr($cHex, 0, 2));
+        $cg = hexdec(substr($cHex, 2, 2));
+        $cb = hexdec(substr($cHex, 4, 2));
+        $cardAlloc = imagecolorallocate($nativeGd, $cr, $cg, $cb);
+        $borderAlloc = imagecolorallocate($nativeGd, 226, 232, 240);
+
+        $this->drawRoundedCard($nativeGd, $dockX, $dockY, $dockW, $dockH, $radius, $cardAlloc, $borderAlloc);
+
+        // 3. Top Accent Line along top inside edge
+        $pHex = ltrim($primaryColor, '#');
+        $pr = hexdec(substr($pHex, 0, 2));
+        $pg = hexdec(substr($pHex, 2, 2));
+        $pb = hexdec(substr($pHex, 4, 2));
+        $accentAlloc = imagecolorallocate($nativeGd, $pr, $pg, $pb);
+        imagefilledrectangle($nativeGd, $dockX + $radius, $dockY, $dockX + $dockW - $radius - 1, $dockY + 4, $accentAlloc);
+
+        // 4. Circular Party Logo on left inside capsule
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 66;
+        $logoX = $dockX + 22;
+        $logoY = $dockY + (int)(($dockH - $logoSize) / 2) - 4;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, $primaryColor, 3);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 18;
+        $maxTextW = 500;
+
+        // 5. Candidate Name (Bold Auto-Fit)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = $dockY + 44;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 30;
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            16,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 6. Designation
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameY + 28;
+            $desigColor = $footerConfig['desig_color'] ?? '#64748b';
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                17,
+                12,
+                $fontHindiRegular,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 7. Embedded Social Row inside the floating capsule
+        $socialPillY = $dockY + 98;
+        $socialTextY = $dockY + 115;
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            $textStartX,
+            $socialPillY,
+            $socialTextY,
+            $fontEngRegular,
+            '#475569'
+        );
+    }
+
+    /**
+     * Helper to draw a filled rounded rectangle card in PHP GD.
+     */
+    protected function drawRoundedCard(
+        $gd,
+        int $x,
+        int $y,
+        int $w,
+        int $h,
+        int $radius,
+        int $fillColor,
+        ?int $borderColor = null
+    ): void {
+        imagefilledrectangle($gd, $x + $radius, $y, $x + $w - $radius - 1, $y + $h - 1, $fillColor);
+        imagefilledrectangle($gd, $x, $y + $radius, $x + $radius - 1, $y + $h - $radius - 1, $fillColor);
+        imagefilledrectangle($gd, $x + $w - $radius, $y + $radius, $x + $w - 1, $y + $h - $radius - 1, $fillColor);
+
+        $d = $radius * 2;
+        imagefilledarc($gd, $x + $radius, $y + $radius, $d, $d, 180, 270, $fillColor, IMG_ARC_PIE);
+        imagefilledarc($gd, $x + $w - $radius - 1, $y + $radius, $d, $d, 270, 360, $fillColor, IMG_ARC_PIE);
+        imagefilledarc($gd, $x + $w - $radius - 1, $y + $h - $radius - 1, $d, $d, 0, 90, $fillColor, IMG_ARC_PIE);
+        imagefilledarc($gd, $x + $radius, $y + $h - $radius - 1, $d, $d, 90, 180, $fillColor, IMG_ARC_PIE);
+
+        if ($borderColor !== null) {
+            imageline($gd, $x + $radius, $y, $x + $w - $radius - 1, $y, $borderColor);
+            imageline($gd, $x + $radius, $y + $h - 1, $x + $w - $radius - 1, $y + $h - 1, $borderColor);
+            imageline($gd, $x, $y + $radius, $x, $y + $h - $radius - 1, $borderColor);
+            imageline($gd, $x + $w - 1, $y + $radius, $x + $w - 1, $y + $h - $radius - 1, $borderColor);
+            imagearc($gd, $x + $radius, $y + $radius, $d, $d, 180, 270, $borderColor);
+            imagearc($gd, $x + $w - $radius - 1, $y + $radius, $d, $d, 270, 360, $borderColor);
+            imagearc($gd, $x + $w - $radius - 1, $y + $h - $radius - 1, $d, $d, 0, 90, $borderColor);
+            imagearc($gd, $x + $radius, $y + $h - $radius - 1, $d, $d, 90, 180, $borderColor);
+        }
     }
 
     /**
@@ -1834,6 +2177,26 @@ class PosterComposer
                 'footer_style'       => 'royal_gold_dock',
             ],
             [
+                'key'                => 'candidate_left_ribbon',
+                'name'               => 'Layer 5: Candidate Left Ribbon (Mirrored for Right-Focus Artwork)',
+                'description'        => 'Candidate cutout anchored on bottom-left with angled ribbon badge across chest and party logo on right. Perfect when deity or festival art is on the right.',
+                'badge'              => 'Layer 5 - Left Candidate',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-left',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'candidate_left_ribbon',
+            ],
+            [
+                'key'                => 'modern_capsule_dock',
+                'name'               => 'Layer 6: Modern Capsule Dock (Floating Rounded Card & Inset Socials)',
+                'description'        => 'Floating rounded card inset from edges with subtle top accent, embedded social row, and candidate photo overlapping right wing. Modern 2026 aesthetic.',
+                'badge'              => 'Layer 6 - Capsule Dock',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'modern_capsule_dock',
+            ],
+            [
                 'key'                => 'classic_political_right',
                 'name'               => 'Classic Political (Dr. Dharam Singh Style)',
                 'description'        => '6-7 circle leaders at top with saffron border, large candidate cutout bottom-right, standard political footer with BJP logo + name + social handles.',
@@ -2034,6 +2397,58 @@ class PosterComposer
                 ],
                 'footer' => [
                     'style' => 'royal_gold_dock',
+                ],
+            ],
+
+            // Layer 5: Candidate Left Ribbon (Mirrored for Right-Focus Artwork)
+            'candidate_left_ribbon' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-left',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_left'      => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'candidate_left_ribbon',
+                ],
+            ],
+
+            // Layer 6: Modern Capsule Dock (Floating Rounded Card & Inset Socials)
+            'modern_capsule_dock' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'rounded_square',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'modern_capsule_dock',
                 ],
             ],
 

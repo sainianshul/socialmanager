@@ -96,8 +96,10 @@
                                 <option value="solid_white_banner" {{ $footerStyle === 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
                                 <option value="floating_tricolor_badge" {{ $footerStyle === 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
                                 <option value="royal_gold_dock" {{ $footerStyle === 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
+                                <option value="candidate_left_ribbon" {{ $footerStyle === 'candidate_left_ribbon' ? 'selected' : '' }}>Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
+                                <option value="modern_capsule_dock" {{ $footerStyle === 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
                             </select>
-                            <small class="form-hint">Choose among Layer 1 (Angled ribbon), Layer 2 (Solid white card), Layer 3 (Floating minimalist tricolor), or Layer 4 (Royal gold card).</small>
+                            <small class="form-hint">Choose among 6 professional branding layouts (Ribbon badges, Ethnic cards, Floating minimalist, Royal midnight, Left-aligned, or Capsule dock).</small>
                         </div>
 
                         <div class="col-md-6">
