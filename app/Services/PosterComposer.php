@@ -457,6 +457,122 @@ class PosterComposer
         }
 
         // -------------------------------------------------------------
+        // Header Layout 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)
+        // -------------------------------------------------------------
+        if ($layout === 'frosted_glass_dock') {
+            $leaders = $strip ? $strip->leaders->take(6) : ($party?->leaders()->take(6)->get() ?? collect());
+            if ($leaders->isNotEmpty()) {
+                $dockX = 20;
+                $dockY = 12;
+                $dockW = 1040;
+                $dockH = 126;
+                $radius = 20;
+
+                $nativeGd = $canvas->core()->native();
+
+                // 1. Draw Floating Rounded Dock with subtle shadow
+                $shadowColor = imagecolorallocatealpha($nativeGd, 0, 0, 0, 110);
+                $this->drawRoundedCard($nativeGd, $dockX, $dockY + 3, $dockW, $dockH, $radius, $shadowColor);
+
+                // 2. Draw crisp rounded card
+                $cardAlloc = imagecolorallocate($nativeGd, 252, 251, 248);
+                $borderAlloc = imagecolorallocate($nativeGd, 226, 232, 240);
+                $this->drawRoundedCard($nativeGd, $dockX, $dockY, $dockW, $dockH, $radius, $cardAlloc, $borderAlloc);
+
+                // 3. Top Accent Line on the dock
+                $accentColor = $headerConfig['chip_border_color'] ?? ($party?->primary_color ?: '#FF9933');
+                $aHex = ltrim($accentColor, '#');
+                $ar = hexdec(substr($aHex, 0, 2));
+                $ag = hexdec(substr($aHex, 2, 2));
+                $ab = hexdec(substr($aHex, 4, 2));
+                $accentAlloc = imagecolorallocate($nativeGd, $ar, $ag, $ab);
+                imagefilledrectangle($nativeGd, $dockX + $radius, $dockY, $dockX + $dockW - $radius, $dockY + 3, $accentAlloc);
+
+                // 2. Render Leaders inside the Dock
+                $leaderCount = $leaders->count();
+                $chipSize = 98;
+                $totalChipW = $leaderCount * $chipSize;
+                $totalGaps = $leaderCount + 1;
+                $gap = (int) (($dockW - $totalChipW) / $totalGaps);
+                if ($gap < 8) $gap = 8;
+                $currX = $dockX + $gap;
+                $avatarY = $dockY + (int) (($dockH - $chipSize) / 2);
+
+                foreach ($leaders as $leader) {
+                    $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
+                    if ($leaderImgPath && file_exists($leaderImgPath)) {
+                        try {
+                            $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
+                            $avatar = $this->makeShapedAvatar($avatar, $chipSize, $shape, $borderColor, $borderWidth);
+                            $canvas->place($avatar, 'top-left', $currX, $avatarY);
+                        } catch (\Throwable $e) {}
+                    }
+                    $currX += $chipSize + $gap;
+                }
+            }
+            return;
+        }
+
+        // -------------------------------------------------------------
+        // Header Layout 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)
+        // -------------------------------------------------------------
+        if ($layout === 'tricolor_ribbon_canopy') {
+            $leaders = $strip ? $strip->leaders->take(6) : ($party?->leaders()->take(6)->get() ?? collect());
+            if ($leaders->isNotEmpty()) {
+                $nativeGd = $canvas->core()->native();
+
+                // 1. Horizontal 3-stripe Indian Tricolor Canopy across top edge (y: 0 to 12)
+                $saffAlloc = imagecolorallocate($nativeGd, 255, 153, 51);
+                $whiteAlloc = imagecolorallocate($nativeGd, 255, 255, 255);
+                $greenAlloc = imagecolorallocate($nativeGd, 19, 136, 8);
+                $goldAlloc = imagecolorallocate($nativeGd, 212, 175, 55);
+
+                imagefilledrectangle($nativeGd, 0, 0, 1080, 3, $saffAlloc);
+                imagefilledrectangle($nativeGd, 0, 4, 1080, 7, $whiteAlloc);
+                imagefilledrectangle($nativeGd, 0, 8, 1080, 11, $greenAlloc);
+                imagefilledrectangle($nativeGd, 0, 12, 1080, 13, $goldAlloc);
+
+                // 2. Leaders under Canopy in Royal Gold Rings
+                $leaderCount = $leaders->count();
+                $chipSize = 104;
+                $stripY = 22;
+                $goldBorder = $headerConfig['chip_border_color'] ?? '#D4AF37';
+
+                $canvasW = 1080;
+                $totalChipWidth = $leaderCount * $chipSize;
+                $totalGaps = $leaderCount + 1;
+                $gap = (int) (($canvasW - $totalChipWidth) / $totalGaps);
+                if ($gap < 6) $gap = 6;
+                $currX = $gap;
+
+                foreach ($leaders as $leader) {
+                    $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
+                    if ($leaderImgPath && file_exists($leaderImgPath)) {
+                        try {
+                            $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
+                            $avatar = $this->makeShapedAvatar($avatar, $chipSize, $shape, $goldBorder, 4);
+                            $canvas->place($avatar, 'top-left', $currX, $stripY);
+                        } catch (\Throwable $e) {}
+                    }
+                    $currX += $chipSize + $gap;
+                }
+            }
+            return;
+        }
+
+        // -------------------------------------------------------------
         // Header Layout 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)
         // -------------------------------------------------------------
         if ($layout === 'top_left_cluster') {

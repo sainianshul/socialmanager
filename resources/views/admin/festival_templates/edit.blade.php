@@ -192,6 +192,8 @@
                                 <option value="split_wings" {{ $headerLayout === 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
                                 <option value="vertical_capsule_strip" {{ $headerLayout === 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
                                 <option value="party_group_cutout" {{ $headerLayout === 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
+                                <option value="frosted_glass_dock" {{ $headerLayout === 'frosted_glass_dock' ? 'selected' : '' }}>Header 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)</option>
+                                <option value="tricolor_ribbon_canopy" {{ $headerLayout === 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
                             </select>
                             <small class="form-hint">Placement of top national/state leadership across canvas.</small>
                         </div>
