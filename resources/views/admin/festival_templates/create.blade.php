@@ -128,6 +128,8 @@
                             <select name="header_layout" class="form-select border-primary fw-bold" id="field-header-layout">
                                 <option value="full_width_strip" selected>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
                                 <option value="top_left_cluster">Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
+                                <option value="top_right_cluster">Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
+                                <option value="split_wings">Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
                             </select>
                             <small class="form-hint">Placement of top national/state leadership across canvas.</small>
                         </div>

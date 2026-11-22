@@ -452,6 +452,117 @@ class PosterComposer
         }
 
         // -------------------------------------------------------------
+        // Header Layout 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)
+        // -------------------------------------------------------------
+        if ($layout === 'top_right_cluster') {
+            $leaders = $strip ? $strip->leaders->take(4) : ($party?->leaders()->take(4)->get() ?? collect());
+            if ($leaders->isNotEmpty()) {
+                $leaderCount = $leaders->count();
+                $chipSize = $headerConfig['chip_size'] ?? 110;
+                $stripY = $headerConfig['chips_start_y'] ?? 15;
+                $gap = 18;
+                $totalClusterW = ($leaderCount * $chipSize) + (($leaderCount - 1) * $gap);
+                $currX = 1080 - 25 - $totalClusterW;
+
+                foreach ($leaders as $leader) {
+                    $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
+                    if ($leaderImgPath && file_exists($leaderImgPath)) {
+                        try {
+                            $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
+                            $avatar = $this->makeShapedAvatar($avatar, $chipSize, $shape, $borderColor, $borderWidth);
+                            $canvas->place($avatar, 'top-left', $currX, $stripY);
+                        } catch (\Throwable $e) {}
+                    }
+                    $currX += $chipSize + $gap;
+                }
+
+                // Top-Left Official Party Emblem for compositional balance
+                $showLogo = $headerConfig['show_party_logo'] ?? true;
+                if ($showLogo) {
+                    $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+                    $resolvedLogo = $this->resolveFilePath($logoPath);
+                    if ($resolvedLogo && file_exists($resolvedLogo)) {
+                        try {
+                            $logoSize = 82;
+                            $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                            $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, $borderColor ?: '#ffffff', 3);
+                            $logoX = 25;
+                            $logoY = $stripY + (int)(($chipSize - $logoSize) / 2);
+                            $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+                        } catch (\Throwable $e) {}
+                    }
+                }
+            }
+            return;
+        }
+
+        // -------------------------------------------------------------
+        // Header Layout 4: Split Wings (3 Left + 3 Right, Center Grand Opening)
+        // -------------------------------------------------------------
+        if ($layout === 'split_wings') {
+            $allLeaders = $strip ? $strip->leaders->take(6) : ($party?->leaders()->take(6)->get() ?? collect());
+            if ($allLeaders->isNotEmpty()) {
+                $chipSize = $headerConfig['chip_size'] ?? 106;
+                $stripY = $headerConfig['chips_start_y'] ?? 14;
+                $gap = 16;
+
+                $half = (int) ceil($allLeaders->count() / 2);
+                $leftLeaders = $allLeaders->slice(0, $half);
+                $rightLeaders = $allLeaders->slice($half);
+
+                // Left Wing (starts at x: 25)
+                $leftX = 25;
+                foreach ($leftLeaders as $leader) {
+                    $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
+                    if ($leaderImgPath && file_exists($leaderImgPath)) {
+                        try {
+                            $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
+                            $avatar = $this->makeShapedAvatar($avatar, $chipSize, $shape, $borderColor, $borderWidth);
+                            $canvas->place($avatar, 'top-left', $leftX, $stripY);
+                        } catch (\Throwable $e) {}
+                    }
+                    $leftX += $chipSize + $gap;
+                }
+
+                // Right Wing (anchored to right: x = 1080 - 25 - totalW)
+                $rightCount = $rightLeaders->count();
+                $rightTotalW = ($rightCount * $chipSize) + (($rightCount - 1) * $gap);
+                $rightX = 1080 - 25 - $rightTotalW;
+
+                foreach ($rightLeaders as $leader) {
+                    $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
+                    if ($leaderImgPath && file_exists($leaderImgPath)) {
+                        try {
+                            $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
+                            $avatar = $this->makeShapedAvatar($avatar, $chipSize, $shape, $borderColor, $borderWidth);
+                            $canvas->place($avatar, 'top-left', $rightX, $stripY);
+                        } catch (\Throwable $e) {}
+                    }
+                    $rightX += $chipSize + $gap;
+                }
+            }
+            return;
+        }
+
+        // -------------------------------------------------------------
         // Header Layout 1: Full-Width Strip (6-7 Leaders Evenly Distributed)
         // -------------------------------------------------------------
         $leaders = $strip ? $strip->leaders->take(7) : ($party?->leaders()->take(7)->get() ?? collect());
