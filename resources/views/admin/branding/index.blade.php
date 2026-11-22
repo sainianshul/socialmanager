@@ -315,7 +315,7 @@
                             <div class="row g-3 mb-4">
                                 <div class="col-md-6">
                                     <label class="bs-label">
-                                        <i class="ti ti-user text-primary"></i>Display Name <span class="text-danger">*</span>
+                                        <i class="ti ti-user text-primary"></i>Display Name (English) <span class="text-danger">*</span>
                                     </label>
                                     <input type="text" name="display_name" id="input-display-name" class="form-control bs-input" 
                                            value="{{ old('display_name', $branding->display_name ?? $user->name) }}" 
@@ -323,11 +323,20 @@
                                 </div>
                                 <div class="col-md-6">
                                     <label class="bs-label">
-                                        <i class="ti ti-medal text-primary"></i>Designation
+                                        <i class="ti ti-language text-primary"></i>Hindi Name (हिंदी में नाम)
+                                    </label>
+                                    <input type="text" name="hindi_name" id="input-hindi-name" class="form-control bs-input" 
+                                           value="{{ old('hindi_name', $branding->hindi_name) }}" 
+                                           placeholder="उदा. डॉ. धर्म सिंह सैनी">
+                                    <span class="text-secondary small" style="font-size: 0.75rem;">If provided, this Hindi name will appear on poster branding strips.</span>
+                                </div>
+                                <div class="col-md-12">
+                                    <label class="bs-label">
+                                        <i class="ti ti-medal text-primary"></i>Designation / Role
                                     </label>
                                     <input type="text" name="designation" id="input-designation" class="form-control bs-input" 
                                            value="{{ old('designation', $branding->designation) }}" 
-                                           placeholder="e.g. Former Minister (Uttar Pradesh)">
+                                           placeholder="e.g. पूर्व मंत्री (उत्तर प्रदेश सरकार)">
                                 </div>
                             </div>
 

@@ -86,6 +86,7 @@ class BrandingController extends Controller
     {
         $validated = $request->validate([
             'display_name'     => 'required|string|max:150',
+            'hindi_name'       => 'nullable|string|max:150',
             'designation'      => 'nullable|string|max:150',
             'client_type'      => 'nullable|in:politician,business,personal',
             'party_id'         => 'nullable|exists:political_parties,id',
@@ -109,6 +110,7 @@ class BrandingController extends Controller
         $clientType = $validated['client_type'] ?? $branding->client_type ?? $user->client_type ?? User::CLIENT_TYPE_POLITICIAN;
 
         $branding->display_name = $validated['display_name'];
+        $branding->hindi_name = $validated['hindi_name'] ?? null;
         $branding->designation = $validated['designation'] ?? null;
         $branding->client_type = $clientType;
         $branding->party_id = $validated['party_id'] ?? null;

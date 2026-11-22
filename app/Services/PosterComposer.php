@@ -1034,7 +1034,7 @@ class PosterComposer
         $nameTextY = $badgeTopY + 45;
         $maxNameW = 1080 - $nameTextX - 20;
 
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $this->renderAutoFitText(
             $canvas,
             $displayName,
@@ -1165,7 +1165,7 @@ class PosterComposer
         $nameY = 968;
         $maxNameW = 460;
 
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $this->renderAutoFitText(
             $canvas,
             $displayName,
@@ -1266,7 +1266,7 @@ class PosterComposer
         $maxTextW = 550;
 
         // 3. Candidate Name (Bold Auto-Fit with shadow for high contrast)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = 942;
         $nameFontSize = $footerConfig['name_font_size'] ?? 34;
 
@@ -1427,7 +1427,7 @@ class PosterComposer
         $maxTextW = 540;
 
         // 4. Candidate Name (Bold White Auto-Fit)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = $cardTopY + 48;
         $nameFontSize = $footerConfig['name_font_size'] ?? 32;
 
@@ -1567,7 +1567,7 @@ class PosterComposer
         imageline($nativeGd, $badgeStartX, $badgeTopY, $badgeEndX, $badgeTopY, $whiteBorder);
 
         // Candidate Name & Designation inside Saffron Badge
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameX = $badgeStartX + 25;
         $nameY = $badgeTopY + 36;
         $maxNameW = $badgeAngleX - $nameX - 20;
@@ -1693,7 +1693,7 @@ class PosterComposer
         $maxTextW = 500;
 
         // 5. Candidate Name (Bold Auto-Fit)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = $dockY + 44;
         $nameFontSize = $footerConfig['name_font_size'] ?? 30;
 
@@ -1835,7 +1835,7 @@ class PosterComposer
         $maxTextW = 680;
 
         // 4. Candidate Name (Bold Auto-Fit)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = $cardTopY + 46;
         $nameFontSize = $footerConfig['name_font_size'] ?? 30;
 
@@ -1979,7 +1979,7 @@ class PosterComposer
         $maxTextW = 540;
 
         // 4. Candidate Name (Bold White Auto-Fit)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = $leftY + 44;
         $nameFontSize = $footerConfig['name_font_size'] ?? 32;
 
@@ -2126,7 +2126,7 @@ class PosterComposer
         $maxTextW = 560;
 
         // 5. Candidate Name on Saffron Band (Bold Crisp White)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = 948;
         $nameFontSize = $footerConfig['name_font_size'] ?? 32;
 
@@ -2258,7 +2258,7 @@ class PosterComposer
         $maxTextW = 550;
 
         // 4. Candidate Name (24K Gilded Gold with 3D Embossed Effect)
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $nameY = $cardTopY + 56;
         $nameFontSize = $footerConfig['name_font_size'] ?? 34;
 
@@ -2430,7 +2430,7 @@ class PosterComposer
             $nameColor = $footerConfig['name_color'] ?? '#c0392b';
             $maxNameWidth = $footerConfig['max_name_width'] ?? 310;
 
-            $displayName = $this->shapeDevanagari($branding->display_name);
+            $displayName = $this->shapeDevanagari($branding->effective_name);
             $this->renderAutoFitText(
                 $canvas,
                 $displayName,
@@ -2479,7 +2479,7 @@ class PosterComposer
             $nameColor = $footerConfig['name_color'] ?? '#c0392b';
             $maxNameWidth = $footerConfig['max_name_width'] ?? 520;
 
-            $displayName = $this->shapeDevanagari($branding->display_name);
+            $displayName = $this->shapeDevanagari($branding->effective_name);
             $this->renderAutoFitText(
                 $canvas,
                 $displayName,
@@ -2611,7 +2611,7 @@ class PosterComposer
             $rect->background($nameColor);
         });
 
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $canvas->text($displayName, $nameX + 30, 972, function ($font) use ($fontHindiBold) {
             $font->file($fontHindiBold);
             $font->size(26);
@@ -2698,7 +2698,7 @@ class PosterComposer
         }
 
         // 3. Name Text in Gold
-        $displayName = $this->shapeDevanagari($branding->display_name);
+        $displayName = $this->shapeDevanagari($branding->effective_name);
         $canvas->text($displayName, $textStartX, 955, function ($font) use ($fontHindiBold, $goldColor) {
             $font->file($fontHindiBold);
             $font->size(34);

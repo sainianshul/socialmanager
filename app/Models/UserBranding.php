@@ -18,6 +18,7 @@ class UserBranding extends Model
         'client_type',
         'party_id',
         'display_name',
+        'hindi_name',
         'designation',
         'phone_number',
         'facebook_handle',
@@ -38,6 +39,11 @@ class UserBranding extends Model
             'is_default' => 'boolean',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function getEffectiveNameAttribute(): string
+    {
+        return !empty($this->hindi_name) ? $this->hindi_name : ($this->display_name ?: '');
     }
 
     public function user(): BelongsTo

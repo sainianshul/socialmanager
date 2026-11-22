@@ -31,6 +31,7 @@ class BrandingTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Branding Studio');
+        $response->assertSee('Hindi Name');
         $response->assertSee('Bharatiya Janata Party');
         $response->assertSee('Political Party');
     }
@@ -45,7 +46,8 @@ class BrandingTest extends TestCase
         $party = PoliticalParty::where('short_code', 'BJP')->first();
 
         $payload = [
-            'display_name'     => 'डॉ. धर्म सिंह सैनी',
+            'display_name'     => 'Dharam Singh Saini',
+            'hindi_name'       => 'डॉ. धर्म सिंह सैनी',
             'designation'      => 'पूर्व मंत्री (उत्तर प्रदेश)',
             'party_id'         => $party->id,
             'phone_number'     => '9876543210',
@@ -61,7 +63,8 @@ class BrandingTest extends TestCase
 
         $this->assertDatabaseHas('user_brandings', [
             'user_id'          => $user->id,
-            'display_name'     => 'डॉ. धर्म सिंह सैनी',
+            'display_name'     => 'Dharam Singh Saini',
+            'hindi_name'       => 'डॉ. धर्म सिंह सैनी',
             'designation'      => 'पूर्व मंत्री (उत्तर प्रदेश)',
             'party_id'         => $party->id,
             'phone_number'     => '9876543210',
