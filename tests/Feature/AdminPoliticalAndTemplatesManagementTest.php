@@ -669,6 +669,8 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
     {
         $createPage = $this->actingAs($this->admin)->get(route('admin.festival-templates.create'));
         $createPage->assertStatus(200);
+        $createPage->assertSee('Festival Month');
+        $createPage->assertSee('Search festival');
         $createPage->assertSee('Branding Frame Layer (Footer Style)');
         $createPage->assertSee('Top Leadership Header (Header Style)');
         $createPage->assertDontSee('name_color');

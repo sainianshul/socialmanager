@@ -41,19 +41,58 @@
 
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-6">
-                    <label class="form-label required">Festival</label>
+                @php
+                    $templateMonth = old('festival_month', $festivalTemplate->festival?->festival_date?->format('m') ?? now()->format('m'));
+                @endphp
+                {{-- Month Selector --}}
+                <div class="col-md-3">
+                    <label class="form-label">Festival Month</label>
+                    <select class="form-select" id="filter-festival-month" name="festival_month">
+                        <option value="">All Months</option>
+                        <option value="01" {{ $templateMonth === '01' ? 'selected' : '' }}>01 - January</option>
+                        <option value="02" {{ $templateMonth === '02' ? 'selected' : '' }}>02 - February</option>
+                        <option value="03" {{ $templateMonth === '03' ? 'selected' : '' }}>03 - March</option>
+                        <option value="04" {{ $templateMonth === '04' ? 'selected' : '' }}>04 - April</option>
+                        <option value="05" {{ $templateMonth === '05' ? 'selected' : '' }}>05 - May</option>
+                        <option value="06" {{ $templateMonth === '06' ? 'selected' : '' }}>06 - June</option>
+                        <option value="07" {{ $templateMonth === '07' ? 'selected' : '' }}>07 - July</option>
+                        <option value="08" {{ $templateMonth === '08' ? 'selected' : '' }}>08 - August</option>
+                        <option value="09" {{ $templateMonth === '09' ? 'selected' : '' }}>09 - September</option>
+                        <option value="10" {{ $templateMonth === '10' ? 'selected' : '' }}>10 - October</option>
+                        <option value="11" {{ $templateMonth === '11' ? 'selected' : '' }}>11 - November</option>
+                        <option value="12" {{ $templateMonth === '12' ? 'selected' : '' }}>12 - December</option>
+                    </select>
+                </div>
+
+                {{-- Festival Selection with Quick Search --}}
+                <div class="col-md-5">
+                    <label class="form-label required mb-1">Festival</label>
+
+                    {{-- Quick Search Input --}}
+                    <div class="input-group input-group-sm mb-1.5">
+                        <span class="input-group-text bg-white text-muted"><i class="ti ti-search"></i></span>
+                        <input type="text" id="festival-search-input" class="form-control" placeholder="Search festival (e.g. Diwali, Samvidhan)...">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="btn-clear-festival-search" style="display: none;">
+                            <i class="ti ti-x"></i>
+                        </button>
+                    </div>
+
                     <select name="festival_id" class="form-select @error('festival_id') is-invalid @enderror" id="field-festival" required>
+                        <option value="">Select Festival</option>
                         @foreach($festivals as $fest)
-                            <option value="{{ $fest->id }}" {{ old('festival_id', $festivalTemplate->festival_id) == $fest->id ? 'selected' : '' }}>
-                                {{ $fest->title }} ({{ $fest->festival_date ? $fest->festival_date->format('d M Y') : '' }})
+                            <option value="{{ $fest->id }}"
+                                    data-month="{{ $fest->festival_date ? $fest->festival_date->format('m') : '' }}"
+                                    data-date="{{ $fest->festival_date ? $fest->festival_date->format('Y-m-d') : '' }}"
+                                    data-title="{{ strtolower($fest->title) }}"
+                                    {{ old('festival_id', $festivalTemplate->festival_id) == $fest->id ? 'selected' : '' }}>
+                                {{ $fest->title }} ({{ $fest->festival_date ? $fest->festival_date->format('d M Y') : 'No Date' }})
                             </option>
                         @endforeach
                     </select>
                     @error('festival_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label class="form-label">Political Party</label>
                     <select name="party_id" class="form-select @error('party_id') is-invalid @enderror" id="field-party">
                         <option value="">All Parties (Universal Template)</option>
@@ -238,6 +277,83 @@ document.addEventListener('DOMContentLoaded', function () {
     const fieldLeaderShape = document.getElementById('field-leader-shape');
     const fieldLeaderBorder = document.getElementById('field-leader-border');
     const fieldShowStrip = document.getElementById('field-show-strip');
+    const fieldFestivalSelect = document.getElementById('field-festival');
+    const filterMonthSelect = document.getElementById('filter-festival-month');
+    const festivalSearchInput = document.getElementById('festival-search-input');
+    const btnClearSearch = document.getElementById('btn-clear-festival-search');
+
+    // Month & Search Filter on Festival Select (Preserves Ascending Date Order)
+    if (fieldFestivalSelect && filterMonthSelect) {
+        const originalFestivalOptions = Array.from(fieldFestivalSelect.options).map(opt => ({
+            value: opt.value,
+            text: opt.textContent,
+            month: opt.getAttribute('data-month') || '',
+            date: opt.getAttribute('data-date') || '',
+            title: (opt.getAttribute('data-title') || opt.textContent).toLowerCase(),
+            selected: opt.selected
+        }));
+
+        function applyFestivalFilter() {
+            const selectedMonth = filterMonthSelect.value;
+            const query = festivalSearchInput ? festivalSearchInput.value.trim().toLowerCase() : '';
+            const currentVal = fieldFestivalSelect.value;
+
+            fieldFestivalSelect.innerHTML = '';
+
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Select Festival';
+            fieldFestivalSelect.appendChild(placeholder);
+
+            let hasCurrent = false;
+
+            originalFestivalOptions.forEach(item => {
+                if (!item.value) return;
+
+                const matchMonth = !selectedMonth || item.month === selectedMonth;
+                const matchSearch = !query || item.title.includes(query) || item.text.toLowerCase().includes(query);
+
+                if (matchMonth && matchSearch) {
+                    const opt = document.createElement('option');
+                    opt.value = item.value;
+                    opt.textContent = item.text;
+                    opt.setAttribute('data-month', item.month);
+                    opt.setAttribute('data-date', item.date);
+                    opt.setAttribute('data-title', item.title);
+                    if (item.value === currentVal) {
+                        opt.selected = true;
+                        hasCurrent = true;
+                    }
+                    fieldFestivalSelect.appendChild(opt);
+                }
+            });
+
+            if (!hasCurrent && currentVal !== '') {
+                fieldFestivalSelect.value = '';
+            }
+
+            if (btnClearSearch) {
+                btnClearSearch.style.display = query ? 'inline-block' : 'none';
+            }
+        }
+
+        filterMonthSelect.addEventListener('change', applyFestivalFilter);
+
+        if (festivalSearchInput) {
+            festivalSearchInput.addEventListener('input', applyFestivalFilter);
+        }
+
+        if (btnClearSearch) {
+            btnClearSearch.addEventListener('click', function () {
+                festivalSearchInput.value = '';
+                applyFestivalFilter();
+                festivalSearchInput.focus();
+            });
+        }
+
+        // Apply on initial load
+        applyFestivalFilter();
+    }
 
     const previewImg = document.getElementById('preview-image');
     const previewLoading = document.getElementById('preview-loading');

@@ -43,7 +43,7 @@ class FestivalTemplateController extends Controller
         }
 
         $templates = $query->latest()->paginate(24)->withQueryString();
-        $festivals = Festival::orderBy('festival_date', 'desc')->get();
+        $festivals = Festival::orderBy('festival_date', 'asc')->get();
         $parties = PoliticalParty::orderBy('name')->get();
 
         return view('admin.festival_templates.index', compact('templates', 'festivals', 'parties'));
@@ -54,7 +54,7 @@ class FestivalTemplateController extends Controller
      */
     public function create()
     {
-        $festivals = Festival::orderBy('festival_date', 'desc')->get();
+        $festivals = Festival::orderBy('festival_date', 'asc')->get();
         $parties = PoliticalParty::orderBy('name')->get();
         $presets = app(PosterComposer::class)->getAvailablePresets();
 
@@ -146,7 +146,7 @@ class FestivalTemplateController extends Controller
      */
     public function edit(FestivalTemplate $festivalTemplate)
     {
-        $festivals = Festival::orderBy('festival_date', 'desc')->get();
+        $festivals = Festival::orderBy('festival_date', 'asc')->get();
         $parties = PoliticalParty::orderBy('name')->get();
         $presets = app(PosterComposer::class)->getAvailablePresets();
         $headerLayout = $festivalTemplate->layout_config['header']['layout'] ?? 'full_width_strip';
