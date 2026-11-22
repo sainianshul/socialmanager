@@ -356,21 +356,23 @@ class PosterComposer
         ?LeaderStrip $strip
     ): void {
         $mode = $headerConfig['mode'] ?? 'individual_chips';
-        $layout = $headerConfig['layout'] ?? 'full_width_strip';
+        $layout = $headerConfig['layout'] ?? ($mode === 'party_group_cutout' ? 'party_group_cutout' : 'full_width_strip');
 
-        // A) Group Cutout Mode (Ram Navami Style)
-        if ($mode === 'party_group_cutout') {
+        // -------------------------------------------------------------
+        // Header Layout 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)
+        // -------------------------------------------------------------
+        if ($layout === 'party_group_cutout' || $mode === 'party_group_cutout') {
             $cutoutPath = $party?->group_cutout_image ?: 'images/parties/bjp-group-cutout.png';
             $resolvedCutout = $this->resolveFilePath($cutoutPath);
 
             if ($resolvedCutout && file_exists($resolvedCutout)) {
                 try {
                     $cutoutImg = $this->manager->read($resolvedCutout);
-                    $targetWidth = $headerConfig['group_cutout_width'] ?? 360;
+                    $targetWidth = $headerConfig['group_cutout_width'] ?? 420;
                     $cutoutImg->scaleDown(width: $targetWidth);
 
                     $x = $headerConfig['group_cutout_x'] ?? 30;
-                    $y = $headerConfig['group_cutout_y'] ?? 25;
+                    $y = $headerConfig['group_cutout_y'] ?? 20;
                     $canvas->place($cutoutImg, 'top-left', $x, $y);
                 } catch (\Throwable $e) {
                     // Ignore load error
@@ -383,12 +385,12 @@ class PosterComposer
                 $resolvedLogo = $this->resolveFilePath($logoPath);
                 if ($resolvedLogo && file_exists($resolvedLogo)) {
                     try {
-                        $logoSize = $headerConfig['logo_size'] ?? 75;
+                        $logoSize = $headerConfig['logo_size'] ?? 82;
                         $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
-                        $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                        $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#D4AF37', 3);
 
-                        $logoX = $headerConfig['logo_x'] ?? (1080 - $logoSize - 35);
-                        $logoY = $headerConfig['logo_y'] ?? 25;
+                        $logoX = $headerConfig['logo_x'] ?? (1080 - $logoSize - 28);
+                        $logoY = $headerConfig['logo_y'] ?? 20;
                         $canvas->place($logoImg, 'top-left', $logoX, $logoY);
                     } catch (\Throwable $e) {}
                 }
@@ -400,6 +402,59 @@ class PosterComposer
         $borderWidth = $headerConfig['chip_border_width'] ?? 4;
         $borderColor = $headerConfig['chip_border_color'] ?? '#FF9933';
         $shape = $headerConfig['chip_shape'] ?? 'circle';
+
+        // -------------------------------------------------------------
+        // Header Layout 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)
+        // -------------------------------------------------------------
+        if ($layout === 'vertical_capsule_strip') {
+            $leaders = $strip ? $strip->leaders->take(7) : ($party?->leaders()->take(7)->get() ?? collect());
+            if ($leaders->isNotEmpty()) {
+                $leaderCount = $leaders->count();
+                $cardW = 96;
+                $cardH = 126;
+                $radius = 16;
+                $stripY = $headerConfig['chips_start_y'] ?? 14;
+
+                $canvasW = 1080;
+                $totalW = $leaderCount * $cardW;
+                $totalGaps = $leaderCount + 1;
+                $gap = (int) (($canvasW - $totalW) / $totalGaps);
+                if ($gap < 6) $gap = 6;
+                $currX = $gap;
+
+                foreach ($leaders as $leader) {
+                    $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
+                    if ($leaderImgPath && file_exists($leaderImgPath)) {
+                        try {
+                            $avatar = $this->manager->read($leaderImgPath);
+                            $avatar = $this->makeVerticalCapsuleAvatar($avatar, $cardW, $cardH, $radius, $borderColor, $borderWidth);
+                            $canvas->place($avatar, 'top-left', $currX, $stripY);
+                        } catch (\Throwable $e) {}
+                    }
+                    $currX += $cardW + $gap;
+                }
+
+                // Mini Party Pill Badge in top right corner
+                $partyCode = $party?->short_code ?: 'BJP';
+                $nativeGd = $canvas->core()->native();
+                $badgeW = 58;
+                $badgeH = 22;
+                $badgeX = 1080 - $badgeW - 22;
+                $badgeY = $stripY + 4;
+                $saffAlloc = imagecolorallocate($nativeGd, 255, 153, 51);
+                imagefilledrectangle($nativeGd, $badgeX, $badgeY, $badgeX + $badgeW, $badgeY + $badgeH, $saffAlloc);
+                $fontEngBold = $this->getFontPath('english_bold');
+                $whiteAlloc = imagecolorallocate($nativeGd, 255, 255, 255);
+                imagettftext($nativeGd, 11, 0, $badgeX + 14, $badgeY + 16, $whiteAlloc, $fontEngBold, $partyCode);
+            }
+            return;
+        }
 
         // -------------------------------------------------------------
         // Header Layout 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)
@@ -2682,6 +2737,82 @@ class PosterComposer
         });
 
         return $size;
+    }
+
+    /**
+     * Vertical capsule / rounded card avatar cropper (Reference Image 1 & 3 style).
+     */
+    protected function makeVerticalCapsuleAvatar(
+        ImageInterface $image,
+        int $width,
+        int $height,
+        int $radius = 16,
+        string $borderColor = '#FF9933',
+        int $borderWidth = 4
+    ): ImageInterface {
+        $image->cover($width, $height);
+        $srcGd = $image->core()->native();
+
+        $destGd = imagecreatetruecolor($width, $height);
+        imagealphablending($destGd, false);
+        imagesavealpha($destGd, true);
+        $transparent = imagecolorallocatealpha($destGd, 0, 0, 0, 127);
+        imagefill($destGd, 0, 0, $transparent);
+
+        // Parse border color
+        $borderAlloc = null;
+        if ($borderWidth > 0 && !empty($borderColor) && $borderColor !== 'none') {
+            $hex = ltrim($borderColor, '#');
+            if (strlen($hex) === 6) {
+                $br = hexdec(substr($hex, 0, 2));
+                $bg = hexdec(substr($hex, 2, 2));
+                $bb = hexdec(substr($hex, 4, 2));
+                $borderAlloc = imagecolorallocate($destGd, $br, $bg, $bb);
+            }
+        }
+
+        for ($x = 0; $x < $width; $x++) {
+            for ($y = 0; $y < $height; $y++) {
+                $inBounds = true;
+                $isBorder = false;
+
+                $cornerX = -1;
+                $cornerY = -1;
+                if ($x < $radius && $y < $radius) {
+                    $cornerX = $radius; $cornerY = $radius;
+                } elseif ($x >= ($width - $radius) && $y < $radius) {
+                    $cornerX = $width - $radius - 1; $cornerY = $radius;
+                } elseif ($x < $radius && $y >= ($height - $radius)) {
+                    $cornerX = $radius; $cornerY = $height - $radius - 1;
+                } elseif ($x >= ($width - $radius) && $y >= ($height - $radius)) {
+                    $cornerX = $width - $radius - 1; $cornerY = $height - $radius - 1;
+                }
+
+                if ($cornerX !== -1) {
+                    $dist = sqrt(pow($x - $cornerX, 2) + pow($y - $cornerY, 2));
+                    if ($dist > $radius) {
+                        $inBounds = false;
+                    } elseif ($dist > ($radius - $borderWidth)) {
+                        $isBorder = true;
+                    }
+                } else {
+                    if ($borderWidth > 0 && ($x < $borderWidth || $x >= ($width - $borderWidth) || $y < $borderWidth || $y >= ($height - $borderWidth))) {
+                        $isBorder = true;
+                    }
+                }
+
+                if ($inBounds) {
+                    if ($isBorder && $borderAlloc !== null) {
+                        imagesetpixel($destGd, $x, $y, $borderAlloc);
+                    } else {
+                        $color = imagecolorat($srcGd, $x, $y);
+                        imagesetpixel($destGd, $x, $y, $color);
+                    }
+                }
+            }
+        }
+
+        return $this->manager->createFromNative($destGd);
     }
 
     /**

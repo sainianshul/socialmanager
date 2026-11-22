@@ -549,6 +549,42 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'success' => true,
         ]);
         $this->assertStringStartsWith('data:image/jpeg;base64,', $responseHeaderSplit->json('preview_url'));
+
+        // Test preview with Header Style 5 (vertical_capsule_strip)
+        $responseHeaderCapsule = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'classic_political_right',
+            'header_layout' => 'vertical_capsule_strip',
+            'footer_style' => 'dual_ribbon_badge',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#FF9933',
+            'show_top_strip' => '1',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $responseHeaderCapsule->assertStatus(200);
+        $responseHeaderCapsule->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $responseHeaderCapsule->json('preview_url'));
+
+        // Test preview with Header Style 6 (party_group_cutout)
+        $responseHeaderCutout = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'classic_political_right',
+            'header_layout' => 'party_group_cutout',
+            'footer_style' => 'dual_ribbon_badge',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#FF9933',
+            'show_top_strip' => '1',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $responseHeaderCutout->assertStatus(200);
+        $responseHeaderCutout->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $responseHeaderCutout->json('preview_url'));
     }
 
     public function test_admin_can_store_festival_template_with_layout_customizations(): void

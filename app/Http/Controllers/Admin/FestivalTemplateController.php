@@ -107,6 +107,7 @@ class FestivalTemplateController extends Controller
         }
         if ($request->filled('header_layout')) {
             $layoutConfig['header']['layout'] = $request->input('header_layout');
+            $layoutConfig['header']['mode'] = ($request->input('header_layout') === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');
@@ -170,6 +171,7 @@ class FestivalTemplateController extends Controller
         }
         if ($request->filled('header_layout')) {
             $layoutConfig['header']['layout'] = $request->input('header_layout');
+            $layoutConfig['header']['mode'] = ($request->input('header_layout') === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');
@@ -261,6 +263,7 @@ class FestivalTemplateController extends Controller
         }
         if ($request->filled('header_layout')) {
             $layoutConfig['header']['layout'] = $request->input('header_layout');
+            $layoutConfig['header']['mode'] = ($request->input('header_layout') === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');

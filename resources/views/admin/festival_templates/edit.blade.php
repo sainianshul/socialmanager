@@ -190,6 +190,8 @@
                                 <option value="top_left_cluster" {{ $headerLayout === 'top_left_cluster' ? 'selected' : '' }}>Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
                                 <option value="top_right_cluster" {{ $headerLayout === 'top_right_cluster' ? 'selected' : '' }}>Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
                                 <option value="split_wings" {{ $headerLayout === 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
+                                <option value="vertical_capsule_strip" {{ $headerLayout === 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
+                                <option value="party_group_cutout" {{ $headerLayout === 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
                             </select>
                             <small class="form-hint">Placement of top national/state leadership across canvas.</small>
                         </div>
