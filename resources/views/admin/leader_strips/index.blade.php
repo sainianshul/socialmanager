@@ -198,43 +198,82 @@
 
 @section('content')
 
-    {{-- Page Title (Clean & Minimal, No Extra Buttons) --}}
-    <div class="mb-4">
-        <h2 class="fw-bold text-dark fs-2 mb-0">Leadership Strips</h2>
-    </div>
+    @if($isAdmin)
+        {{-- Admin Page Header --}}
+        <div class="page-header d-print-none mb-4">
+            <div class="row align-items-center">
+                <div class="col">
+                    <div class="page-pretitle">Political Management</div>
+                    <h2 class="page-title">Political Leadership Strips</h2>
+                </div>
+                <div class="col-auto ms-auto d-print-none">
+                    <button type="button" class="btn btn-primary" id="btn-create-strip-modal">
+                        <i class="ti ti-plus me-1"></i> Add Leader Strip
+                    </button>
+                </div>
+            </div>
+        </div>
+    @else
+        {{-- Regular User Page Title --}}
+        <div class="mb-4">
+            <h2 class="fw-bold text-dark fs-2 mb-0">Leadership Strips</h2>
+        </div>
+    @endif
 
     {{-- Alert Container --}}
     <div id="strip-alert-container"></div>
 
     {{-- ======================================================================
-         SECTION 1: OFFICIAL STRIP
+         SECTION 1: OFFICIAL PARTY STRIPS
          ====================================================================== --}}
-    @if($systemStrips->isNotEmpty())
-        <div class="mb-4">
+    <div class="mb-5">
+        @if($isAdmin)
+            <div class="mb-3">
+                <h3 class="fw-bold text-dark fs-3 mb-0">Official Party Strips</h3>
+                <p class="text-secondary small mb-0">Official top leadership strips configured for each political party.</p>
+            </div>
+        @else
             <div class="mb-2">
                 <h3 class="fw-bold text-dark fs-3 mb-0">Official Strip</h3>
             </div>
+        @endif
 
-            @foreach($systemStrips as $sysStrip)
-                <div class="clean-strip-card {{ ($activeStrip?->id === $sysStrip->id && !$userStrips->contains('is_default', true)) ? 'active-strip' : '' }}" id="strip-card-{{ $sysStrip->id }}">
-                    
-                    {{-- Header Line: Title, Badges & Action --}}
-                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="fw-bold text-dark fs-4">{{ $sysStrip->name }}</span>
-                            @if($sysStrip->party)
-                                <span class="badge bg-light text-secondary border px-2 py-0.5" style="font-size: 11px;">
-                                    {{ $sysStrip->party->short_code ?: $sysStrip->party->name }}
-                                </span>
-                            @endif
+        @forelse($systemStrips as $sysStrip)
+            <div class="clean-strip-card {{ ($activeStrip?->id === $sysStrip->id && !$userStrips->contains('is_default', true)) ? 'active-strip' : '' }}" id="strip-card-{{ $sysStrip->id }}">
+                
+                {{-- Header Line: Title, Badges & Action --}}
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-dark fs-4">{{ $sysStrip->name }}</span>
+                        @if($sysStrip->party)
+                            <span class="badge badge-outline text-primary fw-bold px-2 py-0.5" style="font-size: 11px;">
+                                {{ $sysStrip->party->short_code ?: $sysStrip->party->name }}
+                            </span>
+                        @endif
+                        @if($isAdmin)
+                            <span class="badge badge-outline text-success px-2 py-0.5 fw-semibold" style="font-size: 11px;">
+                                <i class="ti ti-check me-1"></i>Official Strip
+                            </span>
+                        @else
                             @if($activeStrip?->id === $sysStrip->id && !$userStrips->contains('is_default', true))
                                 <span class="badge bg-teal-lt text-teal px-2 py-0.5 fw-semibold" style="font-size: 11px;">
                                     <i class="ti ti-check me-1"></i>Active Default
                                 </span>
                             @endif
-                        </div>
+                        @endif
+                    </div>
 
-                        <div>
+                    <div>
+                        @if($isAdmin)
+                            <div class="d-flex align-items-center gap-1.5">
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 btn-edit-strip" data-id="{{ $sysStrip->id }}" data-name="{{ $sysStrip->name }}" data-party-id="{{ $sysStrip->party_id }}" style="font-size: 12px;">
+                                    <i class="ti ti-pencil me-1"></i>Edit
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 btn-delete-strip" data-id="{{ $sysStrip->id }}" title="Delete strip" style="font-size: 12px;">
+                                    <i class="ti ti-trash"></i>
+                                </button>
+                            </div>
+                        @else
                             @if($activeStrip?->id === $sysStrip->id && !$userStrips->contains('is_default', true))
                                 <span class="badge bg-success text-white py-1.5 px-3 rounded-pill" style="font-size: 12px;">
                                     <i class="ti ti-check me-1"></i>Current Active
@@ -244,114 +283,127 @@
                                     <i class="ti ti-copy me-1"></i>Activate as My Strip
                                 </button>
                             @endif
-                        </div>
-                    </div>
-
-                    {{-- Horizontal Leaders Rail (No Nested Box!) --}}
-                    <div class="leaders-strip-rail">
-                        @forelse($sysStrip->leaders as $leader)
-                            <div class="leader-chip-item">
-                                <div class="leader-avatar-box">
-                                    <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" class="leader-avatar-img">
-                                    <span class="leader-order-num">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
-                                </div>
-                                <span class="leader-name-text" title="{{ $leader->name }}">{{ Str::limit($leader->name, 14) }}</span>
-                                @if($leader->designation)
-                                    <span class="leader-role-text" title="{{ $leader->designation }}">{{ Str::limit($leader->designation, 15) }}</span>
-                                @endif
-                            </div>
-                            @if(!$loop->last)
-                                <i class="ti ti-chevron-right leader-sep-arrow"></i>
-                            @endif
-                        @empty
-                            <span class="text-secondary small">No leaders configured.</span>
-                        @endforelse
+                        @endif
                     </div>
                 </div>
-            @endforeach
-        </div>
-    @endif
+
+                {{-- Horizontal Leaders Rail --}}
+                <div class="leaders-strip-rail">
+                    @forelse($sysStrip->leaders as $leader)
+                        <div class="leader-chip-item">
+                            <div class="leader-avatar-box">
+                                <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" class="leader-avatar-img">
+                                <span class="leader-order-num">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
+                            </div>
+                            <span class="leader-name-text" title="{{ $leader->name }}">{{ Str::limit($leader->name, 14) }}</span>
+                            @if($leader->designation)
+                                <span class="leader-role-text" title="{{ $leader->designation }}">{{ Str::limit($leader->designation, 15) }}</span>
+                            @endif
+                        </div>
+                        @if(!$loop->last)
+                            <i class="ti ti-chevron-right leader-sep-arrow"></i>
+                        @endif
+                    @empty
+                        <span class="text-secondary small">No leaders configured in this strip.</span>
+                    @endforelse
+                </div>
+            </div>
+        @empty
+            <div class="card py-5 text-center text-muted">
+                <i class="ti ti-layout-rows fs-1 d-block mb-2"></i>
+                <h3>No official leadership strips created yet</h3>
+                <p>Click "Add Leader Strip" to create an official strip for a political party.</p>
+                <div>
+                    <button type="button" class="btn btn-primary" onclick="document.getElementById('btn-create-strip-modal').click();">
+                        <i class="ti ti-plus me-1"></i> Add Leader Strip
+                    </button>
+                </div>
+            </div>
+        @endforelse
+    </div>
 
     {{-- ======================================================================
-         SECTION 2: PERSONAL STRIP (WITH CREATE STRIP BUTTON IN FRONT)
+         SECTION 2: PERSONAL STRIP (ONLY FOR REGULAR CLIENT USERS)
          ====================================================================== --}}
-    <div class="mb-5">
-        <div class="d-flex align-items-center justify-content-between mb-2">
-            <h3 class="fw-bold text-dark fs-3 mb-0">Personal Strip</h3>
-            <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs" id="btn-create-strip-modal">
-                <i class="ti ti-plus me-1"></i>Create Strip
-            </button>
-        </div>
-
-        @if($userStrips->isNotEmpty())
-            <div id="user-strips-list">
-                @foreach($userStrips as $strip)
-                    <div class="clean-strip-card {{ $strip->is_default ? 'active-strip' : '' }}" id="strip-card-{{ $strip->id }}">
-                        
-                        {{-- Header Line: Title, Badges & Actions --}}
-                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom">
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold text-dark fs-4">{{ $strip->name }}</span>
-                                @if($strip->party)
-                                    <span class="badge bg-light text-secondary border px-2 py-0.5" style="font-size: 11px;">
-                                        {{ $strip->party->short_code ?: $strip->party->name }}
-                                    </span>
-                                @endif
-                                @if($strip->is_default)
-                                    <span class="badge bg-teal-lt text-teal px-2 py-0.5 fw-semibold" style="font-size: 11px;">
-                                        <i class="ti ti-check me-1"></i>Active Default
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div class="d-flex align-items-center gap-1.5">
-                                @if(!$strip->is_default)
-                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-0.5 btn-make-default" data-id="{{ $strip->id }}" style="font-size: 11px;">
-                                        <i class="ti ti-check me-1"></i>Set Default
-                                    </button>
-                                @endif
-                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-0.5 btn-edit-strip" data-id="{{ $strip->id }}" data-name="{{ $strip->name }}" style="font-size: 11px;">
-                                    <i class="ti ti-pencil me-1"></i>Edit
-                                </button>
-                                <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0.5 btn-delete-strip" data-id="{{ $strip->id }}" title="Delete strip" style="font-size: 11px;">
-                                    <i class="ti ti-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        {{-- Horizontal Leaders Rail (No Nested Box!) --}}
-                        <div class="leaders-strip-rail">
-                            @forelse($strip->leaders as $leader)
-                                <div class="leader-chip-item">
-                                    <div class="leader-avatar-box">
-                                        <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" class="leader-avatar-img">
-                                        <span class="leader-order-num">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
-                                    </div>
-                                    <span class="leader-name-text" title="{{ $leader->name }}">{{ Str::limit($leader->name, 14) }}</span>
-                                    @if($leader->designation)
-                                        <span class="leader-role-text" title="{{ $leader->designation }}">{{ Str::limit($leader->designation, 15) }}</span>
-                                    @endif
-                                </div>
-                                @if(!$loop->last)
-                                    <i class="ti ti-chevron-right leader-sep-arrow"></i>
-                                @endif
-                            @empty
-                                <span class="text-secondary small">No leaders configured.</span>
-                            @endforelse
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @else
-            {{-- Simple Clean Notice If No Personal Strip --}}
-            <div class="clean-strip-card text-center py-4" id="no-user-strips-notice">
-                <p class="text-secondary small mb-2">No personal strip created yet.</p>
-                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" id="btn-create-first-strip">
-                    <i class="ti ti-plus me-1"></i>Create Personal Strip
+    @if(!$isAdmin)
+        <div class="mb-5">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+                <h3 class="fw-bold text-dark fs-3 mb-0">Personal Strip</h3>
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs" id="btn-create-strip-modal-user">
+                    <i class="ti ti-plus me-1"></i>Create Strip
                 </button>
             </div>
-        @endif
-    </div>
+
+            @if($userStrips->isNotEmpty())
+                <div id="user-strips-list">
+                    @foreach($userStrips as $strip)
+                        <div class="clean-strip-card {{ $strip->is_default ? 'active-strip' : '' }}" id="strip-card-{{ $strip->id }}">
+                            
+                            {{-- Header Line: Title, Badges & Actions --}}
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 pb-2 border-bottom">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="fw-bold text-dark fs-4">{{ $strip->name }}</span>
+                                    @if($strip->party)
+                                        <span class="badge bg-light text-secondary border px-2 py-0.5" style="font-size: 11px;">
+                                            {{ $strip->party->short_code ?: $strip->party->name }}
+                                        </span>
+                                    @endif
+                                    @if($strip->is_default)
+                                        <span class="badge bg-teal-lt text-teal px-2 py-0.5 fw-semibold" style="font-size: 11px;">
+                                            <i class="ti ti-check me-1"></i>Active Default
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="d-flex align-items-center gap-1.5">
+                                    @if(!$strip->is_default)
+                                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-0.5 btn-make-default" data-id="{{ $strip->id }}" style="font-size: 11px;">
+                                            <i class="ti ti-check me-1"></i>Set Default
+                                        </button>
+                                    @endif
+                                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-0.5 btn-edit-strip" data-id="{{ $strip->id }}" data-name="{{ $strip->name }}" style="font-size: 11px;">
+                                        <i class="ti ti-pencil me-1"></i>Edit
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0.5 btn-delete-strip" data-id="{{ $strip->id }}" title="Delete strip" style="font-size: 11px;">
+                                        <i class="ti ti-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Horizontal Leaders Rail --}}
+                            <div class="leaders-strip-rail">
+                                @forelse($strip->leaders as $leader)
+                                    <div class="leader-chip-item">
+                                        <div class="leader-avatar-box">
+                                            <img src="{{ $leader->image_url }}" alt="{{ $leader->name }}" class="leader-avatar-img">
+                                            <span class="leader-order-num">#{{ $leader->pivot->order ?? $loop->iteration }}</span>
+                                        </div>
+                                        <span class="leader-name-text" title="{{ $leader->name }}">{{ Str::limit($leader->name, 14) }}</span>
+                                        @if($leader->designation)
+                                            <span class="leader-role-text" title="{{ $leader->designation }}">{{ Str::limit($leader->designation, 15) }}</span>
+                                        @endif
+                                    </div>
+                                    @if(!$loop->last)
+                                        <i class="ti ti-chevron-right leader-sep-arrow"></i>
+                                    @endif
+                                @empty
+                                    <span class="text-secondary small">No leaders configured.</span>
+                                @endforelse
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                {{-- Notice If No Personal Strip --}}
+                <div class="clean-strip-card text-center py-4" id="no-user-strips-notice">
+                    <p class="text-secondary small mb-2">No personal strip created yet.</p>
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" id="btn-create-first-strip">
+                        <i class="ti ti-plus me-1"></i>Create Personal Strip
+                    </button>
+                </div>
+            @endif
+        </div>
+    @endif
 
     {{-- ======================================================================
          INTERACTIVE STRIP BUILDER MODAL (COMPACT & SIMPLE)
@@ -376,32 +428,42 @@
                         <label class="form-label fw-semibold small text-dark mb-1" for="builder-strip-name">
                             Strip Name <span class="text-danger">*</span>
                         </label>
-                        <input type="text" id="builder-strip-name" class="form-control rounded-2" placeholder="e.g. My Campaign Strip" maxlength="150" required>
+                        <input type="text" id="builder-strip-name" class="form-control rounded-2" placeholder="{{ $isAdmin ? 'e.g. BJP Official Leadership Strip' : 'e.g. My Campaign Strip' }}" maxlength="150" required>
                         <input type="hidden" id="builder-strip-id" value="">
                     </div>
 
                     <div class="row g-2 mb-3 align-items-center">
-                        <div class="col-7">
+                        <div class="{{ $isAdmin ? 'col-12' : 'col-7' }}">
                             <label class="form-label fw-semibold small text-dark mb-1" for="builder-party-id">
                                 Political Party <span class="text-danger">*</span>
                             </label>
                             <select id="builder-party-id" class="form-select rounded-2">
                                 <option value="">Select Party</option>
                                 @foreach($parties as $party)
-                                    <option value="{{ $party->id }}" {{ ($currentPartyId == $party->id) ? 'selected' : '' }}>
-                                        {{ $party->name }} ({{ $party->short_code ?: 'General' }})
+                                    @php
+                                        $isAlreadyAdded = in_array($party->id, $existingPartyIdsWithStrips ?? []);
+                                    @endphp
+                                    <option value="{{ $party->id }}" 
+                                        data-already-added="{{ $isAlreadyAdded ? '1' : '0' }}"
+                                        data-party-name="{{ $party->name }}"
+                                        data-party-code="{{ $party->short_code }}"
+                                        {{ ($isAdmin && $isAlreadyAdded) ? 'disabled' : '' }}
+                                        {{ ($currentPartyId == $party->id) ? 'selected' : '' }}>
+                                        {{ $party->name }} ({{ $party->short_code ?: 'General' }}){{ ($isAdmin && $isAlreadyAdded) ? ' - (Already Added)' : '' }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-5 pt-3">
-                            <div class="form-check form-switch mb-0">
-                                <input class="form-check-input" type="checkbox" id="builder-is-default" checked>
-                                <label class="form-check-label small fw-medium text-dark" for="builder-is-default">
-                                    Set as default
-                                </label>
+                        @if(!$isAdmin)
+                            <div class="col-5 pt-3">
+                                <div class="form-check form-switch mb-0">
+                                    <input class="form-check-input" type="checkbox" id="builder-is-default" checked>
+                                    <label class="form-check-label small fw-medium text-dark" for="builder-is-default">
+                                        Set as default
+                                    </label>
+                                </div>
                             </div>
-                        </div>
+                        @endif
                     </div>
 
                     {{-- Selected Preview Strip (Compact Horizontal Rail) --}}
@@ -568,6 +630,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ======================================================================
     // INTERACTIVE STRIP BUILDER JAVASCRIPT LOGIC (SIMPLE & COMPACT)
     // ======================================================================
+    var isUserAdmin = {{ $isAdmin ? 'true' : 'false' }};
     var stripBuilderModalEl = document.getElementById('stripBuilderModal');
     var stripBuilderModal = stripBuilderModalEl ? bootstrap.Modal.getOrCreateInstance(stripBuilderModalEl) : null;
 
@@ -605,12 +668,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load Party Leaders
     async function fetchLeadersForParty(partyId) {
+        if (!partyId) {
+            if (elAvailableList) {
+                elAvailableList.innerHTML = '<div class="text-center py-4 text-muted small">Select a party to load leaders.</div>';
+            }
+            return;
+        }
+
         if (elAvailableList) {
             elAvailableList.innerHTML = '<div class="text-center py-4 text-muted small"><span class="spinner-border spinner-border-sm me-1"></span>Loading leaders...</div>';
         }
 
         try {
-            var url = '/admin/leader-strips/leaders' + (partyId ? '?party_id=' + partyId : '');
+            var url = '/admin/leader-strips/leaders?party_id=' + partyId;
             var res = await fetch(url, {
                 headers: { 'Accept': 'application/json' }
             });
@@ -630,6 +700,18 @@ document.addEventListener('DOMContentLoaded', function () {
         selectParty.addEventListener('change', function () {
             var newPartyId = selectParty.value;
             stripBuilderState.partyId = newPartyId;
+            // Clear selected leaders when party changes so cross-party mixing doesn't occur
+            stripBuilderState.selectedLeaders = [];
+            renderPreviewBar();
+
+            var selOpt = selectParty.options[selectParty.selectedIndex];
+            if (isUserAdmin && !stripBuilderState.stripId && selOpt && selOpt.value) {
+                var pName = selOpt.getAttribute('data-party-name') || selOpt.text.split('(')[0].trim();
+                if (inputStripName) {
+                    inputStripName.value = pName + ' Official Leadership Strip';
+                }
+            }
+
             fetchLeadersForParty(newPartyId);
         });
     }
@@ -638,10 +720,9 @@ document.addEventListener('DOMContentLoaded', function () {
     async function openStripBuilder(stripId) {
         hideModalAlert();
 
-        var initialPartyId = (selectParty ? selectParty.value : '') || '{{ $currentPartyId ?? "" }}';
+        if (btnSaveStrip) btnSaveStrip.disabled = false;
 
         stripBuilderState.stripId = stripId || null;
-        stripBuilderState.partyId = initialPartyId;
         stripBuilderState.selectedLeaders = [];
 
         if (inputStripId) inputStripId.value = stripId || '';
@@ -650,11 +731,38 @@ document.addEventListener('DOMContentLoaded', function () {
         var modalTitle = document.getElementById('stripBuilderModalLabel');
 
         if (stripId) {
-            if (modalTitle) modalTitle.textContent = 'Edit Strip';
+            if (modalTitle) modalTitle.textContent = isUserAdmin ? 'Edit Official Leadership Strip' : 'Edit Strip';
         } else {
-            if (modalTitle) modalTitle.textContent = 'Create Strip';
+            if (modalTitle) modalTitle.textContent = isUserAdmin ? 'Add Official Leadership Strip' : 'Create Strip';
             if (inputStripName) inputStripName.value = '';
             if (checkIsDefault) checkIsDefault.checked = true;
+
+            // In Admin Add mode: enforce disabled state for already-added parties and select the first available
+            if (isUserAdmin && selectParty) {
+                var partyOptions = Array.from(selectParty.options);
+                partyOptions.forEach(function (opt) {
+                    if (!opt.value) return;
+                    var alreadyAdded = opt.getAttribute('data-already-added') === '1';
+                    opt.disabled = alreadyAdded;
+                });
+
+                var firstAvailable = partyOptions.find(function (opt) { return opt.value && !opt.disabled; });
+                if (firstAvailable) {
+                    selectParty.value = firstAvailable.value;
+                    stripBuilderState.partyId = firstAvailable.value;
+                    var pName = firstAvailable.getAttribute('data-party-name') || firstAvailable.text.split('(')[0].trim();
+                    if (inputStripName) {
+                        inputStripName.value = pName + ' Official Leadership Strip';
+                    }
+                } else {
+                    selectParty.value = '';
+                    stripBuilderState.partyId = null;
+                    showModalAlert('All political parties already have an official leadership strip configured.', 'warning');
+                    if (btnSaveStrip) btnSaveStrip.disabled = true;
+                }
+            } else if (selectParty) {
+                stripBuilderState.partyId = selectParty.value || '{{ $currentPartyId ?? "" }}';
+            }
         }
 
         if (stripBuilderModal) {
@@ -673,10 +781,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (inputStripName) inputStripName.value = s.name;
                     if (checkIsDefault) checkIsDefault.checked = !!s.is_default;
                     if (s.party_id && selectParty) {
+                        if (isUserAdmin) {
+                            Array.from(selectParty.options).forEach(function (opt) {
+                                if (!opt.value) return;
+                                var alreadyAdded = opt.getAttribute('data-already-added') === '1';
+                                if (opt.value == s.party_id) {
+                                    opt.disabled = false;
+                                } else {
+                                    opt.disabled = alreadyAdded;
+                                }
+                            });
+                        }
                         selectParty.value = s.party_id;
                         stripBuilderState.partyId = s.party_id;
                     }
-                    stripBuilderState.selectedLeaders = s.leaders.map(function (ldr) {
+                    stripBuilderState.selectedLeaders = (s.leaders || []).map(function (ldr) {
                         return {
                             id: ldr.id,
                             name: ldr.name,
@@ -688,7 +807,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            await fetchLeadersForParty(stripBuilderState.partyId);
+            if (stripBuilderState.partyId) {
+                await fetchLeadersForParty(stripBuilderState.partyId);
+            } else {
+                if (elAvailableList) {
+                    elAvailableList.innerHTML = '<div class="text-center py-4 text-muted small">Select a political party to load leaders.</div>';
+                }
+            }
             renderPreviewBar();
         } catch (err) {
             console.error('Error initializing strip builder:', err);

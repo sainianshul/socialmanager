@@ -26,7 +26,7 @@ class LeaderStripControllerTest extends TestCase
         $this->seed(PoliticalLeaderSeeder::class);
 
         $this->user = User::factory()->create([
-            'role' => User::ROLE_ADMIN,
+            'role' => User::ROLE_USER,
         ]);
 
         $this->bjp = PoliticalParty::where('short_code', 'BJP')->first();
@@ -226,5 +226,110 @@ class LeaderStripControllerTest extends TestCase
 
         $response->assertStatus(422);
         $response->assertJsonValidationErrors(['items']);
+    }
+
+    public function test_admin_can_render_official_strips_page_with_add_button(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.leader-strips.index'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Political Leadership Strips');
+        $response->assertSee('Add Leader Strip');
+        $response->assertDontSee('Personal Strip');
+    }
+
+    public function test_admin_can_create_official_system_strip(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $newParty = PoliticalParty::firstOrCreate(
+            ['short_code' => 'DEMO_P'],
+            [
+                'name' => 'Demo Political Party',
+                'primary_color' => '#0055A5',
+                'secondary_color' => '#ffffff',
+                'is_active' => true,
+            ]
+        );
+        $leader = PoliticalLeader::create([
+            'party_id' => $newParty->id,
+            'name' => 'Demo Leader',
+            'designation' => 'Party President',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->postJson(route('admin.leader-strips.store'), [
+                'name' => 'Demo Official Strip',
+                'party_id' => $newParty->id,
+                'items' => [
+                    ['leader_id' => $leader->id, 'order' => 1],
+                ],
+            ]);
+
+        $response->assertStatus(201);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Official party leadership strip created successfully.',
+        ]);
+
+        $this->assertDatabaseHas('leader_strips', [
+            'party_id' => $newParty->id,
+            'is_system' => true,
+            'user_id' => null,
+            'name' => 'Demo Official Strip',
+        ]);
+    }
+
+    public function test_admin_cannot_create_duplicate_system_strip_for_same_party(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $modi = PoliticalLeader::where('name', 'Narendra Modi')->first();
+
+        // BJP already has a system strip from PoliticalPartySeeder
+        $response = $this->actingAs($admin)
+            ->postJson(route('admin.leader-strips.store'), [
+                'name' => 'Duplicate BJP Strip',
+                'party_id' => $this->bjp->id,
+                'items' => [
+                    ['leader_id' => $modi->id, 'order' => 1],
+                ],
+            ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors(['party_id']);
+    }
+
+    public function test_admin_can_update_and_delete_official_system_strip(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $systemStrip = LeaderStrip::where('is_system', true)->first();
+        $this->assertNotNull($systemStrip);
+
+        // Admin updates official strip
+        $modi = PoliticalLeader::where('name', 'Narendra Modi')->first();
+        $updateRes = $this->actingAs($admin)
+            ->putJson(route('admin.leader-strips.update', $systemStrip->id), [
+                'name' => 'Updated Official Strip Name',
+                'party_id' => $systemStrip->party_id,
+                'items' => [
+                    ['leader_id' => $modi->id, 'order' => 1],
+                ],
+            ]);
+
+        $updateRes->assertStatus(200);
+        $this->assertDatabaseHas('leader_strips', [
+            'id' => $systemStrip->id,
+            'name' => 'Updated Official Strip Name',
+        ]);
+
+        // Admin deletes official strip
+        $deleteRes = $this->actingAs($admin)
+            ->deleteJson(route('admin.leader-strips.destroy', $systemStrip->id));
+
+        $deleteRes->assertStatus(200);
+        $this->assertDatabaseMissing('leader_strips', ['id' => $systemStrip->id]);
     }
 }
