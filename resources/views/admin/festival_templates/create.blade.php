@@ -121,7 +121,18 @@
                             @error('photo_position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <div class="col-md-4">
+                        <div class="col-md-6">
+                            <label class="form-label required fw-bold text-primary">
+                                <i class="ti ti-crown me-1"></i> Top Leadership Layout (Header Style)
+                            </label>
+                            <select name="header_layout" class="form-select border-primary fw-bold" id="field-header-layout">
+                                <option value="full_width_strip" selected>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
+                                <option value="top_left_cluster">Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
+                            </select>
+                            <small class="form-hint">Placement of top national/state leadership across canvas.</small>
+                        </div>
+
+                        <div class="col-md-6">
                             <label class="form-label">Top Leaders Shape</label>
                             <select name="leader_shape" class="form-select" id="field-leader-shape">
                                 <option value="circle" selected>Circular Avatar</option>
@@ -256,6 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const fieldImage = document.getElementById('field-image');
     const fieldFooterStyle = document.getElementById('field-footer-style');
+    const fieldHeaderLayout = document.getElementById('field-header-layout');
     const fieldPreset = document.getElementById('field-preset');
     const fieldParty = document.getElementById('field-party');
     const fieldPhotoPos = document.getElementById('field-photo-position');
@@ -278,6 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const formData = new FormData();
         formData.append('_token', csrfToken);
         if (fieldFooterStyle) formData.append('footer_style', fieldFooterStyle.value);
+        if (fieldHeaderLayout) formData.append('header_layout', fieldHeaderLayout.value);
         formData.append('preset_key', fieldPreset.value);
         if (fieldParty.value) formData.append('party_id', fieldParty.value);
         formData.append('photo_position', fieldPhotoPos.value);
@@ -320,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
         debounceTimer = setTimeout(updatePreview, 300);
     }
 
-    [fieldFooterStyle, fieldPreset, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder, fieldShowStrip, fieldNameColor, fieldFooterBg].forEach(el => {
+    [fieldFooterStyle, fieldHeaderLayout, fieldPreset, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder, fieldShowStrip, fieldNameColor, fieldFooterBg].forEach(el => {
         if (el) el.addEventListener('change', schedulePreview);
     });
 

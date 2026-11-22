@@ -105,6 +105,9 @@ class FestivalTemplateController extends Controller
             $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
         }
+        if ($request->filled('header_layout')) {
+            $layoutConfig['header']['layout'] = $request->input('header_layout');
+        }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');
         }
@@ -139,8 +142,9 @@ class FestivalTemplateController extends Controller
         $festivals = Festival::orderBy('festival_date', 'desc')->get();
         $parties = PoliticalParty::orderBy('name')->get();
         $presets = app(PosterComposer::class)->getAvailablePresets();
+        $headerLayout = $festivalTemplate->layout_config['header']['layout'] ?? 'full_width_strip';
 
-        return view('admin.festival_templates.edit', compact('festivalTemplate', 'festivals', 'parties', 'presets'));
+        return view('admin.festival_templates.edit', compact('festivalTemplate', 'festivals', 'parties', 'presets', 'headerLayout'));
     }
 
     /**
@@ -163,6 +167,9 @@ class FestivalTemplateController extends Controller
             $layoutConfig['header']['chip_shape'] = $request->input('leader_shape', 'circle');
             $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('header_layout')) {
+            $layoutConfig['header']['layout'] = $request->input('header_layout');
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');
@@ -251,6 +258,9 @@ class FestivalTemplateController extends Controller
         }
         if ($request->has('show_top_strip')) {
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('header_layout')) {
+            $layoutConfig['header']['layout'] = $request->input('header_layout');
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');
