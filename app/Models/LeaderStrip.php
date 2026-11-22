@@ -49,6 +49,16 @@ class LeaderStrip extends Model
         }
 
         $templatePartyId = ($template instanceof FestivalTemplate) ? $template->party_id : null;
+        $templateConfigStripId = ($template instanceof FestivalTemplate) ? ($template->layout_config['header']['strip_id'] ?? null) : null;
+        $isHeaderFixed = ($template instanceof FestivalTemplate) ? !empty($template->layout_config['header']['is_fixed']) : false;
+
+        // If template has a fixed assigned strip by admin, enforce it
+        if ($templateConfigStripId && $isHeaderFixed) {
+            $tplStrip = self::with('leaders')->find($templateConfigStripId);
+            if ($tplStrip && $tplStrip->leaders->isNotEmpty()) {
+                return $tplStrip;
+            }
+        }
 
         // 2. If user has created custom strip(s), use user's custom strip
         if ($user) {
@@ -77,7 +87,15 @@ class LeaderStrip extends Model
             }
         }
 
-        // 3. Fallback to Party Official Default Strip
+        // 3. Template assigned default strip (if configured by admin on this template)
+        if ($templateConfigStripId) {
+            $tplStrip = self::with('leaders')->find($templateConfigStripId);
+            if ($tplStrip && $tplStrip->leaders->isNotEmpty()) {
+                return $tplStrip;
+            }
+        }
+
+        // 4. Fallback to Party Official Default Strip
         $targetPartyId = $templatePartyId ?: ($branding?->party_id ?? $user?->defaultBranding?->party_id);
         if ($targetPartyId) {
             $partyStrip = self::where('party_id', $targetPartyId)

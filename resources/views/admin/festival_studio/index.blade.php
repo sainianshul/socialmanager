@@ -633,19 +633,24 @@ document.addEventListener('DOMContentLoaded', function () {
         var inputHiddenBorder = document.getElementById('qs-input-leader-border');
         if (inputHiddenBorder) inputHiddenBorder.value = leaderBorder;
 
-        // Auto-select Leadership Strip (User Custom First, or Party Official Default)
+        // Auto-select Leadership Strip (Template Assigned, User Custom First, or Party Official Default)
         var tplPartyId = trigger.getAttribute('data-party-id') || '';
+        var tplStripId = trigger.getAttribute('data-strip-id') || '';
         var selectStrip = document.getElementById('qs-modal-strip-id');
         var inputStrip = document.getElementById('qs-input-strip-id');
         if (selectStrip) {
-            var currentOption = selectStrip.options[selectStrip.selectedIndex];
-            var isCustom = currentOption && currentOption.text.indexOf('⭐') !== -1;
-            // If user has not selected their own custom strip, align with template party if available
-            if (!isCustom && tplPartyId) {
-                for (var i = 0; i < selectStrip.options.length; i++) {
-                    if (selectStrip.options[i].getAttribute('data-party-id') === tplPartyId) {
-                        selectStrip.selectedIndex = i;
-                        break;
+            if (tplStripId) {
+                selectStrip.value = tplStripId;
+            } else {
+                var currentOption = selectStrip.options[selectStrip.selectedIndex];
+                var isCustom = currentOption && currentOption.text.indexOf('⭐') !== -1;
+                // If user has not selected their own custom strip, align with template party if available
+                if (!isCustom && tplPartyId) {
+                    for (var i = 0; i < selectStrip.options.length; i++) {
+                        if (selectStrip.options[i].getAttribute('data-party-id') === tplPartyId) {
+                            selectStrip.selectedIndex = i;
+                            break;
+                        }
                     }
                 }
             }

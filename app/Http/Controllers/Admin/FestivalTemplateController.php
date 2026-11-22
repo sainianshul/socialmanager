@@ -94,8 +94,9 @@ class FestivalTemplateController extends Controller
         $festivals = Festival::orderBy('festival_date', 'asc')->get();
         $parties = PoliticalParty::orderBy('name')->get();
         $presets = app(PosterComposer::class)->getAvailablePresets();
+        $leaderStrips = LeaderStrip::with(['party', 'leaders'])->get();
 
-        return view('admin.festival_templates.create', compact('festivals', 'parties', 'presets'));
+        return view('admin.festival_templates.create', compact('festivals', 'parties', 'presets', 'leaderStrips'));
     }
 
     /**
@@ -108,6 +109,7 @@ class FestivalTemplateController extends Controller
             'new_festival_title' => 'nullable|string|max:191',
             'new_festival_date' => 'nullable|date',
             'party_id' => 'nullable|exists:political_parties,id',
+            'strip_id' => 'nullable|exists:leader_strips,id',
             'title' => 'required|string|max:191',
             'template_image' => 'required|image|mimes:png,jpg,jpeg,webp|max:15360',
             'preset_key' => 'nullable|string|max:60',
@@ -148,6 +150,7 @@ class FestivalTemplateController extends Controller
             'layout' => $headerLayout,
             'mode' => ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips',
             'is_fixed' => $request->boolean('header_fixed', false),
+            'strip_id' => $request->filled('strip_id') ? (int)$request->input('strip_id') : null,
             'chip_shape' => $request->input('leader_shape', 'circle'),
             'chip_border_color' => $request->input('leader_border_color', '#FF9933'),
         ];
@@ -187,8 +190,10 @@ class FestivalTemplateController extends Controller
         $parties = PoliticalParty::orderBy('name')->get();
         $presets = app(PosterComposer::class)->getAvailablePresets();
         $headerLayout = $festivalTemplate->layout_config['header']['layout'] ?? 'full_width_strip';
+        $assignedStripId = $festivalTemplate->layout_config['header']['strip_id'] ?? null;
+        $leaderStrips = LeaderStrip::with(['party', 'leaders'])->get();
 
-        return view('admin.festival_templates.edit', compact('festivalTemplate', 'festivals', 'parties', 'presets', 'headerLayout'));
+        return view('admin.festival_templates.edit', compact('festivalTemplate', 'festivals', 'parties', 'presets', 'headerLayout', 'assignedStripId', 'leaderStrips'));
     }
 
     /**
@@ -199,6 +204,7 @@ class FestivalTemplateController extends Controller
         $validated = $request->validate([
             'festival_id' => 'required|exists:festivals,id',
             'party_id' => 'nullable|exists:political_parties,id',
+            'strip_id' => 'nullable|exists:leader_strips,id',
             'title' => 'required|string|max:191',
             'template_image' => 'nullable|image|mimes:png,jpg,jpeg,webp|max:15360',
             'preset_key' => 'required|string|max:60',
@@ -218,6 +224,7 @@ class FestivalTemplateController extends Controller
             'layout' => $headerLayout,
             'mode' => ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips',
             'is_fixed' => $request->boolean('header_fixed', false),
+            'strip_id' => $request->filled('strip_id') ? (int)$request->input('strip_id') : null,
             'chip_shape' => $request->input('leader_shape', $layoutConfig['header']['chip_shape'] ?? 'circle'),
             'chip_border_color' => $request->input('leader_border_color', $layoutConfig['header']['chip_border_color'] ?? '#FF9933'),
         ];

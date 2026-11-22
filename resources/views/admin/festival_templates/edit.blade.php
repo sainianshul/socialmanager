@@ -182,6 +182,34 @@
                         </div>
                         <span class="text-muted small">Default: Changeable by user</span>
                     </div>
+
+                    {{-- Assigned Leadership Strip --}}
+                    <div class="mt-2.5 pt-2 border-top">
+                        <label class="form-label small fw-semibold text-secondary mb-1 d-flex align-items-center justify-content-between">
+                            <span><i class="ti ti-users text-primary me-1"></i>Assigned Leadership Strip (Optional)</span>
+                            <a href="{{ route('admin.leader-strips.index') }}" target="_blank" class="text-primary small text-decoration-none" style="font-size: 11px;">
+                                <i class="ti ti-plus me-0.5"></i>Create Custom Strip
+                            </a>
+                        </label>
+                        <select name="strip_id" class="form-select form-select-sm" id="field-strip-id">
+                            <option value="">-- Auto-Resolve (User Custom Strip or Party Default) --</option>
+                            @if(isset($leaderStrips))
+                                @foreach($leaderStrips as $ls)
+                                    @php
+                                        $isUser = !empty($ls->user_id);
+                                        $partyCode = $ls->party?->short_code ?? 'Universal';
+                                        $label = $isUser 
+                                            ? '⭐ ' . $ls->name . ' (Custom Strip)' 
+                                            : '🏛️ ' . $ls->name . ' (' . $partyCode . ' Official)';
+                                    @endphp
+                                    <option value="{{ $ls->id }}" {{ old('strip_id', $assignedStripId) == $ls->id ? 'selected' : '' }}>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <span class="text-muted small" style="font-size: 11px;">Pick a specific strip for this template, or leave empty for auto-party resolution.</span>
+                    </div>
                     @error('header_layout')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
