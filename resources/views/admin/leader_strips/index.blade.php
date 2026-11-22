@@ -471,7 +471,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-1.5">
                             <span class="small fw-semibold text-dark">Selected Sequence</span>
                             <span class="badge bg-teal-lt rounded-pill px-2 py-0.5" id="builder-preview-count" style="font-size: 11px;">
-                                0 / 6 Selected
+                                0 / 7 Selected (Min 5)
                             </span>
                         </div>
                         <div class="border rounded-3 p-2 bg-light-subtle d-flex align-items-center gap-1.5 overflow-x-auto" id="builder-preview-bar" style="min-height: 48px;">
@@ -871,7 +871,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var selected = stripBuilderState.selectedLeaders;
 
         if (elPreviewCount) {
-            elPreviewCount.textContent = selected.length + ' / 6 Selected';
+            elPreviewCount.textContent = selected.length + ' / 7 Selected' + (selected.length < 5 ? ' (Min 5)' : '');
         }
 
         if (selected.length === 0) {
@@ -903,9 +903,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // Deselect
             stripBuilderState.selectedLeaders.splice(existingIdx, 1);
         } else {
-            // Select (Max 6)
-            if (stripBuilderState.selectedLeaders.length >= 6) {
-                showModalAlert('Maximum 6 leaders can be added to a strip.', 'warning');
+            // Select (Max 7)
+            if (stripBuilderState.selectedLeaders.length >= 7) {
+                showModalAlert('Maximum 7 leaders can be added to a strip.', 'warning');
                 return;
             }
             var leader = stripBuilderState.availableLeaders.find(function (l) { return l.id === id; });
@@ -1001,8 +1001,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            if (stripBuilderState.selectedLeaders.length === 0) {
-                showModalAlert('Please select at least 1 leader for the strip.', 'danger');
+            if (stripBuilderState.selectedLeaders.length < 5) {
+                showModalAlert('Please select at least 5 leaders (5 to 7 recommended) for a well-balanced leadership strip.', 'danger');
                 return;
             }
 

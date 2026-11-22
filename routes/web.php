@@ -160,6 +160,7 @@ Route::prefix('admin')->group(function () {
 
                 // Poster & Card Templates Management
                 Route::resource('festivals', \App\Http\Controllers\Admin\FestivalController::class)->names('festivals');
+                Route::post('festival-templates/preview', [\App\Http\Controllers\Admin\FestivalTemplateController::class, 'preview'])->name('festival-templates.preview');
                 Route::resource('festival-templates', \App\Http\Controllers\Admin\FestivalTemplateController::class)->names('festival-templates');
                 Route::resource('card-templates', \App\Http\Controllers\Admin\CardTemplateController::class)->names('card-templates');
             });

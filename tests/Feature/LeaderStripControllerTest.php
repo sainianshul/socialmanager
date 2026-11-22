@@ -207,9 +207,22 @@ class LeaderStripControllerTest extends TestCase
         $response->assertSee('Create Strip');
     }
 
-    public function test_cannot_add_more_than_6_leaders_to_strip(): void
+    public function test_cannot_add_more_than_7_leaders_to_strip(): void
     {
-        $leaders = PoliticalLeader::take(7)->get();
+        // Create 8 dummy leaders if needed
+        $existing = PoliticalLeader::count();
+        if ($existing < 8) {
+            for ($i = $existing + 1; $i <= 8; $i++) {
+                PoliticalLeader::create([
+                    'party_id' => $this->bjp->id,
+                    'name' => 'Leader ' . $i,
+                    'designation' => 'Leader Designation ' . $i,
+                    'is_active' => true,
+                ]);
+            }
+        }
+
+        $leaders = PoliticalLeader::take(8)->get();
         $items = $leaders->map(fn($l, $idx) => [
             'leader_id' => $l->id,
             'order' => $idx + 1,

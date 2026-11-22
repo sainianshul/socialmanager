@@ -317,6 +317,60 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $this->assertDatabaseMissing('festivals', ['id' => $festival->id]);
     }
 
+    public function test_admin_can_preview_festival_template(): void
+    {
+        $response = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'classic_political_right',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#FF9933',
+            'name_color' => '#c0392b',
+            'footer_bg' => '#f8f5ee',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response->json('preview_url'));
+    }
+
+    public function test_admin_can_store_festival_template_with_layout_customizations(): void
+    {
+        $image = UploadedFile::fake()->image('custom_poster.jpg', 1080, 1080);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.festival-templates.store'), [
+            'festival_id' => $this->festival->id,
+            'party_id' => $this->party->id,
+            'title' => 'Custom Saffron Layout Template',
+            'preset_key' => 'classic_political_rounded_square',
+            'photo_position' => 'bottom-right',
+            'leader_shape' => 'rounded_square',
+            'leader_border_color' => '#FF9933',
+            'show_top_strip' => '1',
+            'name_color' => '#c0392b',
+            'footer_bg' => '#f8f5ee',
+            'template_image' => $image,
+            'is_active' => '1',
+        ]);
+
+        $response->assertRedirect(route('admin.festival-templates.index'));
+
+        $this->assertDatabaseHas('festival_templates', [
+            'title' => 'Custom Saffron Layout Template',
+            'preset_key' => 'classic_political_rounded_square',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $template = FestivalTemplate::where('title', 'Custom Saffron Layout Template')->first();
+        $this->assertNotNull($template);
+        $this->assertEquals('rounded_square', $template->layout_config['header']['chip_shape']);
+        $this->assertEquals('#FF9933', $template->layout_config['header']['chip_border_color']);
+        $this->assertEquals('#c0392b', $template->layout_config['footer']['name_color']);
+        $this->assertEquals('#f8f5ee', $template->layout_config['footer']['main_bar_bg']);
+    }
+
     public function test_regular_user_cannot_access_political_party_management(): void
     {
         $response = $this->actingAs($this->regularUser)->get(route('admin.political-parties.index'));

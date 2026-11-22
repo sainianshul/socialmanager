@@ -134,10 +134,10 @@ class LeaderStripController extends Controller
             'name' => 'required|string|max:150',
             'party_id' => 'required|exists:political_parties,id',
             'is_default' => 'nullable|boolean',
-            'items' => 'nullable|array|min:1|max:6',
+            'items' => 'nullable|array|min:1|max:7',
             'items.*.leader_id' => 'required_with:items|exists:political_leaders,id',
             'items.*.order' => 'required_with:items|integer|min:1',
-            'leader_ids' => 'nullable|array|min:1|max:6',
+            'leader_ids' => 'nullable|array|min:1|max:7',
             'leader_ids.*' => 'exists:political_leaders,id',
         ]);
 
@@ -248,10 +248,10 @@ class LeaderStripController extends Controller
             'name' => 'required|string|max:150',
             'party_id' => 'nullable|exists:political_parties,id',
             'is_default' => 'nullable|boolean',
-            'items' => 'nullable|array|min:1|max:6',
+            'items' => 'nullable|array|min:1|max:7',
             'items.*.leader_id' => 'required_with:items|exists:political_leaders,id',
             'items.*.order' => 'required_with:items|integer|min:1',
-            'leader_ids' => 'nullable|array|min:1|max:6',
+            'leader_ids' => 'nullable|array|min:1|max:7',
             'leader_ids.*' => 'exists:political_leaders,id',
         ]);
 

@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Festival;
 use App\Models\FestivalTemplate;
+use App\Models\LeaderStrip;
 use App\Models\PoliticalParty;
+use App\Models\UserBranding;
 use App\Services\PosterComposer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -96,6 +98,19 @@ class FestivalTemplateController extends Controller
         $filename = 'template_' . Str::slug($validated['title']) . '_' . time() . '.' . $file->getClientOriginalExtension();
         $imagePath = $file->storeAs('uploads/festival_templates', $filename, 'public');
 
+        $layoutConfig = [];
+        if ($request->filled('leader_shape') || $request->filled('leader_border_color')) {
+            $layoutConfig['header']['chip_shape'] = $request->input('leader_shape', 'circle');
+            $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
+            $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('name_color')) {
+            $layoutConfig['footer']['name_color'] = $request->input('name_color');
+        }
+        if ($request->filled('footer_bg')) {
+            $layoutConfig['footer']['main_bar_bg'] = $request->input('footer_bg');
+        }
+
         $template = FestivalTemplate::create([
             'festival_id' => $festivalId,
             'party_id' => $validated['party_id'] ?? null,
@@ -104,6 +119,7 @@ class FestivalTemplateController extends Controller
             'thumbnail_path' => $imagePath,
             'preset_key' => $validated['preset_key'],
             'photo_position' => $validated['photo_position'],
+            'layout_config' => !empty($layoutConfig) ? $layoutConfig : null,
             'is_active' => $request->boolean('is_active', true),
         ]);
 
@@ -138,12 +154,26 @@ class FestivalTemplateController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
+        $layoutConfig = $festivalTemplate->layout_config ?? [];
+        if ($request->filled('leader_shape') || $request->filled('leader_border_color')) {
+            $layoutConfig['header']['chip_shape'] = $request->input('leader_shape', 'circle');
+            $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
+            $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('name_color')) {
+            $layoutConfig['footer']['name_color'] = $request->input('name_color');
+        }
+        if ($request->filled('footer_bg')) {
+            $layoutConfig['footer']['main_bar_bg'] = $request->input('footer_bg');
+        }
+
         $data = [
             'festival_id' => $validated['festival_id'],
             'party_id' => $validated['party_id'] ?? null,
             'title' => $validated['title'],
             'preset_key' => $validated['preset_key'],
             'photo_position' => $validated['photo_position'],
+            'layout_config' => !empty($layoutConfig) ? $layoutConfig : null,
             'is_active' => $request->boolean('is_active'),
         ];
 
@@ -161,6 +191,100 @@ class FestivalTemplateController extends Controller
 
         return redirect()->route('admin.festival-templates.index')
             ->with('success', "Festival template '{$festivalTemplate->title}' updated successfully.");
+    }
+
+    /**
+     * Generate dynamic realistic preview of festival template with sample political overlay.
+     */
+    public function preview(Request $request)
+    {
+        $composer = app(PosterComposer::class);
+
+        $bgPath = null;
+        if ($request->hasFile('template_image')) {
+            $bgPath = $request->file('template_image')->getRealPath();
+        } elseif ($request->filled('template_id')) {
+            $tpl = FestivalTemplate::find($request->input('template_id'));
+            $bgPath = $tpl?->template_image_path;
+        }
+
+        if (!$bgPath || (!file_exists($bgPath) && !file_exists(public_path($bgPath)) && !file_exists(storage_path('app/public/' . $bgPath)))) {
+            // Default sample background if none provided
+            $candidates = [
+                public_path('images/templates/tulsi-vivah.jpg'),
+                public_path('images/templates/khatu-shyam-janmotsav.jpg'),
+                public_path('images/festival-templates-sample.jpg'),
+            ];
+            foreach ($candidates as $cand) {
+                if (file_exists($cand)) {
+                    $bgPath = $cand;
+                    break;
+                }
+            }
+        }
+
+        $party = null;
+        if ($request->filled('party_id')) {
+            $party = PoliticalParty::find($request->input('party_id'));
+        }
+        if (!$party) {
+            $party = PoliticalParty::where('short_code', 'BJP')->first() ?? PoliticalParty::first();
+        }
+
+        $presetKey = $request->input('preset_key', 'classic_political_right');
+        $layoutConfig = [];
+
+        if ($request->filled('leader_shape')) {
+            $layoutConfig['header']['chip_shape'] = $request->input('leader_shape');
+        }
+        if ($request->filled('leader_border_color')) {
+            $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color');
+        }
+        if ($request->has('show_top_strip')) {
+            $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
+        }
+        if ($request->filled('name_color')) {
+            $layoutConfig['footer']['name_color'] = $request->input('name_color');
+        }
+        if ($request->filled('footer_bg')) {
+            $layoutConfig['footer']['main_bar_bg'] = $request->input('footer_bg');
+        }
+        if ($request->filled('photo_position')) {
+            $layoutConfig['candidate']['position'] = $request->input('photo_position');
+        }
+
+        // Mock realistic sample politician branding
+        $sampleBranding = new UserBranding([
+            'display_name' => 'डॉ. धर्म सिंह सैनी',
+            'designation' => 'पूर्व कैबिनेट मंत्री (उत्तर प्रदेश)',
+            'facebook_handle' => 'Dharam.singhsaini',
+            'instagram_handle' => 'Drdharamsinghsaini',
+            'phone_number' => '94122xxxxx',
+        ]);
+        $sampleBranding->setRelation('party', $party);
+
+        // Retrieve official party strip for leaders preview
+        $strip = $party ? LeaderStrip::where('party_id', $party->id)->where('is_system', true)->with('leaders')->first() : null;
+
+        try {
+            $canvas = $composer->compose($bgPath, $sampleBranding, $strip, [
+                'preset_key' => $presetKey,
+                'layout_config' => $layoutConfig,
+                'include_strip' => $layoutConfig['header']['enabled'] ?? true,
+            ]);
+
+            $jpegData = $canvas->toJpeg(85)->toString();
+
+            return response()->json([
+                'success' => true,
+                'preview_url' => 'data:image/jpeg;base64,' . base64_encode($jpegData),
+            ]);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Preview generation failed: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

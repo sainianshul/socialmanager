@@ -44,7 +44,8 @@ class PosterComposer
             $party = $branding?->party;
         }
 
-        $config = array_replace_recursive($this->getDefaultPresetConfig($presetKey), $customConfig);
+        $runtimeConfig = $options['layout_config'] ?? [];
+        $config = array_replace_recursive($this->getDefaultPresetConfig($presetKey), $customConfig, $runtimeConfig);
         $canvasWidth = $config['canvas']['width'] ?? 1080;
         $canvasHeight = $config['canvas']['height'] ?? 1080;
 
@@ -168,8 +169,8 @@ class PosterComposer
             }
         }
 
-        // B) Individual Leader Circle Chips Mode — Reference Gold Standard
-        // Layout: 6-7 circle avatars with saffron-orange border, evenly spaced across full 1080px width
+        // B) Individual Leader Circle / Shaped Chips Mode — Reference Gold Standard
+        // Layout: 5-7 avatars with customizable border (saffron, white, etc.), evenly spaced across canvas
         elseif ($mode === 'individual_chips') {
             $leaders = $strip ? $strip->leaders->take(7) : ($party?->leaders()->take(7)->get() ?? collect());
             if ($leaders->isNotEmpty()) {
@@ -180,23 +181,29 @@ class PosterComposer
                 $stripY = $headerConfig['chips_start_y'] ?? 10;
                 $leaderCount = $leaders->count();
 
-                // Calculate even spacing across full canvas width
                 $canvasW = 1080;
                 $totalChipWidth = $leaderCount * $chipSize;
-                $totalGaps = $leaderCount + 1;
-                $gap = (int) (($canvasW - $totalChipWidth) / $totalGaps);
-                if ($gap < 8) $gap = 8;
 
-                $currX = $gap;
+                // If 5 or more leaders, distribute evenly across full canvas width
+                if ($leaderCount >= 5) {
+                    $totalGaps = $leaderCount + 1;
+                    $gap = (int) (($canvasW - $totalChipWidth) / $totalGaps);
+                    if ($gap < 6) $gap = 6;
+                    $currX = $gap;
+                } else {
+                    // When fewer than 5 leaders (e.g. 2 or 3), never stretch with huge ugly gap!
+                    // Center the cluster cleanly with an elegant 30px gap.
+                    $gap = 30;
+                    $clusterWidth = ($leaderCount * $chipSize) + (($leaderCount - 1) * $gap);
+                    $currX = (int) (($canvasW - $clusterWidth) / 2);
+                }
 
                 foreach ($leaders as $leader) {
                     $leaderImgPath = $this->resolveFilePath($leader->image);
                     if ($leaderImgPath && file_exists($leaderImgPath)) {
                         try {
                             $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
-                            if ($shape === 'circle') {
-                                $avatar = $this->makeCircularAvatar($avatar, $chipSize, $borderColor, $borderWidth);
-                            }
+                            $avatar = $this->makeShapedAvatar($avatar, $chipSize, $shape, $borderColor, $borderWidth);
                             $canvas->place($avatar, 'top-left', $currX, $stripY);
                         } catch (\Throwable $e) {
                             // Skip leader on error
@@ -301,18 +308,23 @@ class PosterComposer
             $origW = $photoImg->width();
             $origH = $photoImg->height();
 
-            // Sizing: upscale smaller cutouts so candidate has commanding presence
-            $targetH = min($maxH, 460);
-            $scale = $targetH / $origH;
+            // Smart sizing: if landscape photo uploaded as cutout, crop center-top so face stays commanding
+            if ($origW > ($origH * 1.15)) {
+                $photoImg->cover($maxW, $maxH, 'top');
+            } else {
+                // Portrait cutout: scale proportionally to fill height nicely
+                $targetH = min($maxH, 460);
+                $scale = $targetH / $origH;
 
-            // Ensure width doesn't exceed maxW
-            if (($origW * $scale) > $maxW) {
-                $scale = $maxW / $origW;
+                // Ensure width doesn't exceed maxW
+                if (($origW * $scale) > $maxW) {
+                    $scale = $maxW / $origW;
+                }
+
+                $newW = (int) ($origW * $scale);
+                $newH = (int) ($origH * $scale);
+                $photoImg->resize($newW, $newH);
             }
-
-            $newW = (int) ($origW * $scale);
-            $newH = (int) ($origH * $scale);
-            $photoImg->resize($newW, $newH);
 
             $pw = $photoImg->width();
             $ph = $photoImg->height();
@@ -426,26 +438,42 @@ class PosterComposer
             });
 
             // Candidate Name in Middle (x: 400 to 720, candidate photo is at 720+)
-            $nameX = $footerConfig['name_x'] ?? 420;
-            $nameY = $footerTop + 32;
+            $nameX = $footerConfig['name_x'] ?? 415;
+            $nameY = $footerTop + 33;
             $nameSize = $footerConfig['name_font_size'] ?? 30;
             $nameColor = $footerConfig['name_color'] ?? '#c0392b';
+            $maxNameWidth = $footerConfig['max_name_width'] ?? 310;
 
             $displayName = $this->shapeDevanagari($branding->display_name);
-            $canvas->text($displayName, $nameX, $nameY, function ($font) use ($fontHindiBold, $nameSize, $nameColor) {
-                $font->file($fontHindiBold);
-                $font->size($nameSize);
-                $font->color($nameColor);
-            });
+            $this->renderAutoFitText(
+                $canvas,
+                $displayName,
+                $nameX,
+                $nameY,
+                $maxNameWidth,
+                $nameSize,
+                16,
+                $fontHindiBold,
+                $nameColor,
+                $footerConfig['name_align'] ?? 'left'
+            );
 
             if (!empty($branding->designation)) {
                 $desigText = $this->shapeDevanagari($branding->designation);
-                $desigY = $nameY + 28;
-                $canvas->text($desigText, $nameX, $desigY, function ($font) use ($fontHindiRegular) {
-                    $font->file($fontHindiRegular);
-                    $font->size(17);
-                    $font->color('#4a5568');
-                });
+                $desigY = $nameY + 27;
+                $desigColor = $footerConfig['desig_color'] ?? '#4a5568';
+                $this->renderAutoFitText(
+                    $canvas,
+                    $desigText,
+                    $nameX,
+                    $desigY,
+                    $maxNameWidth,
+                    17,
+                    12,
+                    $fontHindiRegular,
+                    $desigColor,
+                    $footerConfig['name_align'] ?? 'left'
+                );
             }
         } else {
             // Reverse: Candidate on Left -> Party Logo on Right
@@ -459,23 +487,41 @@ class PosterComposer
                 } catch (\Throwable $e) {}
             }
 
-            // Candidate Name (x: 420)
+            // Candidate Name (x: 420 to 980)
             $nameX = 420;
-            $nameY = $footerTop + 32;
+            $nameY = $footerTop + 33;
+            $nameColor = $footerConfig['name_color'] ?? '#c0392b';
+            $maxNameWidth = $footerConfig['max_name_width'] ?? 520;
+
             $displayName = $this->shapeDevanagari($branding->display_name);
-            $canvas->text($displayName, $nameX, $nameY, function ($font) use ($fontHindiBold) {
-                $font->file($fontHindiBold);
-                $font->size(30);
-                $font->color('#c0392b');
-            });
+            $this->renderAutoFitText(
+                $canvas,
+                $displayName,
+                $nameX,
+                $nameY,
+                $maxNameWidth,
+                30,
+                16,
+                $fontHindiBold,
+                $nameColor,
+                $footerConfig['name_align'] ?? 'left'
+            );
 
             if (!empty($branding->designation)) {
                 $desigText = $this->shapeDevanagari($branding->designation);
-                $canvas->text($desigText, $nameX, $nameY + 28, function ($font) use ($fontHindiRegular) {
-                    $font->file($fontHindiRegular);
-                    $font->size(17);
-                    $font->color('#4a5568');
-                });
+                $desigColor = $footerConfig['desig_color'] ?? '#4a5568';
+                $this->renderAutoFitText(
+                    $canvas,
+                    $desigText,
+                    $nameX,
+                    $nameY + 27,
+                    $maxNameWidth,
+                    17,
+                    12,
+                    $fontHindiRegular,
+                    $desigColor,
+                    $footerConfig['name_align'] ?? 'left'
+                );
             }
         }
 
@@ -769,6 +815,179 @@ class PosterComposer
     }
 
     /**
+     * Auto-fitting dynamic text renderer.
+     * Computes the exact text bounding box with imagettfbbox and smoothly scales down font size
+     * so that politician names and designations never overflow or clip, regardless of length.
+     */
+    protected function renderAutoFitText(
+        ImageInterface $canvas,
+        string $text,
+        int $startX,
+        int $baselineY,
+        int $maxWidth,
+        int $maxFontSize,
+        int $minFontSize,
+        string $fontPath,
+        string $color = '#2d3748',
+        string $align = 'left'
+    ): int {
+        if (empty($text)) {
+            return $maxFontSize;
+        }
+
+        $size = $maxFontSize;
+        if (file_exists($fontPath) && function_exists('imagettfbbox')) {
+            while ($size > $minFontSize) {
+                $bbox = @imagettfbbox($size, 0, $fontPath, $text);
+                if ($bbox) {
+                    $width = abs($bbox[2] - $bbox[0]);
+                    if ($width <= $maxWidth) {
+                        break;
+                    }
+                }
+                $size -= 1;
+            }
+        }
+
+        $finalX = $startX;
+        if ($align === 'center' && file_exists($fontPath) && function_exists('imagettfbbox')) {
+            $bbox = @imagettfbbox($size, 0, $fontPath, $text);
+            $width = $bbox ? abs($bbox[2] - $bbox[0]) : 0;
+            $finalX = $startX + (int) (($maxWidth - $width) / 2);
+        } elseif ($align === 'right' && file_exists($fontPath) && function_exists('imagettfbbox')) {
+            $bbox = @imagettfbbox($size, 0, $fontPath, $text);
+            $width = $bbox ? abs($bbox[2] - $bbox[0]) : 0;
+            $finalX = $startX + $maxWidth - $width;
+        }
+
+        $canvas->text($text, $finalX, $baselineY, function ($font) use ($fontPath, $size, $color) {
+            $font->file($fontPath);
+            $font->size($size);
+            $font->color($color);
+        });
+
+        return $size;
+    }
+
+    /**
+     * Avatar cropper supporting 'circle', 'rounded_square', and 'square' shapes with customizable border.
+     */
+    protected function makeShapedAvatar(
+        ImageInterface $image,
+        int $size,
+        string $shape = 'circle',
+        string $borderColor = '#FF9933',
+        int $borderWidth = 0
+    ): ImageInterface {
+        if ($shape === 'circle') {
+            return $this->makeCircularAvatar($image, $size, $borderColor, $borderWidth);
+        }
+
+        $image->cover($size, $size);
+        $srcGd = $image->core()->native();
+
+        $destGd = imagecreatetruecolor($size, $size);
+        imagealphablending($destGd, false);
+        imagesavealpha($destGd, true);
+        $transparent = imagecolorallocatealpha($destGd, 0, 0, 0, 127);
+        imagefill($destGd, 0, 0, $transparent);
+
+        // Parse border color
+        $borderAlloc = null;
+        if ($borderWidth > 0 && !empty($borderColor) && $borderColor !== 'none') {
+            $hex = ltrim($borderColor, '#');
+            if (strlen($hex) === 6) {
+                $br = hexdec(substr($hex, 0, 2));
+                $bg = hexdec(substr($hex, 2, 2));
+                $bb = hexdec(substr($hex, 4, 2));
+                $borderAlloc = imagecolorallocate($destGd, $br, $bg, $bb);
+            }
+        }
+
+        // 1. Plain Square Avatar
+        if ($shape === 'square') {
+            imagealphablending($destGd, true);
+            imagecopyresampled($destGd, $srcGd, 0, 0, 0, 0, $size, $size, $size, $size);
+            if ($borderAlloc !== null && $borderWidth > 0) {
+                for ($b = 0; $b < $borderWidth; $b++) {
+                    imagerectangle($destGd, $b, $b, $size - 1 - $b, $size - 1 - $b, $borderAlloc);
+                }
+            }
+            $result = $this->manager->read($destGd);
+            imagedestroy($destGd);
+            return $result;
+        }
+
+        // 2. Rounded Square Avatar (with smooth corners and border)
+        $cornerRadius = (int) ($size * 0.18);
+        $innerSize = $size - ($borderWidth * 2);
+        if ($innerSize < 10) $innerSize = $size;
+        $innerRadius = max(4, $cornerRadius - $borderWidth);
+
+        $innerGd = imagecreatetruecolor($innerSize, $innerSize);
+        imagealphablending($innerGd, false);
+        imagecopyresampled($innerGd, $srcGd, 0, 0, 0, 0, $innerSize, $innerSize, $size, $size);
+
+        if ($borderAlloc !== null && $borderWidth > 0) {
+            imagealphablending($destGd, true);
+            for ($x = 0; $x < $size; $x++) {
+                for ($y = 0; $y < $size; $y++) {
+                    if ($this->isInsideRoundedRect($x, $y, $size, $size, $cornerRadius)) {
+                        imagesetpixel($destGd, $x, $y, $borderAlloc);
+                    }
+                }
+            }
+        }
+
+        imagealphablending($destGd, true);
+        for ($x = 0; $x < $innerSize; $x++) {
+            for ($y = 0; $y < $innerSize; $y++) {
+                if ($this->isInsideRoundedRect($x, $y, $innerSize, $innerSize, $innerRadius)) {
+                    $color = imagecolorat($innerGd, $x, $y);
+                    imagesetpixel($destGd, $x + $borderWidth, $y + $borderWidth, $color);
+                }
+            }
+        }
+
+        imagedestroy($innerGd);
+        $result = $this->manager->read($destGd);
+        imagedestroy($destGd);
+        return $result;
+    }
+
+    /**
+     * Check if (x, y) is inside rounded rectangle
+     */
+    protected function isInsideRoundedRect(int $x, int $y, int $w, int $h, int $r): bool
+    {
+        if ($x >= $r && $x < ($w - $r)) return true;
+        if ($y >= $r && $y < ($h - $r)) return true;
+
+        if ($x < $r && $y < $r) {
+            $dx = $x - $r + 0.5;
+            $dy = $y - $r + 0.5;
+            return ($dx * $dx + $dy * $dy) <= ($r * $r);
+        }
+        if ($x >= ($w - $r) && $y < $r) {
+            $dx = $x - ($w - $r) + 0.5;
+            $dy = $y - $r + 0.5;
+            return ($dx * $dx + $dy * $dy) <= ($r * $r);
+        }
+        if ($x < $r && $y >= ($h - $r)) {
+            $dx = $x - $r + 0.5;
+            $dy = $y - ($h - $r) + 0.5;
+            return ($dx * $dx + $dy * $dy) <= ($r * $r);
+        }
+        if ($x >= ($w - $r) && $y >= ($h - $r)) {
+            $dx = $x - ($w - $r) + 0.5;
+            $dy = $y - ($h - $r) + 0.5;
+            return ($dx * $dx + $dy * $dy) <= ($r * $r);
+        }
+
+        return false;
+    }
+
+    /**
      * Circular avatar cropper using GD alpha transparency.
      * FIXED: Uses $image->core()->native() compatible with Intervention Image v3 GD Driver.
      */
@@ -905,6 +1124,26 @@ class PosterComposer
                 'footer_style'       => 'standard_political',
             ],
             [
+                'key'                => 'classic_political_rounded_square',
+                'name'               => 'Modern Political (Rounded Square Leaders)',
+                'description'        => 'Rounded square leader avatars with saffron border at top, large candidate cutout bottom-right.',
+                'badge'              => 'Rounded Leaders',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'standard_political',
+            ],
+            [
+                'key'                => 'classic_political_white_borders',
+                'name'               => 'Clean Political (White Border Circles)',
+                'description'        => 'Circle avatars with clean white border at top, large candidate cutout bottom-right.',
+                'badge'              => 'White Circles',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'standard_political',
+            ],
+            [
                 'key'                => 'candidate_left_classic',
                 'name'               => 'Classic Political Left (Artwork on Right)',
                 'description'        => 'Leaders at top, large candidate cutout anchored to bottom-left, footer with party logo on right and name on left.',
@@ -974,6 +1213,58 @@ class PosterComposer
     public function getDefaultPresetConfig(string $key): array
     {
         return match ($key) {
+            // Style: Modern Political (Rounded Square Leaders)
+            'classic_political_rounded_square' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'rounded_square',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'standard_political',
+                ],
+            ],
+
+            // Style: Clean Political (White Border Circles)
+            'classic_political_white_borders' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#ffffff',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'standard_political',
+                ],
+            ],
+
             // Style: Candidate on Left (when artwork / deity is on right)
             'candidate_left_classic' => [
                 'canvas' => ['width' => 1080, 'height' => 1080],
