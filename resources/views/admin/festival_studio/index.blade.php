@@ -4,395 +4,352 @@
 
 @section('breadcrumbs')
     <x-breadcrumb :items="[
-            ['url' => url('/admin'), 'label' => 'Dashboard'],
-            ['label' => 'Festival Studio'],
-        ]" />
+        ['url' => url('/admin'), 'label' => 'Dashboard'],
+        ['label' => 'Festival Studio'],
+    ]" />
 @endsection
 
 @push('styles')
-    <style>
-        /* Apple-Style Minimalist Festival Studio */
-        .fs-date-scroller {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 8px;
-            scrollbar-width: thin;
-            -webkit-overflow-scrolling: touch;
-        }
+<style>
+/* Apple-Style Minimalist Festival Studio */
+.fs-date-scroller {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+}
+.fs-date-scroller::-webkit-scrollbar {
+    height: 4px;
+}
+.fs-date-scroller::-webkit-scrollbar-track {
+    background: transparent;
+}
+.fs-date-scroller::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+}
+[data-bs-theme="dark"] .fs-date-scroller::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+}
 
-        .fs-date-scroller::-webkit-scrollbar {
-            height: 4px;
-        }
+.fs-date-pill {
+    flex-shrink: 0;
+    min-width: 175px;
+    padding: 12px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    background: var(--tblr-card-bg, #ffffff);
+    text-decoration: none !important;
+    color: var(--tblr-body-color, #1e293b);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+[data-bs-theme="dark"] .fs-date-pill {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+.fs-date-pill:hover {
+    border-color: #1db8ab;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(29, 184, 171, 0.15);
+}
+.fs-date-pill.active {
+    background: linear-gradient(135deg, #1db8ab 0%, #0d9488 100%) !important;
+    border-color: #0d9488 !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px rgba(29, 184, 171, 0.35);
+}
+.fs-date-pill.active .text-secondary {
+    color: rgba(255, 255, 255, 0.85) !important;
+}
+.fs-date-pill.active .badge.bg-primary-lt {
+    background: rgba(255, 255, 255, 0.25) !important;
+    color: #ffffff !important;
+}
+.fs-date-pill.active .badge.bg-warning {
+    background: #ffffff !important;
+    color: #0d9488 !important;
+}
 
-        .fs-date-scroller::-webkit-scrollbar-track {
-            background: transparent;
-        }
+/* Scheduled Date Pill Distinction (Warm Amber / Light Yellow) */
+.fs-date-pill.is-scheduled {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+    border-color: #f59e0b !important;
+    color: #92400e !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
+}
+.fs-date-pill.is-scheduled:hover {
+    border-color: #d97706 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+.fs-date-pill.is-scheduled .text-secondary {
+    color: #b45309 !important;
+}
+.fs-date-pill.is-scheduled .badge.bg-primary-lt {
+    background: rgba(245, 158, 11, 0.25) !important;
+    color: #92400e !important;
+}
+.fs-date-pill.is-scheduled.active {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
+    border-color: #f59e0b !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 0 2px #f59e0b, 0 6px 20px rgba(13, 148, 136, 0.35) !important;
+}
+.fs-date-pill.is-scheduled.active .text-secondary {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+[data-bs-theme="dark"] .fs-date-pill.is-scheduled {
+    background: rgba(245, 158, 11, 0.15) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    color: #fde68a !important;
+}
+[data-bs-theme="dark"] .fs-date-pill.is-scheduled .text-secondary {
+    color: rgba(253, 230, 138, 0.8) !important;
+}
 
-        .fs-date-scroller::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.12);
-            border-radius: 4px;
-        }
+/* Template Card */
+.fs-template-card {
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 16px;
+    background: var(--tblr-card-bg, #ffffff);
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+}
+[data-bs-theme="dark"] .fs-template-card {
+    border-color: rgba(255, 255, 255, 0.08);
+}
+.fs-template-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.09);
+    border-color: rgba(0, 0, 0, 0.15);
+}
+.fs-template-preview-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* 1:1 Aspect Ratio */
+    background: #0f172a;
+    overflow: hidden;
+}
+.fs-template-preview-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.fs-template-card:hover .fs-template-preview-img {
+    transform: scale(1.03);
+}
 
-        [data-bs-theme="dark"] .fs-date-scroller::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-        }
+/* Hover Overlay */
+.fs-template-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.68);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    padding: 18px;
+    z-index: 4;
+}
+.fs-template-card:hover .fs-template-overlay {
+    opacity: 1;
+    pointer-events: auto;
+}
 
-        .fs-date-pill {
-            flex-shrink: 0;
-            min-width: 175px;
-            padding: 12px 18px;
-            border-radius: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: var(--tblr-card-bg, #ffffff);
-            text-decoration: none !important;
-            color: var(--tblr-body-color, #1e293b);
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+/* Dynamic Content Area Transition */
+#festival-content-area {
+    min-height: 250px;
+    transition: opacity 0.18s ease-in-out;
+}
+#festival-content-area.is-loading {
+    opacity: 0.35;
+    pointer-events: none;
+    user-select: none;
+}
 
-        [data-bs-theme="dark"] .fs-date-pill {
-            border-color: rgba(255, 255, 255, 0.08);
-        }
+.cursor-pointer {
+    cursor: pointer;
+}
+.qs-account-row {
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.15s ease;
+}
+.qs-account-row:hover {
+    border-color: #1db8ab !important;
+    background: rgba(29, 184, 171, 0.04) !important;
+}
+.qs-account-row.active {
+    border-color: #1db8ab !important;
+    background: rgba(29, 184, 171, 0.08) !important;
+}
+.qs-account-row .qs-check-icon {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+.qs-account-row.active .qs-check-icon {
+    opacity: 1;
+}
 
-        .fs-date-pill:hover {
-            border-color: #1db8ab;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(29, 184, 171, 0.15);
-        }
+/* Floating Clean Notification Toast */
+.fs-floating-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: #0f172a;
+    color: #ffffff;
+    padding: 10px 22px;
+    border-radius: 9999px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    font-size: 0.88rem;
+    font-weight: 500;
+    z-index: 1090;
+    opacity: 0;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+}
+.fs-floating-toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
 
-        .fs-date-pill.active {
-            background: linear-gradient(135deg, #1db8ab 0%, #0d9488 100%) !important;
-            border-color: #0d9488 !important;
-            color: #ffffff !important;
-            box-shadow: 0 6px 20px rgba(29, 184, 171, 0.35);
-        }
+/* Live Poster Header Strip Overlay */
+.fs-poster-header-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 8px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.fs-strip-chip {
+    display: inline-flex;
+    align-items: center;
+}
+.fs-strip-chip img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1.5px solid #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+    object-fit: cover;
+    background: #ffffff;
+}
+.fs-strip-party-logo {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    object-fit: contain;
+    background: #ffffff;
+    padding: 1.5px;
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
 
-        .fs-date-pill.active .text-secondary {
-            color: rgba(255, 255, 255, 0.85) !important;
-        }
+/* Live Poster Bottom Branding Overlay */
+.fs-poster-bottom-branding {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 8px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.fs-branding-badge {
+    color: #ffffff;
+    line-height: 1.2;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    max-width: 70%;
+}
+.fs-branding-name {
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+.fs-branding-desig {
+    font-size: 0.65rem;
+    opacity: 0.9;
+}
+.fs-branding-cutout {
+    width: 44px;
+    height: 52px;
+    object-fit: contain;
+    object-position: bottom;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
+}
 
-        .fs-date-pill.active .badge.bg-primary-lt {
-            background: rgba(255, 255, 255, 0.25) !important;
-            color: #ffffff !important;
-        }
-
-        .fs-date-pill.active .badge.bg-warning {
-            background: #ffffff !important;
-            color: #0d9488 !important;
-        }
-
-        /* Scheduled Date Pill Distinction (Warm Amber / Light Yellow) */
-        .fs-date-pill.is-scheduled {
-            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
-            border-color: #f59e0b !important;
-            color: #92400e !important;
-            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
-        }
-
-        .fs-date-pill.is-scheduled:hover {
-            border-color: #d97706 !important;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
-        }
-
-        .fs-date-pill.is-scheduled .text-secondary {
-            color: #b45309 !important;
-        }
-
-        .fs-date-pill.is-scheduled .badge.bg-primary-lt {
-            background: rgba(245, 158, 11, 0.25) !important;
-            color: #92400e !important;
-        }
-
-        .fs-date-pill.is-scheduled.active {
-            background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%) !important;
-            border-color: #f59e0b !important;
-            color: #ffffff !important;
-            box-shadow: 0 0 0 2px #f59e0b, 0 6px 20px rgba(13, 148, 136, 0.35) !important;
-        }
-
-        .fs-date-pill.is-scheduled.active .text-secondary {
-            color: rgba(255, 255, 255, 0.9) !important;
-        }
-
-        [data-bs-theme="dark"] .fs-date-pill.is-scheduled {
-            background: rgba(245, 158, 11, 0.15) !important;
-            border-color: rgba(245, 158, 11, 0.45) !important;
-            color: #fde68a !important;
-        }
-
-        [data-bs-theme="dark"] .fs-date-pill.is-scheduled .text-secondary {
-            color: rgba(253, 230, 138, 0.8) !important;
-        }
-
-        /* Template Card */
-        .fs-template-card {
-            border: 1px solid rgba(0, 0, 0, 0.07);
-            border-radius: 16px;
-            background: var(--tblr-card-bg, #ffffff);
-            overflow: hidden;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-        }
-
-        [data-bs-theme="dark"] .fs-template-card {
-            border-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .fs-template-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.09);
-            border-color: rgba(0, 0, 0, 0.15);
-        }
-
-        .fs-template-preview-wrapper {
-            position: relative;
-            width: 100%;
-            padding-top: 100%;
-            /* 1:1 Aspect Ratio */
-            background: #0f172a;
-            overflow: hidden;
-        }
-
-        .fs-template-preview-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.4s ease;
-        }
-
-        .fs-template-card:hover .fs-template-preview-img {
-            transform: scale(1.03);
-        }
-
-        /* Hover Overlay */
-        .fs-template-overlay {
-            position: absolute;
-            inset: 0;
-            background: rgba(15, 23, 42, 0.68);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-            padding: 18px;
-            z-index: 4;
-        }
-
-        .fs-template-card:hover .fs-template-overlay {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* Dynamic Content Area Transition */
-        #festival-content-area {
-            min-height: 250px;
-            transition: opacity 0.18s ease-in-out;
-        }
-
-        #festival-content-area.is-loading {
-            opacity: 0.35;
-            pointer-events: none;
-            user-select: none;
-        }
-
-        .cursor-pointer {
-            cursor: pointer;
-        }
-
-        .qs-account-row {
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.15s ease;
-        }
-
-        .qs-account-row:hover {
-            border-color: #1db8ab !important;
-            background: rgba(29, 184, 171, 0.04) !important;
-        }
-
-        .qs-account-row.active {
-            border-color: #1db8ab !important;
-            background: rgba(29, 184, 171, 0.08) !important;
-        }
-
-        .qs-account-row .qs-check-icon {
-            opacity: 0;
-            transition: opacity 0.15s ease;
-        }
-
-        .qs-account-row.active .qs-check-icon {
-            opacity: 1;
-        }
-
-        /* Floating Clean Notification Toast */
-        .fs-floating-toast {
-            position: fixed;
-            top: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: #0f172a;
-            color: #ffffff;
-            padding: 10px 22px;
-            border-radius: 9999px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-            font-size: 0.88rem;
-            font-weight: 500;
-            z-index: 1090;
-            opacity: 0;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            pointer-events: none;
-        }
-
-        .fs-floating-toast.show {
-            transform: translateX(-50%) translateY(0);
-            opacity: 1;
-        }
-
-        /* Live Poster Header Strip Overlay */
-        .fs-poster-header-strip {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 6px 8px;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 2;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .fs-strip-chip {
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .fs-strip-chip img {
-            width: 26px;
-            height: 26px;
-            border-radius: 50%;
-            border: 1.5px solid #ffffff;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
-            object-fit: cover;
-            background: #ffffff;
-        }
-
-        .fs-strip-party-logo {
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            object-fit: contain;
-            background: #ffffff;
-            padding: 1.5px;
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Live Poster Bottom Branding Overlay */
-        .fs-poster-bottom-branding {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 6px 8px;
-            background: linear-gradient(0deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            z-index: 2;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .fs-branding-badge {
-            color: #ffffff;
-            line-height: 1.2;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-            max-width: 70%;
-        }
-
-        .fs-branding-name {
-            font-size: 0.78rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-        }
-
-        .fs-branding-desig {
-            font-size: 0.65rem;
-            opacity: 0.9;
-        }
-
-        .fs-branding-cutout {
-            width: 44px;
-            height: 52px;
-            object-fit: contain;
-            object-position: bottom;
-            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.6));
-        }
-
-        /* Modal Specific Larger Overlays */
-        .qs-modal-header-strip {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 10px 14px;
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            z-index: 3;
-            pointer-events: none;
-            transition: opacity 0.2s ease;
-        }
-
-        .qs-modal-header-strip .fs-strip-chip img {
-            width: 32px;
-            height: 32px;
-            border-width: 2px;
-        }
-
-        .qs-modal-bottom-branding {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 10px 14px;
-            background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
-            display: flex;
-            align-items: flex-end;
-            justify-content: space-between;
-            z-index: 3;
-            pointer-events: none;
-        }
-
-        .qs-modal-bottom-branding .fs-branding-name {
-            font-size: 0.95rem;
-        }
-
-        .qs-modal-bottom-branding .fs-branding-desig {
-            font-size: 0.75rem;
-        }
-
-        .qs-modal-bottom-branding .fs-branding-cutout {
-            width: 60px;
-            height: 72px;
-        }
-    </style>
+/* Modal Specific Larger Overlays */
+.qs-modal-header-strip {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+.qs-modal-header-strip .fs-strip-chip img {
+    width: 32px;
+    height: 32px;
+    border-width: 2px;
+}
+.qs-modal-bottom-branding {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0) 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    z-index: 3;
+    pointer-events: none;
+}
+.qs-modal-bottom-branding .fs-branding-name {
+    font-size: 0.95rem;
+}
+.qs-modal-bottom-branding .fs-branding-desig {
+    font-size: 0.75rem;
+}
+.qs-modal-bottom-branding .fs-branding-cutout {
+    width: 60px;
+    height: 72px;
+}
+</style>
 @endpush
 
 @section('content')
@@ -406,8 +363,7 @@
                 </h1>
             </div>
             <div class="col-auto">
-                <a href="{{ route('admin.posts.create') }}"
-                    class="btn btn-sm btn-outline-secondary px-3 py-1.5 rounded-pill">
+                <a href="{{ route('admin.posts.create') }}" class="btn btn-sm btn-outline-secondary px-3 py-1.5 rounded-pill">
                     <i class="ti ti-plus me-1"></i>New Post Composer
                 </a>
             </div>
@@ -425,30 +381,26 @@
                         $daysAway = now()->startOfDay()->diffInDays($festival->festival_date->startOfDay(), false);
                         $isScheduled = in_array($festival->id, $scheduledFestivalIds ?? []);
                     @endphp
-                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $festival->id]) }}"
-                        class="fs-date-pill {{ $isSelected ? 'active' : '' }} {{ $isScheduled ? 'is-scheduled' : '' }}"
-                        id="date-pill-{{ $festival->id }}" data-festival-id="{{ $festival->id }}">
+                    <a href="{{ route('admin.festival-studio.index', ['festival_id' => $festival->id]) }}" 
+                       class="fs-date-pill {{ $isSelected ? 'active' : '' }} {{ $isScheduled ? 'is-scheduled' : '' }}"
+                       id="date-pill-{{ $festival->id }}"
+                       data-festival-id="{{ $festival->id }}">
                         <div class="d-flex align-items-center justify-content-between mb-1">
-                            <span class="text-secondary small fw-bold text-uppercase"
-                                style="font-size: 11px; letter-spacing: 0.04em;">
+                            <span class="text-secondary small fw-bold text-uppercase" style="font-size: 11px; letter-spacing: 0.04em;">
                                 {{ $festival->festival_date->format('D') }}
                             </span>
                             <div class="d-flex align-items-center gap-1" id="pill-badge-slot-{{ $festival->id }}">
                                 @if($isScheduled)
-                                    <span class="badge bg-warning text-dark rounded-pill fw-semibold"
-                                        style="font-size: 9px; padding: 2px 7px;">
+                                    <span class="badge bg-warning text-dark rounded-pill fw-semibold" style="font-size: 9px; padding: 2px 7px;">
                                         <i class="ti ti-check me-0.5"></i>Set
                                     </span>
                                 @endif
                                 @if($isToday)
-                                    <span class="badge bg-danger text-white rounded-pill"
-                                        style="font-size: 9px; padding: 2px 7px;">Today</span>
+                                    <span class="badge bg-danger text-white rounded-pill" style="font-size: 9px; padding: 2px 7px;">Today</span>
                                 @elseif($daysAway === 1)
-                                    <span class="badge bg-warning text-dark rounded-pill"
-                                        style="font-size: 9px; padding: 2px 7px;">Tomorrow</span>
+                                    <span class="badge bg-warning text-dark rounded-pill" style="font-size: 9px; padding: 2px 7px;">Tomorrow</span>
                                 @elseif($daysAway > 1 && $daysAway <= 7 && !$isScheduled)
-                                    <span class="badge bg-primary-lt rounded-pill" style="font-size: 9px; padding: 2px 7px;">in
-                                        {{ $daysAway }}d</span>
+                                    <span class="badge bg-primary-lt rounded-pill" style="font-size: 9px; padding: 2px 7px;">in {{ $daysAway }}d</span>
                                 @endif
                             </div>
                         </div>
@@ -481,216 +433,216 @@
 @endsection
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var contentArea = document.getElementById('festival-content-area');
-            var activeAbortController = null;
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var contentArea = document.getElementById('festival-content-area');
+    var activeAbortController = null;
 
-            // Toast Notification Helper
-            var toastEl = document.getElementById('fs-floating-toast');
-            var toastMsg = document.getElementById('fs-toast-message');
-            var toastTimeout = null;
+    // Toast Notification Helper
+    var toastEl = document.getElementById('fs-floating-toast');
+    var toastMsg = document.getElementById('fs-toast-message');
+    var toastTimeout = null;
 
-            function showStudioToast(message) {
-                if (!toastEl) return;
-                if (toastTimeout) clearTimeout(toastTimeout);
-                toastMsg.innerText = message || 'Poster scheduled successfully.';
-                toastEl.classList.add('show');
-                toastTimeout = setTimeout(function () {
-                    toastEl.classList.remove('show');
-                }, 3500);
+    function showStudioToast(message) {
+        if (!toastEl) return;
+        if (toastTimeout) clearTimeout(toastTimeout);
+        toastMsg.innerText = message || 'Poster scheduled successfully.';
+        toastEl.classList.add('show');
+        toastTimeout = setTimeout(function () {
+            toastEl.classList.remove('show');
+        }, 3500);
+    }
+
+    // Delegate Date Pill Click to switch festival dynamically
+    document.addEventListener('click', function (e) {
+        var pill = e.target.closest('.fs-date-pill');
+        if (!pill) return;
+
+        e.preventDefault();
+
+        // If already selected and not currently loading, skip
+        if (pill.classList.contains('active') && !contentArea.classList.contains('is-loading')) {
+            return;
+        }
+
+        var festivalId = pill.getAttribute('data-festival-id');
+        var targetUrl = pill.getAttribute('href');
+
+        switchFestival(targetUrl, festivalId, pill, true);
+    });
+
+    function switchFestival(url, festivalId, activePill, pushState) {
+        // 1. Immediately update UI active pill state
+        document.querySelectorAll('.fs-date-pill').forEach(function (el) {
+            el.classList.remove('active');
+        });
+        if (activePill) {
+            activePill.classList.add('active');
+            activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        // 2. Abort previous in-flight AJAX request to prevent race conditions
+        if (activeAbortController) {
+            activeAbortController.abort();
+        }
+        activeAbortController = new AbortController();
+
+        // 3. Mark content area as loading
+        if (contentArea) {
+            contentArea.classList.add('is-loading');
+        }
+
+        // 4. Fetch festival content via AJAX
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            },
+            signal: activeAbortController.signal
+        })
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error('HTTP error ' + response.status);
             }
+            return response.json();
+        })
+        .then(function (data) {
+            if (data && data.html) {
+                contentArea.innerHTML = data.html;
 
-            // Delegate Date Pill Click to switch festival dynamically
-            document.addEventListener('click', function (e) {
-                var pill = e.target.closest('.fs-date-pill');
-                if (!pill) return;
-
-                e.preventDefault();
-
-                // If already selected and not currently loading, skip
-                if (pill.classList.contains('active') && !contentArea.classList.contains('is-loading')) {
-                    return;
+                // Sync URL in browser address bar without page reload
+                if (pushState && window.history && window.history.pushState) {
+                    window.history.pushState({ festival_id: festivalId, url: url }, '', url);
                 }
-
-                var festivalId = pill.getAttribute('data-festival-id');
-                var targetUrl = pill.getAttribute('href');
-
-                switchFestival(targetUrl, festivalId, pill, true);
-            });
-
-            function switchFestival(url, festivalId, activePill, pushState) {
-                // 1. Immediately update UI active pill state
-                document.querySelectorAll('.fs-date-pill').forEach(function (el) {
-                    el.classList.remove('active');
-                });
-                if (activePill) {
-                    activePill.classList.add('active');
-                    activePill.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-                }
-
-                // 2. Abort previous in-flight AJAX request to prevent race conditions
-                if (activeAbortController) {
-                    activeAbortController.abort();
-                }
-                activeAbortController = new AbortController();
-
-                // 3. Mark content area as loading
-                if (contentArea) {
-                    contentArea.classList.add('is-loading');
-                }
-
-                // 4. Fetch festival content via AJAX
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    signal: activeAbortController.signal
-                })
-                    .then(function (response) {
-                        if (!response.ok) {
-                            throw new Error('HTTP error ' + response.status);
-                        }
-                        return response.json();
-                    })
-                    .then(function (data) {
-                        if (data && data.html) {
-                            contentArea.innerHTML = data.html;
-
-                            // Sync URL in browser address bar without page reload
-                            if (pushState && window.history && window.history.pushState) {
-                                window.history.pushState({ festival_id: festivalId, url: url }, '', url);
-                            }
-                        }
-                    })
-                    .catch(function (err) {
-                        if (err.name === 'AbortError') {
-                            return;
-                        }
-                        console.error('Festival Studio AJAX error:', err);
-                        // Fallback graceful degradation
-                        window.location.href = url;
-                    })
-                    .finally(function () {
-                        if (contentArea) {
-                            contentArea.classList.remove('is-loading');
-                        }
-                    });
             }
+        })
+        .catch(function (err) {
+            if (err.name === 'AbortError') {
+                return;
+            }
+            console.error('Festival Studio AJAX error:', err);
+            // Fallback graceful degradation
+            window.location.href = url;
+        })
+        .finally(function () {
+            if (contentArea) {
+                contentArea.classList.remove('is-loading');
+            }
+        });
+    }
 
-            // Handle Browser History Back / Forward navigation (popstate)
-            window.addEventListener('popstate', function (event) {
-                var currentUrl = window.location.href;
-                var urlParams = new URLSearchParams(window.location.search);
-                var festivalId = urlParams.get('festival_id');
+    // Handle Browser History Back / Forward navigation (popstate)
+    window.addEventListener('popstate', function (event) {
+        var currentUrl = window.location.href;
+        var urlParams = new URLSearchParams(window.location.search);
+        var festivalId = urlParams.get('festival_id');
 
-                var targetPill = festivalId
-                    ? document.querySelector('.fs-date-pill[data-festival-id="' + festivalId + '"]')
-                    : document.querySelector('.fs-date-pill');
+        var targetPill = festivalId 
+            ? document.querySelector('.fs-date-pill[data-festival-id="' + festivalId + '"]')
+            : document.querySelector('.fs-date-pill');
 
-                if (targetPill) {
-                    switchFestival(currentUrl, festivalId, targetPill, false);
-                } else {
-                    window.location.reload();
-                }
-            });
+        if (targetPill) {
+            switchFestival(currentUrl, festivalId, targetPill, false);
+        } else {
+            window.location.reload();
+        }
+    });
 
-            // Delegated Quick Schedule Modal Opener (Step 1 -> Step 2 Multi-Step Wizard)
-            document.addEventListener('click', function (e) {
-                var trigger = e.target.closest('.btn-trigger-quick-schedule');
-                if (!trigger) return;
+    // Delegated Quick Schedule Modal Opener (Step 1 -> Step 2 Multi-Step Wizard)
+    document.addEventListener('click', function (e) {
+        var trigger = e.target.closest('.btn-trigger-quick-schedule');
+        if (!trigger) return;
 
-                var templateId = trigger.getAttribute('data-template-id');
-                var templateTitle = trigger.getAttribute('data-template-title') || '';
-                var templateImage = trigger.getAttribute('data-template-image') || '';
-                var festivalId = trigger.getAttribute('data-festival-id') || '';
-                var festivalTitle = trigger.getAttribute('data-festival-title') || '';
-                var festivalDate = trigger.getAttribute('data-festival-date') || '';
-                var festivalDateFormatted = trigger.getAttribute('data-festival-date-formatted') || '';
-                var caption = trigger.getAttribute('data-caption') || '';
-                var footerStyle = trigger.getAttribute('data-footer-style') || 'dual_ribbon_badge';
-                var footerFixed = trigger.getAttribute('data-footer-fixed') === '1';
-                var headerLayout = trigger.getAttribute('data-header-layout') || 'full_width_strip';
-                var headerFixed = trigger.getAttribute('data-header-fixed') === '1';
-                var leaderShape = trigger.getAttribute('data-leader-shape') || 'circle';
-                var leaderBorder = trigger.getAttribute('data-leader-border') || '#FF9933';
+        var templateId = trigger.getAttribute('data-template-id');
+        var templateTitle = trigger.getAttribute('data-template-title') || '';
+        var templateImage = trigger.getAttribute('data-template-image') || '';
+        var festivalId = trigger.getAttribute('data-festival-id') || '';
+        var festivalTitle = trigger.getAttribute('data-festival-title') || '';
+        var festivalDate = trigger.getAttribute('data-festival-date') || '';
+        var festivalDateFormatted = trigger.getAttribute('data-festival-date-formatted') || '';
+        var caption = trigger.getAttribute('data-caption') || '';
+        var footerStyle = trigger.getAttribute('data-footer-style') || 'dual_ribbon_badge';
+        var footerFixed = trigger.getAttribute('data-footer-fixed') === '1';
+        var headerLayout = trigger.getAttribute('data-header-layout') || 'full_width_strip';
+        var headerFixed = trigger.getAttribute('data-header-fixed') === '1';
+        var leaderShape = trigger.getAttribute('data-leader-shape') || 'circle';
+        var leaderBorder = trigger.getAttribute('data-leader-border') || '#FF9933';
 
-                // 1. Reset Wizard to Step 1
-                showWizardStep(1);
+        // 1. Reset Wizard to Step 1
+        showWizardStep(1);
 
-                var imgEl = document.getElementById('qs-modal-img');
-                if (imgEl) imgEl.src = templateImage;
+        var imgEl = document.getElementById('qs-modal-img');
+        if (imgEl) imgEl.src = templateImage;
 
-                var previewLink = document.getElementById('qs-modal-preview-link');
-                var btnPreview = document.getElementById('qs-modal-btn-preview');
-                if (previewLink) {
-                    previewLink.href = templateImage;
-                    previewLink.classList.remove('disabled');
-                }
-                if (btnPreview) {
-                    btnPreview.href = templateImage;
-                    btnPreview.classList.remove('disabled');
-                }
+        var btnPreview = document.getElementById('qs-modal-btn-preview');
+        var previewLink = document.getElementById('qs-modal-preview-link');
+        if (btnPreview) {
+            btnPreview.href = templateImage;
+            btnPreview.classList.remove('disabled');
+        }
+        if (previewLink) {
+            previewLink.href = templateImage;
+            previewLink.classList.remove('disabled');
+        }
 
-                var subEl = document.getElementById('qs-modal-subheading');
-                if (subEl) subEl.innerText = festivalTitle + (festivalDateFormatted ? ' (' + festivalDateFormatted + ')' : '');
+        var subEl = document.getElementById('qs-modal-subheading');
+        if (subEl) subEl.innerText = festivalTitle + (festivalDateFormatted ? ' (' + festivalDateFormatted + ')' : '');
 
-                var inputTpl = document.getElementById('qs-input-template-id');
-                if (inputTpl) inputTpl.value = templateId;
+        var inputTpl = document.getElementById('qs-input-template-id');
+        if (inputTpl) inputTpl.value = templateId;
 
-                var inputFest = document.getElementById('qs-input-festival-id');
-                if (inputFest) inputFest.value = festivalId;
+        var inputFest = document.getElementById('qs-input-festival-id');
+        if (inputFest) inputFest.value = festivalId;
 
-                var inputDate = document.getElementById('qs-input-date');
-                if (inputDate && festivalDate) inputDate.value = festivalDate;
+        var inputDate = document.getElementById('qs-input-date');
+        if (inputDate && festivalDate) inputDate.value = festivalDate;
 
-                var displayDate = document.getElementById('qs-display-date');
-                if (displayDate) displayDate.value = (festivalDateFormatted || festivalDate) + ' - ' + festivalTitle;
+        var displayDate = document.getElementById('qs-display-date');
+        if (displayDate) displayDate.value = (festivalDateFormatted || festivalDate) + ' - ' + festivalTitle;
 
-                // Dynamic target time
-                var isToday = trigger.getAttribute('data-is-today') === '1';
-                var targetTime = trigger.getAttribute('data-target-time') || (isToday ? '{{ now()->addMinutes(10)->format('H:i') }}' : '08:00');
+        // Dynamic target time
+        var isToday = trigger.getAttribute('data-is-today') === '1';
+        var targetTime = trigger.getAttribute('data-target-time') || (isToday ? '{{ now()->addMinutes(10)->format('H:i') }}' : '08:00');
 
-                var inputTime = document.getElementById('qs-input-time');
-                if (inputTime) inputTime.value = targetTime;
+        var inputTime = document.getElementById('qs-input-time');
+        if (inputTime) inputTime.value = targetTime;
 
-                var inputCaption = document.getElementById('qs-input-caption');
-                if (inputCaption) inputCaption.value = caption;
+        var inputCaption = document.getElementById('qs-input-caption');
+        if (inputCaption) inputCaption.value = caption;
 
-                // Set style dropdowns to template defaults and apply Lock/Fixed state
-                var selectFooter = document.getElementById('qs-modal-footer-style');
-                var footerLockedBadge = document.getElementById('qs-modal-footer-locked-badge');
-                var footerLockedMsg = document.getElementById('qs-modal-footer-locked-msg');
-                if (selectFooter) {
-                    selectFooter.value = footerStyle;
-                    selectFooter.disabled = footerFixed;
-                    if (footerLockedBadge) footerLockedBadge.classList.toggle('d-none', !footerFixed);
-                    if (footerLockedMsg) footerLockedMsg.classList.toggle('d-none', !footerFixed);
-                }
+        // Set style dropdowns to template defaults and apply Lock/Fixed state
+        var selectFooter = document.getElementById('qs-modal-footer-style');
+        var footerLockedBadge = document.getElementById('qs-modal-footer-locked-badge');
+        var footerLockedMsg = document.getElementById('qs-modal-footer-locked-msg');
+        if (selectFooter) {
+            selectFooter.value = footerStyle;
+            selectFooter.disabled = footerFixed;
+            if (footerLockedBadge) footerLockedBadge.classList.toggle('d-none', !footerFixed);
+            if (footerLockedMsg) footerLockedMsg.classList.toggle('d-none', !footerFixed);
+        }
 
-                var selectHeader = document.getElementById('qs-modal-header-layout');
-                var headerLockedBadge = document.getElementById('qs-modal-header-locked-badge');
-                var headerLockedMsg = document.getElementById('qs-modal-header-locked-msg');
-                if (selectHeader) {
-                    selectHeader.value = headerLayout;
-                    selectHeader.disabled = headerFixed;
-                    if (headerLockedBadge) headerLockedBadge.classList.toggle('d-none', !headerFixed);
-                    if (headerLockedMsg) headerLockedMsg.classList.toggle('d-none', !headerFixed);
-                }
+        var selectHeader = document.getElementById('qs-modal-header-layout');
+        var headerLockedBadge = document.getElementById('qs-modal-header-locked-badge');
+        var headerLockedMsg = document.getElementById('qs-modal-header-locked-msg');
+        if (selectHeader) {
+            selectHeader.value = headerLayout;
+            selectHeader.disabled = headerFixed;
+            if (headerLockedBadge) headerLockedBadge.classList.toggle('d-none', !headerFixed);
+            if (headerLockedMsg) headerLockedMsg.classList.toggle('d-none', !headerFixed);
+        }
 
-                // Set Advanced Leader Customization inputs
-                var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
-                if (selectLeaderShape) selectLeaderShape.value = leaderShape;
+        // Set Advanced Leader Customization inputs
+        var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
+        if (selectLeaderShape) selectLeaderShape.value = leaderShape;
 
-                var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
-                if (inputLeaderBorder) inputLeaderBorder.value = leaderBorder;
+        var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+        if (inputLeaderBorder) inputLeaderBorder.value = leaderBorder;
 
-                var inputHiddenShape = document.getElementById('qs-input-leader-shape');
-                if (inputHiddenShape) inputHiddenShape.value = leaderShape;
+        var inputHiddenShape = document.getElementById('qs-input-leader-shape');
+        if (inputHiddenShape) inputHiddenShape.value = leaderShape;
 
-                var inputHiddenBorder = document.getElementById('qs-input-leader-border');
-                if (inputHiddenBorder) inputHiddenBorder.value = leaderBorder;
+        var inputHiddenBorder = document.getElementById('qs-input-leader-border');
+        if (inputHiddenBorder) inputHiddenBorder.value = leaderBorder;
 
         // Auto-select Leadership Strip (Template Assigned, User Custom First, or Party Official Default)
         var tplPartyId = trigger.getAttribute('data-party-id') || '';
@@ -711,518 +663,518 @@
                             break;
                         }
                     }
-                    if (inputStrip) inputStrip.value = selectStrip.value;
-                }
-
-                var alertBox = document.getElementById('qs-alert');
-                if (alertBox) {
-                    alertBox.classList.add('d-none');
-                    alertBox.innerText = '';
-                }
-
-                // Reset account checkboxes to checked & active
-                document.querySelectorAll('.qs-account-cb').forEach(function (cb) {
-                    cb.checked = true;
-                    var row = cb.closest('.qs-account-row');
-                    if (row) row.classList.add('active');
-                });
-
-                var modalEl = document.getElementById('quickScheduleModal');
-                if (modalEl) {
-                    var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-                    modal.show();
-                }
-
-                // Trigger Live Server-Side Poster Composition for Step 1
-                composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder);
-                composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null);
-            });
-
-            // Wizard Step Navigation
-            function showWizardStep(step) {
-                var pane1 = document.getElementById('qs-step-pane-1');
-                var pane2 = document.getElementById('qs-step-pane-2');
-                var actions1 = document.getElementById('qs-actions-step-1');
-                var actions2 = document.getElementById('qs-actions-step-2');
-                var ind1 = document.getElementById('qs-step-indicator-1');
-                var ind2 = document.getElementById('qs-step-indicator-2');
-                var footerText = document.getElementById('qs-footer-info-text');
-
-                if (step === 1) {
-                    if (pane1) pane1.classList.remove('d-none');
-                    if (pane2) pane2.classList.add('d-none');
-                    if (actions1) actions1.classList.remove('d-none');
-                    if (actions2) actions2.classList.add('d-none');
-                    if (ind1) {
-                        ind1.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
-                        ind1.innerHTML = '<i class="ti ti-palette me-1"></i> 1. Poster Style';
-                    }
-                    if (ind2) {
-                        ind2.className = 'badge bg-transparent text-secondary px-3 py-1.5 rounded-pill fw-semibold';
-                        ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
-                    }
-                    if (footerText) footerText.innerText = 'Step 1 of 2: Choose poster design styles';
-                } else if (step === 2) {
-                    if (pane1) pane1.classList.add('d-none');
-                    if (pane2) pane2.classList.remove('d-none');
-                    if (actions1) actions1.classList.add('d-none');
-                    if (actions2) actions2.classList.remove('d-none');
-                    if (ind1) {
-                        ind1.className = 'badge bg-success text-white px-3 py-1.5 rounded-pill fw-semibold';
-                        ind1.innerHTML = '<i class="ti ti-check me-1"></i> 1. Poster Ready';
-                    }
-                    if (ind2) {
-                        ind2.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
-                        ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
-                    }
-                    if (footerText) footerText.innerText = 'Step 2 of 2: Review schedule time, accounts & caption';
-
-                    // Sync hidden inputs for final submission
-                    var selectFooter = document.getElementById('qs-modal-footer-style');
-                    var selectHeader = document.getElementById('qs-modal-header-layout');
-                    var inputFooter = document.getElementById('qs-input-footer-style');
-                    var inputHeader = document.getElementById('qs-input-header-layout');
-                    if (inputFooter && selectFooter) inputFooter.value = selectFooter.value;
-                    if (inputHeader && selectHeader) inputHeader.value = selectHeader.value;
-
-                    var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
-                    var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
-                    var inputHiddenShape = document.getElementById('qs-input-leader-shape');
-                    var inputHiddenBorder = document.getElementById('qs-input-leader-border');
-                    if (inputHiddenShape && selectLeaderShape) inputHiddenShape.value = selectLeaderShape.value;
-                    if (inputHiddenBorder && inputLeaderBorder) inputHiddenBorder.value = inputLeaderBorder.value;
-
-                    var selectStrip = document.getElementById('qs-modal-strip-id');
-                    var inputStrip = document.getElementById('qs-input-strip-id');
-                    if (inputStrip && selectStrip) inputStrip.value = selectStrip.value;
                 }
             }
+            if (inputStrip) inputStrip.value = selectStrip.value;
+        }
 
-            var btnNextStep = document.getElementById('qs-btn-next-step');
-            if (btnNextStep) {
-                btnNextStep.addEventListener('click', function () {
-                    showWizardStep(2);
-                });
+        var alertBox = document.getElementById('qs-alert');
+        if (alertBox) {
+            alertBox.classList.add('d-none');
+            alertBox.innerText = '';
+        }
+
+        // Reset account checkboxes to checked & active
+        document.querySelectorAll('.qs-account-cb').forEach(function (cb) {
+            cb.checked = true;
+            var row = cb.closest('.qs-account-row');
+            if (row) row.classList.add('active');
+        });
+
+        var modalEl = document.getElementById('quickScheduleModal');
+        if (modalEl) {
+            var modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+            modal.show();
+        }
+
+        // Trigger Live Server-Side Poster Composition for Step 1
+        composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null);
+    });
+
+    // Wizard Step Navigation
+    function showWizardStep(step) {
+        var pane1 = document.getElementById('qs-step-pane-1');
+        var pane2 = document.getElementById('qs-step-pane-2');
+        var actions1 = document.getElementById('qs-actions-step-1');
+        var actions2 = document.getElementById('qs-actions-step-2');
+        var ind1 = document.getElementById('qs-step-indicator-1');
+        var ind2 = document.getElementById('qs-step-indicator-2');
+        var footerText = document.getElementById('qs-footer-info-text');
+
+        if (step === 1) {
+            if (pane1) pane1.classList.remove('d-none');
+            if (pane2) pane2.classList.add('d-none');
+            if (actions1) actions1.classList.remove('d-none');
+            if (actions2) actions2.classList.add('d-none');
+            if (ind1) {
+                ind1.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
+                ind1.innerHTML = '<i class="ti ti-palette me-1"></i> 1. Poster Style';
             }
-
-            var btnBackStep = document.getElementById('qs-btn-back-step');
-            if (btnBackStep) {
-                btnBackStep.addEventListener('click', function () {
-                    showWizardStep(1);
-                });
+            if (ind2) {
+                ind2.className = 'badge bg-transparent text-secondary px-3 py-1.5 rounded-pill fw-semibold';
+                ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
             }
+            if (footerText) footerText.innerText = 'Step 1 of 2: Choose poster design styles';
+        } else if (step === 2) {
+            if (pane1) pane1.classList.add('d-none');
+            if (pane2) pane2.classList.remove('d-none');
+            if (actions1) actions1.classList.add('d-none');
+            if (actions2) actions2.classList.remove('d-none');
+            if (ind1) {
+                ind1.className = 'badge bg-success text-white px-3 py-1.5 rounded-pill fw-semibold';
+                ind1.innerHTML = '<i class="ti ti-check me-1"></i> 1. Poster Ready';
+            }
+            if (ind2) {
+                ind2.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
+                ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
+            }
+            if (footerText) footerText.innerText = 'Step 2 of 2: Review schedule time, accounts & caption';
 
-            // Live Composition on Style Dropdown & Advanced Leader Customization Change (Step 1)
-            var selectFooterStyle = document.getElementById('qs-modal-footer-style');
-            var selectHeaderLayout = document.getElementById('qs-modal-header-layout');
+            // Sync hidden inputs for final submission
+            var selectFooter = document.getElementById('qs-modal-footer-style');
+            var selectHeader = document.getElementById('qs-modal-header-layout');
+            var inputFooter = document.getElementById('qs-input-footer-style');
+            var inputHeader = document.getElementById('qs-input-header-layout');
+            if (inputFooter && selectFooter) inputFooter.value = selectFooter.value;
+            if (inputHeader && selectHeader) inputHeader.value = selectHeader.value;
+
             var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
             var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+            var inputHiddenShape = document.getElementById('qs-input-leader-shape');
+            var inputHiddenBorder = document.getElementById('qs-input-leader-border');
+            if (inputHiddenShape && selectLeaderShape) inputHiddenShape.value = selectLeaderShape.value;
+            if (inputHiddenBorder && inputLeaderBorder) inputHiddenBorder.value = inputLeaderBorder.value;
+
             var selectStrip = document.getElementById('qs-modal-strip-id');
-
-            function onStyleChange() {
-                var tplId = document.getElementById('qs-input-template-id')?.value;
-                if (!tplId) return;
-                var fStyle = selectFooterStyle ? selectFooterStyle.value : 'dual_ribbon_badge';
-                var hLayout = selectHeaderLayout ? selectHeaderLayout.value : 'full_width_strip';
-                var lShape = selectLeaderShape ? selectLeaderShape.value : 'circle';
-                var lBorder = inputLeaderBorder ? inputLeaderBorder.value : '#FF9933';
-                composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder);
-                var stripId = selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value;
-                composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId);
-            }
-
-            if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
-            if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
-            if (selectLeaderShape) selectLeaderShape.addEventListener('change', onStyleChange);
-            if (inputLeaderBorder) inputLeaderBorder.addEventListener('change', onStyleChange);
-            if (selectStrip) selectStrip.addEventListener('change', onStyleChange);
-
-            document.querySelectorAll('.qs-color-preset').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    var color = this.getAttribute('data-color');
-                    if (inputLeaderBorder) {
-                        inputLeaderBorder.value = color;
-                        onStyleChange();
-                    }
-                });
-            });
-
-            // Helper: Compose High-Res Branded Poster via API
-            function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId) {
-                var spinner = document.getElementById('qs-modal-spinner');
-                var imgEl = document.getElementById('qs-modal-img');
-                var previewLink = document.getElementById('qs-modal-preview-link');
-                var btnPreview = document.getElementById('qs-modal-btn-preview');
-                var btnDownload = document.getElementById('qs-modal-btn-download');
-                var inputComposed = document.getElementById('qs-input-composed-image');
-
-                if (spinner) spinner.classList.remove('d-none');
-                if (btnDownload) {
-                    btnDownload.classList.add('disabled');
-                    btnDownload.href = '#';
-                }
-                if (btnPreview) {
-                    btnPreview.classList.add('disabled');
-                    btnPreview.href = '#';
-                }
-                if (previewLink) {
-                    previewLink.classList.add('disabled');
-                    previewLink.href = '#';
-                }
-
-                var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                var currentStrip = stripId || (selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value);
-
-                var payload = {
-                    template_id: parseInt(templateId),
-                    footer_style: footerStyle || selectFooterStyle?.value,
-                    header_layout: headerLayout || selectHeaderLayout?.value,
-                    leader_shape: leaderShape || selectLeaderShape?.value || 'circle',
-                    leader_border_color: leaderBorder || inputLeaderBorder?.value || '#FF9933',
-                    include_strip: (headerLayout !== 'none'),
-                    strip_id: currentStrip ? parseInt(currentStrip) : null
-                };
-
-                fetch('{{ route('admin.festival-studio.compose') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify(payload)
-                })
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
-                    if (data.success && data.image_url) {
-                        if (imgEl) imgEl.src = data.image_url;
-                        if (previewLink) {
-                            previewLink.href = data.image_url;
-                            previewLink.classList.remove('disabled');
-                        }
-                        if (btnPreview) {
-                            btnPreview.href = data.image_url;
-                            btnPreview.classList.remove('disabled');
-                        }
-                        if (btnDownload) {
-                            btnDownload.href = data.image_url;
-                            btnDownload.classList.remove('disabled');
-                        }
-                        if (inputComposed) {
-                            inputComposed.value = data.relative_path;
-                        }
-                    }
-                })
-                .catch(function (err) {
-                    console.error('Poster composition failed:', err);
-                })
-                .finally(function () {
-                    if (spinner) spinner.classList.add('d-none');
-                });
-            }
-
-        // Share Handlers in Modal (WhatsApp & Native Share)
-        var btnShareWa = document.getElementById('qs-modal-btn-share-wa');
-        if (btnShareWa) {
-            btnShareWa.addEventListener('click', function () {
-                var imgEl = document.getElementById('qs-modal-img');
-                var caption = document.getElementById('qs-input-caption')?.value || '';
-                var shareUrl = imgEl ? imgEl.src : window.location.href;
-                var text = caption + '\n\n' + shareUrl;
-                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
-            });
+            var inputStrip = document.getElementById('qs-input-strip-id');
+            if (inputStrip && selectStrip) inputStrip.value = selectStrip.value;
         }
+    }
 
-        var btnShareNative = document.getElementById('qs-modal-btn-share-native');
-        if (btnShareNative) {
-            btnShareNative.addEventListener('click', function () {
-                var imgEl = document.getElementById('qs-modal-img');
-                var caption = document.getElementById('qs-input-caption')?.value || '';
-                var shareUrl = imgEl ? imgEl.src : window.location.href;
-
-                if (navigator.share) {
-                    navigator.share({
-                        title: 'Festival Greeting Poster',
-                        text: caption,
-                        url: shareUrl
-                    }).catch(function () {});
-                } else {
-                    navigator.clipboard.writeText(shareUrl).then(function () {
-                        showStudioToast('Poster link copied to clipboard!');
-                    }).catch(function () {
-                        window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(caption + '\n' + shareUrl), '_blank');
-                    });
-                }
-            });
-        }
-
-        // Delegated Share Button Handler on Grid Cards
-        document.addEventListener('click', function (e) {
-            var btn = e.target.closest('.btn-trigger-share');
-            if (!btn) return;
-
-            var imgUrl = btn.getAttribute('data-template-image') || window.location.href;
-            var caption = btn.getAttribute('data-caption') || '';
-            var title = btn.getAttribute('data-festival-title') || 'Festival Greeting Poster';
-
-            if (navigator.share) {
-                navigator.share({
-                    title: title,
-                    text: caption,
-                    url: imgUrl
-                }).catch(function () {});
-            } else {
-                var textToShare = (caption ? caption + '\n\n' : '') + imgUrl;
-                window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(textToShare), '_blank');
-            }
+    var btnNextStep = document.getElementById('qs-btn-next-step');
+    if (btnNextStep) {
+        btnNextStep.addEventListener('click', function () {
+            showWizardStep(2);
         });
+    }
 
-        // Account row toggle on checkbox change or row click
-        document.addEventListener('change', function (e) {
-            if (e.target.classList.contains('qs-account-cb')) {
-                var row = e.target.closest('.qs-account-row');
-                if (row) {
-                    if (e.target.checked) {
-                        row.classList.add('active');
-                    } else {
-                        row.classList.remove('active');
-                    }
-                }
-            }
+    var btnBackStep = document.getElementById('qs-btn-back-step');
+    if (btnBackStep) {
+        btnBackStep.addEventListener('click', function () {
+            showWizardStep(1);
         });
+    }
 
-        // Quick Schedule AJAX Submit (Step 2)
-        var submitBtn = document.getElementById('btn-submit-quick-schedule');
-        if (submitBtn) {
-            submitBtn.addEventListener('click', function () {
-                var btnText = document.getElementById('btn-submit-text');
-                var alertBox = document.getElementById('qs-alert');
+    // Live Composition on Style Dropdown & Advanced Leader Customization Change (Step 1)
+    var selectFooterStyle = document.getElementById('qs-modal-footer-style');
+    var selectHeaderLayout = document.getElementById('qs-modal-header-layout');
+    var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
+    var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+    var selectStrip = document.getElementById('qs-modal-strip-id');
 
-                // Gather selected account IDs
-                var selectedAccountIds = [];
-                document.querySelectorAll('.qs-account-cb:checked').forEach(function (cb) {
-                    selectedAccountIds.push(parseInt(cb.value));
-                });
+    function onStyleChange() {
+        var tplId = document.getElementById('qs-input-template-id')?.value;
+        if (!tplId) return;
+        var fStyle = selectFooterStyle ? selectFooterStyle.value : 'dual_ribbon_badge';
+        var hLayout = selectHeaderLayout ? selectHeaderLayout.value : 'full_width_strip';
+        var lShape = selectLeaderShape ? selectLeaderShape.value : 'circle';
+        var lBorder = inputLeaderBorder ? inputLeaderBorder.value : '#FF9933';
+        var stripId = selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value;
+        composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId);
+    }
 
-                if (selectedAccountIds.length === 0) {
-                    if (alertBox) {
-                        alertBox.classList.remove('d-none');
-                        alertBox.innerText = 'Please select at least one social media channel to schedule.';
-                    }
-                    return;
-                }
+    if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
+    if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
+    if (selectLeaderShape) selectLeaderShape.addEventListener('change', onStyleChange);
+    if (inputLeaderBorder) inputLeaderBorder.addEventListener('change', onStyleChange);
+    if (selectStrip) selectStrip.addEventListener('change', onStyleChange);
 
-                var templateId = document.getElementById('qs-input-template-id').value;
-                var festivalId = document.getElementById('qs-input-festival-id').value;
-                var scheduleDate = document.getElementById('qs-input-date').value;
-                var scheduleTime = document.getElementById('qs-input-time').value;
-                var content = document.getElementById('qs-input-caption').value;
-                var footerStyle = document.getElementById('qs-input-footer-style')?.value || selectFooterStyle?.value;
-                var headerLayout = document.getElementById('qs-input-header-layout')?.value || selectHeaderLayout?.value;
-                var leaderShape = document.getElementById('qs-input-leader-shape')?.value || selectLeaderShape?.value || 'circle';
-                var leaderBorder = document.getElementById('qs-input-leader-border')?.value || inputLeaderBorder?.value || '#FF9933';
-                var stripId = document.getElementById('qs-input-strip-id')?.value || (selectStrip ? selectStrip.value : null);
-                var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
-
-                if (!scheduleDate || !scheduleTime) {
-                    if (alertBox) {
-                        alertBox.classList.remove('d-none');
-                        alertBox.innerText = 'Please provide both a schedule date and time.';
-                    }
-                    return;
-                }
-
-                // Button loading state
-                submitBtn.disabled = true;
-                if (btnText) btnText.innerText = 'Scheduling...';
-                if (alertBox) alertBox.classList.add('d-none');
-
-                fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify({
-                        template_id: templateId,
-                        festival_id: festivalId,
-                        account_ids: selectedAccountIds,
-                        schedule_date: scheduleDate,
-                        schedule_time: scheduleTime,
-                        content: content,
-                        composed_image: composedImage,
-                        footer_style: footerStyle,
-                        header_layout: headerLayout,
-                        leader_shape: leaderShape,
-                        leader_border_color: leaderBorder,
-                        strip_id: stripId ? parseInt(stripId) : null,
-                        include_strip: (headerLayout !== 'none')
-                    })
-                })
-                .then(function (res) {
-                    return res.json().then(function (data) {
-                        return { status: res.status, ok: res.ok, data: data };
-                    });
-                })
-                .then(function (result) {
-                    submitBtn.disabled = false;
-                    if (btnText) btnText.innerText = 'Schedule Post';
-
-                    if (!result.ok) {
-                        if (alertBox) {
-                            alertBox.classList.remove('d-none');
-                            alertBox.innerText = result.data.message || 'Scheduling failed. Please try again.';
-                        }
-                        return;
-                    }
-
-                    // Close modal
-                    var modalEl = document.getElementById('quickScheduleModal');
-                    if (modalEl) {
-                        var modal = bootstrap.Modal.getInstance(modalEl);
-                        if (modal) modal.hide();
-                    }
-
-                    // Update card action area on page to show Scheduled badge
-                    var actionEl = document.getElementById('card-action-' + templateId);
-                    if (actionEl) {
-                        actionEl.innerHTML = '<span class="badge bg-success text-white rounded-pill px-3 py-1.5 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
-                    }
-
-                    // Immediately update the festival date pill in the top horizontal bar
-                    var targetFestId = result.data.festival_id || festivalId;
-                    if (targetFestId) {
-                        var pillEl = document.getElementById('date-pill-' + targetFestId);
-                        if (pillEl) {
-                            pillEl.classList.add('is-scheduled');
-                            var badgeSlot = document.getElementById('pill-badge-slot-' + targetFestId);
-                            if (badgeSlot && !badgeSlot.querySelector('.badge.bg-warning')) {
-                                var setBadge = document.createElement('span');
-                                setBadge.className = 'badge bg-warning text-dark rounded-pill fw-semibold';
-                                setBadge.style.fontSize = '9px';
-                                setBadge.style.padding = '2px 7px';
-                                setBadge.innerHTML = '<i class="ti ti-check me-0.5"></i>Set';
-                                badgeSlot.prepend(setBadge);
-                            }
-                        }
-                    }
-
-                    // Show floating notification toast
-                    showStudioToast(result.data.message || 'Poster scheduled successfully.');
-                })
-                .catch(function (err) {
-                    submitBtn.disabled = false;
-                    if (btnText) btnText.innerText = 'Schedule Post';
-                    if (alertBox) {
-                        alertBox.classList.remove('d-none');
-                        alertBox.innerText = 'Network error. Please try again.';
-                    }
-                    console.error('Quick schedule error:', err);
-                });
-            });
-        }
-
-        // Delegated Copy Caption Button Handler
-        document.addEventListener('click', function (e) {
-            var copyBtn = e.target.closest('#btn-copy-caption');
-            if (!copyBtn) return;
-
-            var captionEl = document.getElementById('festival-caption-text');
-            var copyText = document.getElementById('copy-btn-text') || copyBtn;
-            if (!captionEl) return;
-
-            var fullText = captionEl.innerText;
-
-            function showSuccess() {
-                var origText = copyText.innerText;
-                copyText.innerText = 'Copied!';
-                copyBtn.classList.replace('btn-outline-secondary', 'btn-success');
-                setTimeout(function () {
-                    copyText.innerText = origText || 'Copy Caption';
-                    copyBtn.classList.replace('btn-success', 'btn-outline-secondary');
-                }, 2000);
-            }
-
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(fullText).then(showSuccess).catch(function () {
-                    fallbackCopy(fullText, showSuccess);
-                });
-            } else {
-                fallbackCopy(fullText, showSuccess);
-            }
-        });
-
-        function fallbackCopy(text, callback) {
-            var ta = document.createElement('textarea');
-            ta.value = text;
-            ta.style.position = 'fixed';
-            ta.style.opacity = '0';
-            document.body.appendChild(ta);
-            ta.select();
-            try {
-                document.execCommand('copy');
-                if (callback) callback();
-            } catch (e) {
-                console.error('Fallback copy failed', e);
-            }
-            document.body.removeChild(ta);
-        }
-
-        // ======================================================================
-        // STEP 4: HEADER STRIP POSTER CONTROLS & DYNAMIC SWITCHING
-        // ======================================================================
-        // 1. Header Strip Visibility Toggle (Main toolbar)
-        document.addEventListener('change', function (e) {
-            if (e.target && e.target.id === 'fs-toggle-header-strip') {
-                var isChecked = e.target.checked;
-                document.querySelectorAll('.fs-strip-overlay').forEach(function (el) {
-                    if (isChecked) {
-                        el.classList.remove('d-none');
-                    } else {
-                        el.classList.add('d-none');
-                    }
-                });
-
-                try {
-                    localStorage.setItem('socialmanager_header_strip_enabled', isChecked ? '1' : '0');
-                } catch (err) {}
-            }
-        });
-
-        // 3. Quick Strip Switcher in Festival Studio
-        document.addEventListener('click', async function (e) {
-            var switchItem = e.target.closest('.fs-strip-switch-item');
-            if (!switchItem) return;
-
-            e.preventDefault();
-            var stripId = switchItem.getAttribute('data-id');
-            var stripName = switchItem.getAttribute('data-name');
-            if (!stripId) return;
-
-            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-            try {
-                var response = await fetch('/admin/leader-strips/' + stripId + '/default', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    }
-                });
-                var result = await response.json();
-                if (result.success) {
-                    showStudioToast('Leadership strip changed to: ' + stripName);
-                    setTimeout(function () {
-                        window.location.reload();
-                    }, 400);
-                }
-            } catch (err) {
-                console.error('Error switching strip in Festival Studio:', err);
+    document.querySelectorAll('.qs-color-preset').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var color = this.getAttribute('data-color');
+            if (inputLeaderBorder) {
+                inputLeaderBorder.value = color;
+                onStyleChange();
             }
         });
     });
-    </script>
+
+    // Helper: Compose High-Res Branded Poster via API
+    function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId) {
+        var spinner = document.getElementById('qs-modal-spinner');
+        var imgEl = document.getElementById('qs-modal-img');
+        var btnDownload = document.getElementById('qs-modal-btn-download');
+        var btnPreview = document.getElementById('qs-modal-btn-preview');
+        var previewLink = document.getElementById('qs-modal-preview-link');
+        var inputComposed = document.getElementById('qs-input-composed-image');
+
+        if (spinner) spinner.classList.remove('d-none');
+        if (btnDownload) {
+            btnDownload.classList.add('disabled');
+            btnDownload.href = '#';
+        }
+        if (btnPreview) {
+            btnPreview.classList.add('disabled');
+            btnPreview.href = '#';
+        }
+        if (previewLink) {
+            previewLink.classList.add('disabled');
+            previewLink.href = '#';
+        }
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        var currentStrip = stripId || (selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value);
+
+        var payload = {
+            template_id: parseInt(templateId),
+            footer_style: footerStyle || selectFooterStyle?.value,
+            header_layout: headerLayout || selectHeaderLayout?.value,
+            leader_shape: leaderShape || selectLeaderShape?.value || 'circle',
+            leader_border_color: leaderBorder || inputLeaderBorder?.value || '#FF9933',
+            include_strip: (headerLayout !== 'none'),
+            strip_id: currentStrip ? parseInt(currentStrip) : null
+        };
+
+        fetch('{{ route('admin.festival-studio.compose') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(function (res) { return res.json(); })
+        .then(function (data) {
+            if (data.success && data.image_url) {
+                if (imgEl) imgEl.src = data.image_url;
+                if (btnPreview) {
+                    btnPreview.href = data.image_url;
+                    btnPreview.classList.remove('disabled');
+                }
+                if (previewLink) {
+                    previewLink.href = data.image_url;
+                    previewLink.classList.remove('disabled');
+                }
+                if (btnDownload) {
+                    btnDownload.href = data.image_url;
+                    btnDownload.classList.remove('disabled');
+                }
+                if (inputComposed) {
+                    inputComposed.value = data.relative_path;
+                }
+            }
+        })
+        .catch(function (err) {
+            console.error('Poster composition failed:', err);
+        })
+        .finally(function () {
+            if (spinner) spinner.classList.add('d-none');
+        });
+    }
+
+    // Share Handlers in Modal (WhatsApp & Native Share)
+    var btnShareWa = document.getElementById('qs-modal-btn-share-wa');
+    if (btnShareWa) {
+        btnShareWa.addEventListener('click', function () {
+            var imgEl = document.getElementById('qs-modal-img');
+            var caption = document.getElementById('qs-input-caption')?.value || '';
+            var shareUrl = imgEl ? imgEl.src : window.location.href;
+            var text = caption + '\n\n' + shareUrl;
+            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
+        });
+    }
+
+    var btnShareNative = document.getElementById('qs-modal-btn-share-native');
+    if (btnShareNative) {
+        btnShareNative.addEventListener('click', function () {
+            var imgEl = document.getElementById('qs-modal-img');
+            var caption = document.getElementById('qs-input-caption')?.value || '';
+            var shareUrl = imgEl ? imgEl.src : window.location.href;
+
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Festival Greeting Poster',
+                    text: caption,
+                    url: shareUrl
+                }).catch(function () {});
+            } else {
+                navigator.clipboard.writeText(shareUrl).then(function () {
+                    showStudioToast('Poster link copied to clipboard!');
+                }).catch(function () {
+                    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(caption + '\n' + shareUrl), '_blank');
+                });
+            }
+        });
+    }
+
+    // Delegated Share Button Handler on Grid Cards
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.btn-trigger-share');
+        if (!btn) return;
+
+        var imgUrl = btn.getAttribute('data-template-image') || window.location.href;
+        var caption = btn.getAttribute('data-caption') || '';
+        var title = btn.getAttribute('data-festival-title') || 'Festival Greeting Poster';
+
+        if (navigator.share) {
+            navigator.share({
+                title: title,
+                text: caption,
+                url: imgUrl
+            }).catch(function () {});
+        } else {
+            var textToShare = (caption ? caption + '\n\n' : '') + imgUrl;
+            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(textToShare), '_blank');
+        }
+    });
+
+    // Account row toggle on checkbox change or row click
+    document.addEventListener('change', function (e) {
+        if (e.target.classList.contains('qs-account-cb')) {
+            var row = e.target.closest('.qs-account-row');
+            if (row) {
+                if (e.target.checked) {
+                    row.classList.add('active');
+                } else {
+                    row.classList.remove('active');
+                }
+            }
+        }
+    });
+
+    // Quick Schedule AJAX Submit (Step 2)
+    var submitBtn = document.getElementById('btn-submit-quick-schedule');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', function () {
+            var btnText = document.getElementById('btn-submit-text');
+            var alertBox = document.getElementById('qs-alert');
+
+            // Gather selected account IDs
+            var selectedAccountIds = [];
+            document.querySelectorAll('.qs-account-cb:checked').forEach(function (cb) {
+                selectedAccountIds.push(parseInt(cb.value));
+            });
+
+            if (selectedAccountIds.length === 0) {
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    alertBox.innerText = 'Please select at least one social media channel to schedule.';
+                }
+                return;
+            }
+
+            var templateId = document.getElementById('qs-input-template-id').value;
+            var festivalId = document.getElementById('qs-input-festival-id').value;
+            var scheduleDate = document.getElementById('qs-input-date').value;
+            var scheduleTime = document.getElementById('qs-input-time').value;
+            var content = document.getElementById('qs-input-caption').value;
+            var footerStyle = document.getElementById('qs-input-footer-style')?.value || selectFooterStyle?.value;
+            var headerLayout = document.getElementById('qs-input-header-layout')?.value || selectHeaderLayout?.value;
+            var leaderShape = document.getElementById('qs-input-leader-shape')?.value || selectLeaderShape?.value || 'circle';
+            var leaderBorder = document.getElementById('qs-input-leader-border')?.value || inputLeaderBorder?.value || '#FF9933';
+            var stripId = document.getElementById('qs-input-strip-id')?.value || (selectStrip ? selectStrip.value : null);
+            var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
+
+            if (!scheduleDate || !scheduleTime) {
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    alertBox.innerText = 'Please provide both a schedule date and time.';
+                }
+                return;
+            }
+
+            // Button loading state
+            submitBtn.disabled = true;
+            if (btnText) btnText.innerText = 'Scheduling...';
+            if (alertBox) alertBox.classList.add('d-none');
+
+            fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    template_id: templateId,
+                    festival_id: festivalId,
+                    account_ids: selectedAccountIds,
+                    schedule_date: scheduleDate,
+                    schedule_time: scheduleTime,
+                    content: content,
+                    composed_image: composedImage,
+                    footer_style: footerStyle,
+                    header_layout: headerLayout,
+                    leader_shape: leaderShape,
+                    leader_border_color: leaderBorder,
+                    strip_id: stripId ? parseInt(stripId) : null,
+                    include_strip: (headerLayout !== 'none')
+                })
+            })
+            .then(function (res) {
+                return res.json().then(function (data) {
+                    return { status: res.status, ok: res.ok, data: data };
+                });
+            })
+            .then(function (result) {
+                submitBtn.disabled = false;
+                if (btnText) btnText.innerText = 'Schedule Post';
+
+                if (!result.ok) {
+                    if (alertBox) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerText = result.data.message || 'Scheduling failed. Please try again.';
+                    }
+                    return;
+                }
+
+                // Close modal
+                var modalEl = document.getElementById('quickScheduleModal');
+                if (modalEl) {
+                    var modal = bootstrap.Modal.getInstance(modalEl);
+                    if (modal) modal.hide();
+                }
+
+                // Update card action area on page to show Scheduled badge
+                var actionEl = document.getElementById('card-action-' + templateId);
+                if (actionEl) {
+                    actionEl.innerHTML = '<span class="badge bg-success text-white rounded-pill px-3 py-1.5 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
+                }
+
+                // Immediately update the festival date pill in the top horizontal bar
+                var targetFestId = result.data.festival_id || festivalId;
+                if (targetFestId) {
+                    var pillEl = document.getElementById('date-pill-' + targetFestId);
+                    if (pillEl) {
+                        pillEl.classList.add('is-scheduled');
+                        var badgeSlot = document.getElementById('pill-badge-slot-' + targetFestId);
+                        if (badgeSlot && !badgeSlot.querySelector('.badge.bg-warning')) {
+                            var setBadge = document.createElement('span');
+                            setBadge.className = 'badge bg-warning text-dark rounded-pill fw-semibold';
+                            setBadge.style.fontSize = '9px';
+                            setBadge.style.padding = '2px 7px';
+                            setBadge.innerHTML = '<i class="ti ti-check me-0.5"></i>Set';
+                            badgeSlot.prepend(setBadge);
+                        }
+                    }
+                }
+
+                // Show floating notification toast
+                showStudioToast(result.data.message || 'Poster scheduled successfully.');
+            })
+            .catch(function (err) {
+                submitBtn.disabled = false;
+                if (btnText) btnText.innerText = 'Schedule Post';
+                if (alertBox) {
+                    alertBox.classList.remove('d-none');
+                    alertBox.innerText = 'Network error. Please try again.';
+                }
+                console.error('Quick schedule error:', err);
+            });
+        });
+    }
+
+    // Delegated Copy Caption Button Handler
+    document.addEventListener('click', function (e) {
+        var copyBtn = e.target.closest('#btn-copy-caption');
+        if (!copyBtn) return;
+
+        var captionEl = document.getElementById('festival-caption-text');
+        var copyText = document.getElementById('copy-btn-text') || copyBtn;
+        if (!captionEl) return;
+
+        var fullText = captionEl.innerText;
+
+        function showSuccess() {
+            var origText = copyText.innerText;
+            copyText.innerText = 'Copied!';
+            copyBtn.classList.replace('btn-outline-secondary', 'btn-success');
+            setTimeout(function () {
+                copyText.innerText = origText || 'Copy Caption';
+                copyBtn.classList.replace('btn-success', 'btn-outline-secondary');
+            }, 2000);
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(fullText).then(showSuccess).catch(function () {
+                fallbackCopy(fullText, showSuccess);
+            });
+        } else {
+            fallbackCopy(fullText, showSuccess);
+        }
+    });
+
+    function fallbackCopy(text, callback) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+            document.execCommand('copy');
+            if (callback) callback();
+        } catch (e) {
+            console.error('Fallback copy failed', e);
+        }
+        document.body.removeChild(ta);
+    }
+
+    // ======================================================================
+    // STEP 4: HEADER STRIP POSTER CONTROLS & DYNAMIC SWITCHING
+    // ======================================================================
+    // 1. Header Strip Visibility Toggle (Main toolbar)
+    document.addEventListener('change', function (e) {
+        if (e.target && e.target.id === 'fs-toggle-header-strip') {
+            var isChecked = e.target.checked;
+            document.querySelectorAll('.fs-strip-overlay').forEach(function (el) {
+                if (isChecked) {
+                    el.classList.remove('d-none');
+                } else {
+                    el.classList.add('d-none');
+                }
+            });
+
+            try {
+                localStorage.setItem('socialmanager_header_strip_enabled', isChecked ? '1' : '0');
+            } catch (err) {}
+        }
+    });
+
+    // 3. Quick Strip Switcher in Festival Studio
+    document.addEventListener('click', async function (e) {
+        var switchItem = e.target.closest('.fs-strip-switch-item');
+        if (!switchItem) return;
+
+        e.preventDefault();
+        var stripId = switchItem.getAttribute('data-id');
+        var stripName = switchItem.getAttribute('data-name');
+        if (!stripId) return;
+
+        var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+        try {
+            var response = await fetch('/admin/leader-strips/' + stripId + '/default', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            });
+            var result = await response.json();
+            if (result.success) {
+                showStudioToast('Leadership strip changed to: ' + stripName);
+                setTimeout(function () {
+                    window.location.reload();
+                }, 400);
+            }
+        } catch (err) {
+            console.error('Error switching strip in Festival Studio:', err);
+        }
+    });
+});
+</script>
 @endpush
