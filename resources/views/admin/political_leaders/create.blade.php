@@ -37,35 +37,35 @@
 
                 <div class="col-md-6">
                     <label class="form-label required">Leader Full Name</label>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="e.g. Narendra Modi / नरेंद्र मोदी" required>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Full Name" required>
                     @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Designation / Role</label>
-                    <input type="text" name="designation" class="form-control @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="e.g. माननीय प्रधानमंत्री / राष्ट्रीय अध्यक्ष / मुख्यमंत्री">
-                    <small class="form-hint">Shown in candidate or leadership strip selection.</small>
+                    <input type="text" name="designation" class="form-control @error('designation') is-invalid @enderror" value="{{ old('designation') }}" placeholder="Designation">
                     @error('designation')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">State / Region</label>
-                    <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" value="{{ old('state', 'National') }}" placeholder="e.g. National, Uttar Pradesh, Bihar, Rajasthan">
+                    <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" value="{{ old('state', 'National') }}" placeholder="State / Region">
                     @error('state')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label class="form-label">Leader Photo (Avatar / Cutout)</label>
                     <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp">
-                    <small class="form-hint">Upload high-resolution cutout or portrait photo. Used in circular strip chips and candidate banners.</small>
                     @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-12 mt-3">
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                        <span class="form-check-label fw-bold">Active leader (available in strips & posters)</span>
-                    </label>
+                <div class="col-md-6">
+                    <label class="form-label required">Active Leader</label>
+                    <select name="is_active" class="form-select @error('is_active') is-invalid @enderror" required>
+                        <option value="1" {{ old('is_active', '1') == '1' ? 'selected' : '' }}>Yes</option>
+                        <option value="0" {{ old('is_active') === '0' ? 'selected' : '' }}>No</option>
+                    </select>
+                    @error('is_active')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
             </div>
         </div>

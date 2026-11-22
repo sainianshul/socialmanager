@@ -92,25 +92,29 @@
                         </td>
                         <td>
                             @if($leader->party)
-                                <span class="badge" style="background-color: {{ $leader->party->primary_color }}; color: #fff;">
+                                <span class="badge badge-outline text-primary fw-bold">
                                     {{ $leader->party->short_code }}
                                 </span>
-                                <span class="text-muted small ms-1">{{ $leader->party->name }}</span>
+                                <span class="text-body small ms-1">{{ $leader->party->name }}</span>
                             @else
-                                <span class="badge bg-secondary-lt">None</span>
+                                <span class="badge badge-outline text-secondary">None</span>
                             @endif
                         </td>
                         <td class="text-body">
                             {{ $leader->designation ?: '-' }}
                         </td>
                         <td>
-                            <span class="badge bg-azure-lt">{{ $leader->state ?: 'National' }}</span>
+                            <span class="badge badge-outline text-azure">{{ $leader->state ?: 'National' }}</span>
                         </td>
                         <td>
                             @if($leader->is_active)
-                                <span class="badge bg-success-lt">Active</span>
+                                <span class="badge badge-outline text-success">
+                                    <i class="ti ti-check me-1"></i>Active
+                                </span>
                             @else
-                                <span class="badge bg-secondary-lt">Inactive</span>
+                                <span class="badge badge-outline text-secondary">
+                                    <i class="ti ti-x me-1"></i>Inactive
+                                </span>
                             @endif
                         </td>
                         <td class="text-end">

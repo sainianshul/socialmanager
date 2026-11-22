@@ -38,41 +38,39 @@
 
                 <div class="col-md-6">
                     <label class="form-label required">Leader Full Name</label>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $politicalLeader->name) }}" required>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $politicalLeader->name) }}" placeholder="Full Name" required>
                     @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Designation / Role</label>
-                    <input type="text" name="designation" class="form-control @error('designation') is-invalid @enderror" value="{{ old('designation', $politicalLeader->designation) }}" placeholder="e.g. माननीय प्रधानमंत्री / राष्ट्रीय अध्यक्ष">
+                    <input type="text" name="designation" class="form-control @error('designation') is-invalid @enderror" value="{{ old('designation', $politicalLeader->designation) }}" placeholder="Designation">
                     @error('designation')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">State / Region</label>
-                    <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" value="{{ old('state', $politicalLeader->state) }}">
+                    <input type="text" name="state" class="form-control @error('state') is-invalid @enderror" value="{{ old('state', $politicalLeader->state) }}" placeholder="State / Region">
                     @error('state')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <label class="form-label">Leader Photo</label>
-                    <div class="d-flex align-items-center gap-3 mb-2 p-2 bg-light rounded border">
-                        <img src="{{ $politicalLeader->image_url }}" alt="{{ $politicalLeader->name }}" class="avatar avatar-lg rounded-circle border shadow-sm" style="object-fit: cover;">
-                        <div>
-                            <div class="fw-bold">{{ $politicalLeader->name }}</div>
-                            <div class="text-muted small">Current photo preview</div>
-                        </div>
+                    <div class="d-flex align-items-center gap-2 mb-2 p-1 bg-light rounded border" style="width: fit-content;">
+                        <img src="{{ $politicalLeader->image_url }}" alt="{{ $politicalLeader->name }}" class="avatar avatar-md rounded-circle border shadow-sm" style="object-fit: cover;">
+                        <span class="text-body small fw-medium">{{ $politicalLeader->name }}</span>
                     </div>
                     <input type="file" name="image" class="form-control @error('image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp">
-                    <small class="form-hint">Upload new image to replace current photo.</small>
                     @error('image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-12 mt-3">
-                    <label class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="is_active" value="1" {{ old('is_active', $politicalLeader->is_active) ? 'checked' : '' }}>
-                        <span class="form-check-label fw-bold">Active leader (available in strips & posters)</span>
-                    </label>
+                <div class="col-md-6">
+                    <label class="form-label required">Active Leader</label>
+                    <select name="is_active" class="form-select @error('is_active') is-invalid @enderror" required>
+                        <option value="1" {{ old('is_active', $politicalLeader->is_active ? '1' : '0') == '1' ? 'selected' : '' }}>Yes</option>
+                        <option value="0" {{ old('is_active', $politicalLeader->is_active ? '1' : '0') == '0' ? 'selected' : '' }}>No</option>
+                    </select>
+                    @error('is_active')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
             </div>
         </div>
