@@ -91,8 +91,10 @@
                                 <option value="royal_gold_dock">Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
                                 <option value="candidate_left_ribbon">Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
                                 <option value="modern_capsule_dock">Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
+                                <option value="circular_medallion_badge">Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
+                                <option value="saffron_wave_banner">Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
                             </select>
-                            <small class="form-hint">Choose among 6 professional branding layouts (Ribbon badges, Ethnic cards, Floating minimalist, Royal midnight, Left-aligned, or Capsule dock).</small>
+                            <small class="form-hint">Choose among 8 professional branding layouts (Ribbon badges, Ethnic cards, Floating minimalist, Royal midnight, Left-aligned, Capsule dock, Medallion frame, or Saffron wave).</small>
                         </div>
 
                         <div class="col-md-6">

@@ -420,6 +420,44 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'success' => true,
         ]);
         $this->assertStringStartsWith('data:image/jpeg;base64,', $response6->json('preview_url'));
+
+        // Test preview with Layer 7 (circular_medallion_badge)
+        $response7 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'circular_medallion_badge',
+            'footer_style' => 'circular_medallion_badge',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#FF9933',
+            'show_top_strip' => '1',
+            'name_color' => '#c0392b',
+            'footer_bg' => '#fdfbf7',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response7->assertStatus(200);
+        $response7->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response7->json('preview_url'));
+
+        // Test preview with Layer 8 (saffron_wave_banner)
+        $response8 = $this->actingAs($this->admin)->postJson(route('admin.festival-templates.preview'), [
+            'preset_key' => 'saffron_wave_banner',
+            'footer_style' => 'saffron_wave_banner',
+            'party_id' => $this->party->id,
+            'leader_shape' => 'circle',
+            'leader_border_color' => '#FF9933',
+            'show_top_strip' => '1',
+            'name_color' => '#ffffff',
+            'footer_bg' => '#ffffff',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $response8->assertStatus(200);
+        $response8->assertJson([
+            'success' => true,
+        ]);
+        $this->assertStringStartsWith('data:image/jpeg;base64,', $response8->json('preview_url'));
     }
 
     public function test_admin_can_store_festival_template_with_layout_customizations(): void

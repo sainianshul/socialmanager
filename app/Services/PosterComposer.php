@@ -179,6 +179,54 @@ class PosterComposer
                 $options,
                 $config['footer'] ?? []
             );
+        } elseif ($footerStyle === 'circular_medallion_badge') {
+            // Layer 7 (Circular Medallion Badge): Medallion card first, then circular framed candidate avatar
+            if ($branding) {
+                $this->renderCircularMedallionBadgeFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
+
+            // Render candidate as circular avatar overlapping the card
+            $medallionConfig = array_merge($config['candidate'] ?? [], [
+                'shape' => 'circle',
+                'circle_size' => 220,
+                'border_color' => $config['footer']['medallion_border'] ?? ($party?->primary_color ?: '#FF9933'),
+                'border_width' => 6,
+                'position' => 'bottom-right',
+                'offset_right' => 25,
+                'offset_bottom' => 15,
+            ]);
+            $this->renderCandidatePhoto(
+                $canvas,
+                $medallionConfig,
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+        } elseif ($footerStyle === 'saffron_wave_banner') {
+            // Layer 8 (Saffron Wave Banner): Candidate photo rendered first, then dynamic wave banner over lower chest
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+
+            if ($branding) {
+                $this->renderSaffronWaveBannerFooter(
+                    $canvas,
+                    $config['footer'] ?? [],
+                    $branding,
+                    $party,
+                    $config['candidate'] ?? []
+                );
+            }
         } else {
             // Default standard political footer
             if ($branding) {
@@ -509,6 +557,10 @@ class PosterComposer
             $this->renderCandidateLeftRibbonFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'modern_capsule_dock') {
             $this->renderModernCapsuleDockFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'circular_medallion_badge') {
+            $this->renderCircularMedallionBadgeFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
+        } elseif ($style === 'saffron_wave_banner') {
+            $this->renderSaffronWaveBannerFooter($canvas, $footerConfig, $branding, $party, $candidateConfig);
         } elseif ($style === 'royal_bar') {
             $this->renderRoyalBarFooter($canvas, $footerConfig, $branding, $party);
         } elseif ($style === 'dual_ribbon') {
@@ -1348,6 +1400,266 @@ class PosterComposer
             imagearc($gd, $x + $w - $radius - 1, $y + $h - $radius - 1, $d, $d, 0, 90, $borderColor);
             imagearc($gd, $x + $radius, $y + $h - $radius - 1, $d, $d, 90, 180, $borderColor);
         }
+    }
+
+    /**
+     * Layer 7: Circular Medallion Badge (Dual-Tier Card & Circular Framed Avatar)
+     * - White/Cream card at bottom (y: 925 to 1080).
+     * - Circular party logo on left.
+     * - Auto-fit Candidate Name (bold crimson/saffron) + Designation (slate).
+     * - Space on right reserved for the 220px circular framed medallion avatar (x: 825 to 1055).
+     * - Bottom clean social strip (y: 1035 to 1080).
+     */
+    protected function renderCircularMedallionBadgeFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $primaryColor = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF9933');
+        $cardBg = $footerConfig['card_bg'] ?? '#fdfbf7';
+        $nameColor = $footerConfig['name_color'] ?? '#c0392b';
+
+        $cardTopY = 925;
+        $cardHeight = 155;
+
+        // 1. Draw Card Background
+        $canvas->drawRectangle(0, $cardTopY, function ($rect) use ($cardBg, $cardHeight) {
+            $rect->size(1080, $cardHeight);
+            $rect->background($cardBg);
+        });
+
+        // 2. Top Saffron Decorative Line (4px)
+        $canvas->drawRectangle(0, $cardTopY, function ($rect) use ($primaryColor) {
+            $rect->size(1080, 4);
+            $rect->background($primaryColor);
+        });
+
+        // 3. Circular Party Logo on Left
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 64;
+        $logoX = 30;
+        $logoY = $cardTopY + 16;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 18;
+        $maxTextW = 680;
+
+        // 4. Candidate Name (Bold Auto-Fit)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = $cardTopY + 46;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 30;
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            16,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 5. Designation (Slate / Party secondary)
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameY + 28;
+            $desigColor = $footerConfig['desig_color'] ?? '#475569';
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                17,
+                12,
+                $fontHindiRegular,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 6. Social Handles Row at Bottom
+        $socialTopY = 1035;
+        $socialH = 45;
+        $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH);
+            $rect->background('#ffffff');
+        });
+
+        // Thin separator
+        $nativeGd = $canvas->core()->native();
+        $sepAlloc = imagecolorallocate($nativeGd, 235, 235, 235);
+        imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $sepAlloc);
+
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            30,
+            $socialTopY + 10,
+            $socialTopY + 28,
+            $fontEngRegular,
+            '#333333'
+        );
+    }
+
+    /**
+     * Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave & Tricolor Accent)
+     * - Dynamic angled banner sloping from left (y: 918) to right (y: 942) over candidate lower chest.
+     * - Top white/gold highlight line along diagonal edge.
+     * - Indian Tricolor 3-color vertical accent block on left edge.
+     * - Circular party emblem with white ring.
+     * - Candidate Name in crisp bold white text + Designation in warm golden yellow.
+     * - Full-width clean white social handles strip.
+     */
+    protected function renderSaffronWaveBannerFooter(
+        ImageInterface $canvas,
+        array $footerConfig,
+        UserBranding $branding,
+        ?PoliticalParty $party,
+        array $candidateConfig = []
+    ): void {
+        $fontHindiBold = $this->getFontPath('hindi_bold');
+        $fontHindiRegular = $this->getFontPath('hindi_regular');
+        $fontEngRegular = $this->getFontPath('english_regular');
+
+        $primaryColor = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF9933');
+        $nameColor = $footerConfig['name_color'] ?? '#ffffff';
+        $desigColor = $footerConfig['desig_color'] ?? '#FFF275';
+
+        $nativeGd = $canvas->core()->native();
+
+        $leftY = 918;
+        $rightY = 942;
+        $bottomY = 1036;
+
+        // 1. Dynamic Diagonal Saffron Wave Banner (imagefilledpolygon)
+        $pHex = ltrim($primaryColor, '#');
+        $pr = hexdec(substr($pHex, 0, 2));
+        $pg = hexdec(substr($pHex, 2, 2));
+        $pb = hexdec(substr($pHex, 4, 2));
+        $waveAlloc = imagecolorallocate($nativeGd, $pr, $pg, $pb);
+
+        $wavePoints = [
+            0, $leftY,
+            1080, $rightY,
+            1080, $bottomY,
+            0, $bottomY,
+        ];
+        imagefilledpolygon($nativeGd, $wavePoints, $waveAlloc);
+
+        // Top Highlight line along diagonal
+        $hiAlloc = imagecolorallocatealpha($nativeGd, 255, 255, 255, 50);
+        imageline($nativeGd, 0, $leftY, 1080, $rightY, $hiAlloc);
+        imageline($nativeGd, 0, $leftY + 1, 1080, $rightY + 1, $hiAlloc);
+
+        // 2. Vertical Indian Tricolor accent strip on left edge (x: 18)
+        $triX = 18;
+        $canvas->drawRectangle($triX, $leftY + 12, function ($rect) {
+            $rect->size(6, 26);
+            $rect->background('#FF9933');
+        });
+        $canvas->drawRectangle($triX, $leftY + 38, function ($rect) {
+            $rect->size(6, 26);
+            $rect->background('#ffffff');
+        });
+        $canvas->drawRectangle($triX, $leftY + 64, function ($rect) {
+            $rect->size(6, 26);
+            $rect->background('#138808');
+        });
+
+        // 3. Circular Party Logo on Left
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 64;
+        $logoX = $triX + 18;
+        $logoY = $leftY + 18;
+
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+            } catch (\Throwable $e) {}
+        }
+
+        $textStartX = $logoX + $logoSize + 16;
+        $maxTextW = 540;
+
+        // 4. Candidate Name (Bold White Auto-Fit)
+        $displayName = $this->shapeDevanagari($branding->display_name);
+        $nameY = $leftY + 44;
+        $nameFontSize = $footerConfig['name_font_size'] ?? 32;
+
+        $this->renderAutoFitText(
+            $canvas,
+            $displayName,
+            $textStartX,
+            $nameY,
+            $maxTextW,
+            $nameFontSize,
+            16,
+            $fontHindiBold,
+            $nameColor,
+            'left'
+        );
+
+        // 5. Designation (Warm Yellow Auto-Fit)
+        if (!empty($branding->designation)) {
+            $desigText = $this->shapeDevanagari($branding->designation);
+            $desigY = $nameY + 28;
+            $this->renderAutoFitText(
+                $canvas,
+                $desigText,
+                $textStartX,
+                $desigY,
+                $maxTextW,
+                18,
+                12,
+                $fontHindiRegular,
+                $desigColor,
+                'left'
+            );
+        }
+
+        // 6. Clean White Social Media Strip at Bottom (y: 1036 to 1080)
+        $socialY = $bottomY;
+        $socialH = 1080 - $socialY;
+
+        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+            $rect->size(1080, $socialH);
+            $rect->background('#ffffff');
+        });
+
+        // Thin separator line
+        $sepAlloc = imagecolorallocate($nativeGd, 230, 230, 230);
+        imageline($nativeGd, 0, $socialY, 1080, $socialY, $sepAlloc);
+
+        $this->renderSocialIconsRow(
+            $canvas,
+            $branding,
+            25,
+            $socialY + 10,
+            $socialY + 28,
+            $fontEngRegular,
+            '#333333'
+        );
     }
 
     /**
@@ -2197,6 +2509,26 @@ class PosterComposer
                 'footer_style'       => 'modern_capsule_dock',
             ],
             [
+                'key'                => 'circular_medallion_badge',
+                'name'               => 'Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)',
+                'description'        => 'Dual-tier card with 220px circular framed medallion avatar on right. Ideal for standard non-cutout portraits and dignitary styling.',
+                'badge'              => 'Layer 7 - Medallion Avatar',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'circle',
+                'footer_style'       => 'circular_medallion_badge',
+            ],
+            [
+                'key'                => 'saffron_wave_banner',
+                'name'               => 'Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave & Tricolor Accent)',
+                'description'        => 'Dynamic diagonal wave banner sloping across candidate chest with vertical tricolor side accent and bold white typography.',
+                'badge'              => 'Layer 8 - Saffron Wave',
+                'leadership_mode'    => 'individual_chips',
+                'candidate_position' => 'bottom-right',
+                'candidate_shape'    => 'cutout',
+                'footer_style'       => 'saffron_wave_banner',
+            ],
+            [
                 'key'                => 'classic_political_right',
                 'name'               => 'Classic Political (Dr. Dharam Singh Style)',
                 'description'        => '6-7 circle leaders at top with saffron border, large candidate cutout bottom-right, standard political footer with BJP logo + name + social handles.',
@@ -2449,6 +2781,59 @@ class PosterComposer
                 ],
                 'footer' => [
                     'style' => 'modern_capsule_dock',
+                ],
+            ],
+
+            // Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)
+            'circular_medallion_badge' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'circle',
+                    'circle_size'      => 220,
+                    'position'         => 'bottom-right',
+                    'max_width'        => 220,
+                    'max_height'       => 220,
+                    'offset_right'     => 25,
+                    'anchor_bottom_y'  => 1065,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'circular_medallion_badge',
+                ],
+            ],
+
+            // Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave & Tricolor Accent)
+            'saffron_wave_banner' => [
+                'canvas' => ['width' => 1080, 'height' => 1080],
+                'header' => [
+                    'enabled'              => true,
+                    'mode'                 => 'individual_chips',
+                    'chip_shape'           => 'circle',
+                    'chip_size'            => 95,
+                    'chip_border_width'    => 4,
+                    'chip_border_color'    => '#FF9933',
+                    'chips_start_y'        => 10,
+                ],
+                'candidate' => [
+                    'shape'            => 'cutout',
+                    'position'         => 'bottom-right',
+                    'max_width'        => 420,
+                    'max_height'       => 480,
+                    'offset_right'     => 10,
+                    'anchor_bottom_y'  => 1080,
+                    'min_y'            => 115,
+                ],
+                'footer' => [
+                    'style' => 'saffron_wave_banner',
                 ],
             ],
 
