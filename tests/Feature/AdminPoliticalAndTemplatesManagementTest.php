@@ -633,6 +633,9 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
             'title' => 'Custom Saffron Layout Template',
             'preset_key' => 'dual_ribbon_badge',
             'footer_style' => 'dual_ribbon_badge',
+            'footer_fixed' => '1',
+            'header_layout' => 'full_width_strip',
+            'header_fixed' => '1',
             'photo_position' => 'bottom-right',
             'leader_shape' => 'rounded_square',
             'leader_border_color' => '#FF9933',
@@ -654,6 +657,9 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $template = FestivalTemplate::where('title', 'Custom Saffron Layout Template')->first();
         $this->assertNotNull($template);
         $this->assertEquals('dual_ribbon_badge', $template->layout_config['footer']['style']);
+        $this->assertTrue($template->layout_config['footer']['is_fixed']);
+        $this->assertEquals('full_width_strip', $template->layout_config['header']['layout']);
+        $this->assertTrue($template->layout_config['header']['is_fixed']);
         $this->assertEquals('rounded_square', $template->layout_config['header']['chip_shape']);
         $this->assertEquals('#FF9933', $template->layout_config['header']['chip_border_color']);
         $this->assertEquals('#ffffff', $template->layout_config['footer']['name_color']);

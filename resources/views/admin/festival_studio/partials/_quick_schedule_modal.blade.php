@@ -60,7 +60,12 @@
 
                                 {{-- Branding Frame Layer (Footer Style) --}}
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Branding Frame Layer (Footer Style)</label>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label class="form-label fw-bold m-0">Branding Frame Layer (Footer Style)</label>
+                                        <span id="qs-modal-footer-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
+                                            <i class="ti ti-lock me-0.5"></i> Fixed by Admin
+                                        </span>
+                                    </div>
                                     <select class="form-select" id="qs-modal-footer-style">
                                         <option value="dual_ribbon_badge">Layer 1: Dual Ribbon Badge (Bhai Dooj Style)</option>
                                         <option value="solid_white_banner">Layer 2: Solid White Banner (Milkha Singh Style)</option>
@@ -73,11 +78,19 @@
                                         <option value="tricolor_angled_blade">Layer 9: Tricolor Angled Blade (Patriotic Blade)</option>
                                         <option value="royal_maroon_heritage">Layer 10: Royal Maroon Heritage (Sacred Gold & Maroon)</option>
                                     </select>
+                                    <div id="qs-modal-footer-locked-msg" class="text-danger small mt-1 d-none">
+                                        <i class="ti ti-lock me-1"></i> This strip is fixed for this template and cannot be changed.
+                                    </div>
                                 </div>
 
                                 {{-- Top Leadership Header Style --}}
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Top Leadership Header</label>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label class="form-label fw-bold m-0">Top Leadership Header</label>
+                                        <span id="qs-modal-header-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
+                                            <i class="ti ti-lock me-0.5"></i> Fixed by Admin
+                                        </span>
+                                    </div>
                                     <select class="form-select" id="qs-modal-header-layout">
                                         <option value="full_width_strip">Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
                                         <option value="top_left_cluster">Header 2: Top-Left Cluster (3-4 Leaders + Logo)</option>
@@ -89,6 +102,43 @@
                                         <option value="tricolor_ribbon_canopy">Header 8: Tricolor Ribbon Canopy (Tiranga Arch & Gold Rings)</option>
                                         <option value="none">None: Hide Leadership Strip (Artwork Only)</option>
                                     </select>
+                                    <div id="qs-modal-header-locked-msg" class="text-danger small mt-1 d-none">
+                                        <i class="ti ti-lock me-1"></i> This leadership header is fixed for this template and cannot be changed.
+                                    </div>
+                                </div>
+
+                                {{-- Advanced Leader Badges (Shape & Ring Color) --}}
+                                <div class="mb-3 border rounded p-2.5 bg-white">
+                                    <a class="text-decoration-none d-flex align-items-center justify-content-between text-dark fw-bold" data-bs-toggle="collapse" href="#qs-modal-advanced-leader" role="button" aria-expanded="false">
+                                        <span class="small d-flex align-items-center gap-1">
+                                            <i class="ti ti-adjustments-alt text-primary"></i> Advanced: Leader Shape & Border Color
+                                        </span>
+                                        <span class="badge bg-secondary-lt" style="font-size: 10px;">Customize <i class="ti ti-chevron-down ms-0.5"></i></span>
+                                    </a>
+                                    <div class="collapse mt-2 pt-2 border-top" id="qs-modal-advanced-leader">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <label class="form-label small fw-semibold mb-1">Avatar Shape</label>
+                                                <select class="form-select form-select-sm" id="qs-modal-leader-shape">
+                                                    <option value="circle">Circle (गोल)</option>
+                                                    <option value="rounded_square">Rounded (घुमावदार)</option>
+                                                    <option value="square">Square (चौकोर)</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small fw-semibold mb-1">Ring Color</label>
+                                                <div class="d-flex align-items-center gap-1.5">
+                                                    <input type="color" id="qs-modal-leader-border" class="form-control form-control-color form-control-sm p-0" value="#FF9933" title="Ring Color">
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <button type="button" class="btn btn-outline-secondary px-1.5 py-0.5 qs-color-preset" data-color="#FF9933" style="font-size: 10px;">Saffron</button>
+                                                        <button type="button" class="btn btn-outline-secondary px-1.5 py-0.5 qs-color-preset" data-color="#FFFFFF" style="font-size: 10px;">White</button>
+                                                        <button type="button" class="btn btn-outline-secondary px-1.5 py-0.5 qs-color-preset" data-color="#138808" style="font-size: 10px;">Green</button>
+                                                        <button type="button" class="btn btn-outline-secondary px-1.5 py-0.5 qs-color-preset" data-color="#D4AF37" style="font-size: 10px;">Gold</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="p-2.5 bg-white rounded border small text-secondary">
@@ -111,6 +161,8 @@
                         <input type="hidden" name="composed_image" id="qs-input-composed-image" value="">
                         <input type="hidden" name="footer_style" id="qs-input-footer-style" value="">
                         <input type="hidden" name="header_layout" id="qs-input-header-layout" value="">
+                        <input type="hidden" name="leader_shape" id="qs-input-leader-shape" value="circle">
+                        <input type="hidden" name="leader_border_color" id="qs-input-leader-border" value="#FF9933">
 
                         {{-- Alert Box for Dynamic Errors --}}
                         <div id="qs-alert" class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" role="alert"></div>

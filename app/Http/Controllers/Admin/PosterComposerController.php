@@ -102,6 +102,14 @@ class PosterComposerController extends Controller
             }
         }
 
+        if ($request->filled('leader_shape')) {
+            $options['layout_config']['header']['chip_shape'] = $request->input('leader_shape');
+        }
+
+        if ($request->filled('leader_border_color')) {
+            $options['layout_config']['header']['chip_border_color'] = $request->input('leader_border_color');
+        }
+
         if ($request->filled('layout_config') && is_array($request->input('layout_config'))) {
             $options['layout_config'] = array_replace_recursive($options['layout_config'], $request->input('layout_config'));
         }

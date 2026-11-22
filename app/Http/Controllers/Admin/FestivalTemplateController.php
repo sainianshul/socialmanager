@@ -100,24 +100,21 @@ class FestivalTemplateController extends Controller
         $imagePath = $file->storeAs('uploads/festival_templates', $filename, 'public');
 
         $layoutConfig = [];
-        if ($request->filled('leader_shape') || $request->filled('leader_border_color')) {
-            $layoutConfig['header']['chip_shape'] = $request->input('leader_shape', 'circle');
-            $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
-            $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
-        }
-        if ($request->filled('header_layout')) {
-            $headerLayout = $request->input('header_layout');
-            if ($headerLayout === 'none') {
-                $layoutConfig['header']['enabled'] = false;
-            } else {
-                $layoutConfig['header']['enabled'] = true;
-                $layoutConfig['header']['layout'] = $headerLayout;
-                $layoutConfig['header']['mode'] = ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
-            }
-        }
-        if ($request->filled('footer_style')) {
-            $layoutConfig['footer']['style'] = $request->input('footer_style');
-        }
+        $layoutConfig['footer'] = [
+            'style' => $request->input('footer_style', 'dual_ribbon_badge'),
+            'is_fixed' => $request->boolean('footer_fixed', false),
+        ];
+
+        $headerLayout = $request->input('header_layout', 'full_width_strip');
+        $layoutConfig['header'] = [
+            'enabled' => ($headerLayout !== 'none'),
+            'layout' => $headerLayout,
+            'mode' => ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips',
+            'is_fixed' => $request->boolean('header_fixed', false),
+            'chip_shape' => $request->input('leader_shape', 'circle'),
+            'chip_border_color' => $request->input('leader_border_color', '#FF9933'),
+        ];
+
         if ($request->filled('name_color')) {
             $layoutConfig['footer']['name_color'] = $request->input('name_color');
         }
@@ -173,18 +170,21 @@ class FestivalTemplateController extends Controller
         ]);
 
         $layoutConfig = $festivalTemplate->layout_config ?? [];
-        if ($request->filled('leader_shape') || $request->filled('leader_border_color')) {
-            $layoutConfig['header']['chip_shape'] = $request->input('leader_shape', 'circle');
-            $layoutConfig['header']['chip_border_color'] = $request->input('leader_border_color', '#FF9933');
-            $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
-        }
-        if ($request->filled('header_layout')) {
-            $layoutConfig['header']['layout'] = $request->input('header_layout');
-            $layoutConfig['header']['mode'] = ($request->input('header_layout') === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
-        }
-        if ($request->filled('footer_style')) {
-            $layoutConfig['footer']['style'] = $request->input('footer_style');
-        }
+        $layoutConfig['footer'] = [
+            'style' => $request->input('footer_style', $layoutConfig['footer']['style'] ?? 'dual_ribbon_badge'),
+            'is_fixed' => $request->boolean('footer_fixed', false),
+        ];
+
+        $headerLayout = $request->input('header_layout', $layoutConfig['header']['layout'] ?? 'full_width_strip');
+        $layoutConfig['header'] = [
+            'enabled' => ($headerLayout !== 'none'),
+            'layout' => $headerLayout,
+            'mode' => ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips',
+            'is_fixed' => $request->boolean('header_fixed', false),
+            'chip_shape' => $request->input('leader_shape', $layoutConfig['header']['chip_shape'] ?? 'circle'),
+            'chip_border_color' => $request->input('leader_border_color', $layoutConfig['header']['chip_border_color'] ?? '#FF9933'),
+        ];
+
         if ($request->filled('name_color')) {
             $layoutConfig['footer']['name_color'] = $request->input('name_color');
         }

@@ -35,6 +35,10 @@
                 $isScheduled = in_array($template->id, $scheduledTemplateIds ?? []);
                 $defaultFooterStyle = $template->layout_config['footer']['style'] ?? ($template->preset_key === 'solid_white_banner' ? 'solid_white_banner' : 'dual_ribbon_badge');
                 $defaultHeaderLayout = $template->layout_config['header']['layout'] ?? ($template->layout_config['header']['mode'] ?? 'full_width_strip');
+                $footerFixed = !empty($template->layout_config['footer']['is_fixed']) ? '1' : '0';
+                $headerFixed = !empty($template->layout_config['header']['is_fixed']) ? '1' : '0';
+                $leaderShape = $template->layout_config['header']['chip_shape'] ?? 'circle';
+                $leaderBorder = $template->layout_config['header']['chip_border_color'] ?? '#FF9933';
             @endphp
             <div class="col" id="template-card-col-{{ $template->id }}">
                 <div class="fs-template-card h-100 d-flex flex-column shadow-xs" id="template-card-{{ $template->id }}">
@@ -53,7 +57,11 @@
                          data-target-time-formatted="{{ $targetTimeFormatted }}"
                          data-caption="{{ $captionText }}"
                          data-footer-style="{{ $defaultFooterStyle }}"
+                         data-footer-fixed="{{ $footerFixed }}"
                          data-header-layout="{{ $defaultHeaderLayout }}"
+                         data-header-fixed="{{ $headerFixed }}"
+                         data-leader-shape="{{ $leaderShape }}"
+                         data-leader-border="{{ $leaderBorder }}"
                          data-composer-url="{{ $composerUrl }}">
                         
                         <img src="{{ $template->image_url }}" alt="{{ $template->title }}" class="fs-template-preview-img" loading="lazy">
@@ -82,7 +90,11 @@
                                     data-target-time-formatted="{{ $targetTimeFormatted }}"
                                     data-caption="{{ $captionText }}"
                                     data-footer-style="{{ $defaultFooterStyle }}"
+                                    data-footer-fixed="{{ $footerFixed }}"
                                     data-header-layout="{{ $defaultHeaderLayout }}"
+                                    data-header-fixed="{{ $headerFixed }}"
+                                    data-leader-shape="{{ $leaderShape }}"
+                                    data-leader-border="{{ $leaderBorder }}"
                                     data-composer-url="{{ $composerUrl }}">
                                 <i class="ti ti-calendar-time me-1"></i>Customize & Schedule
                             </button>
@@ -124,7 +136,11 @@
                                         data-target-time-formatted="{{ $targetTimeFormatted }}"
                                         data-caption="{{ $captionText }}"
                                         data-footer-style="{{ $defaultFooterStyle }}"
+                                        data-footer-fixed="{{ $footerFixed }}"
                                         data-header-layout="{{ $defaultHeaderLayout }}"
+                                        data-header-fixed="{{ $headerFixed }}"
+                                        data-leader-shape="{{ $leaderShape }}"
+                                        data-leader-border="{{ $leaderBorder }}"
                                         data-composer-url="{{ $composerUrl }}"
                                         title="Quick Schedule Poster">
                                     Schedule

@@ -562,7 +562,11 @@ document.addEventListener('DOMContentLoaded', function () {
         var festivalDateFormatted = trigger.getAttribute('data-festival-date-formatted') || '';
         var caption = trigger.getAttribute('data-caption') || '';
         var footerStyle = trigger.getAttribute('data-footer-style') || 'dual_ribbon_badge';
+        var footerFixed = trigger.getAttribute('data-footer-fixed') === '1';
         var headerLayout = trigger.getAttribute('data-header-layout') || 'full_width_strip';
+        var headerFixed = trigger.getAttribute('data-header-fixed') === '1';
+        var leaderShape = trigger.getAttribute('data-leader-shape') || 'circle';
+        var leaderBorder = trigger.getAttribute('data-leader-border') || '#FF9933';
 
         // 1. Reset Wizard to Step 1
         showWizardStep(1);
@@ -595,12 +599,39 @@ document.addEventListener('DOMContentLoaded', function () {
         var inputCaption = document.getElementById('qs-input-caption');
         if (inputCaption) inputCaption.value = caption;
 
-        // Set style dropdowns to template defaults
+        // Set style dropdowns to template defaults and apply Lock/Fixed state
         var selectFooter = document.getElementById('qs-modal-footer-style');
-        if (selectFooter) selectFooter.value = footerStyle;
+        var footerLockedBadge = document.getElementById('qs-modal-footer-locked-badge');
+        var footerLockedMsg = document.getElementById('qs-modal-footer-locked-msg');
+        if (selectFooter) {
+            selectFooter.value = footerStyle;
+            selectFooter.disabled = footerFixed;
+            if (footerLockedBadge) footerLockedBadge.classList.toggle('d-none', !footerFixed);
+            if (footerLockedMsg) footerLockedMsg.classList.toggle('d-none', !footerFixed);
+        }
 
         var selectHeader = document.getElementById('qs-modal-header-layout');
-        if (selectHeader) selectHeader.value = headerLayout;
+        var headerLockedBadge = document.getElementById('qs-modal-header-locked-badge');
+        var headerLockedMsg = document.getElementById('qs-modal-header-locked-msg');
+        if (selectHeader) {
+            selectHeader.value = headerLayout;
+            selectHeader.disabled = headerFixed;
+            if (headerLockedBadge) headerLockedBadge.classList.toggle('d-none', !headerFixed);
+            if (headerLockedMsg) headerLockedMsg.classList.toggle('d-none', !headerFixed);
+        }
+
+        // Set Advanced Leader Customization inputs
+        var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
+        if (selectLeaderShape) selectLeaderShape.value = leaderShape;
+
+        var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+        if (inputLeaderBorder) inputLeaderBorder.value = leaderBorder;
+
+        var inputHiddenShape = document.getElementById('qs-input-leader-shape');
+        if (inputHiddenShape) inputHiddenShape.value = leaderShape;
+
+        var inputHiddenBorder = document.getElementById('qs-input-leader-border');
+        if (inputHiddenBorder) inputHiddenBorder.value = leaderBorder;
 
         var alertBox = document.getElementById('qs-alert');
         if (alertBox) {
@@ -622,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Trigger Live Server-Side Poster Composition for Step 1
-        composeModalPoster(templateId, footerStyle, headerLayout);
+        composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder);
     });
 
     // Wizard Step Navigation
@@ -659,6 +690,13 @@ document.addEventListener('DOMContentLoaded', function () {
             var inputHeader = document.getElementById('qs-input-header-layout');
             if (inputFooter && selectFooter) inputFooter.value = selectFooter.value;
             if (inputHeader && selectHeader) inputHeader.value = selectHeader.value;
+
+            var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
+            var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+            var inputHiddenShape = document.getElementById('qs-input-leader-shape');
+            var inputHiddenBorder = document.getElementById('qs-input-leader-border');
+            if (inputHiddenShape && selectLeaderShape) inputHiddenShape.value = selectLeaderShape.value;
+            if (inputHiddenBorder && inputLeaderBorder) inputHiddenBorder.value = inputLeaderBorder.value;
         }
     }
 
@@ -676,23 +714,39 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Live Composition on Style Dropdown Change (Step 1)
+    // Live Composition on Style Dropdown & Advanced Leader Customization Change (Step 1)
     var selectFooterStyle = document.getElementById('qs-modal-footer-style');
     var selectHeaderLayout = document.getElementById('qs-modal-header-layout');
+    var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
+    var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
 
     function onStyleChange() {
         var tplId = document.getElementById('qs-input-template-id')?.value;
         if (!tplId) return;
         var fStyle = selectFooterStyle ? selectFooterStyle.value : 'dual_ribbon_badge';
         var hLayout = selectHeaderLayout ? selectHeaderLayout.value : 'full_width_strip';
-        composeModalPoster(tplId, fStyle, hLayout);
+        var lShape = selectLeaderShape ? selectLeaderShape.value : 'circle';
+        var lBorder = inputLeaderBorder ? inputLeaderBorder.value : '#FF9933';
+        composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder);
     }
 
     if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
     if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
+    if (selectLeaderShape) selectLeaderShape.addEventListener('change', onStyleChange);
+    if (inputLeaderBorder) inputLeaderBorder.addEventListener('change', onStyleChange);
+
+    document.querySelectorAll('.qs-color-preset').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var color = this.getAttribute('data-color');
+            if (inputLeaderBorder) {
+                inputLeaderBorder.value = color;
+                onStyleChange();
+            }
+        });
+    });
 
     // Helper: Compose High-Res Branded Poster via API
-    function composeModalPoster(templateId, footerStyle, headerLayout) {
+    function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder) {
         var spinner = document.getElementById('qs-modal-spinner');
         var imgEl = document.getElementById('qs-modal-img');
         var btnDownload = document.getElementById('qs-modal-btn-download');
@@ -710,6 +764,8 @@ document.addEventListener('DOMContentLoaded', function () {
             template_id: parseInt(templateId),
             footer_style: footerStyle || selectFooterStyle?.value,
             header_layout: headerLayout || selectHeaderLayout?.value,
+            leader_shape: leaderShape || selectLeaderShape?.value || 'circle',
+            leader_border_color: leaderBorder || inputLeaderBorder?.value || '#FF9933',
             include_strip: (headerLayout !== 'none')
         };
 
@@ -841,6 +897,8 @@ document.addEventListener('DOMContentLoaded', function () {
             var content = document.getElementById('qs-input-caption').value;
             var footerStyle = document.getElementById('qs-input-footer-style')?.value || selectFooterStyle?.value;
             var headerLayout = document.getElementById('qs-input-header-layout')?.value || selectHeaderLayout?.value;
+            var leaderShape = document.getElementById('qs-input-leader-shape')?.value || selectLeaderShape?.value || 'circle';
+            var leaderBorder = document.getElementById('qs-input-leader-border')?.value || inputLeaderBorder?.value || '#FF9933';
             var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
 
             if (!scheduleDate || !scheduleTime) {
@@ -874,6 +932,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     composed_image: composedImage,
                     footer_style: footerStyle,
                     header_layout: headerLayout,
+                    leader_shape: leaderShape,
+                    leader_border_color: leaderBorder,
                     include_strip: (headerLayout !== 'none')
                 })
             })

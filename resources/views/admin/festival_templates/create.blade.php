@@ -23,8 +23,6 @@
     {{-- Hidden technical fields --}}
     <input type="hidden" name="preset_key" id="field-preset" value="{{ old('preset_key', 'classic_political_right') }}">
     <input type="hidden" name="show_top_strip" id="field-show-strip" value="{{ old('show_top_strip', '1') }}">
-    <input type="hidden" name="leader_shape" id="field-leader-shape" value="circle">
-    <input type="hidden" name="leader_border_color" id="field-leader-border" value="#FF9933">
 
     <div class="row g-4">
         {{-- Left Column: Single Clean Card like Political Leader Form --}}
@@ -94,6 +92,15 @@
                                 <option value="tricolor_angled_blade" {{ old('footer_style') == 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
                                 <option value="royal_maroon_heritage" {{ old('footer_style') == 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
                             </select>
+                            <div class="mt-1 d-flex align-items-center justify-content-between">
+                                <div class="form-check m-0">
+                                    <input class="form-check-input" type="checkbox" name="footer_fixed" value="1" id="field-footer-fixed" {{ old('footer_fixed') ? 'checked' : '' }}>
+                                    <label class="form-check-label small" for="field-footer-fixed">
+                                        <i class="ti ti-lock me-1 text-danger"></i><strong>Make this Strip Fixed</strong> (Locked on poster, user cannot change)
+                                    </label>
+                                </div>
+                                <span class="text-muted small">Default: Changeable by user</span>
+                            </div>
                             @error('footer_style')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
@@ -110,6 +117,15 @@
                                 <option value="tricolor_ribbon_canopy" {{ old('header_layout') == 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
                                 <option value="none" {{ old('header_layout') == 'none' ? 'selected' : '' }}>None: Hide Leadership Strip (Artwork Only)</option>
                             </select>
+                            <div class="mt-1 d-flex align-items-center justify-content-between">
+                                <div class="form-check m-0">
+                                    <input class="form-check-input" type="checkbox" name="header_fixed" value="1" id="field-header-fixed" {{ old('header_fixed') ? 'checked' : '' }}>
+                                    <label class="form-check-label small" for="field-header-fixed">
+                                        <i class="ti ti-lock me-1 text-danger"></i><strong>Make this Header Fixed</strong> (Locked on poster, user cannot change)
+                                    </label>
+                                </div>
+                                <span class="text-muted small">Default: Changeable by user</span>
+                            </div>
                             @error('header_layout')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
@@ -120,6 +136,42 @@
                                 <option value="bottom-left" {{ old('photo_position') == 'bottom-left' ? 'selected' : '' }}>Left Side (When Artwork Is On Right)</option>
                             </select>
                             @error('photo_position')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        {{-- Advanced Options Collapsible --}}
+                        <div class="col-md-12">
+                            <div class="border rounded p-3 bg-light">
+                                <a class="text-decoration-none d-flex align-items-center justify-content-between text-dark fw-bold" data-bs-toggle="collapse" href="#advanced-leader-settings" role="button" aria-expanded="false" aria-controls="advanced-leader-settings">
+                                    <span class="d-flex align-items-center gap-1.5">
+                                        <i class="ti ti-adjustments-alt text-primary"></i> Advanced: Leader Shape & Border Color
+                                    </span>
+                                    <span class="badge bg-secondary-lt small">Click to Expand <i class="ti ti-chevron-down ms-1"></i></span>
+                                </a>
+                                <div class="collapse mt-3" id="advanced-leader-settings">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Leader Avatar Shape</label>
+                                            <select name="leader_shape" class="form-select form-select-sm" id="field-leader-shape">
+                                                <option value="circle" {{ old('leader_shape', 'circle') === 'circle' ? 'selected' : '' }}>Circle (गोल - Standard)</option>
+                                                <option value="rounded_square" {{ old('leader_shape') === 'rounded_square' ? 'selected' : '' }}>Rounded Square (घुमावदार चौकोर)</option>
+                                                <option value="square" {{ old('leader_shape') === 'square' ? 'selected' : '' }}>Square (चौकोर / Boxed)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-semibold">Leader Ring / Border Color</label>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <input type="color" name="leader_border_color" id="field-leader-border" class="form-control form-control-color form-control-sm" value="{{ old('leader_border_color', '#FF9933') }}" title="Choose Custom Color">
+                                                <div class="btn-group btn-group-sm flex-wrap" role="group">
+                                                    <button type="button" class="btn btn-outline-secondary px-2 py-0.5 btn-color-preset" data-color="#FF9933">Saffron</button>
+                                                    <button type="button" class="btn btn-outline-secondary px-2 py-0.5 btn-color-preset" data-color="#FFFFFF">White</button>
+                                                    <button type="button" class="btn btn-outline-secondary px-2 py-0.5 btn-color-preset" data-color="#138808">Green</button>
+                                                    <button type="button" class="btn btn-outline-secondary px-2 py-0.5 btn-color-preset" data-color="#D4AF37">Gold</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-md-12">
@@ -299,8 +351,18 @@ document.addEventListener('DOMContentLoaded', function () {
         debounceTimer = setTimeout(updatePreview, 300);
     }
 
-    [fieldFooterStyle, fieldHeaderLayout, fieldParty, fieldPhotoPos].forEach(el => {
+    [fieldFooterStyle, fieldHeaderLayout, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder].forEach(el => {
         if (el) el.addEventListener('change', schedulePreview);
+    });
+
+    document.querySelectorAll('.btn-color-preset').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const color = this.dataset.color;
+            if (fieldLeaderBorder) {
+                fieldLeaderBorder.value = color;
+                schedulePreview();
+            }
+        });
     });
 
     if (fieldImage) {

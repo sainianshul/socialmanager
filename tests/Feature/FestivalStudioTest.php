@@ -186,4 +186,60 @@ class FestivalStudioTest extends TestCase
         $response->assertSee('fs-template-preview-img');
         $response->assertSee('Festival Studio');
     }
+
+    public function test_quick_schedule_enforces_fixed_strip_and_customizes_leader_shape_and_color(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'name' => 'Official Facebook Page',
+            'meta_account_id' => '1234567891',
+            'access_token' => 'test-token',
+            'is_active' => true,
+        ]);
+
+        $template = FestivalTemplate::first();
+        $template->update([
+            'layout_config' => [
+                'footer' => [
+                    'style' => 'royal_maroon_heritage',
+                    'is_fixed' => true,
+                ],
+                'header' => [
+                    'layout' => 'frosted_glass_dock',
+                    'is_fixed' => true,
+                    'chip_shape' => 'rounded_square',
+                    'chip_border_color' => '#D4AF37',
+                ],
+            ],
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('admin.festival-studio.quick-schedule'), [
+            'template_id' => $template->id,
+            'festival_id' => $template->festival_id,
+            'account_ids' => [$account->id],
+            'schedule_date' => '2026-11-26',
+            'schedule_time' => '08:00',
+            'content' => 'Message with fixed header & footer',
+            'footer_style' => 'dual_ribbon_badge', // Attempt to override fixed footer
+            'header_layout' => 'full_width_strip', // Attempt to override fixed header
+            'leader_shape' => 'rounded_square',
+            'leader_border_color' => '#D4AF37',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'template_id' => $template->id,
+            'posts_count' => 1,
+        ]);
+
+        $post = ScheduledPost::where('user_id', $user->id)->first();
+        $this->assertNotNull($post);
+        $this->assertNotEmpty($post->media_urls);
+        $this->assertNotEmpty($post->thumbnail_path);
+    }
 }

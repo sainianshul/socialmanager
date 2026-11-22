@@ -196,8 +196,19 @@ class FestivalStudioController extends Controller
                     'layout_config' => [],
                 ];
 
+                $templateConfig = $template->layout_config ?? [];
+
+                // If footer is fixed on template, enforce it
+                if (!empty($templateConfig['footer']['is_fixed']) && !empty($templateConfig['footer']['style'])) {
+                    $footerStyle = $templateConfig['footer']['style'];
+                }
                 if (!empty($footerStyle)) {
                     $options['layout_config']['footer']['style'] = $footerStyle;
+                }
+
+                // If header is fixed on template, enforce it
+                if (!empty($templateConfig['header']['is_fixed']) && isset($templateConfig['header']['layout'])) {
+                    $headerLayout = $templateConfig['header']['layout'];
                 }
                 if (!empty($headerLayout)) {
                     if ($headerLayout === 'none') {
@@ -210,6 +221,11 @@ class FestivalStudioController extends Controller
                         $options['layout_config']['header']['mode'] = ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
                     }
                 }
+
+                $leaderShape = $request->input('leader_shape') ?: ($templateConfig['header']['chip_shape'] ?? 'circle');
+                $leaderBorder = $request->input('leader_border_color') ?: ($templateConfig['header']['chip_border_color'] ?? '#FF9933');
+                $options['layout_config']['header']['chip_shape'] = $leaderShape;
+                $options['layout_config']['header']['chip_border_color'] = $leaderBorder;
 
                 $composed = $composer->composeToFile($template, $branding, $strip, $options);
                 $mediaUrls = [$composed['relative_path']];
