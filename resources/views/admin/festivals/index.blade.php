@@ -87,17 +87,7 @@
                     @endphp
                     <tr>
                         <td>
-                            <div class="font-weight-medium fs-3 text-dark mb-0.5">{{ $festival->title }}</div>
-                            @if($festival->ready_caption)
-                                <div class="text-secondary small text-truncate" style="max-width: 380px;" title="{{ $festival->ready_caption }}">
-                                    {{ Str::limit($festival->ready_caption, 80) }}
-                                </div>
-                            @endif
-                            @if($festival->hashtags)
-                                <div class="text-muted small mt-0.5" style="font-size: 11px;">
-                                    {{ Str::limit($festival->hashtags, 60) }}
-                                </div>
-                            @endif
+                            <div class="font-weight-medium fs-3 text-dark">{{ $festival->title }}</div>
                         </td>
                         <td>
                             <div class="fw-semibold text-dark">{{ $festivalDate->format('d M, Y') }}</div>
