@@ -242,6 +242,12 @@ class PosterComposer
 
                 foreach ($leaders as $leader) {
                     $leaderImgPath = $this->resolveFilePath($leader->image);
+                    if (!$leaderImgPath || !file_exists($leaderImgPath)) {
+                        $modiFallback = public_path('images/leaders/modiji.png');
+                        if (file_exists($modiFallback)) {
+                            $leaderImgPath = $modiFallback;
+                        }
+                    }
                     if ($leaderImgPath && file_exists($leaderImgPath)) {
                         try {
                             $avatar = $this->manager->read($leaderImgPath)->cover($chipSize, $chipSize);
@@ -1258,6 +1264,8 @@ class PosterComposer
 
         // 1. Plain Square Avatar
         if ($shape === 'square') {
+            $whiteBg = imagecolorallocate($destGd, 255, 255, 255);
+            imagefill($destGd, 0, 0, $whiteBg);
             imagealphablending($destGd, true);
             imagecopyresampled($destGd, $srcGd, 0, 0, 0, 0, $size, $size, $size, $size);
             if ($borderAlloc !== null && $borderWidth > 0) {
@@ -1277,7 +1285,9 @@ class PosterComposer
         $innerRadius = max(4, $cornerRadius - $borderWidth);
 
         $innerGd = imagecreatetruecolor($innerSize, $innerSize);
-        imagealphablending($innerGd, false);
+        $whiteBg = imagecolorallocate($innerGd, 255, 255, 255);
+        imagefill($innerGd, 0, 0, $whiteBg);
+        imagealphablending($innerGd, true);
         imagecopyresampled($innerGd, $srcGd, 0, 0, 0, 0, $innerSize, $innerSize, $size, $size);
 
         if ($borderAlloc !== null && $borderWidth > 0) {
@@ -1382,6 +1392,9 @@ class PosterComposer
         // Draw inner image circle
         $innerRadius = $innerSize / 2;
         $innerGd = imagecreatetruecolor($innerSize, $innerSize);
+        $whiteBg = imagecolorallocate($innerGd, 255, 255, 255);
+        imagefill($innerGd, 0, 0, $whiteBg);
+        imagealphablending($innerGd, true);
         imagecopyresampled($innerGd, $srcGd, 0, 0, 0, 0, $innerSize, $innerSize, $size, $size);
 
         for ($x = 0; $x < $innerSize; $x++) {

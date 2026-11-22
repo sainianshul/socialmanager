@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Festival;
 use App\Models\FestivalTemplate;
 use App\Models\LeaderStrip;
+use App\Models\PoliticalLeader;
 use App\Models\PoliticalParty;
 use App\Models\UserBranding;
 use App\Services\PosterComposer;
@@ -215,8 +216,10 @@ class FestivalTemplateController extends Controller
         }
 
         if (!$bgPath || (!file_exists($bgPath) && !file_exists(public_path($bgPath)) && !file_exists(storage_path('app/public/' . $bgPath)))) {
-            // Default sample background if none provided
+            // Default sample background: prioritize Devotthan Ekadashi Sacred Frame as requested by user
             $candidates = [
+                public_path('images/templates/devotthan-ekadashi.jpg'),
+                public_path('images/templates/bhai-dooj.jpg'),
                 public_path('images/templates/tulsi-vivah.jpg'),
                 public_path('images/templates/khatu-shyam-janmotsav.jpg'),
                 public_path('images/festival-templates-sample.jpg'),
@@ -274,12 +277,32 @@ class FestivalTemplateController extends Controller
 
         // Retrieve official party strip for leaders preview
         $strip = $party ? LeaderStrip::where('party_id', $party->id)->where('is_system', true)->with('leaders')->first() : null;
+        if (!$strip || $strip->leaders->isEmpty()) {
+            $strip = LeaderStrip::where('is_system', true)->with('leaders')->first();
+        }
+
+        // Mock leaders if strip still empty
+        if (!$strip || $strip->leaders->isEmpty()) {
+            $mockLeaders = collect([
+                new PoliticalLeader(['name' => 'Narendra Modi', 'image' => 'images/leaders/modiji.png']),
+                new PoliticalLeader(['name' => 'Amit Shah', 'image' => 'images/leaders/amitshah.jpg']),
+                new PoliticalLeader(['name' => 'Yogi Adityanath', 'image' => 'images/leaders/yogiadityanath.jpg']),
+                new PoliticalLeader(['name' => 'Keshav Prasad Maurya', 'image' => 'images/leaders/keshavprshadmorya.jpg']),
+                new PoliticalLeader(['name' => 'Atal Bihari Vajpayee', 'image' => 'images/leaders/atalbiharibajpyee.jpg']),
+                new PoliticalLeader(['name' => 'J.P. Nadda', 'image' => 'images/leaders/modiji.png']),
+            ]);
+            $strip = new LeaderStrip(['name' => 'Official Leadership Strip']);
+            $strip->setRelation('leaders', $mockLeaders);
+        }
+
+        $sampleCutout = file_exists(public_path('images/leaders/modiji.png')) ? 'images/leaders/modiji.png' : null;
 
         try {
             $canvas = $composer->compose($bgPath, $sampleBranding, $strip, [
                 'preset_key' => $presetKey,
                 'layout_config' => $layoutConfig,
                 'include_strip' => $layoutConfig['header']['enabled'] ?? true,
+                'cutout_url' => $sampleCutout,
             ]);
 
             $jpegData = $canvas->toJpeg(85)->toString();

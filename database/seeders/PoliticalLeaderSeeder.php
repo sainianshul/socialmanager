@@ -16,7 +16,7 @@ class PoliticalLeaderSeeder extends Seeder
         $bjp = PoliticalParty::where('short_code', 'BJP')->first();
         if ($bjp) {
             $bjpLeaders = [
-                ['name' => 'Narendra Modi', 'designation' => 'Prime Minister', 'image' => 'images/leaders/narendramodi.jpg', 'state' => 'National', 'order' => 1],
+                ['name' => 'Narendra Modi', 'designation' => 'Prime Minister', 'image' => 'images/leaders/modiji.png', 'state' => 'National', 'order' => 1],
                 ['name' => 'Amit Shah', 'designation' => 'Home Minister', 'image' => 'images/leaders/amitshah.jpg', 'state' => 'National', 'order' => 2],
                 ['name' => 'J.P. Nadda', 'designation' => 'BJP National President', 'image' => null, 'state' => 'National', 'order' => 3],
                 ['name' => 'Rajnath Singh', 'designation' => 'Defence Minister', 'image' => null, 'state' => 'National', 'order' => 4],

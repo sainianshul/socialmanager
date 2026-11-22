@@ -64,7 +64,7 @@
 
                         <div class="col-md-6">
                             <label class="form-label required">Template Title</label>
-                            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" placeholder="e.g. Tulsi Vivah Shubhkaamnaayein Poster 1" required>
+                            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', 'Devotthan Ekadashi Sacred Frame') }}" placeholder="e.g. Devotthan Ekadashi Sacred Frame" required>
                             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
                     </div>
