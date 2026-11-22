@@ -44,6 +44,7 @@
                 @php
                     $templateMonth = old('festival_month', $festivalTemplate->festival?->festival_date?->format('m') ?? now()->format('m'));
                 @endphp
+
                 {{-- Month Selector --}}
                 <div class="col-md-3">
                     <label class="form-label">Festival Month</label>
@@ -68,7 +69,6 @@
                 <div class="col-md-5">
                     <label class="form-label required mb-1">Festival</label>
 
-                    {{-- Quick Search Input --}}
                     <div class="input-group input-group-sm mb-1.5">
                         <span class="input-group-text bg-white text-muted"><i class="ti ti-search"></i></span>
                         <input type="text" id="festival-search-input" class="form-control" placeholder="Search festival (e.g. Diwali, Samvidhan)...">
@@ -92,6 +92,7 @@
                     @error('festival_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
+                {{-- Political Party --}}
                 <div class="col-md-4">
                     <label class="form-label">Political Party</label>
                     <select name="party_id" class="form-select @error('party_id') is-invalid @enderror" id="field-party">
@@ -105,59 +106,38 @@
                     @error('party_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-12">
+                {{-- Template Title --}}
+                <div class="col-md-6">
                     <label class="form-label required">Template Title</label>
                     <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', $festivalTemplate->title) }}" placeholder="Template Title" required>
                     @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
-                <div class="col-md-12">
+                {{-- Artwork Image Upload --}}
+                <div class="col-md-6">
                     <label class="form-label">Artwork Image</label>
-                    <div class="d-flex align-items-center gap-3 mb-2 p-2 bg-light rounded border">
-                        <img src="{{ $festivalTemplate->image_url }}" alt="Current Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
-                        <div class="text-muted small">Current artwork in use. Upload new file only if replacing.</div>
+                    <div class="d-flex align-items-center gap-2">
+                        <img src="{{ $festivalTemplate->image_url }}" alt="Current Image" style="width: 38px; height: 38px; object-fit: cover; border-radius: 4px; border: 1px solid #dee2e6;">
+                        <input type="file" name="template_image" id="field-image" class="form-control @error('template_image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp">
                     </div>
-                    <input type="file" name="template_image" id="field-image" class="form-control @error('template_image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp">
+                    <div class="text-muted small mt-1">Leave blank to retain current artwork image.</div>
                     @error('template_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
-
-                    {{-- Live Preview: Shown for existing template, updates if new image or style is chosen --}}
-                    <div id="preview-box" class="mt-3 p-3 bg-light rounded border">
-                        <div class="d-flex align-items-center justify-content-between mb-2">
-                            <span class="small fw-bold text-dark">
-                                <i class="ti ti-eye me-1"></i> Poster Live Preview
-                            </span>
-                            <div class="d-flex align-items-center gap-2">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-manual-refresh">
-                                    <i class="ti ti-refresh me-1"></i> Refresh Preview
-                                </button>
-                                <a href="#" id="btn-download-preview" class="btn btn-sm btn-outline-success" download="preview-poster.jpg">
-                                    <i class="ti ti-download me-1"></i> Download
-                                </a>
-                            </div>
-                        </div>
-                        <div class="position-relative mx-auto rounded overflow-hidden border bg-dark" style="max-width: 440px; aspect-ratio: 1 / 1;" id="preview-wrapper">
-                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-50 text-white z-3 d-none" id="preview-loading">
-                                <div class="spinner-border text-primary mb-2" role="status"></div>
-                                <span class="small fw-semibold">Rendering Live Preview...</span>
-                            </div>
-                            <img src="" alt="Template Live Preview" class="w-100 h-100 d-block" style="object-fit: contain;" id="preview-image">
-                        </div>
-                    </div>
                 </div>
 
+                {{-- Branding Frame Layer (Footer Style) --}}
                 <div class="col-md-12">
                     <label class="form-label required">Branding Frame Layer (Footer Style)</label>
                     <select name="footer_style" class="form-select @error('footer_style') is-invalid @enderror" id="field-footer-style">
-                        <option value="dual_ribbon_badge" {{ $footerStyle === 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
-                        <option value="solid_white_banner" {{ $footerStyle === 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
-                        <option value="floating_tricolor_badge" {{ $footerStyle === 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
-                        <option value="royal_gold_dock" {{ $footerStyle === 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
-                        <option value="candidate_left_ribbon" {{ $footerStyle === 'candidate_left_ribbon' ? 'selected' : '' }}>Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
-                        <option value="modern_capsule_dock" {{ $footerStyle === 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
-                        <option value="circular_medallion_badge" {{ $footerStyle === 'circular_medallion_badge' ? 'selected' : '' }}>Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
-                        <option value="saffron_wave_banner" {{ $footerStyle === 'saffron_wave_banner' ? 'selected' : '' }}>Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
-                        <option value="tricolor_angled_blade" {{ $footerStyle === 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
-                        <option value="royal_maroon_heritage" {{ $footerStyle === 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
+                        <option value="dual_ribbon_badge" {{ old('footer_style', $footerStyle) === 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
+                        <option value="solid_white_banner" {{ old('footer_style', $footerStyle) === 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
+                        <option value="floating_tricolor_badge" {{ old('footer_style', $footerStyle) === 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
+                        <option value="royal_gold_dock" {{ old('footer_style', $footerStyle) === 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
+                        <option value="candidate_left_ribbon" {{ old('footer_style', $footerStyle) === 'candidate_left_ribbon' ? 'selected' : '' }}>Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
+                        <option value="modern_capsule_dock" {{ old('footer_style', $footerStyle) === 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
+                        <option value="circular_medallion_badge" {{ old('footer_style', $footerStyle) === 'circular_medallion_badge' ? 'selected' : '' }}>Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
+                        <option value="saffron_wave_banner" {{ old('footer_style', $footerStyle) === 'saffron_wave_banner' ? 'selected' : '' }}>Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
+                        <option value="tricolor_angled_blade" {{ old('footer_style', $footerStyle) === 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
+                        <option value="royal_maroon_heritage" {{ old('footer_style', $footerStyle) === 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
                     </select>
                     <div class="mt-1 d-flex align-items-center justify-content-between">
                         <div class="form-check m-0">
@@ -171,18 +151,19 @@
                     @error('footer_style')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
+                {{-- Top Leadership Header (Header Style) --}}
                 <div class="col-md-6">
                     <label class="form-label required">Top Leadership Header (Header Style)</label>
                     <select name="header_layout" class="form-select @error('header_layout') is-invalid @enderror" id="field-header-layout">
-                        <option value="full_width_strip" {{ $headerLayout === 'full_width_strip' ? 'selected' : '' }}>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
-                        <option value="top_left_cluster" {{ $headerLayout === 'top_left_cluster' ? 'selected' : '' }}>Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
-                        <option value="top_right_cluster" {{ $headerLayout === 'top_right_cluster' ? 'selected' : '' }}>Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
-                        <option value="split_wings" {{ $headerLayout === 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
-                        <option value="vertical_capsule_strip" {{ $headerLayout === 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
-                        <option value="party_group_cutout" {{ $headerLayout === 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
-                        <option value="frosted_glass_dock" {{ $headerLayout === 'frosted_glass_dock' ? 'selected' : '' }}>Header 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)</option>
-                        <option value="tricolor_ribbon_canopy" {{ $headerLayout === 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
-                        <option value="none" {{ $headerLayout === 'none' ? 'selected' : '' }}>None: Hide Leadership Strip (Artwork Only)</option>
+                        <option value="full_width_strip" {{ old('header_layout', $headerLayout) === 'full_width_strip' ? 'selected' : '' }}>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
+                        <option value="top_left_cluster" {{ old('header_layout', $headerLayout) === 'top_left_cluster' ? 'selected' : '' }}>Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
+                        <option value="top_right_cluster" {{ old('header_layout', $headerLayout) === 'top_right_cluster' ? 'selected' : '' }}>Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
+                        <option value="split_wings" {{ old('header_layout', $headerLayout) === 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
+                        <option value="vertical_capsule_strip" {{ old('header_layout', $headerLayout) === 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
+                        <option value="party_group_cutout" {{ old('header_layout', $headerLayout) === 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
+                        <option value="frosted_glass_dock" {{ old('header_layout', $headerLayout) === 'frosted_glass_dock' ? 'selected' : '' }}>Header 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)</option>
+                        <option value="tricolor_ribbon_canopy" {{ old('header_layout', $headerLayout) === 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
+                        <option value="none" {{ old('header_layout', $headerLayout) === 'none' ? 'selected' : '' }}>None: Hide Leadership Strip (Artwork Only)</option>
                     </select>
                     <div class="mt-1 d-flex align-items-center justify-content-between">
                         <div class="form-check m-0">
@@ -196,21 +177,22 @@
                     @error('header_layout')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
+                {{-- Candidate Photo Position --}}
                 <div class="col-md-6">
                     <label class="form-label required">Candidate Photo Position</label>
                     <select name="photo_position" class="form-select @error('photo_position') is-invalid @enderror" id="field-photo-position" required>
-                        <option value="bottom-right" {{ old('photo_position', $festivalTemplate->photo_position) == 'bottom-right' ? 'selected' : '' }}>Right Side (Standard)</option>
-                        <option value="bottom-left" {{ old('photo_position', $festivalTemplate->photo_position) == 'bottom-left' ? 'selected' : '' }}>Left Side (When Artwork Is On Right)</option>
+                        <option value="bottom-right" {{ old('photo_position', $festivalTemplate->photo_position) === 'bottom-right' ? 'selected' : '' }}>Right Side (Standard)</option>
+                        <option value="bottom-left" {{ old('photo_position', $festivalTemplate->photo_position) === 'bottom-left' ? 'selected' : '' }}>Left Side (When Artwork Is On Right)</option>
                     </select>
                     @error('photo_position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 {{-- Advanced Options Collapsible --}}
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <div class="border rounded p-3 bg-light">
                         <a class="text-decoration-none d-flex align-items-center justify-content-between text-dark fw-bold" data-bs-toggle="collapse" href="#advanced-leader-settings" role="button" aria-expanded="false" aria-controls="advanced-leader-settings">
                             <span class="d-flex align-items-center gap-1.5">
-                                <i class="ti ti-adjustments-alt text-primary"></i> Advanced: Leader Shape & Border Color
+                                <i class="ti ti-adjustments-alt text-secondary"></i> Advanced: Leader Shape & Border Color
                             </span>
                             <span class="badge bg-secondary-lt small">Click to Expand <i class="ti ti-chevron-down ms-1"></i></span>
                         </a>
@@ -241,12 +223,42 @@
                     </div>
                 </div>
 
-                <div class="col-md-12">
-                    <div class="form-check form-switch m-0">
-                        <input class="form-check-input" type="checkbox" name="is_active" value="1" id="field-is-active" {{ old('is_active', $festivalTemplate->is_active) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="field-is-active">Active</label>
+                {{-- Active Status --}}
+                <div class="col-md-6">
+                    <label class="form-label required">Status</label>
+                    <select name="is_active" class="form-select @error('is_active') is-invalid @enderror" required>
+                        <option value="1" {{ old('is_active', $festivalTemplate->is_active ? '1' : '0') === '1' ? 'selected' : '' }}>Active</option>
+                        <option value="0" {{ old('is_active', $festivalTemplate->is_active ? '1' : '0') === '0' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                    @error('is_active')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                {{-- Live Preview Box: Visible for existing template --}}
+                <div id="preview-box" class="col-md-12">
+                    <div class="border rounded p-3 bg-light">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="fw-bold text-dark">
+                                <i class="ti ti-eye me-1"></i> Live Preview
+                            </span>
+                            <div class="d-flex align-items-center gap-2">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" id="btn-manual-refresh">
+                                    <i class="ti ti-refresh me-1"></i> Refresh
+                                </button>
+                                <a href="#" id="btn-download-preview" class="btn btn-sm btn-outline-success" download="preview-poster.jpg">
+                                    <i class="ti ti-download me-1"></i> Download
+                                </a>
+                            </div>
+                        </div>
+                        <div class="position-relative mx-auto rounded overflow-hidden border bg-dark" style="max-width: 480px; aspect-ratio: 1 / 1;" id="preview-wrapper">
+                            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-50 text-white z-3 d-none" id="preview-loading">
+                                <div class="spinner-border text-primary mb-2" role="status"></div>
+                                <span class="small fw-semibold">Rendering Live Preview...</span>
+                            </div>
+                            <img src="{{ $festivalTemplate->image_url }}" alt="Template Live Preview" class="w-100 h-100 d-block" style="object-fit: contain;" id="preview-image">
+                        </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -277,12 +289,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const fieldLeaderShape = document.getElementById('field-leader-shape');
     const fieldLeaderBorder = document.getElementById('field-leader-border');
     const fieldShowStrip = document.getElementById('field-show-strip');
+
+    const previewImg = document.getElementById('preview-image');
+    const previewLoading = document.getElementById('preview-loading');
+    const btnRefresh = document.getElementById('btn-manual-refresh');
+    const btnDownload = document.getElementById('btn-download-preview');
+
     const fieldFestivalSelect = document.getElementById('field-festival');
     const filterMonthSelect = document.getElementById('filter-festival-month');
     const festivalSearchInput = document.getElementById('festival-search-input');
     const btnClearSearch = document.getElementById('btn-clear-festival-search');
 
-    // Month & Search Filter on Festival Select (Preserves Ascending Date Order)
     if (fieldFestivalSelect && filterMonthSelect) {
         const originalFestivalOptions = Array.from(fieldFestivalSelect.options).map(opt => ({
             value: opt.value,
@@ -351,16 +368,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Apply on initial load
         applyFestivalFilter();
     }
 
-    const previewImg = document.getElementById('preview-image');
-    const previewLoading = document.getElementById('preview-loading');
-    const btnRefresh = document.getElementById('btn-manual-refresh');
-    const btnDownload = document.getElementById('btn-download-preview');
-
-    // Auto sync candidate position & preset
     if (fieldFooterStyle && fieldPhotoPos) {
         fieldFooterStyle.addEventListener('change', function () {
             if (fieldFooterStyle.value === 'candidate_left_ribbon') {
@@ -463,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
         btnRefresh.addEventListener('click', updatePreview);
     }
 
-    // Trigger initial preview on page load
+    // Trigger initial preview on load
     updatePreview();
 });
 </script>

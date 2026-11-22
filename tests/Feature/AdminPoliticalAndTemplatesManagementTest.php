@@ -703,6 +703,53 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $this->assertTrue($saved->layout_config['header']['enabled']);
     }
 
+    public function test_admin_can_filter_templates_by_month_and_paginate(): void
+    {
+        $novFestival = Festival::create([
+            'title' => 'November Fest',
+            'festival_date' => '2026-11-15',
+            'category' => 'general',
+            'is_active' => true,
+        ]);
+
+        $decFestival = Festival::create([
+            'title' => 'December Fest',
+            'festival_date' => '2026-12-25',
+            'category' => 'general',
+            'is_active' => true,
+        ]);
+
+        for ($i = 1; $i <= 15; $i++) {
+            FestivalTemplate::create([
+                'festival_id' => $novFestival->id,
+                'title' => "Nov Template {$i}",
+                'template_image_path' => "path/nov_{$i}.jpg",
+                'thumbnail_path' => "path/nov_{$i}.jpg",
+                'is_active' => true,
+            ]);
+        }
+
+        FestivalTemplate::create([
+            'festival_id' => $decFestival->id,
+            'title' => 'Dec Template 1',
+            'template_image_path' => 'path/dec_1.jpg',
+            'thumbnail_path' => 'path/dec_1.jpg',
+            'is_active' => true,
+        ]);
+
+        // Filter by November (month 11)
+        $resNov = $this->actingAs($this->admin)->get(route('admin.festival-templates.index', ['month' => '11']));
+        $resNov->assertStatus(200);
+        $resNov->assertSee('Nov Template 1');
+        $resNov->assertDontSee('Dec Template 1');
+
+        // Test custom per_page (12 per page)
+        $resPaginated = $this->actingAs($this->admin)->get(route('admin.festival-templates.index', ['month' => '11', 'per_page' => '12']));
+        $resPaginated->assertStatus(200);
+        $resPaginated->assertSee('Showing');
+        $resPaginated->assertSee('templates');
+    }
+
     public function test_regular_user_cannot_access_political_party_management(): void
     {
         $response = $this->actingAs($this->regularUser)->get(route('admin.political-parties.index'));

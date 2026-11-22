@@ -10,7 +10,7 @@
             <h2 class="page-title">Festival Templates</h2>
         </div>
         <div class="col-auto ms-auto d-print-none d-flex gap-2">
-            <a href="{{ route('admin.festival-studio.index') }}" class="btn btn-outline-teal">
+            <a href="{{ route('admin.festival-studio.index') }}" class="btn btn-outline-secondary">
                 <i class="ti ti-photo-edit me-1"></i> Open Studio
             </a>
             <a href="{{ route('admin.festival-templates.create') }}" class="btn btn-primary">
@@ -33,50 +33,78 @@
 @endif
 
 <div class="card mb-4">
-    <div class="card-header">
-        <div class="d-flex align-items-center justify-content-between w-100 flex-wrap gap-3">
-            <form action="{{ route('admin.festival-templates.index') }}" method="GET" class="d-flex gap-2 flex-wrap">
-                <div class="input-icon">
-                    <span class="input-icon-addon"><i class="ti ti-search"></i></span>
-                    <input type="text" name="search" class="form-control" placeholder="Search template..." value="{{ request('search') }}" style="width: 220px;">
-                </div>
-                <select name="festival_id" class="form-select" style="width: 200px;" onchange="this.form.submit()">
-                    <option value="">All Festivals</option>
-                    @foreach($festivals as $fest)
-                        <option value="{{ $fest->id }}" {{ request('festival_id') == $fest->id ? 'selected' : '' }}>
-                            {{ $fest->title }} ({{ $fest->festival_date ? $fest->festival_date->format('d M') : '' }})
-                        </option>
-                    @endforeach
-                </select>
-                <select name="party_id" class="form-select" style="width: 170px;" onchange="this.form.submit()">
-                    <option value="">All Parties</option>
-                    @foreach($parties as $party)
-                        <option value="{{ $party->id }}" {{ request('party_id') == $party->id ? 'selected' : '' }}>
-                            {{ $party->short_code }} - {{ $party->name }}
-                        </option>
-                    @endforeach
-                </select>
-                <select name="status" class="form-select" style="width: 130px;" onchange="this.form.submit()">
-                    <option value="">All Status</option>
-                    <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
-                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
-                </select>
-                @if(request('search') || request('festival_id') || request('party_id') || request('status') !== null)
-                    <a href="{{ route('admin.festival-templates.index') }}" class="btn btn-outline-secondary">Clear</a>
-                @endif
-            </form>
-            <div class="text-muted small">
-                Showing {{ $templates->total() }} templates
+    <div class="card-header py-3">
+        <form action="{{ route('admin.festival-templates.index') }}" method="GET" class="d-flex gap-2 flex-wrap align-items-center w-100">
+            {{-- Search Input --}}
+            <div class="input-icon" style="min-width: 200px; flex: 1 1 200px;">
+                <span class="input-icon-addon"><i class="ti ti-search"></i></span>
+                <input type="text" name="search" class="form-control" placeholder="Search template..." value="{{ request('search') }}">
             </div>
-        </div>
+
+            {{-- Month Filter --}}
+            <select name="month" class="form-select" style="width: 150px;" onchange="this.form.submit()">
+                <option value="">All Months</option>
+                <option value="01" {{ request('month') === '01' ? 'selected' : '' }}>01 - January</option>
+                <option value="02" {{ request('month') === '02' ? 'selected' : '' }}>02 - February</option>
+                <option value="03" {{ request('month') === '03' ? 'selected' : '' }}>03 - March</option>
+                <option value="04" {{ request('month') === '04' ? 'selected' : '' }}>04 - April</option>
+                <option value="05" {{ request('month') === '05' ? 'selected' : '' }}>05 - May</option>
+                <option value="06" {{ request('month') === '06' ? 'selected' : '' }}>06 - June</option>
+                <option value="07" {{ request('month') === '07' ? 'selected' : '' }}>07 - July</option>
+                <option value="08" {{ request('month') === '08' ? 'selected' : '' }}>08 - August</option>
+                <option value="09" {{ request('month') === '09' ? 'selected' : '' }}>09 - September</option>
+                <option value="10" {{ request('month') === '10' ? 'selected' : '' }}>10 - October</option>
+                <option value="11" {{ request('month') === '11' ? 'selected' : '' }}>11 - November</option>
+                <option value="12" {{ request('month') === '12' ? 'selected' : '' }}>12 - December</option>
+            </select>
+
+            {{-- Festival Dropdown --}}
+            <select name="festival_id" class="form-select" style="width: 190px;" onchange="this.form.submit()">
+                <option value="">All Festivals</option>
+                @foreach($festivals as $fest)
+                    <option value="{{ $fest->id }}" {{ request('festival_id') == $fest->id ? 'selected' : '' }}>
+                        {{ $fest->title }} ({{ $fest->festival_date ? $fest->festival_date->format('d M') : '' }})
+                    </option>
+                @endforeach
+            </select>
+
+            {{-- Party Dropdown --}}
+            <select name="party_id" class="form-select" style="width: 160px;" onchange="this.form.submit()">
+                <option value="">All Parties</option>
+                @foreach($parties as $party)
+                    <option value="{{ $party->id }}" {{ request('party_id') == $party->id ? 'selected' : '' }}>
+                        {{ $party->short_code }} - {{ $party->name }}
+                    </option>
+                @endforeach
+            </select>
+
+            {{-- Status Dropdown --}}
+            <select name="status" class="form-select" style="width: 120px;" onchange="this.form.submit()">
+                <option value="">All Status</option>
+                <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Active</option>
+                <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactive</option>
+            </select>
+
+            {{-- Per Page Dropdown --}}
+            <select name="per_page" class="form-select" style="width: 120px;" onchange="this.form.submit()" title="Templates per page">
+                <option value="12" {{ request('per_page') == '12' ? 'selected' : '' }}>12 / page</option>
+                <option value="24" {{ request('per_page', 24) == 24 ? 'selected' : '' }}>24 / page</option>
+                <option value="48" {{ request('per_page') == '48' ? 'selected' : '' }}>48 / page</option>
+                <option value="96" {{ request('per_page') == '96' ? 'selected' : '' }}>96 / page</option>
+            </select>
+
+            @if(request('search') || request('month') || request('festival_id') || request('party_id') || request('status') !== null || request('per_page'))
+                <a href="{{ route('admin.festival-templates.index') }}" class="btn btn-outline-secondary">Clear</a>
+            @endif
+        </form>
     </div>
 </div>
 
 <div class="row row-cards">
     @forelse($templates as $tpl)
         <div class="col-sm-6 col-md-4 col-xl-3">
-            <div class="card h-100 shadow-sm border-0 position-relative">
-                <div class="card-img-top position-relative" style="padding-top: 100%; background: #0f172a; overflow: hidden; border-radius: 8px 8px 0 0;">
+            <div class="card h-100 shadow-sm border position-relative">
+                <div class="card-img-top position-relative" style="padding-top: 100%; background: #0f172a; overflow: hidden; border-radius: 4px 4px 0 0;">
                     <img src="{{ $tpl->image_url }}" alt="{{ $tpl->title }}" class="position-absolute top-0 start-0 w-100 h-100" style="object-fit: cover;">
                     <div class="position-absolute top-0 end-0 m-2 d-flex gap-1">
                         @if($tpl->party)
@@ -105,7 +133,7 @@
                         <span class="badge bg-purple-lt small">{{ $tpl->photo_position ?? 'bottom-right' }}</span>
                     </div>
                     <div class="mt-auto d-flex justify-content-between align-items-center pt-2 border-top">
-                        <a href="{{ route('admin.festival-studio.index') }}" class="btn btn-sm btn-outline-teal" title="Preview / Test">
+                        <a href="{{ route('admin.festival-studio.index') }}" class="btn btn-sm btn-outline-secondary" title="Preview / Test">
                             <i class="ti ti-eye me-1"></i> Preview
                         </a>
                         <div class="d-flex gap-1">
@@ -140,9 +168,17 @@
     @endforelse
 </div>
 
-@if($templates->hasPages())
-    <div class="d-flex justify-content-center mt-4">
-        {{ $templates->links() }}
+{{-- Pagination & Count Footer --}}
+<div class="card mt-4">
+    <div class="card-footer d-flex align-items-center justify-content-between flex-wrap gap-2 py-3">
+        <div class="text-secondary small">
+            Showing <strong>{{ $templates->firstItem() ?? 0 }}</strong> to <strong>{{ $templates->lastItem() ?? 0 }}</strong> of <strong>{{ $templates->total() }}</strong> templates
+        </div>
+        @if($templates->hasPages())
+            <div>
+                {{ $templates->links() }}
+            </div>
+        @endif
     </div>
-@endif
+</div>
 @endsection

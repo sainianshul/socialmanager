@@ -30,6 +30,12 @@ class FestivalTemplateController extends Controller
             });
         }
 
+        if ($month = $request->input('month')) {
+            $query->whereHas('festival', function ($f) use ($month) {
+                $f->whereMonth('festival_date', (int) $month);
+            });
+        }
+
         if ($festivalId = $request->input('festival_id')) {
             $query->where('festival_id', $festivalId);
         }
@@ -42,7 +48,12 @@ class FestivalTemplateController extends Controller
             $query->where('is_active', $request->input('status') === '1');
         }
 
-        $templates = $query->latest()->paginate(24)->withQueryString();
+        $perPage = (int) $request->input('per_page', 24);
+        if (!in_array($perPage, [12, 24, 48, 96])) {
+            $perPage = 24;
+        }
+
+        $templates = $query->latest()->paginate($perPage)->withQueryString();
         $festivals = Festival::orderBy('festival_date', 'asc')->get();
         $parties = PoliticalParty::orderBy('name')->get();
 
