@@ -42,10 +42,14 @@ class PoliticalLeader extends Model
     public function getImageUrlAttribute(): string
     {
         if ($this->image) {
+            if (filter_var($this->image, FILTER_VALIDATE_URL)) {
+                return $this->image;
+            }
             $cleanPath = ltrim($this->image, '/\\');
             if (file_exists(public_path($cleanPath))) {
                 return asset($cleanPath);
             }
+            return asset('storage/' . $cleanPath);
         }
 
         return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&background=ff9933&color=fff&bold=true&size=120';

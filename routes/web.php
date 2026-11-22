@@ -153,6 +153,14 @@ Route::prefix('admin')->group(function () {
                     Route::post('{user}/revoke-token', [\App\Http\Controllers\Admin\UserController::class, 'revokeToken'])->name('revoke-token');
                 });
                 Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+
+                // Political Management (Parties, Leaders)
+                Route::resource('political-parties', \App\Http\Controllers\Admin\PoliticalPartyController::class)->names('political-parties');
+                Route::resource('political-leaders', \App\Http\Controllers\Admin\PoliticalLeaderController::class)->names('political-leaders');
+
+                // Poster & Card Templates Management
+                Route::resource('festival-templates', \App\Http\Controllers\Admin\FestivalTemplateController::class)->names('festival-templates');
+                Route::resource('card-templates', \App\Http\Controllers\Admin\CardTemplateController::class)->names('card-templates');
             });
         });
     });

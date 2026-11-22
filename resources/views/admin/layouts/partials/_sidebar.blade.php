@@ -129,6 +129,61 @@
                             <span class="nav-link-title">Support Tickets</span>
                         </a>
                     </li>
+
+                    {{-- POLITICAL MANAGEMENT (Admin / Manager) --}}
+                    <li class="nav-section-title">Political</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.political-parties.*') ? 'active' : '' }}" href="{{ route('admin.political-parties.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Political Parties">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-primary">
+                                <i class="ti ti-flag fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Political Parties</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.political-leaders.*') ? 'active' : '' }}" href="{{ route('admin.political-leaders.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Political Leaders">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-warning">
+                                <i class="ti ti-users-group fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Political Leaders</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.leader-strips.*') ? 'active' : '' }}" href="{{ route('admin.leader-strips.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Leader Strips">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
+                                <i class="ti ti-layout-rows fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Leader Strips</span>
+                        </a>
+                    </li>
+
+                    {{-- POSTER & TEMPLATES (Admin / Manager) --}}
+                    <li class="nav-section-title">Poster Templates</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.festival-templates.*') ? 'active' : '' }}" href="{{ route('admin.festival-templates.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Festival Templates">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-yellow">
+                                <i class="ti ti-sparkles fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Festival Templates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.card-templates.*') ? 'active' : '' }}" href="{{ route('admin.card-templates.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Card Templates">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-success">
+                                <i class="ti ti-id-badge-2 fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Card Templates</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.festival-studio.*') ? 'active' : '' }}" href="{{ route('admin.festival-studio.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Poster Studio (Composer & Preview)">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
+                                <i class="ti ti-photo-edit fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Poster Studio</span>
+                            <span class="badge bg-teal-lt ms-auto">Preview</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- CLIENT SOCIAL ACCOUNTS, CONTENT & ENGAGEMENT (Only for Regular Users / Non-Admin) --}}
