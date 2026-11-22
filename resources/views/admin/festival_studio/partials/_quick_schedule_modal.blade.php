@@ -42,7 +42,9 @@
                         {{-- Left Column: Big HD Poster Preview --}}
                         <div class="col-md-6">
                             <div class="position-relative rounded-4 overflow-hidden border shadow-sm bg-dark" style="aspect-ratio: 1 / 1;">
-                                <img id="qs-modal-img" src="" alt="Poster Preview" class="w-100 h-100 d-block" style="object-fit: contain;">
+                                <a href="#" id="qs-modal-preview-link" target="_blank" rel="noopener noreferrer" class="d-block w-100 h-100 disabled text-decoration-none" title="Click to view full 1080p HD poster in new tab" style="cursor: zoom-in;">
+                                    <img id="qs-modal-img" src="" alt="Poster Preview" class="w-100 h-100 d-block" style="object-fit: contain;">
+                                </a>
 
                                 {{-- Live Composition Loading Spinner Overlay --}}
                                 <div id="qs-modal-spinner" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-75 text-white" style="backdrop-filter: blur(5px);">
@@ -52,15 +54,18 @@
                                 </div>
                             </div>
 
-                            {{-- Actions Under Poster: Download & Share --}}
+                            {{-- Actions Under Poster: Preview, Download & Share --}}
                             <div class="d-flex align-items-center justify-content-center gap-2 mt-3 flex-wrap">
+                                <a href="#" id="qs-modal-btn-preview" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 disabled fw-medium" title="Open Full-Screen 1080p HD Preview in New Tab">
+                                    <i class="ti ti-external-link me-1"></i>Preview (HD)
+                                </a>
                                 <a href="#" id="qs-modal-btn-download" target="_blank" download="festival-poster.jpg" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 disabled fw-medium" title="Download High-Res 1080p Poster">
                                     <i class="ti ti-download me-1"></i>Download (1080p)
                                 </a>
                                 <button type="button" id="qs-modal-btn-share-wa" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1.5 fw-medium" title="Share on WhatsApp">
                                     <i class="ti ti-brand-whatsapp me-1 text-success"></i>WhatsApp
                                 </button>
-                                <button type="button" id="qs-modal-btn-share-native" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1.5 fw-medium" title="Share Link or Image">
+                                <button type="button" id="qs-modal-btn-share-native" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 fw-medium" title="Share Link or Image">
                                     <i class="ti ti-share me-1"></i>Share
                                 </button>
                             </div>

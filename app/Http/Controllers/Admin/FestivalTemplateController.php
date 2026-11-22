@@ -26,7 +26,7 @@ class FestivalTemplateController extends Controller
         if ($search = trim((string) $request->input('search'))) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhereHas('festival', fn($f) => $f->where('title', 'like', "%{$search}%"));
+                    ->orWhereHas('festival', fn($f) => $f->where('title', 'like', "%{$search}%"));
             });
         }
 
