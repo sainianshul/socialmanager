@@ -633,6 +633,25 @@ document.addEventListener('DOMContentLoaded', function () {
         var inputHiddenBorder = document.getElementById('qs-input-leader-border');
         if (inputHiddenBorder) inputHiddenBorder.value = leaderBorder;
 
+        // Auto-select Leadership Strip (User Custom First, or Party Official Default)
+        var tplPartyId = trigger.getAttribute('data-party-id') || '';
+        var selectStrip = document.getElementById('qs-modal-strip-id');
+        var inputStrip = document.getElementById('qs-input-strip-id');
+        if (selectStrip) {
+            var currentOption = selectStrip.options[selectStrip.selectedIndex];
+            var isCustom = currentOption && currentOption.text.indexOf('⭐') !== -1;
+            // If user has not selected their own custom strip, align with template party if available
+            if (!isCustom && tplPartyId) {
+                for (var i = 0; i < selectStrip.options.length; i++) {
+                    if (selectStrip.options[i].getAttribute('data-party-id') === tplPartyId) {
+                        selectStrip.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (inputStrip) inputStrip.value = selectStrip.value;
+        }
+
         var alertBox = document.getElementById('qs-alert');
         if (alertBox) {
             alertBox.classList.add('d-none');
@@ -653,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Trigger Live Server-Side Poster Composition for Step 1
-        composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder);
+        composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null);
     });
 
     // Wizard Step Navigation
@@ -709,6 +728,10 @@ document.addEventListener('DOMContentLoaded', function () {
             var inputHiddenBorder = document.getElementById('qs-input-leader-border');
             if (inputHiddenShape && selectLeaderShape) inputHiddenShape.value = selectLeaderShape.value;
             if (inputHiddenBorder && inputLeaderBorder) inputHiddenBorder.value = inputLeaderBorder.value;
+
+            var selectStrip = document.getElementById('qs-modal-strip-id');
+            var inputStrip = document.getElementById('qs-input-strip-id');
+            if (inputStrip && selectStrip) inputStrip.value = selectStrip.value;
         }
     }
 
@@ -731,6 +754,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var selectHeaderLayout = document.getElementById('qs-modal-header-layout');
     var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
     var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+    var selectStrip = document.getElementById('qs-modal-strip-id');
 
     function onStyleChange() {
         var tplId = document.getElementById('qs-input-template-id')?.value;
@@ -739,13 +763,15 @@ document.addEventListener('DOMContentLoaded', function () {
         var hLayout = selectHeaderLayout ? selectHeaderLayout.value : 'full_width_strip';
         var lShape = selectLeaderShape ? selectLeaderShape.value : 'circle';
         var lBorder = inputLeaderBorder ? inputLeaderBorder.value : '#FF9933';
-        composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder);
+        var stripId = selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value;
+        composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId);
     }
 
     if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
     if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
     if (selectLeaderShape) selectLeaderShape.addEventListener('change', onStyleChange);
     if (inputLeaderBorder) inputLeaderBorder.addEventListener('change', onStyleChange);
+    if (selectStrip) selectStrip.addEventListener('change', onStyleChange);
 
     document.querySelectorAll('.qs-color-preset').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -758,7 +784,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Helper: Compose High-Res Branded Poster via API
-    function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder) {
+    function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId) {
         var spinner = document.getElementById('qs-modal-spinner');
         var imgEl = document.getElementById('qs-modal-img');
         var btnDownload = document.getElementById('qs-modal-btn-download');
@@ -771,6 +797,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        var currentStrip = stripId || (selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value);
 
         var payload = {
             template_id: parseInt(templateId),
@@ -778,7 +805,8 @@ document.addEventListener('DOMContentLoaded', function () {
             header_layout: headerLayout || selectHeaderLayout?.value,
             leader_shape: leaderShape || selectLeaderShape?.value || 'circle',
             leader_border_color: leaderBorder || inputLeaderBorder?.value || '#FF9933',
-            include_strip: (headerLayout !== 'none')
+            include_strip: (headerLayout !== 'none'),
+            strip_id: currentStrip ? parseInt(currentStrip) : null
         };
 
         fetch('{{ route('admin.festival-studio.compose') }}', {
@@ -911,6 +939,7 @@ document.addEventListener('DOMContentLoaded', function () {
             var headerLayout = document.getElementById('qs-input-header-layout')?.value || selectHeaderLayout?.value;
             var leaderShape = document.getElementById('qs-input-leader-shape')?.value || selectLeaderShape?.value || 'circle';
             var leaderBorder = document.getElementById('qs-input-leader-border')?.value || inputLeaderBorder?.value || '#FF9933';
+            var stripId = document.getElementById('qs-input-strip-id')?.value || (selectStrip ? selectStrip.value : null);
             var composedImage = document.getElementById('qs-input-composed-image')?.value || '';
 
             if (!scheduleDate || !scheduleTime) {
@@ -946,6 +975,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     header_layout: headerLayout,
                     leader_shape: leaderShape,
                     leader_border_color: leaderBorder,
+                    strip_id: stripId ? parseInt(stripId) : null,
                     include_strip: (headerLayout !== 'none')
                 })
             })

@@ -61,21 +61,8 @@ class PosterComposerController extends Controller
             $branding = $user->defaultBranding ?? $user->brandings()->first();
         }
 
-        // 3. Resolve Leadership Strip
-        $strip = null;
-        if (!empty($validated['strip_id'])) {
-            $strip = LeaderStrip::with('leaders')->find($validated['strip_id']);
-        }
-        if (!$strip && $user) {
-            $strip = $user->defaultLeaderStrip;
-        }
-        if (!$strip && $template->party_id) {
-            $strip = LeaderStrip::where('party_id', $template->party_id)
-                ->where('is_system', true)
-                ->where('is_default', true)
-                ->with('leaders')
-                ->first();
-        }
+        // 3. Resolve Leadership Strip (User Custom First, then Party Official Default)
+        $strip = LeaderStrip::resolveFor($user, $template, $branding, !empty($validated['strip_id']) ? (int)$validated['strip_id'] : null);
 
         // 4. Compose Options
         $options = [

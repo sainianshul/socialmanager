@@ -127,6 +127,34 @@
                                     <div id="qs-modal-header-locked-msg" class="text-danger small mt-1.5 d-none" style="font-size: 11px;">
                                         <i class="ti ti-lock me-1"></i> This leadership header is locked for this template by admin.
                                     </div>
+
+                                    {{-- Leadership Team / Strip Selector --}}
+                                    @if(isset($allStrips) && $allStrips->isNotEmpty())
+                                        <div class="mt-2.5 pt-2 border-top">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <label class="form-label small fw-semibold text-secondary m-0 d-flex align-items-center gap-1">
+                                                    <i class="ti ti-users text-primary"></i> Leadership Strip
+                                                </label>
+                                                <a href="{{ route('admin.leader-strips.index') }}" target="_blank" class="text-primary small text-decoration-none" style="font-size: 11px;">
+                                                    <i class="ti ti-settings me-0.5"></i>Manage
+                                                </a>
+                                            </div>
+                                            <select class="form-select form-select-sm" id="qs-modal-strip-id">
+                                                @foreach($allStrips as $s)
+                                                    @php
+                                                        $isUser = !empty($s->user_id);
+                                                        $partyCode = $s->party?->short_code ?? 'Universal';
+                                                        $label = $isUser 
+                                                            ? '⭐ ' . $s->name . ' (My Custom Strip)' 
+                                                            : '🏛️ ' . $s->name . ' (' . $partyCode . ' Default)';
+                                                    @endphp
+                                                    <option value="{{ $s->id }}" {{ ($activeStrip?->id == $s->id) ? 'selected' : '' }} data-party-id="{{ $s->party_id }}">
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    @endif
                                 </div>
 
                                 {{-- Advanced Leader Badges (Shape & Ring Color) --}}
@@ -203,6 +231,7 @@
                         <input type="hidden" name="header_layout" id="qs-input-header-layout" value="">
                         <input type="hidden" name="leader_shape" id="qs-input-leader-shape" value="circle">
                         <input type="hidden" name="leader_border_color" id="qs-input-leader-border" value="#FF9933">
+                        <input type="hidden" name="strip_id" id="qs-input-strip-id" value="{{ $activeStrip?->id }}">
 
                         {{-- Alert Box for Dynamic Errors --}}
                         <div id="qs-alert" class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" role="alert"></div>

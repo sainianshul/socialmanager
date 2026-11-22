@@ -242,4 +242,83 @@ class FestivalStudioTest extends TestCase
         $this->assertNotEmpty($post->media_urls);
         $this->assertNotEmpty($post->thumbnail_path);
     }
+
+    public function test_leadership_strip_resolves_to_party_default_when_user_has_no_custom_strip(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $this->seed(\Database\Seeders\PoliticalPartySeeder::class);
+        $this->seed(\Database\Seeders\PoliticalLeaderSeeder::class);
+
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $bjp = \App\Models\PoliticalParty::where('short_code', 'BJP')->first();
+        $inc = \App\Models\PoliticalParty::where('short_code', 'INC')->first();
+
+        // 1. User with BJP branding and no custom strips gets BJP official system strip
+        $branding = \App\Models\UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'display_name' => 'BJP Worker',
+            'is_default' => true,
+        ]);
+
+        $template = FestivalTemplate::first();
+        $template->update(['party_id' => null]); // Universal festival template (e.g. Diwali / New Year)
+
+        $resolved = \App\Models\LeaderStrip::resolveFor($user, $template, $branding);
+
+        $this->assertNotNull($resolved);
+        $this->assertTrue($resolved->is_system);
+        $this->assertEquals($bjp->id, $resolved->party_id);
+
+        // 2. User with INC branding gets INC official system strip on universal template
+        $branding->update(['party_id' => $inc->id]);
+        $resolvedInc = \App\Models\LeaderStrip::resolveFor($user, $template, $branding);
+
+        $this->assertNotNull($resolvedInc);
+        $this->assertTrue($resolvedInc->is_system);
+        $this->assertEquals($inc->id, $resolvedInc->party_id);
+    }
+
+    public function test_leadership_strip_resolves_to_user_custom_strip_when_user_has_added_their_own(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $this->seed(\Database\Seeders\PoliticalPartySeeder::class);
+        $this->seed(\Database\Seeders\PoliticalLeaderSeeder::class);
+
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $bjp = \App\Models\PoliticalParty::where('short_code', 'BJP')->first();
+
+        \App\Models\UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'display_name' => 'Dr. Custom Leader',
+            'is_default' => true,
+        ]);
+
+        // Create a custom strip for the user
+        $customStrip = \App\Models\LeaderStrip::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'name' => 'My Personal Constituency Leaders',
+            'is_default' => true,
+            'is_system' => false,
+        ]);
+
+        $leaders = \App\Models\PoliticalLeader::where('party_id', $bjp->id)->take(3)->get();
+        foreach ($leaders as $idx => $leader) {
+            \App\Models\LeaderStripItem::create([
+                'leader_strip_id' => $customStrip->id,
+                'political_leader_id' => $leader->id,
+                'order' => $idx + 1,
+            ]);
+        }
+
+        $template = FestivalTemplate::first();
+        $resolved = \App\Models\LeaderStrip::resolveFor($user, $template);
+
+        $this->assertNotNull($resolved);
+        $this->assertEquals($customStrip->id, $resolved->id);
+        $this->assertFalse($resolved->is_system);
+        $this->assertEquals('My Personal Constituency Leaders', $resolved->name);
+    }
 }

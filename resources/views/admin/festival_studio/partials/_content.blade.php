@@ -62,7 +62,8 @@
                          data-header-fixed="{{ $headerFixed }}"
                          data-leader-shape="{{ $leaderShape }}"
                          data-leader-border="{{ $leaderBorder }}"
-                         data-composer-url="{{ $composerUrl }}">
+                         data-composer-url="{{ $composerUrl }}"
+                         data-party-id="{{ $template->party_id ?? '' }}">
                         
                         <img src="{{ $template->image_url }}" alt="{{ $template->title }}" class="fs-template-preview-img" loading="lazy">
                         
@@ -95,7 +96,8 @@
                                     data-header-fixed="{{ $headerFixed }}"
                                     data-leader-shape="{{ $leaderShape }}"
                                     data-leader-border="{{ $leaderBorder }}"
-                                    data-composer-url="{{ $composerUrl }}">
+                                    data-composer-url="{{ $composerUrl }}"
+                                    data-party-id="{{ $template->party_id ?? '' }}">
                                 <i class="ti ti-calendar-time me-1"></i>Customize & Schedule
                             </button>
                         </div>

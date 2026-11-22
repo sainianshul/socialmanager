@@ -75,17 +75,16 @@ class FestivalStudioController extends Controller
             ? $user->leaderStrips()->with(['leaders', 'party'])->orderByDesc('is_default')->get() 
             : collect();
 
-        $systemStrip = null;
-        if ($partyId) {
-            $systemStrip = LeaderStrip::where('party_id', $partyId)
-                ->where('is_system', true)
-                ->where('is_default', true)
-                ->with(['leaders', 'party'])
-                ->first();
-        }
+        $activeStrip = LeaderStrip::resolveFor($user, $templates->first(), $userBranding);
 
-        $activeStrip = $user?->defaultLeaderStrip ?? $systemStrip;
-        $allStrips = $userStrips->merge($systemStrip ? collect([$systemStrip]) : collect())->unique('id');
+        $systemStrips = LeaderStrip::where('is_system', true)
+            ->when($partyId, fn($q) => $q->where('party_id', $partyId))
+            ->with(['leaders', 'party'])
+            ->get();
+        if ($systemStrips->isEmpty()) {
+            $systemStrips = LeaderStrip::where('is_system', true)->with(['leaders', 'party'])->get();
+        }
+        $allStrips = $userStrips->merge($systemStrips)->unique('id');
 
         $userCutout = $userBranding?->defaultImage?->cutout_url 
             ?? ($user?->profile_photo ? asset('storage/' . $user->profile_photo) : null)
@@ -154,6 +153,7 @@ class FestivalStudioController extends Controller
             'content'        => 'nullable|string|max:5000',
             'composed_image' => 'nullable|string',
             'include_strip'  => 'nullable|boolean',
+            'strip_id'       => 'nullable|integer|exists:leader_strips,id',
         ]);
 
         $user = auth()->user();
@@ -188,7 +188,8 @@ class FestivalStudioController extends Controller
             try {
                 $composer = app(\App\Services\PosterComposer::class);
                 $branding = $user->defaultBranding ?? $user->brandings()->first();
-                $strip = $user->defaultLeaderStrip;
+                $stripId = $request->input('strip_id');
+                $strip = LeaderStrip::resolveFor($user, $template, $branding, $stripId ? (int)$stripId : null);
                 $includeStrip = $request->boolean('include_strip', true);
 
                 $options = [

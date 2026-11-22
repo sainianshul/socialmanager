@@ -30,6 +30,84 @@ class LeaderStrip extends Model
         ];
     }
 
+    /**
+     * Resolve the effective leadership strip according to user preference and party default.
+     * Priority:
+     * 1. Explicitly requested strip ID (if provided)
+     * 2. User's custom strip (if user added custom leaders/strips)
+     * 3. Target party's official default strip (matching template party or user branding party)
+     * 4. System default fallback strip
+     */
+    public static function resolveFor(?User $user, mixed $template = null, ?UserBranding $branding = null, ?int $stripId = null): ?self
+    {
+        // 1. Explicitly requested strip ID
+        if (!empty($stripId)) {
+            $explicit = self::with('leaders')->find($stripId);
+            if ($explicit && $explicit->leaders->isNotEmpty()) {
+                return $explicit;
+            }
+        }
+
+        $templatePartyId = ($template instanceof FestivalTemplate) ? $template->party_id : null;
+
+        // 2. If user has created custom strip(s), use user's custom strip
+        if ($user) {
+            // First check party-specific custom strip if template has a specific party
+            if ($templatePartyId) {
+                $userPartyStrip = $user->leaderStrips()
+                    ->where('party_id', $templatePartyId)
+                    ->orderByDesc('is_default')
+                    ->with('leaders')
+                    ->first();
+                if ($userPartyStrip && $userPartyStrip->leaders->isNotEmpty()) {
+                    return $userPartyStrip;
+                }
+            }
+
+            // User's default custom strip
+            $userDefault = $user->defaultLeaderStrip()->with('leaders')->first();
+            if ($userDefault && $userDefault->leaders->isNotEmpty()) {
+                return $userDefault;
+            }
+
+            // Any custom strip belonging to the user
+            $userFirst = $user->leaderStrips()->orderByDesc('is_default')->with('leaders')->first();
+            if ($userFirst && $userFirst->leaders->isNotEmpty()) {
+                return $userFirst;
+            }
+        }
+
+        // 3. Fallback to Party Official Default Strip
+        $targetPartyId = $templatePartyId ?: ($branding?->party_id ?? $user?->defaultBranding?->party_id);
+        if ($targetPartyId) {
+            $partyStrip = self::where('party_id', $targetPartyId)
+                ->where('is_system', true)
+                ->where('is_default', true)
+                ->with('leaders')
+                ->first()
+                ?? self::where('party_id', $targetPartyId)
+                    ->where('is_system', true)
+                    ->with('leaders')
+                    ->first()
+                ?? self::where('party_id', $targetPartyId)
+                    ->with('leaders')
+                    ->first();
+
+            if ($partyStrip && $partyStrip->leaders->isNotEmpty()) {
+                return $partyStrip;
+            }
+        }
+
+        // 4. System Default Fallback Strip
+        return self::where('is_system', true)
+            ->where('is_default', true)
+            ->with('leaders')
+            ->first()
+            ?? self::where('is_system', true)
+                ->with('leaders')
+                ->first();
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

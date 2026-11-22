@@ -37,11 +37,11 @@ class PosterComposer
             $presetKey = $presetKey ?: ($template->preset_key ?: 'classic_political_right');
             $customConfig = $template->layout_config ?: [];
             $bgPath = $template->template_image_path;
-            $party = $template->party ?: ($branding?->party);
+            $party = $template->party ?: ($branding?->party ?: $strip?->party);
         } else {
             $presetKey = $presetKey ?: 'classic_political_right';
             $bgPath = $template;
-            $party = $branding?->party;
+            $party = $branding?->party ?: $strip?->party;
         }
 
         $runtimeConfig = $options['layout_config'] ?? [];
