@@ -30,6 +30,32 @@ class FestivalTemplateController extends Controller
             });
         }
 
+        if ($dateFilter = $request->input('date_filter')) {
+            $today = now()->toDateString();
+            if ($dateFilter === 'today') {
+                $query->whereHas('festival', function ($f) use ($today) {
+                    $f->whereDate('festival_date', $today);
+                });
+            } elseif ($dateFilter === 'tomorrow') {
+                $tomorrow = now()->addDay()->toDateString();
+                $query->whereHas('festival', function ($f) use ($tomorrow) {
+                    $f->whereDate('festival_date', $tomorrow);
+                });
+            } elseif ($dateFilter === 'this_week') {
+                $startOfWeek = now()->startOfWeek()->toDateString();
+                $endOfWeek = now()->endOfWeek()->toDateString();
+                $query->whereHas('festival', function ($f) use ($startOfWeek, $endOfWeek) {
+                    $f->whereBetween('festival_date', [$startOfWeek, $endOfWeek]);
+                });
+            } elseif ($dateFilter === 'this_month') {
+                $startOfMonth = now()->startOfMonth()->toDateString();
+                $endOfMonth = now()->endOfMonth()->toDateString();
+                $query->whereHas('festival', function ($f) use ($startOfMonth, $endOfMonth) {
+                    $f->whereBetween('festival_date', [$startOfMonth, $endOfMonth]);
+                });
+            }
+        }
+
         if ($month = $request->input('month')) {
             $query->whereHas('festival', function ($f) use ($month) {
                 $f->whereMonth('festival_date', (int) $month);

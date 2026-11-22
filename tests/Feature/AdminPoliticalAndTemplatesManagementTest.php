@@ -748,6 +748,29 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $resPaginated->assertStatus(200);
         $resPaginated->assertSee('Showing');
         $resPaginated->assertSee('templates');
+
+        // Test date_filter (today, tomorrow, this_week, this_month)
+        $todayFest = Festival::create([
+            'title' => 'Today Special Festival',
+            'festival_date' => now()->toDateString(),
+            'category' => 'general',
+            'is_active' => true,
+        ]);
+        FestivalTemplate::create([
+            'festival_id' => $todayFest->id,
+            'title' => 'Today Fest Template Unique',
+            'template_image_path' => 'path/today.jpg',
+            'thumbnail_path' => 'path/today.jpg',
+            'is_active' => true,
+        ]);
+
+        $resToday = $this->actingAs($this->admin)->get(route('admin.festival-templates.index', ['date_filter' => 'today']));
+        $resToday->assertStatus(200);
+        $resToday->assertSee('Today Fest Template Unique');
+
+        $resTomorrow = $this->actingAs($this->admin)->get(route('admin.festival-templates.index', ['date_filter' => 'tomorrow']));
+        $resTomorrow->assertStatus(200);
+        $resTomorrow->assertDontSee('Today Fest Template Unique');
     }
 
     public function test_regular_user_cannot_access_political_party_management(): void

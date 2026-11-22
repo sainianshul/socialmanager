@@ -41,6 +41,15 @@
                 <input type="text" name="search" class="form-control" placeholder="Search template..." value="{{ request('search') }}">
             </div>
 
+            {{-- Quick Date Range Filter (Today, Tomorrow, This Week, This Month) --}}
+            <select name="date_filter" class="form-select" style="width: 140px;" onchange="this.form.submit()">
+                <option value="">All Dates</option>
+                <option value="today" {{ request('date_filter') === 'today' ? 'selected' : '' }}>Today</option>
+                <option value="tomorrow" {{ request('date_filter') === 'tomorrow' ? 'selected' : '' }}>Tomorrow</option>
+                <option value="this_week" {{ request('date_filter') === 'this_week' ? 'selected' : '' }}>This Week</option>
+                <option value="this_month" {{ request('date_filter') === 'this_month' ? 'selected' : '' }}>This Month</option>
+            </select>
+
             {{-- Month Filter --}}
             <select name="month" class="form-select" style="width: 150px;" onchange="this.form.submit()">
                 <option value="">All Months</option>
@@ -93,7 +102,7 @@
                 <option value="96" {{ request('per_page') == '96' ? 'selected' : '' }}>96 / page</option>
             </select>
 
-            @if(request('search') || request('month') || request('festival_id') || request('party_id') || request('status') !== null || request('per_page'))
+            @if(request('search') || request('date_filter') || request('month') || request('festival_id') || request('party_id') || request('status') !== null || request('per_page'))
                 <a href="{{ route('admin.festival-templates.index') }}" class="btn btn-outline-secondary">Clear</a>
             @endif
         </form>

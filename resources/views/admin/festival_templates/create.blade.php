@@ -31,23 +31,31 @@
                     $currentMonth = old('festival_month', now()->format('m'));
                 @endphp
 
-                {{-- Month Selector --}}
+                {{-- Month / Quick Date Filter --}}
                 <div class="col-md-3">
                     <label class="form-label">Festival Month</label>
                     <select class="form-select" id="filter-festival-month" name="festival_month">
-                        <option value="">All Months</option>
-                        <option value="01" {{ $currentMonth === '01' ? 'selected' : '' }}>01 - January</option>
-                        <option value="02" {{ $currentMonth === '02' ? 'selected' : '' }}>02 - February</option>
-                        <option value="03" {{ $currentMonth === '03' ? 'selected' : '' }}>03 - March</option>
-                        <option value="04" {{ $currentMonth === '04' ? 'selected' : '' }}>04 - April</option>
-                        <option value="05" {{ $currentMonth === '05' ? 'selected' : '' }}>05 - May</option>
-                        <option value="06" {{ $currentMonth === '06' ? 'selected' : '' }}>06 - June</option>
-                        <option value="07" {{ $currentMonth === '07' ? 'selected' : '' }}>07 - July</option>
-                        <option value="08" {{ $currentMonth === '08' ? 'selected' : '' }}>08 - August</option>
-                        <option value="09" {{ $currentMonth === '09' ? 'selected' : '' }}>09 - September</option>
-                        <option value="10" {{ $currentMonth === '10' ? 'selected' : '' }}>10 - October</option>
-                        <option value="11" {{ $currentMonth === '11' ? 'selected' : '' }}>11 - November</option>
-                        <option value="12" {{ $currentMonth === '12' ? 'selected' : '' }}>12 - December</option>
+                        <option value="">All Dates & Months</option>
+                        <optgroup label="Quick Dates">
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                            <option value="this_week">This Week</option>
+                            <option value="this_month">This Month</option>
+                        </optgroup>
+                        <optgroup label="By Calendar Month">
+                            <option value="01" {{ $currentMonth === '01' ? 'selected' : '' }}>01 - January</option>
+                            <option value="02" {{ $currentMonth === '02' ? 'selected' : '' }}>02 - February</option>
+                            <option value="03" {{ $currentMonth === '03' ? 'selected' : '' }}>03 - March</option>
+                            <option value="04" {{ $currentMonth === '04' ? 'selected' : '' }}>04 - April</option>
+                            <option value="05" {{ $currentMonth === '05' ? 'selected' : '' }}>05 - May</option>
+                            <option value="06" {{ $currentMonth === '06' ? 'selected' : '' }}>06 - June</option>
+                            <option value="07" {{ $currentMonth === '07' ? 'selected' : '' }}>07 - July</option>
+                            <option value="08" {{ $currentMonth === '08' ? 'selected' : '' }}>08 - August</option>
+                            <option value="09" {{ $currentMonth === '09' ? 'selected' : '' }}>09 - September</option>
+                            <option value="10" {{ $currentMonth === '10' ? 'selected' : '' }}>10 - October</option>
+                            <option value="11" {{ $currentMonth === '11' ? 'selected' : '' }}>11 - November</option>
+                            <option value="12" {{ $currentMonth === '12' ? 'selected' : '' }}>12 - December</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -310,9 +318,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }));
 
         function applyFestivalFilter() {
-            const selectedMonth = filterMonthSelect.value;
+            const selectedFilter = filterMonthSelect.value;
             const query = festivalSearchInput ? festivalSearchInput.value.trim().toLowerCase() : '';
             const currentVal = fieldFestivalSelect.value;
+
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${yyyy}-${mm}-${dd}`;
+
+            const tmrw = new Date(now);
+            tmrw.setDate(now.getDate() + 1);
+            const tomorrowStr = `${tmrw.getFullYear()}-${String(tmrw.getMonth() + 1).padStart(2, '0')}-${String(tmrw.getDate()).padStart(2, '0')}`;
+
+            const dayOfWeek = (now.getDay() + 6) % 7; // Monday = 0
+            const startOfWeekDate = new Date(now);
+            startOfWeekDate.setDate(now.getDate() - dayOfWeek);
+            const startOfWeekStr = `${startOfWeekDate.getFullYear()}-${String(startOfWeekDate.getMonth() + 1).padStart(2, '0')}-${String(startOfWeekDate.getDate()).padStart(2, '0')}`;
+
+            const endOfWeekDate = new Date(startOfWeekDate);
+            endOfWeekDate.setDate(startOfWeekDate.getDate() + 6);
+            const endOfWeekStr = `${endOfWeekDate.getFullYear()}-${String(endOfWeekDate.getMonth() + 1).padStart(2, '0')}-${String(endOfWeekDate.getDate()).padStart(2, '0')}`;
 
             fieldFestivalSelect.innerHTML = '';
 
@@ -326,10 +353,22 @@ document.addEventListener('DOMContentLoaded', function () {
             originalFestivalOptions.forEach(item => {
                 if (!item.value) return;
 
-                const matchMonth = !selectedMonth || item.month === selectedMonth;
+                let matchDate = true;
+                if (selectedFilter === 'today') {
+                    matchDate = (item.date === todayStr);
+                } else if (selectedFilter === 'tomorrow') {
+                    matchDate = (item.date === tomorrowStr);
+                } else if (selectedFilter === 'this_week') {
+                    matchDate = (item.date >= startOfWeekStr && item.date <= endOfWeekStr);
+                } else if (selectedFilter === 'this_month') {
+                    matchDate = (item.month === mm);
+                } else if (selectedFilter) {
+                    matchDate = (item.month === selectedFilter);
+                }
+
                 const matchSearch = !query || item.title.includes(query) || item.text.toLowerCase().includes(query);
 
-                if (matchMonth && matchSearch) {
+                if (matchDate && matchSearch) {
                     const opt = document.createElement('option');
                     opt.value = item.value;
                     opt.textContent = item.text;
