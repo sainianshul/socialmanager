@@ -235,6 +235,13 @@
                         <img src="" alt="Template Live Preview" class="w-100 h-100 d-block" style="object-fit: contain;" id="preview-image">
                     </div>
 
+                    {{-- Download & Actions --}}
+                    <div class="mt-3">
+                        <a href="#" id="btn-download-preview" class="btn btn-success w-100 fw-bold py-2 shadow-xs" download="preview-poster.jpg">
+                            <i class="ti ti-download me-1.5"></i> Download Full Image (1080x1080)
+                        </a>
+                    </div>
+
                     {{-- Helpful explanation notes --}}
                     <div class="mt-2.5 p-2 bg-light rounded-2 border">
                         <div class="d-flex align-items-center gap-1.5 text-secondary small" style="font-size: 11px;">
@@ -271,6 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const previewImg = document.getElementById('preview-image');
     const previewLoading = document.getElementById('preview-loading');
     const btnRefresh = document.getElementById('btn-manual-refresh');
+    const btnDownload = document.getElementById('btn-download-preview');
 
     let debounceTimer = null;
 
@@ -305,6 +313,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const data = await res.json();
             if (data.success && data.preview_url) {
                 previewImg.src = data.preview_url;
+                if (btnDownload) {
+                    btnDownload.href = data.preview_url;
+                    const titleVal = document.querySelector('input[name="title"]')?.value || 'festival-poster-preview';
+                    btnDownload.download = titleVal.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.jpg';
+                }
             }
         } catch (err) {
             console.error('Preview error:', err);

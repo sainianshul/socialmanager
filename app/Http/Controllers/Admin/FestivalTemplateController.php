@@ -305,7 +305,7 @@ class FestivalTemplateController extends Controller
                 'cutout_url' => $sampleCutout,
             ]);
 
-            $jpegData = $canvas->toJpeg(85)->toString();
+            $jpegData = $canvas->toJpeg(92)->toString();
 
             return response()->json([
                 'success' => true,
