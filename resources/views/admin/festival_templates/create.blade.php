@@ -3,11 +3,11 @@
 @section('title', 'Add Festival Template')
 
 @section('content')
-<div class="page-header d-print-none mb-4">
+<div class="page-header d-print-none mb-3">
     <div class="row align-items-center">
         <div class="col">
-            <div class="page-pretitle">Poster & Templates</div>
-            <h2 class="page-title">Add New Festival Template</h2>
+            <div class="page-pretitle">Festival Studio</div>
+            <h2 class="page-title">Add Festival Template</h2>
         </div>
         <div class="col-auto ms-auto d-print-none">
             <a href="{{ route('admin.festival-templates.index') }}" class="btn btn-outline-secondary">
@@ -19,10 +19,15 @@
 
 <form action="{{ route('admin.festival-templates.store') }}" method="POST" enctype="multipart/form-data" id="template-form">
     @csrf
+
+    {{-- Hidden technical fields --}}
+    <input type="hidden" name="preset_key" id="field-preset" value="{{ old('preset_key', 'classic_political_right') }}">
+    <input type="hidden" name="show_top_strip" id="field-show-strip" value="{{ old('show_top_strip', '1') }}">
+
     <div class="row g-4">
-        {{-- Left Column: Configuration Controls --}}
+        {{-- Left Column: Clean Configuration Controls --}}
         <div class="col-lg-7">
-            {{-- 1. General & Festival Details --}}
+            {{-- 1. Festival & Template Info --}}
             <div class="card mb-3 shadow-xs">
                 <div class="card-header py-3 bg-light-subtle">
                     <h3 class="card-title text-dark fw-bold">
@@ -31,8 +36,14 @@
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        {{-- Festival Selection with sleek inline + Add New toggle --}}
                         <div class="col-md-6">
-                            <label class="form-label required">Select Festival</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label required m-0">Festival</label>
+                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" id="toggle-new-festival">
+                                    <i class="ti ti-plus" id="new-fest-icon"></i> <span id="new-fest-text">New Festival</span>
+                                </button>
+                            </div>
                             <select name="festival_id" class="form-select @error('festival_id') is-invalid @enderror" id="field-festival">
                                 <option value="">-- Choose Existing Festival --</option>
                                 @foreach($festivals as $fest)
@@ -42,15 +53,17 @@
                                 @endforeach
                             </select>
                             @error('festival_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
+
+                            {{-- Collapsible inline new festival title box --}}
+                            <div id="new-festival-box" class="mt-2 p-2.5 bg-light rounded-2 border d-none">
+                                <label class="form-label small fw-bold text-primary mb-1">New Festival Title</label>
+                                <input type="text" name="new_festival_title" id="field-new-festival-title" class="form-control form-control-sm" value="{{ old('new_festival_title') }}" placeholder="e.g. महाशिवरात्रि / गणतंत्र दिवस">
+                            </div>
                         </div>
 
+                        {{-- Target Political Party --}}
                         <div class="col-md-6">
-                            <label class="form-label">Or Add New Festival</label>
-                            <input type="text" name="new_festival_title" class="form-control" value="{{ old('new_festival_title') }}" placeholder="e.g. महाशिवरात्रि / गणतंत्र दिवस">
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Target Political Party</label>
+                            <label class="form-label mb-1">Target Political Party</label>
                             <select name="party_id" class="form-select @error('party_id') is-invalid @enderror" id="field-party">
                                 <option value="">All Parties (Universal Template)</option>
                                 @foreach($parties as $party)
@@ -62,154 +75,121 @@
                             @error('party_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <div class="col-md-6">
+                        {{-- Template Title --}}
+                        <div class="col-md-12">
                             <label class="form-label required">Template Title</label>
-                            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title', 'Devotthan Ekadashi Sacred Frame') }}" placeholder="e.g. Devotthan Ekadashi Sacred Frame" required>
+                            <input type="text" name="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" placeholder="e.g. Diwali Greeting 2026 Special Poster" required>
                             @error('title')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        {{-- Artwork Image Upload --}}
+                        <div class="col-md-12">
+                            <label class="form-label required">Artwork Background Image (1080x1080)</label>
+                            <input type="file" name="template_image" id="field-image" class="form-control @error('template_image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp" required>
+                            <small class="form-hint">Square 1080x1080 JPG or PNG. The Live Preview updates immediately on selection.</small>
+                            @error('template_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        </div>
+
+                        {{-- Active Switch --}}
+                        <div class="col-md-12">
+                            <div class="form-check form-switch m-0">
+                                <input class="form-check-input" type="checkbox" name="is_active" value="1" id="field-is-active" {{ old('is_active', true) ? 'checked' : '' }}>
+                                <label class="form-check-label fw-semibold" for="field-is-active">Active in Festival Studio</label>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- 2. Styling & Layout Customization --}}
+            {{-- 2. Design & Branding Frame Selection --}}
             <div class="card mb-3 shadow-xs">
                 <div class="card-header py-3 bg-light-subtle">
                     <h3 class="card-title text-dark fw-bold">
-                        <i class="ti ti-palette me-1.5 text-primary"></i> 2. Layout & Branding Customization
+                        <i class="ti ti-palette me-1.5 text-primary"></i> 2. Design & Branding Frame
                     </h3>
                 </div>
                 <div class="card-body">
                     <div class="row g-3">
+                        {{-- Branding Frame Layer (Footer Style) --}}
                         <div class="col-md-12">
                             <label class="form-label required fw-bold text-primary">
                                 <i class="ti ti-layout-bottombar me-1"></i> Branding Frame Layer (Footer Style)
                             </label>
-                            <select name="footer_style" class="form-select border-primary fw-bold" id="field-footer-style">
-                                <option value="dual_ribbon_badge" selected>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
-                                <option value="solid_white_banner">Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
-                                <option value="floating_tricolor_badge">Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
-                                <option value="royal_gold_dock">Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
-                                <option value="candidate_left_ribbon">Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
-                                <option value="modern_capsule_dock">Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
-                                <option value="circular_medallion_badge">Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
-                                <option value="saffron_wave_banner">Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
-                                <option value="tricolor_angled_blade">Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
-                                <option value="royal_maroon_heritage">Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
+                            <select name="footer_style" class="form-select border-primary fw-semibold" id="field-footer-style">
+                                <option value="dual_ribbon_badge" {{ old('footer_style', 'dual_ribbon_badge') == 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
+                                <option value="solid_white_banner" {{ old('footer_style') == 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
+                                <option value="floating_tricolor_badge" {{ old('footer_style') == 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
+                                <option value="royal_gold_dock" {{ old('footer_style') == 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
+                                <option value="candidate_left_ribbon" {{ old('footer_style') == 'candidate_left_ribbon' ? 'selected' : '' }}>Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
+                                <option value="modern_capsule_dock" {{ old('footer_style') == 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
+                                <option value="circular_medallion_badge" {{ old('footer_style') == 'circular_medallion_badge' ? 'selected' : '' }}>Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
+                                <option value="saffron_wave_banner" {{ old('footer_style') == 'saffron_wave_banner' ? 'selected' : '' }}>Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
+                                <option value="tricolor_angled_blade" {{ old('footer_style') == 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
+                                <option value="royal_maroon_heritage" {{ old('footer_style') == 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
                             </select>
-                            <small class="form-hint">Choose among 10 professional branding layouts (Ribbon badges, Ethnic cards, Floating minimalist, Royal midnight, Left-aligned, Capsule dock, Medallion frame, Saffron wave, Tricolor blade, or Maroon heritage).</small>
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label required">Base Poster Preset</label>
-                            <select name="preset_key" class="form-select @error('preset_key') is-invalid @enderror" id="field-preset" required>
-                                @foreach($presets as $p)
-                                    <option value="{{ $p['key'] }}" {{ old('preset_key', 'classic_political_right') == $p['key'] ? 'selected' : '' }}>
-                                        {{ $p['name'] }} ({{ $p['badge'] ?? '' }})
-                                    </option>
-                                @endforeach
+                        {{-- Top Leadership Layout (Header Style) --}}
+                        <div class="col-md-7">
+                            <label class="form-label required fw-bold text-primary">
+                                <i class="ti ti-crown me-1"></i> Top Leadership Header (Header Style)
+                            </label>
+                            <select name="header_layout" class="form-select border-primary fw-semibold" id="field-header-layout">
+                                <option value="full_width_strip" {{ old('header_layout', 'full_width_strip') == 'full_width_strip' ? 'selected' : '' }}>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
+                                <option value="top_left_cluster" {{ old('header_layout') == 'top_left_cluster' ? 'selected' : '' }}>Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
+                                <option value="top_right_cluster" {{ old('header_layout') == 'top_right_cluster' ? 'selected' : '' }}>Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
+                                <option value="split_wings" {{ old('header_layout') == 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
+                                <option value="vertical_capsule_strip" {{ old('header_layout') == 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
+                                <option value="party_group_cutout" {{ old('header_layout') == 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
+                                <option value="frosted_glass_dock" {{ old('header_layout') == 'frosted_glass_dock' ? 'selected' : '' }}>Header 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)</option>
+                                <option value="tricolor_ribbon_canopy" {{ old('header_layout') == 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
+                                <option value="none" {{ old('header_layout') == 'none' ? 'selected' : '' }}>None: Hide Leadership Strip (Artwork Only)</option>
                             </select>
-                            @error('preset_key')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label required">Candidate Photo Position</label>
+                        {{-- Candidate Photo Placement --}}
+                        <div class="col-md-5">
+                            <label class="form-label required fw-bold">Candidate Photo Position</label>
                             <select name="photo_position" class="form-select @error('photo_position') is-invalid @enderror" id="field-photo-position" required>
-                                <option value="bottom-right" {{ old('photo_position') == 'bottom-right' ? 'selected' : '' }}>Bottom Right (Classic Dr. Dharam Singh)</option>
-                                <option value="bottom-left" {{ old('photo_position') == 'bottom-left' ? 'selected' : '' }}>Bottom Left (When artwork is on right)</option>
-                                <option value="footer-strip" {{ old('photo_position') == 'footer-strip' ? 'selected' : '' }}>Footer Strip Avatar</option>
+                                <option value="bottom-right" {{ old('photo_position', 'bottom-right') == 'bottom-right' ? 'selected' : '' }}>Right Side (Standard)</option>
+                                <option value="bottom-left" {{ old('photo_position') == 'bottom-left' ? 'selected' : '' }}>Left Side (For Right-Focus Art)</option>
                             </select>
                             @error('photo_position')<div class="invalid-feedback">{{ $message }}</div>@enderror
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label required fw-bold text-primary">
-                                <i class="ti ti-crown me-1"></i> Top Leadership Layout (Header Style)
-                            </label>
-                            <select name="header_layout" class="form-select border-primary fw-bold" id="field-header-layout">
-                                <option value="full_width_strip" selected>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
-                                <option value="top_left_cluster">Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
-                                <option value="top_right_cluster">Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
-                                <option value="split_wings">Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
-                                <option value="vertical_capsule_strip">Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
-                                <option value="party_group_cutout">Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
-                                <option value="frosted_glass_dock">Header 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)</option>
-                                <option value="tricolor_ribbon_canopy">Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
-                            </select>
-                            <small class="form-hint">Placement of top national/state leadership across canvas.</small>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Top Leaders Shape</label>
-                            <select name="leader_shape" class="form-select" id="field-leader-shape">
-                                <option value="circle" selected>Circular Avatar</option>
-                                <option value="rounded_square">Rounded Square</option>
-                                <option value="square">Square</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Leader Border Color</label>
-                            <select name="leader_border_color" class="form-select" id="field-leader-border">
-                                <option value="#FF9933" selected>Saffron Orange (#FF9933)</option>
-                                <option value="#ffffff">Clean White (#FFFFFF)</option>
-                                <option value="#D4AF37">Royal Gold (#D4AF37)</option>
-                                <option value="none">No Border</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Top Leadership Strip</label>
-                            <select name="show_top_strip" class="form-select" id="field-show-strip">
-                                <option value="1" selected>Yes (Show Leaders)</option>
-                                <option value="0">No (Hide Strip)</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Politician Name Color</label>
-                            <select name="name_color" class="form-select" id="field-name-color">
-                                <option value="#c0392b" selected>Deep Red (#c0392b - Classic)</option>
-                                <option value="#E65100">Saffron Deep (#E65100)</option>
-                                <option value="#1a365d">Dark Navy (#1a365d)</option>
-                                <option value="#2d3748">Dark Charcoal (#2d3748)</option>
-                                <option value="#ffffff">Pure White (#ffffff)</option>
-                            </select>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Footer Bar Background</label>
-                            <select name="footer_bg" class="form-select" id="field-footer-bg">
-                                <option value="#f8f5ee" selected>Warm Light Cream (#f8f5ee)</option>
-                                <option value="#ffffff">Pure White (#ffffff)</option>
-                                <option value="#1a202c">Dark Midnight (#1a202c)</option>
-                            </select>
+                        {{-- Optional Collapsed Customization for Avatars --}}
+                        <div class="col-md-12">
+                            <details class="border rounded-2 p-2.5 bg-light-subtle">
+                                <summary class="fw-semibold text-secondary small" style="cursor: pointer;">
+                                    <i class="ti ti-adjustments me-1 text-primary"></i> Optional: Customize Leader Avatar Shape & Border
+                                </summary>
+                                <div class="row g-2 mt-1">
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1">Avatar Shape</label>
+                                        <select name="leader_shape" class="form-select form-select-sm" id="field-leader-shape">
+                                            <option value="circle" selected>Circular Avatar</option>
+                                            <option value="rounded_square">Rounded Square</option>
+                                            <option value="square">Square</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label small mb-1">Ring / Border Color</label>
+                                        <select name="leader_border_color" class="form-select form-select-sm" id="field-leader-border">
+                                            <option value="#FF9933" selected>Saffron Orange (#FF9933)</option>
+                                            <option value="#D4AF37">Royal Gold (#D4AF37)</option>
+                                            <option value="#ffffff">Clean White (#FFFFFF)</option>
+                                            <option value="none">No Border</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </details>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {{-- 3. Graphic Background Artwork --}}
-            <div class="card mb-3 shadow-xs">
-                <div class="card-header py-3 bg-light-subtle">
-                    <h3 class="card-title text-dark fw-bold">
-                        <i class="ti ti-photo me-1.5 text-primary"></i> 3. Template Artwork Image (1080x1080)
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="mb-3">
-                        <input type="file" name="template_image" id="field-image" class="form-control @error('template_image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp" required>
-                        <small class="form-hint">Square 1080x1080 JPG or PNG. As soon as you select an image, the Live Preview on the right updates instantly.</small>
-                        @error('template_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                    </div>
-
-                    <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" name="is_active" value="1" {{ old('is_active', true) ? 'checked' : '' }}>
-                        <span class="form-check-label fw-bold">Active in Festival Studio</span>
-                    </div>
-                </div>
                 <div class="card-footer d-flex justify-content-end gap-2 bg-white">
                     <a href="{{ route('admin.festival-templates.index') }}" class="btn btn-outline-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary px-4">
+                    <button type="submit" class="btn btn-primary px-4 fw-bold">
                         <i class="ti ti-check me-1"></i> Save Festival Template
                     </button>
                 </div>
@@ -280,31 +260,85 @@ document.addEventListener('DOMContentLoaded', function () {
     const fieldLeaderShape = document.getElementById('field-leader-shape');
     const fieldLeaderBorder = document.getElementById('field-leader-border');
     const fieldShowStrip = document.getElementById('field-show-strip');
-    const fieldNameColor = document.getElementById('field-name-color');
-    const fieldFooterBg = document.getElementById('field-footer-bg');
 
     const previewImg = document.getElementById('preview-image');
     const previewLoading = document.getElementById('preview-loading');
     const btnRefresh = document.getElementById('btn-manual-refresh');
     const btnDownload = document.getElementById('btn-download-preview');
 
+    // Inline + Add New Festival Toggle
+    const toggleNewFestBtn = document.getElementById('toggle-new-festival');
+    const newFestBox = document.getElementById('new-festival-box');
+    const newFestText = document.getElementById('new-fest-text');
+    const newFestIcon = document.getElementById('new-fest-icon');
+    const fieldFestivalSelect = document.getElementById('field-festival');
+    const fieldNewFestTitle = document.getElementById('field-new-festival-title');
+
+    if (toggleNewFestBtn && newFestBox) {
+        toggleNewFestBtn.addEventListener('click', function () {
+            const isHidden = newFestBox.classList.contains('d-none');
+            if (isHidden) {
+                newFestBox.classList.remove('d-none');
+                newFestText.textContent = 'Cancel';
+                newFestIcon.className = 'ti ti-x';
+                if (fieldFestivalSelect) fieldFestivalSelect.value = '';
+                if (fieldNewFestTitle) fieldNewFestTitle.focus();
+            } else {
+                newFestBox.classList.add('d-none');
+                newFestText.textContent = 'New Festival';
+                newFestIcon.className = 'ti ti-plus';
+                if (fieldNewFestTitle) fieldNewFestTitle.value = '';
+            }
+        });
+    }
+
+    // Auto sync candidate position & preset
+    if (fieldFooterStyle && fieldPhotoPos) {
+        fieldFooterStyle.addEventListener('change', function () {
+            if (fieldFooterStyle.value === 'candidate_left_ribbon') {
+                fieldPhotoPos.value = 'bottom-left';
+            }
+            syncPresetKey();
+        });
+    }
+
+    if (fieldPhotoPos) {
+        fieldPhotoPos.addEventListener('change', syncPresetKey);
+    }
+
+    function syncPresetKey() {
+        if (!fieldPreset || !fieldPhotoPos) return;
+        if (fieldPhotoPos.value === 'bottom-left') {
+            fieldPreset.value = 'classic_political_left';
+        } else {
+            fieldPreset.value = 'classic_political_right';
+        }
+    }
+
+    // Auto sync show_top_strip hidden field with header layout
+    function syncHeaderStrip() {
+        if (!fieldShowStrip || !fieldHeaderLayout) return;
+        fieldShowStrip.value = (fieldHeaderLayout.value === 'none') ? '0' : '1';
+    }
+
     let debounceTimer = null;
 
     async function updatePreview() {
         if (previewLoading) previewLoading.classList.remove('d-none');
 
+        syncPresetKey();
+        syncHeaderStrip();
+
         const formData = new FormData();
         formData.append('_token', csrfToken);
         if (fieldFooterStyle) formData.append('footer_style', fieldFooterStyle.value);
         if (fieldHeaderLayout) formData.append('header_layout', fieldHeaderLayout.value);
-        formData.append('preset_key', fieldPreset.value);
-        if (fieldParty.value) formData.append('party_id', fieldParty.value);
-        formData.append('photo_position', fieldPhotoPos.value);
-        formData.append('leader_shape', fieldLeaderShape.value);
-        formData.append('leader_border_color', fieldLeaderBorder.value);
-        formData.append('show_top_strip', fieldShowStrip.value);
-        formData.append('name_color', fieldNameColor.value);
-        formData.append('footer_bg', fieldFooterBg.value);
+        if (fieldPreset) formData.append('preset_key', fieldPreset.value);
+        if (fieldParty && fieldParty.value) formData.append('party_id', fieldParty.value);
+        if (fieldPhotoPos) formData.append('photo_position', fieldPhotoPos.value);
+        if (fieldLeaderShape) formData.append('leader_shape', fieldLeaderShape.value);
+        if (fieldLeaderBorder) formData.append('leader_border_color', fieldLeaderBorder.value);
+        if (fieldShowStrip) formData.append('show_top_strip', fieldShowStrip.value);
 
         if (fieldImage && fieldImage.files && fieldImage.files[0]) {
             formData.append('template_image', fieldImage.files[0]);
@@ -339,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
         debounceTimer = setTimeout(updatePreview, 300);
     }
 
-    [fieldFooterStyle, fieldHeaderLayout, fieldPreset, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder, fieldShowStrip, fieldNameColor, fieldFooterBg].forEach(el => {
+    [fieldFooterStyle, fieldHeaderLayout, fieldParty, fieldPhotoPos, fieldLeaderShape, fieldLeaderBorder].forEach(el => {
         if (el) el.addEventListener('change', schedulePreview);
     });
 

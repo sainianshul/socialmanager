@@ -73,8 +73,8 @@ class FestivalTemplateController extends Controller
             'party_id' => 'nullable|exists:political_parties,id',
             'title' => 'required|string|max:191',
             'template_image' => 'required|image|mimes:png,jpg,jpeg,webp|max:15360',
-            'preset_key' => 'required|string|max:60',
-            'photo_position' => 'required|in:bottom-right,bottom-left,footer-strip',
+            'preset_key' => 'nullable|string|max:60',
+            'photo_position' => 'nullable|in:bottom-right,bottom-left,footer-strip',
             'is_active' => 'nullable|boolean',
         ]);
 
@@ -106,8 +106,14 @@ class FestivalTemplateController extends Controller
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
         }
         if ($request->filled('header_layout')) {
-            $layoutConfig['header']['layout'] = $request->input('header_layout');
-            $layoutConfig['header']['mode'] = ($request->input('header_layout') === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
+            $headerLayout = $request->input('header_layout');
+            if ($headerLayout === 'none') {
+                $layoutConfig['header']['enabled'] = false;
+            } else {
+                $layoutConfig['header']['enabled'] = true;
+                $layoutConfig['header']['layout'] = $headerLayout;
+                $layoutConfig['header']['mode'] = ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
+            }
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');
@@ -119,14 +125,17 @@ class FestivalTemplateController extends Controller
             $layoutConfig['footer']['main_bar_bg'] = $request->input('footer_bg');
         }
 
+        $presetKey = $validated['preset_key'] ?? ($request->input('photo_position') === 'bottom-left' ? 'classic_political_left' : 'classic_political_right');
+        $photoPosition = $validated['photo_position'] ?? ($request->input('footer_style') === 'candidate_left_ribbon' ? 'bottom-left' : 'bottom-right');
+
         $template = FestivalTemplate::create([
             'festival_id' => $festivalId,
             'party_id' => $validated['party_id'] ?? null,
             'title' => $validated['title'],
             'template_image_path' => $imagePath,
             'thumbnail_path' => $imagePath,
-            'preset_key' => $validated['preset_key'],
-            'photo_position' => $validated['photo_position'],
+            'preset_key' => $presetKey,
+            'photo_position' => $photoPosition,
             'layout_config' => !empty($layoutConfig) ? $layoutConfig : null,
             'is_active' => $request->boolean('is_active', true),
         ]);
@@ -262,8 +271,14 @@ class FestivalTemplateController extends Controller
             $layoutConfig['header']['enabled'] = $request->boolean('show_top_strip', true);
         }
         if ($request->filled('header_layout')) {
-            $layoutConfig['header']['layout'] = $request->input('header_layout');
-            $layoutConfig['header']['mode'] = ($request->input('header_layout') === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
+            $headerLayout = $request->input('header_layout');
+            if ($headerLayout === 'none') {
+                $layoutConfig['header']['enabled'] = false;
+            } else {
+                $layoutConfig['header']['enabled'] = true;
+                $layoutConfig['header']['layout'] = $headerLayout;
+                $layoutConfig['header']['mode'] = ($headerLayout === 'party_group_cutout') ? 'party_group_cutout' : 'individual_chips';
+            }
         }
         if ($request->filled('footer_style')) {
             $layoutConfig['footer']['style'] = $request->input('footer_style');

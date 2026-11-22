@@ -659,6 +659,42 @@ class AdminPoliticalAndTemplatesManagementTest extends TestCase
         $this->assertEquals('#ffffff', $template->layout_config['footer']['name_color']);
     }
 
+    public function test_admin_can_render_and_submit_clean_create_festival_template_form(): void
+    {
+        $createPage = $this->actingAs($this->admin)->get(route('admin.festival-templates.create'));
+        $createPage->assertStatus(200);
+        $createPage->assertSee('Branding Frame Layer (Footer Style)');
+        $createPage->assertSee('Top Leadership Header (Header Style)');
+        $createPage->assertDontSee('name_color');
+        $createPage->assertDontSee('footer_bg');
+
+        $image = UploadedFile::fake()->image('clean_poster.jpg', 1080, 1080);
+        $response = $this->actingAs($this->admin)->post(route('admin.festival-templates.store'), [
+            'festival_id' => $this->festival->id,
+            'party_id' => $this->party->id,
+            'title' => 'Clean Streamlined Diwali Template',
+            'footer_style' => 'royal_maroon_heritage',
+            'header_layout' => 'frosted_glass_dock',
+            'photo_position' => 'bottom-right',
+            'template_image' => $image,
+            'is_active' => '1',
+        ]);
+
+        $response->assertRedirect(route('admin.festival-templates.index'));
+
+        $this->assertDatabaseHas('festival_templates', [
+            'title' => 'Clean Streamlined Diwali Template',
+            'preset_key' => 'classic_political_right',
+            'photo_position' => 'bottom-right',
+        ]);
+
+        $saved = FestivalTemplate::where('title', 'Clean Streamlined Diwali Template')->first();
+        $this->assertNotNull($saved);
+        $this->assertEquals('royal_maroon_heritage', $saved->layout_config['footer']['style']);
+        $this->assertEquals('frosted_glass_dock', $saved->layout_config['header']['layout']);
+        $this->assertTrue($saved->layout_config['header']['enabled']);
+    }
+
     public function test_regular_user_cannot_access_political_party_management(): void
     {
         $response = $this->actingAs($this->regularUser)->get(route('admin.political-parties.index'));
