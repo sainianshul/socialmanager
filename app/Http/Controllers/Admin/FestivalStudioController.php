@@ -94,6 +94,14 @@ class FestivalStudioController extends Controller
 
         $userImages = $user ? $user->brandingImages()->orderByDesc('is_default')->get() : collect();
 
+        $accountsQuery = Account::query()
+            ->where('is_active', true)
+            ->whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM]);
+        if ($user && !$user->isAdmin()) {
+            $accountsQuery->where('user_id', $user->id);
+        }
+        $accounts = $accountsQuery->orderBy('account_type')->orderBy('name')->get();
+
         // Support seamless AJAX date switching without full page refresh
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json([
@@ -112,20 +120,13 @@ class FestivalStudioController extends Controller
                     'allStrips',
                     'userBranding',
                     'userCutout',
-                    'userImages'
+                    'userImages',
+                    'accounts'
                 ))->render(),
             ]);
         }
 
         $parties = PoliticalParty::where('is_active', true)->get();
-
-        $accountsQuery = Account::query()
-            ->where('is_active', true)
-            ->whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM]);
-        if ($user && !$user->isAdmin()) {
-            $accountsQuery->where('user_id', $user->id);
-        }
-        $accounts = $accountsQuery->orderBy('account_type')->orderBy('name')->get();
 
         return view('admin.festival_studio.index', compact(
             'upcomingFestivals',

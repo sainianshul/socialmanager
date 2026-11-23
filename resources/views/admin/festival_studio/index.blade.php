@@ -446,6 +446,49 @@
             border-color: #0d9488 !important;
             background: #f0fdfa !important;
         }
+
+        /* Studio Editor Minimalist Apple Styling */
+        .studio-filmstrip-card {
+            cursor: pointer;
+            border-radius: 14px;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .studio-filmstrip-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+        .studio-filmstrip-card.active {
+            border-color: #0d9488 !important;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.25) !important;
+        }
+        .studio-photo-chip {
+            transition: all 0.15s ease;
+        }
+        .studio-photo-chip:hover {
+            transform: scale(1.08);
+        }
+        .studio-account-item {
+            transition: all 0.15s ease;
+        }
+        .studio-account-item:hover {
+            border-color: #0d9488 !important;
+            background-color: #f0fdfa !important;
+        }
+        .studio-account-item.active {
+            border-color: #0d9488 !important;
+            background-color: #f0fdfa !important;
+        }
+        .inspector-tab-btn.active {
+            background-color: #0d9488 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
+        }
+        .fs-view-btn.active {
+            background-color: #ffffff !important;
+            color: #0d9488 !important;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
     </style>
 @endpush
 
@@ -615,6 +658,11 @@
                             // Sync URL in browser address bar without page reload
                             if (pushState && window.history && window.history.pushState) {
                                 window.history.pushState({ festival_id: festivalId, url: url }, '', url);
+                            }
+
+                            // Re-initialize Studio Editor with newly loaded festival templates
+                            if (typeof initStudioEditor === 'function') {
+                                initStudioEditor();
                             }
                         }
                     })
@@ -1568,6 +1616,561 @@
                     }
                 } catch (err) {
                     console.error('Error switching strip in Festival Studio:', err);
+                }
+            });
+
+            // ======================================================================
+            // APPLE-GRADE STUDIO EDITOR: CANVAS, INSPECTOR & FILMSTRIP LOGIC
+            // ======================================================================
+            var currentStudioTemplateId = null;
+            var studioDebounceTimer = null;
+
+            function initStudioEditor() {
+                var activeFilmstrip = document.querySelector('.studio-filmstrip-card.active');
+                if (!activeFilmstrip) {
+                    activeFilmstrip = document.querySelector('.studio-filmstrip-card');
+                }
+                if (activeFilmstrip) {
+                    currentStudioTemplateId = activeFilmstrip.getAttribute('data-template-id');
+                    composeStudioPoster();
+                }
+            }
+
+            function composeStudioPoster() {
+                if (!currentStudioTemplateId) return;
+
+                var spinner = document.getElementById('studio-canvas-spinner');
+                var imgEl = document.getElementById('studio-canvas-img');
+                var linkEl = document.getElementById('studio-canvas-link');
+                var btnPreview = document.getElementById('studio-btn-preview');
+                var btnDownload = document.getElementById('studio-btn-download');
+
+                if (spinner) spinner.classList.remove('d-none');
+                if (btnDownload) btnDownload.classList.add('disabled');
+                if (btnPreview) btnPreview.classList.add('disabled');
+
+                var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                var fStyle = document.getElementById('studio-footer-style')?.value || 'dual_ribbon_badge';
+                var hLayout = document.getElementById('studio-header-layout')?.value || 'full_width_strip';
+                var stripId = document.getElementById('studio-strip-id')?.value;
+                var lShape = document.getElementById('studio-leader-shape')?.value || 'circle';
+                var lBorder = document.getElementById('studio-leader-border')?.value || '#FF9933';
+                var lSize = document.getElementById('studio-leader-size')?.value || '106';
+                var isSocial = document.getElementById('studio-show-social')?.checked ?? true;
+                var candName = document.getElementById('studio-candidate-name')?.value?.trim();
+                var candDesig = document.getElementById('studio-candidate-designation')?.value?.trim();
+                var candCutout = document.getElementById('studio-cutout-url')?.value;
+
+                var payload = {
+                    template_id: parseInt(currentStudioTemplateId),
+                    footer_style: fStyle,
+                    header_layout: hLayout,
+                    leader_shape: lShape,
+                    leader_border_color: lBorder,
+                    leader_size: parseInt(lSize),
+                    include_strip: (hLayout !== 'none'),
+                    show_social_handles: isSocial,
+                    strip_id: stripId ? parseInt(stripId) : null,
+                    candidate_name: candName || null,
+                    candidate_designation: candDesig || null,
+                    cutout_url: candCutout || null
+                };
+
+                fetch('{{ route('admin.festival-studio.compose') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    if (data.success && data.image_url) {
+                        if (imgEl) imgEl.src = data.image_url;
+                        if (linkEl) linkEl.href = data.image_url;
+                        if (btnPreview) {
+                            btnPreview.href = data.image_url;
+                            btnPreview.classList.remove('disabled');
+                        }
+                        if (btnDownload) {
+                            btnDownload.href = data.image_url;
+                            btnDownload.classList.remove('disabled');
+                        }
+                        var wrapper = document.getElementById('studio-canvas-wrapper');
+                        if (wrapper) wrapper.setAttribute('data-composed-path', data.relative_path || '');
+                    }
+                })
+                .catch(function(err) {
+                    console.error('Studio compose error:', err);
+                })
+                .finally(function() {
+                    if (spinner) spinner.classList.add('d-none');
+                });
+            }
+
+            // Initial trigger on page load
+            initStudioEditor();
+
+            // 1. View Mode Switcher (Studio Editor vs All Designs Grid)
+            document.addEventListener('click', function(e) {
+                var viewBtn = e.target.closest('.fs-view-btn');
+                if (!viewBtn) return;
+                document.querySelectorAll('.fs-view-btn').forEach(function(b) {
+                    b.classList.remove('active', 'fw-semibold');
+                    b.classList.add('text-secondary');
+                });
+                viewBtn.classList.add('active', 'fw-semibold');
+                viewBtn.classList.remove('text-secondary');
+
+                var viewMode = viewBtn.getAttribute('data-view');
+                var studioWorkspace = document.getElementById('fs-studio-workspace');
+                var gridWorkspace = document.getElementById('fs-grid-workspace');
+
+                if (viewMode === 'grid') {
+                    if (studioWorkspace) studioWorkspace.classList.add('d-none');
+                    if (gridWorkspace) gridWorkspace.classList.remove('d-none');
+                } else {
+                    if (studioWorkspace) studioWorkspace.classList.remove('d-none');
+                    if (gridWorkspace) gridWorkspace.classList.add('d-none');
+                }
+            });
+
+            // 2. Filmstrip Thumbnail Click or Grid Card Click to Activate Template
+            document.addEventListener('click', function(e) {
+                var filmstripCard = e.target.closest('.studio-filmstrip-card');
+                var gridCardBtn = e.target.closest('.btn-activate-studio-template');
+
+                var targetEl = filmstripCard || gridCardBtn;
+                if (!targetEl) return;
+
+                var tplId = targetEl.getAttribute('data-template-id');
+                var tplTitle = targetEl.getAttribute('data-template-title');
+                var fStyle = targetEl.getAttribute('data-footer-style');
+                var hLayout = targetEl.getAttribute('data-header-layout');
+                var stripId = targetEl.getAttribute('data-strip-id');
+
+                currentStudioTemplateId = tplId;
+
+                // Ensure Studio workspace is visible if clicked from grid
+                var studioWorkspace = document.getElementById('fs-studio-workspace');
+                var gridWorkspace = document.getElementById('fs-grid-workspace');
+                if (gridWorkspace && !gridWorkspace.classList.contains('d-none')) {
+                    gridWorkspace.classList.add('d-none');
+                    if (studioWorkspace) studioWorkspace.classList.remove('d-none');
+                    document.querySelectorAll('.fs-view-btn').forEach(function(b) {
+                        if (b.getAttribute('data-view') === 'studio') {
+                            b.classList.add('active', 'fw-semibold');
+                            b.classList.remove('text-secondary');
+                        } else {
+                            b.classList.remove('active', 'fw-semibold');
+                            b.classList.add('text-secondary');
+                        }
+                    });
+                }
+
+                // Update active filmstrip card
+                document.querySelectorAll('.studio-filmstrip-card').forEach(function(c) {
+                    c.classList.remove('active');
+                    c.style.borderColor = '#e2e8f0';
+                    var check = c.querySelector('.filmstrip-check');
+                    if (check) check.classList.add('d-none');
+                });
+
+                var activeCard = document.getElementById('filmstrip-card-' + tplId);
+                if (activeCard) {
+                    activeCard.classList.add('active');
+                    activeCard.style.borderColor = '#0d9488';
+                    var check = activeCard.querySelector('.filmstrip-check');
+                    if (check) check.classList.remove('d-none');
+                    activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                }
+
+                // Update Stage Header
+                var titleEl = document.getElementById('studio-active-template-title');
+                if (titleEl && tplTitle) titleEl.textContent = tplTitle;
+                var idBadge = document.getElementById('studio-active-id-badge');
+                if (idBadge) idBadge.textContent = '#' + tplId;
+
+                // Update Dropdown Values
+                var selFooter = document.getElementById('studio-footer-style');
+                if (selFooter && fStyle) selFooter.value = fStyle;
+                var selHeader = document.getElementById('studio-header-layout');
+                if (selHeader && hLayout) selHeader.value = hLayout;
+                var selStrip = document.getElementById('studio-strip-id');
+                if (selStrip && stripId) selStrip.value = stripId;
+
+                // Compose poster on canvas
+                composeStudioPoster();
+            });
+
+            // 3. Debounced Candidate Inputs
+            function onStudioDebouncedInput() {
+                clearTimeout(studioDebounceTimer);
+                studioDebounceTimer = setTimeout(function() {
+                    composeStudioPoster();
+                }, 400);
+            }
+
+            document.addEventListener('input', function(e) {
+                if (e.target && (e.target.id === 'studio-candidate-name' || e.target.id === 'studio-candidate-designation')) {
+                    onStudioDebouncedInput();
+                }
+            });
+
+            document.addEventListener('change', function(e) {
+                if (e.target && (
+                    e.target.id === 'studio-footer-style' ||
+                    e.target.id === 'studio-header-layout' ||
+                    e.target.id === 'studio-strip-id' ||
+                    e.target.id === 'studio-show-social'
+                )) {
+                    composeStudioPoster();
+                }
+            });
+
+            // 4. Photo Cutout Chips in Studio
+            document.addEventListener('click', function(e) {
+                var chip = e.target.closest('.studio-photo-chip');
+                if (!chip) return;
+                var url = chip.getAttribute('data-url');
+                if (!url) return;
+
+                document.querySelectorAll('.studio-photo-chip').forEach(function(c) {
+                    c.classList.remove('active');
+                    c.style.border = '2px solid #e2e8f0';
+                    c.style.outline = 'none';
+                });
+                chip.classList.add('active');
+                chip.style.border = '2px solid #0d9488';
+                chip.style.outline = '2px solid rgba(13, 148, 136, 0.3)';
+                chip.style.outlineOffset = '1px';
+
+                var hiddenCutout = document.getElementById('studio-cutout-url');
+                if (hiddenCutout) hiddenCutout.value = url;
+
+                composeStudioPoster();
+            });
+
+            // 5. Studio Photo Upload
+            document.addEventListener('change', function(e) {
+                if (e.target && e.target.id === 'studio-upload-photo-input') {
+                    var file = e.target.files[0];
+                    if (!file) return;
+
+                    var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    var formData = new FormData();
+                    formData.append('photo', file);
+
+                    var spinner = document.getElementById('studio-canvas-spinner');
+                    if (spinner) spinner.classList.remove('d-none');
+
+                    fetch('{{ route('admin.festival-studio.upload-photo') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(function(res) { return res.json(); })
+                    .then(function(data) {
+                        if (data.success && data.url) {
+                            var wrapper = document.getElementById('studio-photo-chips-wrapper');
+                            if (wrapper) {
+                                document.querySelectorAll('.studio-photo-chip').forEach(function(c) {
+                                    c.classList.remove('active');
+                                    c.style.border = '2px solid #e2e8f0';
+                                    c.style.outline = 'none';
+                                });
+
+                                var newChip = document.createElement('div');
+                                newChip.className = 'studio-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0';
+                                newChip.setAttribute('data-url', data.path);
+                                newChip.style.cssText = 'width: 38px; height: 38px; border: 2px solid #0d9488; outline: 2px solid rgba(13, 148, 136, 0.3); outline-offset: 1px;';
+                                newChip.innerHTML = '<img src="' + data.url + '" class="w-100 h-100 rounded-circle object-fit-cover bg-white">';
+                                wrapper.insertBefore(newChip, wrapper.firstChild);
+                            }
+
+                            var hiddenCutout = document.getElementById('studio-cutout-url');
+                            if (hiddenCutout) hiddenCutout.value = data.path;
+
+                            composeStudioPoster();
+                        } else {
+                            alert(data.message || 'Failed to upload photo.');
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error('Photo upload error:', err);
+                        alert('Could not upload photo.');
+                    })
+                    .finally(function() {
+                        if (spinner) spinner.classList.add('d-none');
+                        e.target.value = '';
+                    });
+                }
+            });
+
+            // 6. Shape Tiles & Ring Color Swatches
+            document.addEventListener('click', function(e) {
+                var shapeTile = e.target.closest('.studio-shape-tile');
+                if (shapeTile) {
+                    var shape = shapeTile.getAttribute('data-shape');
+                    document.querySelectorAll('.studio-shape-tile').forEach(function(t) {
+                        t.classList.remove('active');
+                        t.style.border = '1.5px solid #e2e8f0';
+                        t.style.background = '#ffffff';
+                    });
+                    shapeTile.classList.add('active');
+                    shapeTile.style.border = '1.5px solid #0d9488';
+                    shapeTile.style.background = '#f0fdfa';
+
+                    var hiddenShape = document.getElementById('studio-leader-shape');
+                    if (hiddenShape) hiddenShape.value = shape;
+                    composeStudioPoster();
+                    return;
+                }
+
+                var swatch = e.target.closest('.studio-swatch');
+                if (swatch) {
+                    var color = swatch.getAttribute('data-color');
+                    document.querySelectorAll('.studio-swatch').forEach(function(s) {
+                        s.classList.remove('active');
+                        s.style.border = '1.5px solid transparent';
+                    });
+                    swatch.classList.add('active');
+                    swatch.style.border = '1.5px solid #0d9488';
+
+                    var hiddenBorder = document.getElementById('studio-leader-border');
+                    if (hiddenBorder) hiddenBorder.value = color;
+                    composeStudioPoster();
+                }
+            });
+
+            // 7. Inspector Tab Switching & Stepper
+            document.addEventListener('click', function(e) {
+                var tabBtn = e.target.closest('.inspector-tab-btn');
+                var nextBtn = e.target.closest('#studio-btn-next-step');
+                var backBtn = e.target.closest('#studio-btn-back-step');
+
+                if (tabBtn) {
+                    var paneId = tabBtn.getAttribute('data-pane');
+                    document.querySelectorAll('.inspector-tab-btn').forEach(function(b) {
+                        b.classList.remove('active');
+                        b.classList.add('text-secondary');
+                    });
+                    tabBtn.classList.add('active');
+                    tabBtn.classList.remove('text-secondary');
+
+                    if (paneId === 'pane-design') {
+                        document.getElementById('inspector-pane-design')?.classList.remove('d-none');
+                        document.getElementById('inspector-pane-schedule')?.classList.add('d-none');
+                    } else {
+                        document.getElementById('inspector-pane-design')?.classList.add('d-none');
+                        document.getElementById('inspector-pane-schedule')?.classList.remove('d-none');
+                    }
+                    return;
+                }
+
+                if (nextBtn) {
+                    document.getElementById('inspector-pane-design')?.classList.add('d-none');
+                    document.getElementById('inspector-pane-schedule')?.classList.remove('d-none');
+                    document.getElementById('tab-btn-design')?.classList.remove('active');
+                    document.getElementById('tab-btn-design')?.classList.add('text-secondary');
+                    document.getElementById('tab-btn-schedule')?.classList.add('active');
+                    document.getElementById('tab-btn-schedule')?.classList.remove('text-secondary');
+                    return;
+                }
+
+                if (backBtn) {
+                    document.getElementById('inspector-pane-design')?.classList.remove('d-none');
+                    document.getElementById('inspector-pane-schedule')?.classList.add('d-none');
+                    document.getElementById('tab-btn-design')?.classList.add('active');
+                    document.getElementById('tab-btn-design')?.classList.remove('text-secondary');
+                    document.getElementById('tab-btn-schedule')?.classList.remove('active');
+                    document.getElementById('tab-btn-schedule')?.classList.add('text-secondary');
+                    return;
+                }
+            });
+
+            // 8. Studio Social Account Item Toggle
+            document.addEventListener('click', function(e) {
+                var item = e.target.closest('.studio-account-item');
+                if (!item) return;
+                if (e.target.tagName.toLowerCase() === 'input') return;
+
+                var cb = item.querySelector('.studio-acc-cb');
+                if (cb) {
+                    cb.checked = !cb.checked;
+                    item.classList.toggle('active', cb.checked);
+                }
+            });
+
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('studio-acc-cb')) {
+                    var item = e.target.closest('.studio-account-item');
+                    if (item) item.classList.toggle('active', e.target.checked);
+                }
+            });
+
+            // 9. Submit Schedule from Studio
+            document.addEventListener('click', function(e) {
+                var submitBtn = e.target.closest('#studio-btn-submit-schedule');
+                if (!submitBtn) return;
+
+                var selectedAccountIds = [];
+                document.querySelectorAll('.studio-acc-cb:checked').forEach(function(cb) {
+                    selectedAccountIds.push(parseInt(cb.value));
+                });
+
+                var alertBox = document.getElementById('studio-schedule-alert');
+                if (selectedAccountIds.length === 0) {
+                    if (alertBox) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerText = 'Please select at least one social media account.';
+                    }
+                    return;
+                }
+
+                var schedDate = document.getElementById('studio-schedule-date')?.value;
+                var schedTime = document.getElementById('studio-schedule-time')?.value;
+                var caption = document.getElementById('studio-caption-text')?.value;
+                var activePill = document.querySelector('.fs-date-pill.active');
+                var festivalId = activePill ? activePill.getAttribute('data-festival-id') : null;
+
+                if (!schedDate || !schedTime) {
+                    if (alertBox) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerText = 'Please provide date and time.';
+                    }
+                    return;
+                }
+
+                var origText = submitBtn.innerHTML;
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1.5" role="status"></span>Scheduling...';
+                if (alertBox) alertBox.classList.add('d-none');
+
+                var fStyle = document.getElementById('studio-footer-style')?.value || 'dual_ribbon_badge';
+                var hLayout = document.getElementById('studio-header-layout')?.value || 'full_width_strip';
+                var stripId = document.getElementById('studio-strip-id')?.value;
+                var lShape = document.getElementById('studio-leader-shape')?.value || 'circle';
+                var lBorder = document.getElementById('studio-leader-border')?.value || '#FF9933';
+                var lSize = document.getElementById('studio-leader-size')?.value || '106';
+                var isSocial = document.getElementById('studio-show-social')?.checked ?? true;
+                var candName = document.getElementById('studio-candidate-name')?.value?.trim();
+                var candDesig = document.getElementById('studio-candidate-designation')?.value?.trim();
+                var candCutout = document.getElementById('studio-cutout-url')?.value;
+                var composedPath = document.getElementById('studio-canvas-wrapper')?.getAttribute('data-composed-path') || '';
+
+                var payload = {
+                    template_id: parseInt(currentStudioTemplateId),
+                    festival_id: festivalId ? parseInt(festivalId) : null,
+                    account_ids: selectedAccountIds,
+                    schedule_date: schedDate,
+                    schedule_time: schedTime,
+                    content: caption,
+                    composed_image: composedPath,
+                    footer_style: fStyle,
+                    header_layout: hLayout,
+                    leader_shape: lShape,
+                    leader_border_color: lBorder,
+                    leader_size: parseInt(lSize),
+                    include_strip: (hLayout !== 'none'),
+                    show_social_handles: isSocial,
+                    strip_id: stripId ? parseInt(stripId) : null,
+                    candidate_name: candName || null,
+                    candidate_designation: candDesig || null,
+                    cutout_url: candCutout || null
+                };
+
+                fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(function(res) {
+                    return res.json().then(function(data) {
+                        return { status: res.status, ok: res.ok, data: data };
+                    });
+                })
+                .then(function(result) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = origText;
+
+                    if (!result.ok) {
+                        if (alertBox) {
+                            alertBox.classList.remove('d-none');
+                            alertBox.innerText = result.data.message || 'Scheduling failed. Please try again.';
+                        }
+                        return;
+                    }
+
+                    showStudioToast(result.data.message || 'Poster scheduled successfully!');
+
+                    var targetFestId = result.data.festival_id || festivalId;
+                    if (targetFestId) {
+                        var pillEl = document.getElementById('date-pill-' + targetFestId);
+                        if (pillEl) {
+                            pillEl.classList.add('is-scheduled');
+                            var badgeSlot = document.getElementById('pill-badge-slot-' + targetFestId);
+                            if (badgeSlot && !badgeSlot.querySelector('.badge.bg-warning')) {
+                                var setBadge = document.createElement('span');
+                                setBadge.className = 'badge bg-warning text-dark rounded-pill fw-semibold';
+                                setBadge.style.fontSize = '9px';
+                                setBadge.style.padding = '2px 7px';
+                                setBadge.innerHTML = '<i class="ti ti-check me-0.5"></i>Set';
+                                badgeSlot.prepend(setBadge);
+                            }
+                        }
+                    }
+                })
+                .catch(function(err) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = origText;
+                    if (alertBox) {
+                        alertBox.classList.remove('d-none');
+                        alertBox.innerText = 'Network error while scheduling.';
+                    }
+                    console.error('Schedule error:', err);
+                });
+            });
+
+            // 10. WhatsApp & Share from Studio
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('#studio-btn-whatsapp')) {
+                    var imgEl = document.getElementById('studio-canvas-img');
+                    var caption = document.getElementById('studio-caption-text')?.value || '';
+                    var shareUrl = imgEl ? imgEl.src : window.location.href;
+                    var text = caption + '\n\n' + shareUrl;
+                    window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(text), '_blank');
+                    return;
+                }
+
+                if (e.target.closest('#studio-btn-share')) {
+                    var imgEl = document.getElementById('studio-canvas-img');
+                    var caption = document.getElementById('studio-caption-text')?.value || '';
+                    var shareUrl = imgEl ? imgEl.src : window.location.href;
+
+                    if (navigator.share) {
+                        navigator.share({
+                            title: 'Festival Greeting Poster',
+                            text: caption,
+                            url: shareUrl
+                        }).catch(function() {});
+                    } else {
+                        navigator.clipboard.writeText(shareUrl).then(function() {
+                            showStudioToast('Poster link copied to clipboard!');
+                        }).catch(function() {
+                            window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent(caption + '\n' + shareUrl), '_blank');
+                        });
+                    }
                 }
             });
         });
