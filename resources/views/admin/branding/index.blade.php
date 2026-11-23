@@ -629,7 +629,7 @@
                                                 {{-- Delete Button --}}
                                                 <button type="button" class="btn btn-sm btn-light text-danger rounded-circle p-0 position-absolute top-0 end-0 m-2 shadow-xs border btn-delete-photo" 
                                                         data-id="{{ $img->id }}" 
-                                                        data-url="{{ route('admin.branding.images.destroy', $img->id) }}"
+                                                        data-url="{{ route('admin.branding.images.destroy', ['image' => $img->id]) }}"
                                                         title="Delete this photo"
                                                         style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 2;">
                                                     <i class="ti ti-trash fs-2"></i>
@@ -652,7 +652,7 @@
                                                     <button type="button" 
                                                             class="btn btn-xs rounded-pill w-100 py-1 fw-semibold btn-make-default {{ $img->is_default ? 'btn-success disabled' : 'btn-outline-primary' }}"
                                                             data-id="{{ $img->id }}"
-                                                            data-url="{{ route('admin.branding.images.default', $img->id) }}">
+                                                            data-url="{{ route('admin.branding.images.default', ['image' => $img->id]) }}">
                                                         @if($img->is_default)
                                                             <i class="ti ti-circle-check me-1"></i>Active Default
                                                         @else
@@ -974,8 +974,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     // Prepend new card
-                    var defaultRouteTemplate = '{{ route('admin.branding.images.default', ':id') }}';
-                    var destroyRouteTemplate = '{{ route('admin.branding.images.destroy', ':id') }}';
+                    var defaultRouteTemplate = '{{ route('admin.branding.images.default', ['image' => ':id']) }}';
+                    var destroyRouteTemplate = '{{ route('admin.branding.images.destroy', ['image' => ':id']) }}';
                     var defaultUrl = defaultRouteTemplate.replace(':id', data.image.id);
                     var destroyUrl = destroyRouteTemplate.replace(':id', data.image.id);
 
