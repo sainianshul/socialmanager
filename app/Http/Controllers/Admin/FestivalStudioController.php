@@ -86,7 +86,9 @@ class FestivalStudioController extends Controller
         }
         $allStrips = $userStrips->merge($systemStrips)->unique('id');
 
-        $userCutout = $userBranding?->defaultImage?->cutout_url 
+        $defaultImg = $userBranding?->defaultImage ?? ($user ? $user->brandingImages()->where('is_default', true)->first() : null);
+
+        $userCutout = $defaultImg?->cutout_url 
             ?? ($user?->profile_photo ? asset('storage/' . $user->profile_photo) : null)
             ?? 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'User') . '&background=1db8ab&color=fff&bold=true&size=128';
 

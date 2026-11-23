@@ -11,6 +11,7 @@ use App\Models\User;
 use App\Models\UserBranding;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class BrandingController extends Controller
 {
@@ -66,6 +67,8 @@ class BrandingController extends Controller
             ? PoliticalLeader::where('party_id', $selectedPartyId)->where('is_active', true)->get() 
             : collect();
 
+        $brandingImages = $user->brandingImages()->orderByDesc('is_default')->latest()->get();
+
         return view('admin.branding.index', compact(
             'branding',
             'parties',
@@ -75,7 +78,8 @@ class BrandingController extends Controller
             'userStrips',
             'systemStrip',
             'activeStrip',
-            'partyLeaders'
+            'partyLeaders',
+            'brandingImages'
         ));
     }
 
@@ -145,5 +149,118 @@ class BrandingController extends Controller
         }
 
         return redirect()->route('admin.branding.index')->with('success', 'Branding profile updated successfully.');
+    }
+
+    /**
+     * Upload an additional branding photo to user's gallery
+     */
+    public function uploadImage(Request $request)
+    {
+        $request->validate([
+            'branding_image' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
+            'is_default'     => 'nullable|boolean',
+        ]);
+
+        $user = auth()->user();
+        $branding = $user->defaultBranding ?? $user->brandings()->first();
+
+        $file = $request->file('branding_image');
+        $filename = 'branding_' . $user->id . '_' . time() . '_' . Str::random(4) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('uploads/branding', $filename, 'public');
+
+        $isDefault = $request->boolean('is_default', false);
+        if ($user->brandingImages()->count() === 0 || $isDefault) {
+            $user->brandingImages()->update(['is_default' => false]);
+            $isDefault = true;
+        }
+
+        $image = BrandingImage::create([
+            'user_id'             => $user->id,
+            'user_branding_id'    => $branding?->id,
+            'title'               => $branding?->display_name ?: $user->name,
+            'original_image_path' => $path,
+            'cutout_image_path'   => $path,
+            'is_default'          => $isDefault,
+        ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Branding photo uploaded successfully.',
+                'image'   => [
+                    'id'         => $image->id,
+                    'url'        => $image->cutout_url,
+                    'is_default' => $image->is_default,
+                ],
+            ]);
+        }
+
+        return redirect()->route('admin.branding.index', ['#pane-cutout'])->with('success', 'Branding photo uploaded successfully.');
+    }
+
+    /**
+     * Set a specific photo as the active default for posters
+     */
+    public function setDefaultImage(BrandingImage $image)
+    {
+        $user = auth()->user();
+        if ($image->user_id !== $user->id && !$user->isAdmin()) {
+            abort(403);
+        }
+
+        $user->brandingImages()->update(['is_default' => false]);
+        $image->update(['is_default' => true]);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success'   => true,
+                'message'   => 'Default branding photo updated successfully.',
+                'image_id'  => $image->id,
+                'image_url' => $image->cutout_url,
+            ]);
+        }
+
+        return redirect()->route('admin.branding.index', ['#pane-cutout'])->with('success', 'Default photo updated.');
+    }
+
+    /**
+     * Delete a branding photo from user's gallery
+     */
+    public function destroyImage(BrandingImage $image)
+    {
+        $user = auth()->user();
+        if ($image->user_id !== $user->id && !$user->isAdmin()) {
+            abort(403);
+        }
+
+        $wasDefault = $image->is_default;
+
+        if ($image->original_image_path && Storage::disk('public')->exists($image->original_image_path)) {
+            Storage::disk('public')->delete($image->original_image_path);
+        }
+        if ($image->cutout_image_path && $image->cutout_image_path !== $image->original_image_path && Storage::disk('public')->exists($image->cutout_image_path)) {
+            Storage::disk('public')->delete($image->cutout_image_path);
+        }
+
+        $image->delete();
+
+        $nextImage = null;
+        if ($wasDefault) {
+            $nextImage = $user->brandingImages()->latest()->first();
+            if ($nextImage) {
+                $nextImage->update(['is_default' => true]);
+            }
+        }
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success'        => true,
+                'message'        => 'Photo removed successfully.',
+                'new_default_id' => $nextImage?->id ?? null,
+                'new_default_url'=> $nextImage?->cutout_url ?? null,
+            ]);
+        }
+
+        return redirect()->route('admin.branding.index', ['#pane-cutout'])->with('success', 'Photo removed.');
     }
 }

@@ -129,4 +129,91 @@ class BrandingTest extends TestCase
 
         $response->assertSessionHasErrors(['display_name']);
     }
+
+    public function test_user_can_upload_multiple_branding_images_to_gallery(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        // Upload first image as default
+        $response1 = $this->actingAs($user)->postJson(route('admin.branding.images.store'), [
+            'branding_image' => UploadedFile::fake()->image('photo1.png', 400, 400),
+            'is_default'     => true,
+        ]);
+        $response1->assertJson(['success' => true]);
+
+        // Upload second image not default
+        $response2 = $this->actingAs($user)->postJson(route('admin.branding.images.store'), [
+            'branding_image' => UploadedFile::fake()->image('photo2.png', 400, 400),
+            'is_default'     => false,
+        ]);
+        $response2->assertJson(['success' => true]);
+
+        $this->assertEquals(2, $user->brandingImages()->count());
+        $this->assertEquals(1, $user->brandingImages()->where('is_default', true)->count());
+    }
+
+    public function test_user_can_switch_default_branding_image(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $img1 = BrandingImage::create([
+            'user_id'             => $user->id,
+            'original_image_path' => 'uploads/branding/p1.png',
+            'is_default'          => true,
+        ]);
+
+        $img2 = BrandingImage::create([
+            'user_id'             => $user->id,
+            'original_image_path' => 'uploads/branding/p2.png',
+            'is_default'          => false,
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('admin.branding.images.default', $img2->id));
+        $response->assertJson(['success' => true]);
+
+        $this->assertFalse($img1->fresh()->is_default);
+        $this->assertTrue($img2->fresh()->is_default);
+    }
+
+    public function test_user_can_delete_branding_image(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $img1 = BrandingImage::create([
+            'user_id'             => $user->id,
+            'original_image_path' => 'uploads/branding/del1.png',
+            'is_default'          => true,
+        ]);
+
+        $img2 = BrandingImage::create([
+            'user_id'             => $user->id,
+            'original_image_path' => 'uploads/branding/del2.png',
+            'is_default'          => false,
+        ]);
+
+        $response = $this->actingAs($user)->deleteJson(route('admin.branding.images.destroy', $img1->id));
+        $response->assertJson(['success' => true]);
+
+        $this->assertDatabaseMissing('branding_images', ['id' => $img1->id]);
+        // Since default was deleted, img2 should automatically be set as default
+        $this->assertTrue($img2->fresh()->is_default);
+    }
+
+    public function test_user_cannot_delete_another_users_branding_image(): void
+    {
+        $userA = User::factory()->create(['role' => User::ROLE_USER]);
+        $userB = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $imgA = BrandingImage::create([
+            'user_id'             => $userA->id,
+            'original_image_path' => 'uploads/branding/userA.png',
+            'is_default'          => true,
+        ]);
+
+        $response = $this->actingAs($userB)->deleteJson(route('admin.branding.images.destroy', $imgA->id));
+        $response->assertStatus(403);
+    }
 }

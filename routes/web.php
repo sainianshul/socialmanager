@@ -41,6 +41,9 @@ Route::prefix('admin')->group(function () {
             Route::prefix('branding')->name('branding.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\BrandingController::class, 'index'])->name('index');
                 Route::post('/', [\App\Http\Controllers\Admin\BrandingController::class, 'update'])->name('update');
+                Route::post('/images', [\App\Http\Controllers\Admin\BrandingController::class, 'uploadImage'])->name('images.store');
+                Route::post('/images/{image}/default', [\App\Http\Controllers\Admin\BrandingController::class, 'setDefaultImage'])->name('images.default');
+                Route::delete('/images/{image}', [\App\Http\Controllers\Admin\BrandingController::class, 'destroyImage'])->name('images.destroy');
             });
 
             // Political Leadership Strips API & Management

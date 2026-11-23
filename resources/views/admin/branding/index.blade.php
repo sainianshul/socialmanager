@@ -177,6 +177,24 @@
     background-image: repeating-conic-gradient(#cbd5e1 0% 25%, #ffffff 0% 50%) !important;
     background-size: 12px 12px !important;
 }
+
+/* Photo Gallery & Checkerboard Background */
+.checkerboard-bg {
+    background-color: #f8fafc;
+    background-image: repeating-conic-gradient(#e2e8f0 0% 25%, #ffffff 0% 50%) !important;
+    background-size: 14px 14px !important;
+}
+.photo-gallery-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.photo-gallery-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+.photo-gallery-card.is-active-default {
+    border-color: #0d9488 !important;
+    box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.25) !important;
+}
 </style>
 @endpush
 
@@ -529,25 +547,36 @@
                         </div>
 
                         {{-- ======================================================================
-                             TAB PANE 3: PHOTO CUTOUT
+                             TAB PANE 3: PHOTO CUTOUT & MULTI-PHOTO GALLERY
                              ====================================================================== --}}
                         <div class="tab-pane fade p-4 p-md-5" id="pane-cutout" role="tabpanel" aria-labelledby="tab-cutout-btn">
-                            <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+                            <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom flex-wrap gap-2">
                                 <div>
-                                    <h3 class="fw-bold text-dark mb-1" style="font-size: 1.25rem;">Profile Photo & Background Removal</h3>
-                                    <p class="text-secondary small mb-0">Upload your portrait photo and remove the background for high quality poster placement.</p>
+                                    <h3 class="fw-bold text-dark mb-1" style="font-size: 1.25rem;">Branding Photos & Cutout Gallery</h3>
+                                    <p class="text-secondary small mb-0">Upload multiple photos and select a default one for your festival and political posters.</p>
                                 </div>
-                                <span class="badge bg-light text-secondary border px-2.5 py-1">Photo</span>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-pill">
+                                    <i class="ti ti-photo me-1"></i>Multi-Photo Studio
+                                </span>
                             </div>
 
+                            {{-- Dynamic Alert Box for Gallery Actions --}}
+                            <div id="gallery-alert-box" class="d-none mb-4"></div>
+
+                            {{-- Top Card: Upload New Photo --}}
                             <div class="p-4 rounded-3 border bg-light-subtle mb-4">
+                                <div class="fw-bold text-dark mb-3 d-flex align-items-center gap-2">
+                                    <i class="ti ti-cloud-upload text-primary fs-3"></i>
+                                    <span>Upload New Photo (नई तस्वीर जोड़ें)</span>
+                                </div>
+
                                 <div class="d-flex align-items-center gap-4 flex-wrap flex-sm-nowrap">
                                     <div>
                                         <img id="upload-preview-thumb" src="{{ $currentPhotoUrl }}" alt="Photo" class="bs-upload-thumb">
                                     </div>
                                     <div class="flex-grow-1">
                                         <label class="bs-label mb-2">
-                                            <i class="ti ti-upload text-primary"></i>Upload New Photo
+                                            <i class="ti ti-upload text-primary"></i>Choose Image File
                                         </label>
                                         <input type="file" name="branding_image" id="input-branding-image" class="form-control bs-input" accept="image/png,image/jpeg,image/webp">
                                         <div class="form-text small text-secondary mt-1">Recommended: Clear portrait or bust photo with good lighting (JPG, PNG, WebP up to 10MB).</div>
@@ -564,12 +593,92 @@
                                     </div>
                                     <div id="bg-remove-status" class="mt-2 d-none"></div>
                                 </div>
+
+                                {{-- Quick Upload Options --}}
+                                <div class="mt-3 pt-3 border-top d-flex align-items-center justify-content-between flex-wrap gap-3">
+                                    <div class="form-check form-switch mb-0">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="check-make-default" {{ $brandingImages->isEmpty() ? 'checked' : '' }}>
+                                        <label class="form-check-label small fw-semibold text-dark" for="check-make-default">
+                                            Set as active default photo (मुख्य फोटो बनाएं)
+                                        </label>
+                                    </div>
+
+                                    <button type="button" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm" id="btn-upload-direct">
+                                        <i class="ti ti-cloud-upload me-1.5 fs-2"></i>Upload to Gallery
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Bottom Section: Photo Collection Grid --}}
+                            <div class="mt-4">
+                                <div class="d-flex align-items-center justify-content-between mb-3">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h4 class="fw-bold text-dark mb-0" style="font-size: 1.05rem;">My Photo Collection (आपकी फोटो गैलरी)</h4>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-0.5 small" id="gallery-counter">
+                                            {{ $brandingImages->count() }} {{ Str::plural('photo', $brandingImages->count()) }}
+                                        </span>
+                                    </div>
+                                    <span class="text-secondary small">Click "Set Default" to choose active poster photo</span>
+                                </div>
+
+                                {{-- Photos Grid --}}
+                                <div class="row g-3 row-cols-2 row-cols-sm-3 row-cols-md-4" id="photo-gallery-grid">
+                                    @foreach($brandingImages as $img)
+                                        <div class="col" id="photo-col-{{ $img->id }}">
+                                            <div class="card h-100 border rounded-3 position-relative photo-gallery-card {{ $img->is_default ? 'is-active-default border-primary' : 'border-light-subtle' }}" style="background: #ffffff;">
+                                                {{-- Delete Button --}}
+                                                <button type="button" class="btn btn-sm btn-light text-danger rounded-circle p-0 position-absolute top-0 end-0 m-2 shadow-xs border btn-delete-photo" 
+                                                        data-id="{{ $img->id }}" 
+                                                        data-url="{{ route('admin.branding.images.destroy', $img->id) }}"
+                                                        title="Delete this photo"
+                                                        style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 2;">
+                                                    <i class="ti ti-trash fs-2"></i>
+                                                </button>
+
+                                                {{-- Default Badge --}}
+                                                <div class="position-absolute top-0 start-0 m-2 z-1">
+                                                    <span class="badge bg-success rounded-pill px-2 py-0.5 small shadow-xs default-badge {{ $img->is_default ? '' : 'd-none' }}">
+                                                        <i class="ti ti-check me-0.5"></i>Default
+                                                    </span>
+                                                </div>
+
+                                                {{-- Image Viewport with Checkerboard Pattern --}}
+                                                <div class="checkerboard-bg p-2 rounded-top-3 d-flex align-items-center justify-content-center" style="height: 150px; overflow: hidden;">
+                                                    <img src="{{ $img->cutout_url }}" alt="Branding Photo" class="img-fluid gallery-photo-img" style="max-height: 135px; object-fit: contain;">
+                                                </div>
+
+                                                {{-- Card Footer Action --}}
+                                                <div class="p-2.5 text-center bg-white rounded-bottom-3 border-top">
+                                                    <button type="button" 
+                                                            class="btn btn-xs rounded-pill w-100 py-1 fw-semibold btn-make-default {{ $img->is_default ? 'btn-success disabled' : 'btn-outline-primary' }}"
+                                                            data-id="{{ $img->id }}"
+                                                            data-url="{{ route('admin.branding.images.default', $img->id) }}">
+                                                        @if($img->is_default)
+                                                            <i class="ti ti-circle-check me-1"></i>Active Default
+                                                        @else
+                                                            <i class="ti ti-star me-1"></i>Set Default
+                                                        @endif
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+
+                                {{-- Empty State when no photos exist --}}
+                                <div id="gallery-empty-state" class="text-center py-5 border border-dashed rounded-3 bg-light-subtle {{ $brandingImages->isEmpty() ? '' : 'd-none' }}">
+                                    <div class="mb-2 text-secondary">
+                                        <i class="ti ti-photo-off" style="font-size: 2.5rem; opacity: 0.5;"></i>
+                                    </div>
+                                    <div class="fw-bold text-dark mb-1">No Branding Photos Yet</div>
+                                    <div class="text-secondary small mb-3">Upload your portrait cutout photo above to start creating branded festival posters.</div>
+                                </div>
                             </div>
 
                             {{-- Save Button for Cutout Tab --}}
-                            <div class="pt-4 border-top text-end">
+                            <div class="pt-4 border-top text-end mt-4">
                                 <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold shadow-sm">
-                                    <i class="ti ti-device-floppy me-1.5 fs-2"></i>Save Photo
+                                    <i class="ti ti-device-floppy me-1.5 fs-2"></i>Save All Changes
                                 </button>
                             </div>
                         </div>
@@ -593,6 +702,15 @@ document.addEventListener('DOMContentLoaded', function () {
         if (targetBtn) {
             var tabTrigger = new bootstrap.Tab(targetBtn);
             tabTrigger.show();
+        }
+    }
+
+    // Support URL param ?tab=cutout
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'cutout') {
+        var cutoutBtn = document.getElementById('tab-cutout-btn');
+        if (cutoutBtn) {
+            new bootstrap.Tab(cutoutBtn).show();
         }
     }
 
@@ -752,6 +870,271 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 btnRemoveBg.classList.remove('d-none');
                 btnRemoveBg.disabled = false;
+            }
+        });
+    }
+
+    // =========================================================================
+    // MULTI-PHOTO GALLERY: UPLOAD, SET DEFAULT & DELETE
+    // =========================================================================
+    var btnUploadDirect = document.getElementById('btn-upload-direct');
+    var checkMakeDefault = document.getElementById('check-make-default');
+    var galleryGrid = document.getElementById('photo-gallery-grid');
+    var galleryCounter = document.getElementById('gallery-counter');
+    var galleryEmpty = document.getElementById('gallery-empty-state');
+    var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '{{ csrf_token() }}';
+
+    function showGalleryAlert(message, type) {
+        var alertBox = document.getElementById('gallery-alert-box');
+        if (!alertBox) return;
+        var icon = type === 'success' ? 'ti-circle-check' : 'ti-alert-circle';
+        alertBox.className = 'alert alert-' + type + ' alert-dismissible fade show rounded-3 shadow-xs mb-4';
+        alertBox.innerHTML = '<div class="d-flex align-items-center gap-2">' +
+            '<i class="ti ' + icon + ' fs-2"></i>' +
+            '<span class="fw-semibold">' + message + '</span>' +
+        '</div>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+    }
+
+    function updateGalleryCounter() {
+        if (!galleryGrid || !galleryCounter) return;
+        var count = galleryGrid.querySelectorAll('.photo-gallery-card').length;
+        galleryCounter.textContent = count + ' ' + (count === 1 ? 'photo' : 'photos');
+        if (count === 0 && galleryEmpty) {
+            galleryEmpty.classList.remove('d-none');
+        } else if (galleryEmpty) {
+            galleryEmpty.classList.add('d-none');
+        }
+    }
+
+    function setCardAsActiveDefault(targetCard) {
+        if (!galleryGrid) return;
+        var cards = galleryGrid.querySelectorAll('.photo-gallery-card');
+        cards.forEach(function (card) {
+            card.classList.remove('is-active-default', 'border-primary');
+            card.classList.add('border-light-subtle');
+            var badge = card.querySelector('.default-badge');
+            if (badge) badge.classList.add('d-none');
+            var btn = card.querySelector('.btn-make-default');
+            if (btn) {
+                btn.className = 'btn btn-xs rounded-pill w-100 py-1 fw-semibold btn-make-default btn-outline-primary';
+                btn.removeAttribute('disabled');
+                btn.innerHTML = '<i class="ti ti-star me-1"></i>Set Default';
+            }
+        });
+
+        if (targetCard) {
+            targetCard.classList.add('is-active-default', 'border-primary');
+            targetCard.classList.remove('border-light-subtle');
+            var targetBadge = targetCard.querySelector('.default-badge');
+            if (targetBadge) targetBadge.classList.remove('d-none');
+            var targetBtn = targetCard.querySelector('.btn-make-default');
+            if (targetBtn) {
+                targetBtn.className = 'btn btn-xs rounded-pill w-100 py-1 fw-semibold btn-make-default btn-success disabled';
+                targetBtn.setAttribute('disabled', 'disabled');
+                targetBtn.innerHTML = '<i class="ti ti-circle-check me-1"></i>Active Default';
+            }
+        }
+    }
+
+    if (btnUploadDirect && imageInput) {
+        btnUploadDirect.addEventListener('click', async function () {
+            if (!imageInput.files || !imageInput.files[0]) {
+                showGalleryAlert('Please select a photo to upload.', 'danger');
+                imageInput.focus();
+                return;
+            }
+
+            var originalBtnHtml = btnUploadDirect.innerHTML;
+            btnUploadDirect.disabled = true;
+            btnUploadDirect.innerHTML = '<span class="spinner-border spinner-border-sm me-1.5" role="status"></span>Uploading...';
+
+            var formData = new FormData();
+            formData.append('branding_image', imageInput.files[0]);
+            formData.append('is_default', checkMakeDefault && checkMakeDefault.checked ? '1' : '0');
+
+            try {
+                var response = await fetch('{{ route('admin.branding.images.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                });
+
+                var data = await response.json();
+
+                if (response.ok && data.success) {
+                    showGalleryAlert(data.message || 'Branding photo uploaded successfully.', 'success');
+
+                    // If set as default, update previous cards
+                    if (data.image.is_default) {
+                        setCardAsActiveDefault(null);
+                    }
+
+                    // Prepend new card
+                    var defaultRouteTemplate = '{{ route('admin.branding.images.default', ':id') }}';
+                    var destroyRouteTemplate = '{{ route('admin.branding.images.destroy', ':id') }}';
+                    var defaultUrl = defaultRouteTemplate.replace(':id', data.image.id);
+                    var destroyUrl = destroyRouteTemplate.replace(':id', data.image.id);
+
+                    var newCol = document.createElement('div');
+                    newCol.className = 'col';
+                    newCol.id = 'photo-col-' + data.image.id;
+                    newCol.innerHTML = '<div class="card h-100 border rounded-3 position-relative photo-gallery-card ' + (data.image.is_default ? 'is-active-default border-primary' : 'border-light-subtle') + '" style="background: #ffffff;">' +
+                        '<button type="button" class="btn btn-sm btn-light text-danger rounded-circle p-0 position-absolute top-0 end-0 m-2 shadow-xs border btn-delete-photo" ' +
+                                'data-id="' + data.image.id + '" ' +
+                                'data-url="' + destroyUrl + '" ' +
+                                'title="Delete this photo" ' +
+                                'style="width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; z-index: 2;">' +
+                            '<i class="ti ti-trash fs-2"></i>' +
+                        '</button>' +
+                        '<div class="position-absolute top-0 start-0 m-2 z-1">' +
+                            '<span class="badge bg-success rounded-pill px-2 py-0.5 small shadow-xs default-badge ' + (data.image.is_default ? '' : 'd-none') + '">' +
+                                '<i class="ti ti-check me-0.5"></i>Default' +
+                            '</span>' +
+                        '</div>' +
+                        '<div class="checkerboard-bg p-2 rounded-top-3 d-flex align-items-center justify-content-center" style="height: 150px; overflow: hidden;">' +
+                            '<img src="' + data.image.url + '" alt="Branding Photo" class="img-fluid gallery-photo-img" style="max-height: 135px; object-fit: contain;">' +
+                        '</div>' +
+                        '<div class="p-2.5 text-center bg-white rounded-bottom-3 border-top">' +
+                            '<button type="button" class="btn btn-xs rounded-pill w-100 py-1 fw-semibold btn-make-default ' + (data.image.is_default ? 'btn-success disabled' : 'btn-outline-primary') + '" ' +
+                                    'data-id="' + data.image.id + '" ' +
+                                    'data-url="' + defaultUrl + '">' +
+                                (data.image.is_default ? '<i class="ti ti-circle-check me-1"></i>Active Default' : '<i class="ti ti-star me-1"></i>Set Default') +
+                            '</button>' +
+                        '</div>' +
+                    '</div>';
+
+                    if (galleryGrid) {
+                        galleryGrid.prepend(newCol);
+                    }
+
+                    if (previewThumb) {
+                        previewThumb.src = data.image.url;
+                        previewThumb.classList.remove('transparent-bg');
+                    }
+
+                    // Reset input
+                    imageInput.value = '';
+                    if (bgRemoveBox) bgRemoveBox.classList.add('d-none');
+                    if (bgStatus) { bgStatus.classList.add('d-none'); bgStatus.innerHTML = ''; }
+                    updateGalleryCounter();
+                } else {
+                    showGalleryAlert(data.message || 'Failed to upload photo. Please check image format.', 'danger');
+                }
+            } catch (err) {
+                console.error('Upload error:', err);
+                showGalleryAlert('Network error while uploading photo. Please try again.', 'danger');
+            } finally {
+                btnUploadDirect.disabled = false;
+                btnUploadDirect.innerHTML = originalBtnHtml;
+            }
+        });
+    }
+
+    // Event Delegation for "Set Default" and "Delete Photo"
+    if (galleryGrid) {
+        galleryGrid.addEventListener('click', async function (e) {
+            // Set Default Action
+            var makeDefaultBtn = e.target.closest('.btn-make-default');
+            if (makeDefaultBtn && !makeDefaultBtn.disabled && !makeDefaultBtn.classList.contains('disabled')) {
+                var url = makeDefaultBtn.getAttribute('data-url');
+                var card = makeDefaultBtn.closest('.photo-gallery-card');
+                var originalHtml = makeDefaultBtn.innerHTML;
+
+                makeDefaultBtn.disabled = true;
+                makeDefaultBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Setting...';
+
+                try {
+                    var response = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    var data = await response.json();
+
+                    if (response.ok && data.success) {
+                        setCardAsActiveDefault(card);
+                        showGalleryAlert(data.message || 'Default branding photo updated.', 'success');
+
+                        // Update thumbnail
+                        var cardImg = card.querySelector('.gallery-photo-img');
+                        if (cardImg && previewThumb) {
+                            previewThumb.src = cardImg.src;
+                            previewThumb.classList.remove('transparent-bg');
+                        }
+                    } else {
+                        makeDefaultBtn.disabled = false;
+                        makeDefaultBtn.innerHTML = originalHtml;
+                        showGalleryAlert(data.message || 'Could not set default photo.', 'danger');
+                    }
+                } catch (err) {
+                    console.error('Set default error:', err);
+                    makeDefaultBtn.disabled = false;
+                    makeDefaultBtn.innerHTML = originalHtml;
+                    showGalleryAlert('Network error while setting default photo.', 'danger');
+                }
+                return;
+            }
+
+            // Delete Action
+            var deleteBtn = e.target.closest('.btn-delete-photo');
+            if (deleteBtn) {
+                if (!confirm('Are you sure you want to delete this photo?')) {
+                    return;
+                }
+
+                var deleteUrl = deleteBtn.getAttribute('data-url');
+                var col = deleteBtn.closest('.col');
+
+                deleteBtn.disabled = true;
+
+                try {
+                    var delResponse = await fetch(deleteUrl, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    var delData = await delResponse.json();
+
+                    if (delResponse.ok && delData.success) {
+                        col.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+                        col.style.opacity = '0';
+                        col.style.transform = 'scale(0.9)';
+                        setTimeout(function () {
+                            col.remove();
+                            updateGalleryCounter();
+
+                            if (delData.new_default_id) {
+                                var nextCard = document.querySelector('#photo-col-' + delData.new_default_id + ' .photo-gallery-card');
+                                if (nextCard) {
+                                    setCardAsActiveDefault(nextCard);
+                                }
+                                if (delData.new_default_url && previewThumb) {
+                                    previewThumb.src = delData.new_default_url;
+                                }
+                            }
+                        }, 250);
+
+                        showGalleryAlert(delData.message || 'Photo removed successfully.', 'success');
+                    } else {
+                        deleteBtn.disabled = false;
+                        showGalleryAlert(delData.message || 'Could not delete photo.', 'danger');
+                    }
+                } catch (delErr) {
+                    console.error('Delete photo error:', delErr);
+                    deleteBtn.disabled = false;
+                    showGalleryAlert('Network error while deleting photo.', 'danger');
+                }
             }
         });
     }
