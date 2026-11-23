@@ -42,6 +42,9 @@ class PosterComposerController extends Controller
             'strip_id'      => 'nullable|integer|exists:leader_strips,id',
             'branding_id'   => 'nullable|integer|exists:user_brandings,id',
             'cutout_url'    => 'nullable|string',
+            'leader_shape'  => 'nullable|string|max:30',
+            'leader_border_color' => 'nullable|string|max:20',
+            'leader_size'   => 'nullable|integer|min:50|max:200',
             'custom_config' => 'nullable|array',
         ]);
 
@@ -95,6 +98,10 @@ class PosterComposerController extends Controller
 
         if ($request->filled('leader_border_color')) {
             $options['layout_config']['header']['chip_border_color'] = $request->input('leader_border_color');
+        }
+
+        if ($request->filled('leader_size')) {
+            $options['layout_config']['header']['chip_size'] = (int) $request->input('leader_size');
         }
 
         if ($request->filled('layout_config') && is_array($request->input('layout_config'))) {

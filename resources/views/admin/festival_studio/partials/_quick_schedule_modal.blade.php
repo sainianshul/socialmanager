@@ -170,24 +170,90 @@
                                         </span>
                                     </a>
                                     <div class="collapse mt-3 pt-3 border-top" id="qs-modal-advanced-leader" style="border-color: #E2E8F0 !important;">
-                                        <div class="row g-3 align-items-center">
-                                            <div class="col-sm-6">
-                                                <label for="qs-modal-leader-shape" class="form-label text-muted small mb-1.5" style="font-size: 11px; font-weight: 500;">Avatar Shape</label>
-                                                <select class="form-select form-select-sm rounded-3 shadow-none" id="qs-modal-leader-shape" style="border-color: #E2E8F0; padding: 7px 12px; font-size: 13px;">
-                                                    <option value="circle">Circle (गोल)</option>
-                                                    <option value="rounded_square">Rounded (घुमावदार)</option>
-                                                    <option value="square">Square (चौकोर)</option>
-                                                </select>
+                                        <div class="row g-3">
+                                            {{-- Avatar Shape Selector (Excalidraw / Figma Style Tiles) --}}
+                                            <div class="col-sm-5">
+                                                <label class="form-label text-muted small mb-2 d-block" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Avatar Shape</label>
+                                                <input type="hidden" id="qs-modal-leader-shape" value="circle">
+                                                <div class="d-flex align-items-center gap-1.5" id="qs-shape-group">
+                                                    <button type="button" class="btn btn-sm qs-shape-btn flex-fill d-flex flex-column align-items-center justify-content-center py-2 px-1 rounded-3 transition-all" data-shape="circle" style="border: 1.5px solid #2563EB; background: #EFF6FF;" title="Circle (गोल)">
+                                                        <span class="qs-shape-icon d-inline-block rounded-circle" style="width: 18px; height: 18px; border: 2px solid #2563EB; background: transparent;"></span>
+                                                        <span class="qs-shape-text mt-1 text-truncate" style="font-size: 10.5px; font-weight: 600; color: #1E40AF; line-height: 1;">Circle</span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm qs-shape-btn flex-fill d-flex flex-column align-items-center justify-content-center py-2 px-1 rounded-3 transition-all" data-shape="rounded_square" style="border: 1.5px solid #E2E8F0; background: #FFFFFF;" title="Rounded (घुमावदार)">
+                                                        <span class="qs-shape-icon d-inline-block rounded-2" style="width: 18px; height: 18px; border: 2px solid #64748B; background: transparent;"></span>
+                                                        <span class="qs-shape-text mt-1 text-truncate text-secondary" style="font-size: 10.5px; font-weight: 500; color: #64748B; line-height: 1;">Round</span>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm qs-shape-btn flex-fill d-flex flex-column align-items-center justify-content-center py-2 px-1 rounded-3 transition-all" data-shape="square" style="border: 1.5px solid #E2E8F0; background: #FFFFFF;" title="Square (चौकोर)">
+                                                        <span class="qs-shape-icon d-inline-block rounded-0" style="width: 18px; height: 18px; border: 2px solid #64748B; background: transparent;"></span>
+                                                        <span class="qs-shape-text mt-1 text-truncate text-secondary" style="font-size: 10.5px; font-weight: 500; color: #64748B; line-height: 1;">Square</span>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="col-sm-6">
-                                                <label class="form-label text-muted small mb-1.5" style="font-size: 11px; font-weight: 500;">Ring Color</label>
-                                                <div class="d-flex align-items-center gap-1.5">
-                                                    <input type="color" id="qs-modal-leader-border" class="form-control form-control-color form-control-sm p-0 rounded-3 shadow-none" value="#FF9933" title="Ring Color" style="width: 34px; height: 33px; border-color: #E2E8F0;">
-                                                    <div class="btn-group btn-group-sm flex-fill" role="group">
-                                                        <button type="button" class="btn btn-outline-secondary px-2 py-1 qs-color-preset" data-color="#FF9933" style="font-size: 11px; border-color: #E2E8F0;" title="Saffron">Saffron</button>
-                                                        <button type="button" class="btn btn-outline-secondary px-2 py-1 qs-color-preset" data-color="#FFFFFF" style="font-size: 11px; border-color: #E2E8F0;" title="White">White</button>
-                                                        <button type="button" class="btn btn-outline-secondary px-2 py-1 qs-color-preset" data-color="#138808" style="font-size: 11px; border-color: #E2E8F0;" title="Green">Green</button>
-                                                        <button type="button" class="btn btn-outline-secondary px-2 py-1 qs-color-preset" data-color="#D4AF37" style="font-size: 11px; border-color: #E2E8F0;" title="Gold">Gold</button>
+
+                                            {{-- Ring Color Swatches (Excalidraw Style Color Boxes) --}}
+                                            <div class="col-sm-7">
+                                                <label class="form-label text-muted small mb-2 d-block" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Ring Accent Color</label>
+                                                <div class="d-flex align-items-center gap-1.5 flex-wrap" id="qs-color-swatches-wrapper" style="min-height: 48px;">
+                                                    <!-- Saffron -->
+                                                    <button type="button" class="btn p-0 qs-color-swatch position-relative rounded-2 shadow-sm" data-color="#FF9933" title="Saffron (केसरिया)" style="width: 28px; height: 28px; background-color: #FF9933; border: 1px solid rgba(0,0,0,0.1); outline: 2px solid #2563EB; outline-offset: 2px;">
+                                                        <span class="qs-color-check position-absolute top-50 start-50 translate-middle text-white fw-bold" style="font-size: 13px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));">&#10003;</span>
+                                                    </button>
+                                                    <!-- White -->
+                                                    <button type="button" class="btn p-0 qs-color-swatch position-relative rounded-2 shadow-sm" data-color="#FFFFFF" title="White (सफेद)" style="width: 28px; height: 28px; background-color: #FFFFFF; border: 1.5px solid #CBD5E1;">
+                                                        <span class="qs-color-check d-none position-absolute top-50 start-50 translate-middle text-dark fw-bold" style="font-size: 13px; line-height: 1;">&#10003;</span>
+                                                    </button>
+                                                    <!-- Green -->
+                                                    <button type="button" class="btn p-0 qs-color-swatch position-relative rounded-2 shadow-sm" data-color="#138808" title="Green (हरा)" style="width: 28px; height: 28px; background-color: #138808; border: 1px solid rgba(0,0,0,0.1);">
+                                                        <span class="qs-color-check d-none position-absolute top-50 start-50 translate-middle text-white fw-bold" style="font-size: 13px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));">&#10003;</span>
+                                                    </button>
+                                                    <!-- Gold -->
+                                                    <button type="button" class="btn p-0 qs-color-swatch position-relative rounded-2 shadow-sm" data-color="#D4AF37" title="Gold (सुनहरा)" style="width: 28px; height: 28px; background-color: #D4AF37; border: 1px solid rgba(0,0,0,0.1);">
+                                                        <span class="qs-color-check d-none position-absolute top-50 start-50 translate-middle text-white fw-bold" style="font-size: 13px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));">&#10003;</span>
+                                                    </button>
+                                                    <!-- Red -->
+                                                    <button type="button" class="btn p-0 qs-color-swatch position-relative rounded-2 shadow-sm" data-color="#DC2626" title="Red (लाल)" style="width: 28px; height: 28px; background-color: #DC2626; border: 1px solid rgba(0,0,0,0.1);">
+                                                        <span class="qs-color-check d-none position-absolute top-50 start-50 translate-middle text-white fw-bold" style="font-size: 13px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));">&#10003;</span>
+                                                    </button>
+                                                    <!-- Navy Blue -->
+                                                    <button type="button" class="btn p-0 qs-color-swatch position-relative rounded-2 shadow-sm" data-color="#1E3A8A" title="Navy Blue (नीला)" style="width: 28px; height: 28px; background-color: #1E3A8A; border: 1px solid rgba(0,0,0,0.1);">
+                                                        <span class="qs-color-check d-none position-absolute top-50 start-50 translate-middle text-white fw-bold" style="font-size: 13px; line-height: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,0.6));">&#10003;</span>
+                                                    </button>
+                                                    <!-- Custom Color Picker Box -->
+                                                    <div id="qs-custom-color-box" class="position-relative rounded-2 overflow-hidden shadow-sm d-flex align-items-center justify-content-center" title="Custom Color (कस्टम रंग)" style="width: 28px; height: 28px; border: 1.5px dashed #94A3B8; background: conic-gradient(from 180deg at 50% 50%, #FF0000 0deg, #FFFF00 60deg, #00FF00 120deg, #00FFFF 180deg, #0000FF 240deg, #FF00FF 300deg, #FF0000 360deg); cursor: pointer;">
+                                                        <input type="color" id="qs-modal-leader-border" class="position-absolute top-0 start-0 w-100 h-100 opacity-0" value="#FF9933" style="cursor: pointer;">
+                                                        <span class="text-white fw-bold position-relative" style="font-size: 12px; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8)); pointer-events: none;">+</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {{-- Leader Avatar Size (Increase / Decrease Buttons & Presets) --}}
+                                            <div class="col-12 pt-2.5 mt-2 border-top" style="border-color: #E2E8F0 !important;">
+                                                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                                                    <div>
+                                                        <label class="form-label text-muted small mb-0 d-block" style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Avatar Size (लीडर बॉक्स का साइज़)</label>
+                                                        <span class="text-secondary" style="font-size: 11px;">Tap &minus; / &#43; to adjust</span>
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-1.5">
+                                                        <!-- Minus Button -->
+                                                        <button type="button" class="btn btn-sm btn-light border d-flex align-items-center justify-content-center p-0 rounded-2 shadow-sm" id="qs-btn-size-dec" title="Decrease Size (छोटा करें)" style="width: 30px; height: 30px; border-color: #CBD5E1 !important; background: #FFFFFF;">
+                                                            <span class="fw-bold text-dark" style="font-size: 16px; line-height: 1;">&minus;</span>
+                                                        </button>
+                                                        
+                                                        <!-- Size Presets: S, M, L -->
+                                                        <div class="btn-group btn-group-sm" role="group" id="qs-size-preset-group">
+                                                            <button type="button" class="btn btn-outline-secondary px-2.5 py-1 qs-size-btn" data-size="88" style="font-size: 11px; border-color: #E2E8F0;">Small</button>
+                                                            <button type="button" class="btn btn-primary px-2.5 py-1 qs-size-btn active" data-size="106" style="font-size: 11px;">Default</button>
+                                                            <button type="button" class="btn btn-outline-secondary px-2.5 py-1 qs-size-btn" data-size="124" style="font-size: 11px; border-color: #E2E8F0;">Large</button>
+                                                        </div>
+
+                                                        <!-- Plus Button -->
+                                                        <button type="button" class="btn btn-sm btn-light border d-flex align-items-center justify-content-center p-0 rounded-2 shadow-sm" id="qs-btn-size-inc" title="Increase Size (बड़ा करें)" style="width: 30px; height: 30px; border-color: #CBD5E1 !important; background: #FFFFFF;">
+                                                            <span class="fw-bold text-dark" style="font-size: 16px; line-height: 1;">&#43;</span>
+                                                        </button>
+
+                                                        <!-- Hidden input for modal leader size -->
+                                                        <input type="hidden" id="qs-modal-leader-size" value="106">
                                                     </div>
                                                 </div>
                                             </div>
@@ -237,6 +303,7 @@
                         <input type="hidden" name="header_layout" id="qs-input-header-layout" value="">
                         <input type="hidden" name="leader_shape" id="qs-input-leader-shape" value="circle">
                         <input type="hidden" name="leader_border_color" id="qs-input-leader-border" value="#FF9933">
+                        <input type="hidden" name="leader_size" id="qs-input-leader-size" value="106">
                         <input type="hidden" name="strip_id" id="qs-input-strip-id" value="{{ $activeStrip?->id }}">
 
                         {{-- Alert Box for Dynamic Errors --}}

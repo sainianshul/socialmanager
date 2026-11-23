@@ -154,6 +154,9 @@ class FestivalStudioController extends Controller
             'composed_image' => 'nullable|string',
             'include_strip'  => 'nullable|boolean',
             'strip_id'       => 'nullable|integer|exists:leader_strips,id',
+            'leader_shape'   => 'nullable|string|max:30',
+            'leader_border_color' => 'nullable|string|max:20',
+            'leader_size'    => 'nullable|integer|min:50|max:200',
         ]);
 
         $user = auth()->user();
@@ -225,8 +228,12 @@ class FestivalStudioController extends Controller
 
                 $leaderShape = $request->input('leader_shape') ?: ($templateConfig['header']['chip_shape'] ?? 'circle');
                 $leaderBorder = $request->input('leader_border_color') ?: ($templateConfig['header']['chip_border_color'] ?? '#FF9933');
+                $leaderSize = $request->input('leader_size');
                 $options['layout_config']['header']['chip_shape'] = $leaderShape;
                 $options['layout_config']['header']['chip_border_color'] = $leaderBorder;
+                if (!empty($leaderSize)) {
+                    $options['layout_config']['header']['chip_size'] = (int) $leaderSize;
+                }
 
                 $composed = $composer->composeToFile($template, $branding, $strip, $options);
                 $mediaUrls = [$composed['relative_path']];

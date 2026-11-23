@@ -746,6 +746,17 @@
                 var inputHiddenBorder = document.getElementById('qs-input-leader-border');
                 if (inputHiddenBorder) inputHiddenBorder.value = leaderBorder;
 
+                var leaderSize = trigger.getAttribute('data-leader-size') || '106';
+                var inputModalSize = document.getElementById('qs-modal-leader-size');
+                if (inputModalSize) inputModalSize.value = leaderSize;
+                var inputHiddenSize = document.getElementById('qs-input-leader-size');
+                if (inputHiddenSize) inputHiddenSize.value = leaderSize;
+
+                // Sync UI Shape Tiles, Color Swatches & Size Buttons
+                if (typeof updateShapeTilesUI === 'function') updateShapeTilesUI(leaderShape);
+                if (typeof updateColorSwatchesUI === 'function') updateColorSwatchesUI(leaderBorder);
+                if (typeof updateSizeButtonsUI === 'function') updateSizeButtonsUI(leaderSize);
+
                 // Auto-select Leadership Strip (Template Assigned, User Custom First, or Party Official Default)
                 var tplPartyId = trigger.getAttribute('data-party-id') || '';
                 var tplStripId = trigger.getAttribute('data-strip-id') || '';
@@ -790,7 +801,7 @@
                 }
 
                 // Trigger Live Server-Side Poster Composition for Step 1
-                composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null);
+                composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null, leaderSize);
             });
 
             // Wizard Step Navigation
@@ -842,10 +853,13 @@
 
                     var selectLeaderShape = document.getElementById('qs-modal-leader-shape');
                     var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
+                    var inputModalSize = document.getElementById('qs-modal-leader-size');
                     var inputHiddenShape = document.getElementById('qs-input-leader-shape');
                     var inputHiddenBorder = document.getElementById('qs-input-leader-border');
+                    var inputHiddenSize = document.getElementById('qs-input-leader-size');
                     if (inputHiddenShape && selectLeaderShape) inputHiddenShape.value = selectLeaderShape.value;
                     if (inputHiddenBorder && inputLeaderBorder) inputHiddenBorder.value = inputLeaderBorder.value;
+                    if (inputHiddenSize && inputModalSize) inputHiddenSize.value = inputModalSize.value;
 
                     var selectStrip = document.getElementById('qs-modal-strip-id');
                     var inputStrip = document.getElementById('qs-input-strip-id');
@@ -874,6 +888,83 @@
             var inputLeaderBorder = document.getElementById('qs-modal-leader-border');
             var selectStrip = document.getElementById('qs-modal-strip-id');
 
+            function updateShapeTilesUI(selectedShape) {
+                var targetShape = selectedShape || 'circle';
+                document.querySelectorAll('.qs-shape-btn').forEach(function (btn) {
+                    var shape = btn.getAttribute('data-shape');
+                    var icon = btn.querySelector('.qs-shape-icon');
+                    var text = btn.querySelector('.qs-shape-text');
+                    if (shape === targetShape) {
+                        btn.style.borderColor = '#2563EB';
+                        btn.style.backgroundColor = '#EFF6FF';
+                        if (icon) icon.style.borderColor = '#2563EB';
+                        if (text) {
+                            text.style.color = '#1E40AF';
+                            text.style.fontWeight = '600';
+                        }
+                    } else {
+                        btn.style.borderColor = '#E2E8F0';
+                        btn.style.backgroundColor = '#FFFFFF';
+                        if (icon) icon.style.borderColor = '#64748B';
+                        if (text) {
+                            text.style.color = '#64748B';
+                            text.style.fontWeight = '500';
+                        }
+                    }
+                });
+            }
+
+            function updateColorSwatchesUI(selectedColor) {
+                var normColor = (selectedColor || '#FF9933').toLowerCase().trim();
+                var matched = false;
+                document.querySelectorAll('.qs-color-swatch').forEach(function (btn) {
+                    var c = (btn.getAttribute('data-color') || '').toLowerCase().trim();
+                    var check = btn.querySelector('.qs-color-check');
+                    if (c === normColor) {
+                        matched = true;
+                        btn.style.outline = '2px solid #2563EB';
+                        btn.style.outlineOffset = '2px';
+                        if (check) check.classList.remove('d-none');
+                    } else {
+                        btn.style.outline = 'none';
+                        btn.style.outlineOffset = '0px';
+                        if (check) check.classList.add('d-none');
+                    }
+                });
+                var customBox = document.getElementById('qs-custom-color-box');
+                if (customBox) {
+                    if (!matched) {
+                        customBox.style.outline = '2px solid #2563EB';
+                        customBox.style.outlineOffset = '2px';
+                    } else {
+                        customBox.style.outline = 'none';
+                        customBox.style.outlineOffset = '0px';
+                    }
+                }
+            }
+
+            function setLeaderSize(size) {
+                var s = Math.max(70, Math.min(145, parseInt(size) || 106));
+                var inputModalSize = document.getElementById('qs-modal-leader-size');
+                var inputHiddenSize = document.getElementById('qs-input-leader-size');
+                if (inputModalSize) inputModalSize.value = s;
+                if (inputHiddenSize) inputHiddenSize.value = s;
+                updateSizeButtonsUI(s);
+                onStyleChange();
+            }
+
+            function updateSizeButtonsUI(size) {
+                var s = parseInt(size) || 106;
+                document.querySelectorAll('.qs-size-btn').forEach(function (btn) {
+                    var bSize = parseInt(btn.getAttribute('data-size'));
+                    if (Math.abs(bSize - s) <= 6) {
+                        btn.className = 'btn btn-primary px-2.5 py-1 qs-size-btn active';
+                    } else {
+                        btn.className = 'btn btn-outline-secondary px-2.5 py-1 qs-size-btn';
+                    }
+                });
+            }
+
             function onStyleChange() {
                 var tplId = document.getElementById('qs-input-template-id')?.value;
                 if (!tplId) return;
@@ -881,28 +972,80 @@
                 var hLayout = selectHeaderLayout ? selectHeaderLayout.value : 'full_width_strip';
                 var lShape = selectLeaderShape ? selectLeaderShape.value : 'circle';
                 var lBorder = inputLeaderBorder ? inputLeaderBorder.value : '#FF9933';
+                var lSize = document.getElementById('qs-modal-leader-size')?.value || '106';
                 var stripId = selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value;
-                composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId);
+                composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId, lSize);
             }
 
             if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
             if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
             if (selectLeaderShape) selectLeaderShape.addEventListener('change', onStyleChange);
-            if (inputLeaderBorder) inputLeaderBorder.addEventListener('change', onStyleChange);
+            if (inputLeaderBorder) {
+                inputLeaderBorder.addEventListener('input', function () {
+                    updateColorSwatchesUI(this.value);
+                    onStyleChange();
+                });
+                inputLeaderBorder.addEventListener('change', function () {
+                    updateColorSwatchesUI(this.value);
+                    onStyleChange();
+                });
+            }
             if (selectStrip) selectStrip.addEventListener('change', onStyleChange);
 
-            document.querySelectorAll('.qs-color-preset').forEach(function (btn) {
+            // Click handlers for shape buttons
+            document.querySelectorAll('.qs-shape-btn').forEach(function (btn) {
                 btn.addEventListener('click', function () {
-                    var color = this.getAttribute('data-color');
-                    if (inputLeaderBorder) {
-                        inputLeaderBorder.value = color;
-                        onStyleChange();
-                    }
+                    var shape = this.getAttribute('data-shape') || 'circle';
+                    if (selectLeaderShape) selectLeaderShape.value = shape;
+                    var inputHiddenShape = document.getElementById('qs-input-leader-shape');
+                    if (inputHiddenShape) inputHiddenShape.value = shape;
+                    updateShapeTilesUI(shape);
+                    onStyleChange();
                 });
             });
 
+            // Click handlers for Excalidraw color swatches
+            document.querySelectorAll('.qs-color-swatch').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var color = this.getAttribute('data-color') || '#FF9933';
+                    if (inputLeaderBorder) inputLeaderBorder.value = color;
+                    var inputHiddenBorder = document.getElementById('qs-input-leader-border');
+                    if (inputHiddenBorder) inputHiddenBorder.value = color;
+                    updateColorSwatchesUI(color);
+                    onStyleChange();
+                });
+            });
+
+            // Click handlers for size presets
+            document.querySelectorAll('.qs-size-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var size = parseInt(this.getAttribute('data-size')) || 106;
+                    setLeaderSize(size);
+                });
+            });
+
+            // Click handler for Decrease Size (-)
+            var btnSizeDec = document.getElementById('qs-btn-size-dec');
+            if (btnSizeDec) {
+                btnSizeDec.addEventListener('click', function () {
+                    var inputModalSize = document.getElementById('qs-modal-leader-size');
+                    var curr = parseInt(inputModalSize ? inputModalSize.value : '106') || 106;
+                    setLeaderSize(curr - 8);
+                });
+            }
+
+            // Click handler for Increase Size (+)
+            var btnSizeInc = document.getElementById('qs-btn-size-inc');
+            if (btnSizeInc) {
+                btnSizeInc.addEventListener('click', function () {
+                    var inputModalSize = document.getElementById('qs-modal-leader-size');
+                    var curr = parseInt(inputModalSize ? inputModalSize.value : '106') || 106;
+                    setLeaderSize(curr + 8);
+                });
+            }
+
             // Helper: Compose High-Res Branded Poster via API
-            function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId) {
+            function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId, leaderSize) {
                 var spinner = document.getElementById('qs-modal-spinner');
                 var imgEl = document.getElementById('qs-modal-img');
                 var previewLink = document.getElementById('qs-modal-preview-link');
@@ -926,6 +1069,7 @@
 
                 var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 var currentStrip = stripId || (selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value);
+                var currentSize = leaderSize || document.getElementById('qs-modal-leader-size')?.value || '106';
 
                 var payload = {
                     template_id: parseInt(templateId),
@@ -933,6 +1077,7 @@
                     header_layout: headerLayout || selectHeaderLayout?.value,
                     leader_shape: leaderShape || selectLeaderShape?.value || 'circle',
                     leader_border_color: leaderBorder || inputLeaderBorder?.value || '#FF9933',
+                    leader_size: parseInt(currentSize),
                     include_strip: (headerLayout !== 'none'),
                     strip_id: currentStrip ? parseInt(currentStrip) : null
                 };

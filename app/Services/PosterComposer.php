@@ -410,8 +410,10 @@ class PosterComposer
             $leaders = $strip ? $strip->leaders->take(7) : ($party?->leaders()->take(7)->get() ?? collect());
             if ($leaders->isNotEmpty()) {
                 $leaderCount = $leaders->count();
-                $cardW = 96;
-                $cardH = 126;
+                $chipSize = $headerConfig['chip_size'] ?? 102;
+                $scale = $chipSize / 102.0;
+                $cardW = max(60, (int) (96 * $scale));
+                $cardH = max(80, (int) (126 * $scale));
                 $radius = 16;
                 $stripY = $headerConfig['chips_start_y'] ?? 14;
 
@@ -490,7 +492,7 @@ class PosterComposer
 
                 // 2. Render Leaders inside the Dock
                 $leaderCount = $leaders->count();
-                $chipSize = 98;
+                $chipSize = $headerConfig['chip_size'] ?? 98;
                 $totalChipW = $leaderCount * $chipSize;
                 $totalGaps = $leaderCount + 1;
                 $gap = (int) (($dockW - $totalChipW) / $totalGaps);
@@ -540,7 +542,7 @@ class PosterComposer
 
                 // 2. Leaders under Canopy in Royal Gold Rings
                 $leaderCount = $leaders->count();
-                $chipSize = 104;
+                $chipSize = $headerConfig['chip_size'] ?? 104;
                 $stripY = 22;
                 $goldBorder = $headerConfig['chip_border_color'] ?? '#D4AF37';
 
