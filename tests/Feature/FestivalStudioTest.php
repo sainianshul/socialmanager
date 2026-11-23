@@ -367,4 +367,52 @@ class FestivalStudioTest extends TestCase
         $indexResponse->assertSee('id="qs-modal-show-social"', false);
         $indexResponse->assertSee('Social Media Handles');
     }
+
+    public function test_festival_studio_supports_candidate_customization_and_photo_upload(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+        $this->seed(FestivalSeeder::class);
+        $this->seed(\Database\Seeders\PoliticalPartySeeder::class);
+
+        $user = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $bjp = \App\Models\PoliticalParty::where('short_code', 'BJP')->first();
+
+        \App\Models\UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'display_name' => 'Rahul Sharma',
+            'designation' => 'Yuva Morcha Adhyaksh',
+            'is_default' => true,
+        ]);
+
+        $template = FestivalTemplate::first();
+
+        // 1. Quick Photo Upload
+        $fakePhoto = \Illuminate\Http\UploadedFile::fake()->image('custom_cutout.png', 400, 400);
+        $uploadResponse = $this->actingAs($user)->postJson(route('admin.festival-studio.upload-photo'), [
+            'photo' => $fakePhoto,
+        ]);
+
+        $uploadResponse->assertStatus(200);
+        $uploadResponse->assertJson(['success' => true]);
+        $this->assertDatabaseHas('branding_images', [
+            'user_id' => $user->id,
+        ]);
+
+        // 2. Compose with Custom Name & Designation
+        $composeResponse = $this->actingAs($user)->postJson(route('admin.festival-studio.compose'), [
+            'template_id' => $template->id,
+            'candidate_name' => 'विक्रम सिंह राठौड़',
+            'candidate_designation' => 'प्रदेश संयोजक',
+        ]);
+        $composeResponse->assertStatus(200);
+        $composeResponse->assertJson(['success' => true]);
+
+        // 3. Verify blade inputs exist
+        $indexResponse = $this->actingAs($user)->get(route('admin.festival-studio.index'));
+        $indexResponse->assertStatus(200);
+        $indexResponse->assertSee('id="qs-modal-candidate-name"', false);
+        $indexResponse->assertSee('id="qs-modal-candidate-designation"', false);
+        $indexResponse->assertSee('id="qs-upload-photo-input"', false);
+    }
 }

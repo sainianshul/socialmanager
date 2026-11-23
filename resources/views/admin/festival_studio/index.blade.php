@@ -872,6 +872,17 @@
                     var toggleSocial = document.getElementById('qs-modal-show-social');
                     var inputSocial = document.getElementById('qs-input-show-social');
                     if (inputSocial && toggleSocial) inputSocial.value = toggleSocial.checked ? '1' : '0';
+
+                    var inputCandName = document.getElementById('qs-modal-candidate-name');
+                    var inputCandDesig = document.getElementById('qs-modal-candidate-designation');
+                    var inputModalCutout = document.getElementById('qs-modal-cutout-url');
+                    var inputHiddenName = document.getElementById('qs-input-candidate-name');
+                    var inputHiddenDesig = document.getElementById('qs-input-candidate-designation');
+                    var inputHiddenCutout = document.getElementById('qs-input-cutout-url');
+
+                    if (inputHiddenName && inputCandName) inputHiddenName.value = inputCandName.value;
+                    if (inputHiddenDesig && inputCandDesig) inputHiddenDesig.value = inputCandDesig.value;
+                    if (inputHiddenCutout && inputModalCutout) inputHiddenCutout.value = inputModalCutout.value;
                 }
             }
 
@@ -1087,6 +1098,10 @@
                     ? Boolean(showSocial)
                     : (toggleSocial ? toggleSocial.checked : true);
 
+                var candNameInput = document.getElementById('qs-modal-candidate-name');
+                var candDesigInput = document.getElementById('qs-modal-candidate-designation');
+                var candCutoutInput = document.getElementById('qs-modal-cutout-url');
+
                 var payload = {
                     template_id: parseInt(templateId),
                     footer_style: footerStyle || selectFooterStyle?.value,
@@ -1096,7 +1111,10 @@
                     leader_size: parseInt(currentSize),
                     include_strip: (headerLayout !== 'none'),
                     show_social_handles: isSocial,
-                    strip_id: currentStrip ? parseInt(currentStrip) : null
+                    strip_id: currentStrip ? parseInt(currentStrip) : null,
+                    candidate_name: candNameInput ? candNameInput.value.trim() : null,
+                    candidate_designation: candDesigInput ? candDesigInput.value.trim() : null,
+                    cutout_url: candCutoutInput ? candCutoutInput.value : null
                 };
 
                 fetch('{{ route('admin.festival-studio.compose') }}', {
@@ -1135,6 +1153,119 @@
                     .finally(function () {
                         if (spinner) spinner.classList.add('d-none');
                     });
+            }
+
+            // Candidate Name & Designation live typing listener (debounced 400ms)
+            var candDebounceTimer = null;
+            function onCandidateTextChange() {
+                clearTimeout(candDebounceTimer);
+                candDebounceTimer = setTimeout(function () {
+                    onStyleChange();
+                }, 400);
+            }
+
+            var inputCandName = document.getElementById('qs-modal-candidate-name');
+            var inputCandDesig = document.getElementById('qs-modal-candidate-designation');
+            if (inputCandName) {
+                inputCandName.addEventListener('input', onCandidateTextChange);
+                inputCandName.addEventListener('change', onStyleChange);
+            }
+            if (inputCandDesig) {
+                inputCandDesig.addEventListener('input', onCandidateTextChange);
+                inputCandDesig.addEventListener('change', onStyleChange);
+            }
+
+            // Candidate Photo Selection Chips click handler
+            document.addEventListener('click', function (e) {
+                var chip = e.target.closest('.qs-photo-chip');
+                if (!chip) return;
+                var cutout = chip.getAttribute('data-cutout');
+                if (!cutout) return;
+
+                // Update visual active state
+                document.querySelectorAll('.qs-photo-chip').forEach(function (c) {
+                    c.classList.remove('active');
+                    c.style.outline = '1px solid #E2E8F0';
+                    var check = c.querySelector('.qs-photo-check');
+                    if (check) check.classList.add('d-none');
+                });
+                chip.classList.add('active');
+                chip.style.outline = '2.5px solid #0D9488';
+                chip.style.outlineOffset = '2px';
+                var activeCheck = chip.querySelector('.qs-photo-check');
+                if (activeCheck) activeCheck.classList.remove('d-none');
+
+                // Update hidden cutout input & re-compose
+                var inputCutout = document.getElementById('qs-modal-cutout-url');
+                if (inputCutout) inputCutout.value = cutout;
+
+                onStyleChange();
+            });
+
+            // Quick Photo Upload via AJAX
+            var uploadPhotoInput = document.getElementById('qs-upload-photo-input');
+            if (uploadPhotoInput) {
+                uploadPhotoInput.addEventListener('change', function () {
+                    var file = this.files[0];
+                    if (!file) return;
+
+                    var uploadSpinner = document.getElementById('qs-upload-spinner');
+                    if (uploadSpinner) uploadSpinner.classList.remove('d-none');
+
+                    var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    var formData = new FormData();
+                    formData.append('photo', file);
+
+                    fetch('{{ route('admin.festival-studio.upload-photo') }}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Accept': 'application/json'
+                        },
+                        body: formData
+                    })
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        if (data.success && data.url) {
+                            var wrapper = document.getElementById('qs-photo-chips-wrapper');
+                            if (wrapper) {
+                                // Deactivate existing chips
+                                document.querySelectorAll('.qs-photo-chip').forEach(function (c) {
+                                    c.classList.remove('active');
+                                    c.style.outline = '1px solid #E2E8F0';
+                                    var check = c.querySelector('.qs-photo-check');
+                                    if (check) check.classList.add('d-none');
+                                });
+
+                                // Create new active chip for the uploaded photo
+                                var newChip = document.createElement('button');
+                                newChip.type = 'button';
+                                newChip.className = 'btn p-0 rounded-circle position-relative qs-photo-chip active flex-shrink-0';
+                                newChip.setAttribute('data-cutout', data.path);
+                                newChip.style.cssText = 'width: 44px; height: 44px; outline: 2.5px solid #0D9488; outline-offset: 2px;';
+                                newChip.innerHTML = '<img src="' + data.url + '" class="rounded-circle w-100 h-100" style="object-fit: cover;">' +
+                                    '<span class="qs-photo-check position-absolute bottom-0 end-0 rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 14px; height: 14px; font-size: 9px;">&#10003;</span>';
+
+                                wrapper.insertBefore(newChip, wrapper.firstChild);
+                            }
+
+                            var inputCutout = document.getElementById('qs-modal-cutout-url');
+                            if (inputCutout) inputCutout.value = data.path;
+
+                            onStyleChange();
+                        } else {
+                            alert(data.message || 'Failed to upload photo.');
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('Photo upload error:', err);
+                        alert('Could not upload photo. Please check image format (JPG, PNG, WebP) and size (under 10MB).');
+                    })
+                    .finally(function () {
+                        if (uploadSpinner) uploadSpinner.classList.add('d-none');
+                        uploadPhotoInput.value = '';
+                    });
+                });
             }
 
             // Share Handlers in Modal (WhatsApp & Native Share)

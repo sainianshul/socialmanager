@@ -90,6 +90,8 @@ class FestivalStudioController extends Controller
             ?? ($user?->profile_photo ? asset('storage/' . $user->profile_photo) : null)
             ?? 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? 'User') . '&background=1db8ab&color=fff&bold=true&size=128';
 
+        $userImages = $user ? $user->brandingImages()->orderByDesc('is_default')->get() : collect();
+
         // Support seamless AJAX date switching without full page refresh
         if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest') {
             return response()->json([
@@ -107,7 +109,8 @@ class FestivalStudioController extends Controller
                     'activeStrip',
                     'allStrips',
                     'userBranding',
-                    'userCutout'
+                    'userCutout',
+                    'userImages'
                 ))->render(),
             ]);
         }
@@ -128,6 +131,7 @@ class FestivalStudioController extends Controller
             'templates',
             'userBranding',
             'userCutout',
+            'userImages',
             'parties',
             'partyFilter',
             'accounts',
@@ -139,25 +143,62 @@ class FestivalStudioController extends Controller
     }
 
     /**
+     * Quick upload new candidate photo/cutout from Festival Poster Studio.
+     */
+    public function uploadPhoto(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $request->validate([
+            'photo' => 'required|image|mimes:jpeg,jpg,png,webp|max:10240',
+        ]);
+
+        $user = auth()->user();
+        $file = $request->file('photo');
+        $filename = 'branding_' . $user->id . '_' . time() . '_' . \Illuminate\Support\Str::random(6) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('uploads/branding', $filename, 'public');
+
+        $branding = $user->defaultBranding ?? $user->brandings()->first();
+
+        $image = \App\Models\BrandingImage::create([
+            'user_id'             => $user->id,
+            'user_branding_id'    => $branding?->id,
+            'title'               => $branding?->display_name ?: $user->name,
+            'original_image_path' => $path,
+            'cutout_image_path'   => $path,
+            'is_default'          => false,
+        ]);
+
+        return response()->json([
+            'success'   => true,
+            'image_id'  => $image->id,
+            'path'      => $path,
+            'url'       => asset('storage/' . $path),
+            'filename'  => $filename,
+        ]);
+    }
+
+    /**
      * One-Click Quick Schedule Festival Poster to Connected Social Channels
      */
     public function quickSchedule(Request $request)
     {
         $validated = $request->validate([
-            'template_id'   => 'required|exists:festival_templates,id',
-            'festival_id'   => 'nullable|exists:festivals,id',
-            'account_ids'   => 'required|array|min:1',
-            'account_ids.*' => 'integer|exists:accounts,id',
-            'schedule_date'  => 'required|date',
-            'schedule_time'  => 'required|string',
-            'content'        => 'nullable|string|max:5000',
-            'composed_image' => 'nullable|string',
-            'include_strip'  => 'nullable|boolean',
-            'show_social_handles' => 'nullable|boolean',
-            'strip_id'       => 'nullable|integer|exists:leader_strips,id',
-            'leader_shape'   => 'nullable|string|max:30',
-            'leader_border_color' => 'nullable|string|max:20',
-            'leader_size'    => 'nullable|integer|min:50|max:200',
+            'template_id'           => 'required|exists:festival_templates,id',
+            'festival_id'           => 'nullable|exists:festivals,id',
+            'account_ids'           => 'required|array|min:1',
+            'account_ids.*'         => 'integer|exists:accounts,id',
+            'schedule_date'         => 'required|date',
+            'schedule_time'         => 'required|string',
+            'content'               => 'nullable|string|max:5000',
+            'composed_image'        => 'nullable|string',
+            'include_strip'         => 'nullable|boolean',
+            'show_social_handles'   => 'nullable|boolean',
+            'candidate_name'        => 'nullable|string|max:100',
+            'candidate_designation' => 'nullable|string|max:150',
+            'cutout_url'            => 'nullable|string',
+            'strip_id'              => 'nullable|integer|exists:leader_strips,id',
+            'leader_shape'          => 'nullable|string|max:30',
+            'leader_border_color'   => 'nullable|string|max:20',
+            'leader_size'           => 'nullable|integer|min:50|max:200',
         ]);
 
         $user = auth()->user();
@@ -198,9 +239,12 @@ class FestivalStudioController extends Controller
                 $showSocialHandles = $request->boolean('show_social_handles', true);
 
                 $options = [
-                    'include_strip'       => $includeStrip,
-                    'show_social_handles' => $showSocialHandles,
-                    'layout_config'       => [
+                    'include_strip'         => $includeStrip,
+                    'show_social_handles'   => $showSocialHandles,
+                    'cutout_url'            => $request->input('cutout_url'),
+                    'candidate_name'        => $request->input('candidate_name'),
+                    'candidate_designation' => $request->input('candidate_designation'),
+                    'layout_config'         => [
                         'footer' => [
                             'show_social_handles' => $showSocialHandles,
                         ],

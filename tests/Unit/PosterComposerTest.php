@@ -364,4 +364,24 @@ class PosterComposerTest extends TestCase
         $this->assertTrue($this->composer->shouldRenderSocialHandles($branding, ['show_social_handles' => true]));
         $this->assertFalse($this->composer->shouldRenderSocialHandles($branding, ['show_social_handles' => false]));
     }
+
+    public function test_composer_supports_candidate_name_and_designation_override(): void
+    {
+        $user = User::factory()->create();
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'display_name' => 'Original Name',
+            'designation' => 'Original Designation',
+            'is_default' => true,
+        ]);
+
+        $image = $this->composer->compose('non_existent_bg.jpg', $branding, null, [
+            'candidate_name' => 'Custom Name Edited',
+            'candidate_designation' => 'Custom Designation Edited',
+        ]);
+
+        $this->assertInstanceOf(ImageInterface::class, $image);
+        $this->assertEquals(1080, $image->width());
+        $this->assertEquals(1080, $image->height());
+    }
 }

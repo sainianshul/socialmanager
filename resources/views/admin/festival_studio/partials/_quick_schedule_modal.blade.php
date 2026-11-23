@@ -283,27 +283,90 @@
                                     </div>
                                 </div>
 
-                                {{-- 6. User Branding Profile Summary Bar (Generous White Card) --}}
+                                {{-- 6. Candidate Personalization & Photo Switch (Clean & Modern) --}}
                                 @php
                                     $userBranding = auth()->user()->defaultBranding ?? auth()->user()->brandings()->first();
                                     $userName = $userBranding?->effective_name ?? auth()->user()->name;
                                     $userParty = $userBranding?->party?->short_code ?? 'Universal';
+                                    $activeCutout = $userCutout ?? ($userBranding?->defaultImage?->cutout_url);
                                 @endphp
-                                <div class="d-flex align-items-center justify-content-between p-3 rounded-4" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
-                                    <div class="d-flex align-items-center gap-2.5 min-width-0">
-                                        <div class="avatar avatar-sm rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 fw-bold" style="background: #E0F2FE; color: #0284C7; font-size: 12px; width: 34px; height: 34px;">
-                                            {{ mb_substr($userName, 0, 1) }}
+                                <div class="rounded-4 p-3.5" style="background: #FAFAFA; border: 1px solid #F1F5F9;">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="avatar avatar-xs rounded-circle d-flex align-items-center justify-content-center fw-bold" style="background: #E0F2FE; color: #0284C7; font-size: 11px; width: 24px; height: 24px;">
+                                                {{ mb_substr($userName, 0, 1) }}
+                                            </span>
+                                            <span class="small fw-semibold text-dark text-uppercase" style="font-size: 11px; letter-spacing: 0.05em;">
+                                                Candidate Personalization
+                                            </span>
                                         </div>
-                                        <div class="min-width-0">
-                                            <div class="fw-semibold text-dark text-truncate" style="font-size: 13.5px; max-width: 200px;">{{ $userName }}</div>
-                                            <div class="text-secondary" style="font-size: 11px;">
-                                                Party: <span class="fw-semibold text-dark">{{ $userParty }}</span> &bull; Auto-branded in 1080p
-                                            </div>
+                                        <a href="{{ route('admin.branding.index') }}" target="_blank" class="text-primary small text-decoration-none fw-medium" style="font-size: 11.5px;">
+                                            Profile &rarr;
+                                        </a>
+                                    </div>
+
+                                    {{-- Candidate Name & Designation Inputs --}}
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-sm-6">
+                                            <label for="qs-modal-candidate-name" class="form-label text-muted small mb-1 fw-semibold" style="font-size: 11px;">
+                                                Candidate Name (नाम)
+                                            </label>
+                                            <input type="text" class="form-control qs-premium-input" id="qs-modal-candidate-name" value="{{ $userName }}" placeholder="e.g. राहुल शर्मा" style="font-size: 13px; height: 38px; border-radius: 10px; border-color: #E2E8F0;">
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="qs-modal-candidate-designation" class="form-label text-muted small mb-1 fw-semibold" style="font-size: 11px;">
+                                                Designation (पद / उपाधि)
+                                            </label>
+                                            <input type="text" class="form-control qs-premium-input" id="qs-modal-candidate-designation" value="{{ $userBranding?->designation }}" placeholder="e.g. जिला महामंत्री" style="font-size: 13px; height: 38px; border-radius: 10px; border-color: #E2E8F0;">
                                         </div>
                                     </div>
-                                    <a href="{{ route('admin.branding.index') }}" target="_blank" class="text-primary small text-decoration-none fw-medium" style="font-size: 12px;">
-                                        Edit Profile &rarr;
-                                    </a>
+
+                                    {{-- Photo Switch / Quick Change Section --}}
+                                    <div>
+                                        <div class="d-flex align-items-center justify-content-between mb-2">
+                                            <span class="text-muted small fw-semibold" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;">
+                                                Candidate Photo (फोटो चुनें)
+                                            </span>
+                                            <label for="qs-upload-photo-input" class="text-primary small fw-semibold text-decoration-none mb-0 cursor-pointer" style="font-size: 11.5px;">
+                                                + Upload New Photo
+                                            </label>
+                                        </div>
+                                        
+                                        <input type="file" id="qs-upload-photo-input" class="d-none" accept="image/jpeg,image/png,image/webp">
+                                        <input type="hidden" id="qs-modal-cutout-url" value="{{ $activeCutout }}">
+
+                                        {{-- Photos Row: Horizontal chips --}}
+                                        <div class="d-flex align-items-center gap-2 overflow-x-auto py-1" id="qs-photo-chips-wrapper">
+                                            {{-- Active Default Photo Chip --}}
+                                            @if($activeCutout)
+                                                <button type="button" class="btn p-0 rounded-circle position-relative qs-photo-chip active flex-shrink-0" data-cutout="{{ $activeCutout }}" style="width: 44px; height: 44px; outline: 2.5px solid #0D9488; outline-offset: 2px;">
+                                                    <img src="{{ $activeCutout }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                                    <span class="qs-photo-check position-absolute bottom-0 end-0 rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 14px; height: 14px; font-size: 9px;">&#10003;</span>
+                                                </button>
+                                            @endif
+
+                                            {{-- Additional Existing User Branding Images --}}
+                                            @if(isset($userImages))
+                                                @foreach($userImages as $img)
+                                                    @php $imgCutout = $img->cutout_url; @endphp
+                                                    @if($imgCutout && $imgCutout !== $activeCutout)
+                                                        <button type="button" class="btn p-0 rounded-circle position-relative qs-photo-chip flex-shrink-0" data-cutout="{{ $imgCutout }}" style="width: 44px; height: 44px; outline: 1px solid #E2E8F0;">
+                                                            <img src="{{ $imgCutout }}" class="rounded-circle w-100 h-100" style="object-fit: cover;">
+                                                            <span class="qs-photo-check d-none position-absolute bottom-0 end-0 rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width: 14px; height: 14px; font-size: 9px;">&#10003;</span>
+                                                        </button>
+                                                    @endif
+                                                @endforeach
+                                            @endif
+
+                                            {{-- Quick Upload Button Chip --}}
+                                            <label for="qs-upload-photo-input" class="btn p-0 rounded-circle flex-shrink-0 d-flex flex-column align-items-center justify-content-center border border-dashed text-secondary cursor-pointer m-0" style="width: 44px; height: 44px; border-color: #CBD5E1 !important; background: #ffffff;" title="Upload new photo (नई फोटो अपलोड करें)">
+                                                <span class="small fw-bold text-primary" style="font-size: 16px; line-height: 1;">+</span>
+                                            </label>
+                                        </div>
+                                        <div id="qs-upload-spinner" class="small text-primary mt-1 d-none" style="font-size: 11px;">
+                                            <div class="spinner-border spinner-border-sm me-1" role="status"></div> Uploading photo...
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -328,6 +391,9 @@
                         <input type="hidden" name="leader_size" id="qs-input-leader-size" value="106">
                         <input type="hidden" name="strip_id" id="qs-input-strip-id" value="{{ $activeStrip?->id }}">
                         <input type="hidden" name="show_social_handles" id="qs-input-show-social" value="1">
+                        <input type="hidden" name="candidate_name" id="qs-input-candidate-name" value="{{ $userName }}">
+                        <input type="hidden" name="candidate_designation" id="qs-input-candidate-designation" value="{{ $userBranding?->designation }}">
+                        <input type="hidden" name="cutout_url" id="qs-input-cutout-url" value="{{ $activeCutout }}">
 
                         {{-- Alert Box for Dynamic Errors --}}
                         <div id="qs-alert" class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" role="alert"></div>

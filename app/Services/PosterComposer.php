@@ -50,6 +50,25 @@ class PosterComposer
         $this->showSocialHandles = isset($options['show_social_handles'])
             ? (bool)$options['show_social_handles']
             : ($config['footer']['show_social_handles'] ?? true);
+
+        // Apply Candidate Name / Designation Override if provided
+        if ($branding) {
+            $branding = clone $branding;
+            if (!empty($options['candidate_name'])) {
+                $branding->hindi_name = $options['candidate_name'];
+                $branding->display_name = $options['candidate_name'];
+            }
+            if (array_key_exists('candidate_designation', $options)) {
+                $branding->designation = $options['candidate_designation'];
+            }
+        } elseif (!empty($options['candidate_name']) || !empty($options['candidate_designation'])) {
+            $branding = new UserBranding([
+                'display_name' => $options['candidate_name'] ?? '',
+                'hindi_name'   => $options['candidate_name'] ?? '',
+                'designation'  => $options['candidate_designation'] ?? '',
+            ]);
+        }
+
         $canvasWidth = $config['canvas']['width'] ?? 1080;
         $canvasHeight = $config['canvas']['height'] ?? 1080;
 
@@ -3251,10 +3270,25 @@ class PosterComposer
             return $path;
         }
 
+        // If a full URL is passed, extract the URL path
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            $urlPath = parse_url($path, PHP_URL_PATH);
+            if ($urlPath) {
+                $path = $urlPath;
+            }
+        }
+
         $cleanPath = ltrim($path, '/\\');
 
         if (file_exists(public_path($cleanPath))) {
             return public_path($cleanPath);
+        }
+
+        // Strip leading storage/ prefix if present
+        $relativeToStorage = preg_replace('#^storage/#', '', $cleanPath);
+
+        if (file_exists(storage_path('app/public/' . $relativeToStorage))) {
+            return storage_path('app/public/' . $relativeToStorage);
         }
 
         if (file_exists(storage_path('app/public/' . $cleanPath))) {

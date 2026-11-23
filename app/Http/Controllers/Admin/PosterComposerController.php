@@ -36,17 +36,19 @@ class PosterComposerController extends Controller
     public function compose(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'template_id'   => 'required|integer|exists:festival_templates,id',
-            'preset_key'    => 'nullable|string|max:60',
-            'include_strip' => 'nullable|boolean',
-            'show_social_handles' => 'nullable|boolean',
-            'strip_id'      => 'nullable|integer|exists:leader_strips,id',
-            'branding_id'   => 'nullable|integer|exists:user_brandings,id',
-            'cutout_url'    => 'nullable|string',
-            'leader_shape'  => 'nullable|string|max:30',
-            'leader_border_color' => 'nullable|string|max:20',
-            'leader_size'   => 'nullable|integer|min:50|max:200',
-            'custom_config' => 'nullable|array',
+            'template_id'           => 'required|integer|exists:festival_templates,id',
+            'preset_key'            => 'nullable|string|max:60',
+            'include_strip'         => 'nullable|boolean',
+            'show_social_handles'   => 'nullable|boolean',
+            'strip_id'              => 'nullable|integer|exists:leader_strips,id',
+            'branding_id'           => 'nullable|integer|exists:user_brandings,id',
+            'cutout_url'            => 'nullable|string',
+            'candidate_name'        => 'nullable|string|max:100',
+            'candidate_designation' => 'nullable|string|max:150',
+            'leader_shape'          => 'nullable|string|max:30',
+            'leader_border_color'   => 'nullable|string|max:20',
+            'leader_size'           => 'nullable|integer|min:50|max:200',
+            'custom_config'         => 'nullable|array',
         ]);
 
         $user = auth()->user();
@@ -70,11 +72,13 @@ class PosterComposerController extends Controller
 
         // 4. Compose Options
         $options = [
-            'preset_key'          => $validated['preset_key'] ?? $template->preset_key,
-            'include_strip'       => $request->has('include_strip') ? $request->boolean('include_strip') : true,
-            'show_social_handles' => $request->has('show_social_handles') ? $request->boolean('show_social_handles') : true,
-            'cutout_url'          => $validated['cutout_url'] ?? null,
-            'layout_config'       => [
+            'preset_key'            => $validated['preset_key'] ?? $template->preset_key,
+            'include_strip'         => $request->has('include_strip') ? $request->boolean('include_strip') : true,
+            'show_social_handles'   => $request->has('show_social_handles') ? $request->boolean('show_social_handles') : true,
+            'cutout_url'            => $validated['cutout_url'] ?? null,
+            'candidate_name'        => $validated['candidate_name'] ?? null,
+            'candidate_designation' => $validated['candidate_designation'] ?? null,
+            'layout_config'         => [
                 'footer' => [
                     'show_social_handles' => $request->has('show_social_handles') ? $request->boolean('show_social_handles') : true,
                 ],

@@ -32,6 +32,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('festival-studio')->name('festival-studio.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'index'])->name('index');
                 Route::post('/quick-schedule', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'quickSchedule'])->name('quick-schedule');
+                Route::post('/upload-photo', [\App\Http\Controllers\Admin\FestivalStudioController::class, 'uploadPhoto'])->name('upload-photo');
                 Route::post('/compose', [\App\Http\Controllers\Admin\PosterComposerController::class, 'compose'])->name('compose');
                 Route::get('/presets', [\App\Http\Controllers\Admin\PosterComposerController::class, 'presets'])->name('presets');
             });
