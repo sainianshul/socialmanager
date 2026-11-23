@@ -696,7 +696,8 @@
                 var stripId = document.getElementById('panel-strip-id')?.value;
                 var lShape = document.getElementById('panel-leader-shape')?.value || 'circle';
                 var lBorder = document.getElementById('panel-leader-border')?.value || '#FF9933';
-                var lSize = document.getElementById('panel-leader-size')?.value || '106';
+                var lSize = document.getElementById('panel-leader-size')?.value || '104';
+                var candScale = document.getElementById('panel-candidate-scale')?.value || '100';
                 var isSocial = document.getElementById('panel-show-social')?.checked ?? true;
                 var candName = document.getElementById('panel-candidate-name')?.value?.trim();
                 var candDesig = document.getElementById('panel-candidate-designation')?.value?.trim();
@@ -709,6 +710,7 @@
                     leader_shape: lShape,
                     leader_border_color: lBorder,
                     leader_size: parseInt(lSize),
+                    candidate_scale: parseInt(candScale),
                     include_strip: (hLayout !== 'none'),
                     show_social_handles: isSocial,
                     strip_id: stripId ? parseInt(stripId) : null,
@@ -853,6 +855,80 @@
 
                 var hidBorder = document.getElementById('panel-leader-border');
                 if (hidBorder) hidBorder.value = color;
+                composePanelPoster();
+            });
+
+            // Leader Avatar Size Pills
+            document.addEventListener('click', function (e) {
+                var pill = e.target.closest('.panel-leader-size-pill');
+                if (!pill) return;
+
+                var size = pill.getAttribute('data-size');
+                document.querySelectorAll('.panel-leader-size-pill').forEach(function (p) {
+                    p.classList.remove('active');
+                    p.style.border = '1px solid #E2E8F0';
+                    p.style.background = '#ffffff';
+                    var span = p.querySelector('span');
+                    if (span) {
+                        span.classList.remove('fw-semibold', 'text-teal');
+                        span.classList.add('fw-medium', 'text-secondary');
+                    }
+                });
+
+                pill.classList.add('active');
+                pill.style.border = '1.5px solid #0D9488';
+                pill.style.background = '#F0FDFA';
+                var span = pill.querySelector('span');
+                if (span) {
+                    span.classList.remove('fw-medium', 'text-secondary');
+                    span.classList.add('fw-semibold', 'text-teal');
+                }
+
+                var hidSize = document.getElementById('panel-leader-size');
+                if (hidSize) hidSize.value = size;
+
+                var label = document.getElementById('panel-leader-size-label');
+                if (label) {
+                    label.innerText = (parseInt(size) <= 90) ? 'Small' : ((parseInt(size) <= 106) ? 'Medium' : 'Large');
+                }
+
+                composePanelPoster();
+            });
+
+            // Candidate Photo Scale Pills
+            document.addEventListener('click', function (e) {
+                var pill = e.target.closest('.panel-candidate-scale-pill');
+                if (!pill) return;
+
+                var scale = pill.getAttribute('data-scale');
+                document.querySelectorAll('.panel-candidate-scale-pill').forEach(function (p) {
+                    p.classList.remove('active');
+                    p.style.border = '1px solid #E2E8F0';
+                    p.style.background = '#ffffff';
+                    var span = p.querySelector('span');
+                    if (span) {
+                        span.classList.remove('fw-semibold', 'text-teal');
+                        span.classList.add('fw-medium', 'text-secondary');
+                    }
+                });
+
+                pill.classList.add('active');
+                pill.style.border = '1.5px solid #0D9488';
+                pill.style.background = '#F0FDFA';
+                var span = pill.querySelector('span');
+                if (span) {
+                    span.classList.remove('fw-medium', 'text-secondary');
+                    span.classList.add('fw-semibold', 'text-teal');
+                }
+
+                var hidScale = document.getElementById('panel-candidate-scale');
+                if (hidScale) hidScale.value = scale;
+
+                var label = document.getElementById('panel-candidate-scale-label');
+                if (label) {
+                    label.innerText = scale + '%';
+                }
+
                 composePanelPoster();
             });
 
@@ -1059,7 +1135,8 @@
                 var stripId = document.getElementById('panel-strip-id')?.value;
                 var lShape = document.getElementById('panel-leader-shape')?.value || 'circle';
                 var lBorder = document.getElementById('panel-leader-border')?.value || '#FF9933';
-                var lSize = document.getElementById('panel-leader-size')?.value || '106';
+                var lSize = document.getElementById('panel-leader-size')?.value || '104';
+                var candScale = document.getElementById('panel-candidate-scale')?.value || '100';
                 var isSocial = document.getElementById('panel-show-social')?.checked ?? true;
                 var candName = document.getElementById('panel-candidate-name')?.value?.trim();
                 var candDesig = document.getElementById('panel-candidate-designation')?.value?.trim();
@@ -1079,6 +1156,7 @@
                     leader_shape: lShape,
                     leader_border_color: lBorder,
                     leader_size: parseInt(lSize),
+                    candidate_scale: parseInt(candScale),
                     include_strip: (hLayout !== 'none'),
                     show_social_handles: isSocial,
                     strip_id: stripId ? parseInt(stripId) : null,

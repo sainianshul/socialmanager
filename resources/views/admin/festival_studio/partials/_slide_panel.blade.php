@@ -143,183 +143,250 @@
 
                 {{-- Right Column: Apple-Clean Toolbar --}}
                 <div class="col-lg-6">
-                    <div class="d-flex flex-column" style="gap: 18px;">
+                    <div class="d-flex flex-column" style="gap: 20px;">
                         
-                        {{-- 1. Leadership Strip --}}
-                        @if(isset($allStrips) && $allStrips->isNotEmpty())
-                            <div>
-                                <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                    <label for="panel-strip-id" class="form-label text-muted fw-semibold small text-uppercase mb-0" style="font-size: 11px; letter-spacing: 0.05em;">
-                                        Leadership Strip
-                                    </label>
-                                    <a href="{{ route('admin.leader-strips.index') }}" target="_blank" class="text-primary small text-decoration-none fw-medium" style="font-size: 11.5px;">
+                        {{-- ========================================================= --}}
+                        {{-- SECTION 1: TOP LEADERSHIP HEADER (शीर्ष नेतृत्व हेडर)       --}}
+                        {{-- ========================================================= --}}
+                        <div class="card bg-white border rounded-4 p-3.5 shadow-none mb-0" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                <span class="text-uppercase fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 11px; letter-spacing: 0.06em; color: #334155 !important;">
+                                    <i class="ti ti-crown text-primary" style="font-size: 14px;"></i>
+                                    Top Leadership Header
+                                </span>
+                                @if(isset($allStrips) && $allStrips->isNotEmpty())
+                                    <a href="{{ route('admin.leader-strips.index') }}" target="_blank" class="text-primary small text-decoration-none fw-medium" style="font-size: 11px;">
                                         Manage Strips &rarr;
                                     </a>
+                                @endif
+                            </div>
+
+                            <div class="d-flex flex-column" style="gap: 14px;">
+                                {{-- 1.1 Leadership Strip Selection --}}
+                                @if(isset($allStrips) && $allStrips->isNotEmpty())
+                                    <div>
+                                        <label for="panel-strip-id" class="form-label text-muted fw-semibold small text-uppercase mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
+                                            Select Leadership Strip
+                                        </label>
+                                        <select class="form-select qs-premium-select" id="panel-strip-id">
+                                            @foreach($allStrips as $s)
+                                                @php
+                                                    $isUser = !empty($s->user_id);
+                                                    $partyCode = $s->party?->short_code ?? 'Universal';
+                                                    $label = $isUser ? $s->name . ' (Custom)' : $s->name . ' (' . $partyCode . ')';
+                                                @endphp
+                                                <option value="{{ $s->id }}" {{ ($activeStrip?->id == $s->id) ? 'selected' : '' }} data-party-id="{{ $s->party_id }}">
+                                                    {{ $label }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
+
+                                {{-- 1.2 Header Layout Design --}}
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label for="panel-header-layout" class="form-label text-muted fw-semibold small text-uppercase mb-0" style="font-size: 10.5px; letter-spacing: 0.04em;">
+                                            Header Layout Design
+                                        </label>
+                                        <span id="panel-header-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
+                                            Fixed by Admin
+                                        </span>
+                                    </div>
+                                    <select class="form-select qs-premium-select" id="panel-header-layout">
+                                        <option value="full_width_strip">Full-Width Strip</option>
+                                        <option value="top_left_cluster">Top-Left Cluster</option>
+                                        <option value="top_right_cluster">Top-Right Cluster</option>
+                                        <option value="split_wings">Split Wings</option>
+                                        <option value="vertical_capsule_strip">Vertical Capsules</option>
+                                        <option value="party_group_cutout">Group Cutout</option>
+                                        <option value="frosted_glass_dock">Frosted Glass Dock</option>
+                                        <option value="tricolor_ribbon_canopy">Tricolor Canopy</option>
+                                        <option value="none">None (Hide Header)</option>
+                                    </select>
                                 </div>
-                                <select class="form-select qs-premium-select" id="panel-strip-id">
-                                    @foreach($allStrips as $s)
-                                        @php
-                                            $isUser = !empty($s->user_id);
-                                            $partyCode = $s->party?->short_code ?? 'Universal';
-                                            $label = $isUser ? $s->name . ' (Custom)' : $s->name . ' (' . $partyCode . ' Default)';
-                                        @endphp
-                                        <option value="{{ $s->id }}" {{ ($activeStrip?->id == $s->id) ? 'selected' : '' }} data-party-id="{{ $s->party_id }}">
-                                            {{ $label }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
 
-                        {{-- 2. Top Leadership Header Layout --}}
-                        <div>
-                            <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                <label for="panel-header-layout" class="form-label text-muted fw-semibold small text-uppercase mb-0" style="font-size: 11px; letter-spacing: 0.05em;">
-                                    Top Leadership Header
-                                </label>
-                                <span id="panel-header-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
-                                    Fixed by Admin
-                                </span>
-                            </div>
-                            <select class="form-select qs-premium-select" id="panel-header-layout">
-                                <option value="full_width_strip">Header 1: Full-Width Strip (6-7 Leaders)</option>
-                                <option value="top_left_cluster">Header 2: Top-Left Cluster (3-4 Leaders + Logo)</option>
-                                <option value="top_right_cluster">Header 3: Top-Right Cluster (3-4 Leaders + Logo)</option>
-                                <option value="split_wings">Header 4: Split Wings (3 Left + 3 Right)</option>
-                                <option value="vertical_capsule_strip">Header 5: Vertical Capsule Cards</option>
-                                <option value="party_group_cutout">Header 6: Joint Group Cutout</option>
-                                <option value="frosted_glass_dock">Header 7: Frosted Glass Dock</option>
-                                <option value="tricolor_ribbon_canopy">Header 8: Tricolor Canopy</option>
-                                <option value="none">None (Hide Leadership Strip)</option>
-                            </select>
-                        </div>
+                                {{-- 1.3 Leader Ring Shape & Color --}}
+                                <div class="row g-2 align-items-center pt-1">
+                                    <div class="col-sm-5">
+                                        <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Ring Shape</label>
+                                        <input type="hidden" id="panel-leader-shape" value="circle">
+                                        <div class="d-flex gap-1" id="panel-shape-tiles">
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2 active" data-shape="circle" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
+                                                <span class="small fw-semibold text-teal" style="font-size: 11px;">Circle</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="rounded_square" style="border: 1px solid #E2E8F0; background: #ffffff;">
+                                                <span class="small fw-medium text-secondary" style="font-size: 11px;">Round</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="square" style="border: 1px solid #E2E8F0; background: #ffffff;">
+                                                <span class="small fw-medium text-secondary" style="font-size: 11px;">Square</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-7">
+                                        <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Ring Color</label>
+                                        <div class="d-flex align-items-center gap-1.5 flex-wrap" id="panel-color-swatches">
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2 active" data-color="#FF9933" style="width: 24px; height: 24px; background: #FF9933; border: 1.5px solid #0D9488;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#FFFFFF" style="width: 24px; height: 24px; background: #FFFFFF; border: 1px solid #E2E8F0;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#138808" style="width: 24px; height: 24px; background: #138808; border: 1.5px solid transparent;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#D4AF37" style="width: 24px; height: 24px; background: #D4AF37; border: 1.5px solid transparent;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#DC2626" style="width: 24px; height: 24px; background: #DC2626; border: 1.5px solid transparent;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#1E3A8A" style="width: 24px; height: 24px; background: #1E3A8A; border: 1.5px solid transparent;"></button>
+                                        </div>
+                                        <input type="hidden" id="panel-leader-border" value="#FF9933">
+                                    </div>
+                                </div>
 
-                        {{-- 3. Branding Footer Ribbon Style --}}
-                        <div>
-                            <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                <label for="panel-footer-style" class="form-label text-muted fw-semibold small text-uppercase mb-0" style="font-size: 11px; letter-spacing: 0.05em;">
-                                    Branding Footer Style
-                                </label>
-                                <span id="panel-footer-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
-                                    Fixed by Admin
-                                </span>
-                            </div>
-                            <select class="form-select qs-premium-select" id="panel-footer-style">
-                                <option value="dual_ribbon_badge">Layer 1: Dual Ribbon Badge (Classic Political)</option>
-                                <option value="solid_white_banner">Layer 2: Solid White Banner (Minimal Card)</option>
-                                <option value="floating_tricolor_badge">Layer 3: Floating Tricolor Badge (Festive Glow)</option>
-                                <option value="royal_gold_dock">Layer 4: Royal Gold Banner (Midnight Slate)</option>
-                                <option value="candidate_left_ribbon">Layer 5: Candidate Left Ribbon (Mirrored Style)</option>
-                                <option value="modern_capsule_dock">Layer 6: Modern Capsule Dock (Floating Pill)</option>
-                                <option value="circular_medallion_badge">Layer 7: Circular Medallion Badge (Framed Portrait)</option>
-                                <option value="saffron_wave_banner">Layer 8: Saffron Wave Banner (Dynamic Wave)</option>
-                                <option value="tricolor_angled_blade">Layer 9: Tricolor Angled Blade (Patriotic Blade)</option>
-                                <option value="royal_maroon_heritage">Layer 10: Royal Maroon Heritage (Sacred Gold & Maroon)</option>
-                            </select>
-                        </div>
-
-                        {{-- 4. Ring Color & Shape Toolbar Row (Clean Pure White Card) --}}
-                        <div class="p-3.5 rounded-4 bg-white border" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="text-muted fw-semibold small text-uppercase" style="font-size: 10.5px; letter-spacing: 0.05em;">
-                                    Leader Ring & Avatar Style
-                                </span>
-                            </div>
-
-                            <div class="row g-2 align-items-center">
-                                <div class="col-sm-5">
-                                    <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Avatar Shape</label>
-                                    <input type="hidden" id="panel-leader-shape" value="circle">
-                                    <div class="d-flex gap-1" id="panel-shape-tiles">
-                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2 active" data-shape="circle" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
-                                            <span class="small fw-semibold text-teal" style="font-size: 11px;">Circle</span>
+                                {{-- 1.4 Leader Avatar Size --}}
+                                <div class="pt-1">
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label class="form-label text-muted small mb-0" style="font-size: 10.5px;">Leader Avatar Size</label>
+                                        <span class="text-secondary small font-monospace" id="panel-leader-size-label" style="font-size: 10px;">Medium</span>
+                                    </div>
+                                    <input type="hidden" id="panel-leader-size" value="104">
+                                    <div class="d-flex gap-1" id="panel-leader-size-tiles">
+                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2" data-size="88" style="border: 1px solid #E2E8F0; background: #ffffff;">
+                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Small</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="rounded_square" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Round</span>
+                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2 active" data-size="104" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
+                                            <span class="small fw-semibold text-teal" style="font-size: 11px;">Medium</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="square" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Square</span>
+                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2" data-size="120" style="border: 1px solid #E2E8F0; background: #ffffff;">
+                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Large</span>
                                         </button>
                                     </div>
                                 </div>
-                                <div class="col-sm-7">
-                                    <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Ring Color</label>
-                                    <div class="d-flex align-items-center gap-1.5 flex-wrap" id="panel-color-swatches">
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2 active" data-color="#FF9933" style="width: 24px; height: 24px; background: #FF9933; border: 1.5px solid #0D9488;"></button>
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#FFFFFF" style="width: 24px; height: 24px; background: #FFFFFF; border: 1px solid #E2E8F0;"></button>
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#138808" style="width: 24px; height: 24px; background: #138808; border: 1.5px solid transparent;"></button>
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#D4AF37" style="width: 24px; height: 24px; background: #D4AF37; border: 1.5px solid transparent;"></button>
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#DC2626" style="width: 24px; height: 24px; background: #DC2626; border: 1.5px solid transparent;"></button>
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#1E3A8A" style="width: 24px; height: 24px; background: #1E3A8A; border: 1.5px solid transparent;"></button>
-                                    </div>
-                                    <input type="hidden" id="panel-leader-border" value="#FF9933">
-                                    <input type="hidden" id="panel-leader-size" value="106">
-                                </div>
                             </div>
                         </div>
 
-                        {{-- 5. Candidate Personalization (Clean Pure White Card) --}}
-                        <div class="p-3.5 rounded-4 bg-white border" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
-                            <div class="d-flex align-items-center justify-content-between mb-2">
-                                <span class="text-muted fw-semibold small text-uppercase" style="font-size: 10.5px; letter-spacing: 0.05em;">
-                                    Candidate Details
+                        {{-- ========================================================= --}}
+                        {{-- SECTION 2: BRANDING BOTTOM STRIP (ब्रांडिंग बॉटम स्ट्रिप)    --}}
+                        {{-- ========================================================= --}}
+                        <div class="card bg-white border rounded-4 p-3.5 shadow-none mb-0" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                <span class="text-uppercase fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 11px; letter-spacing: 0.06em; color: #334155 !important;">
+                                    <i class="ti ti-id-badge-2 text-primary" style="font-size: 14px;"></i>
+                                    Branding Bottom Strip
                                 </span>
                                 <a href="{{ route('admin.branding.index') }}" target="_blank" class="text-primary small text-decoration-none fw-medium" style="font-size: 11px;">
                                     Branding Profile &rarr;
                                 </a>
                             </div>
 
-                            <div class="row g-2 mb-2">
-                                <div class="col-6">
-                                    <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Name</label>
-                                    <input type="text" id="panel-candidate-name" name="candidate_name" class="form-control form-control-sm rounded-2" value="{{ $userName }}" placeholder="e.g. राहुल शर्मा" style="font-size: 12.5px; height: 35px;">
-                                    <input type="hidden" id="qs-modal-candidate-name" value="{{ $userName }}">
+                            <div class="d-flex flex-column" style="gap: 14px;">
+                                {{-- 2.1 Footer Ribbon Style Selection --}}
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label for="panel-footer-style" class="form-label text-muted fw-semibold small text-uppercase mb-0" style="font-size: 10.5px; letter-spacing: 0.04em;">
+                                            Footer Ribbon Style
+                                        </label>
+                                        <span id="panel-footer-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
+                                            Fixed by Admin
+                                        </span>
+                                    </div>
+                                    <select class="form-select qs-premium-select" id="panel-footer-style">
+                                        <option value="dual_ribbon_badge">Dual Ribbon Badge</option>
+                                        <option value="solid_white_banner">Solid White Banner</option>
+                                        <option value="floating_tricolor_badge">Floating Tricolor</option>
+                                        <option value="royal_gold_dock">Royal Gold Banner</option>
+                                        <option value="candidate_left_ribbon">Candidate Left Ribbon</option>
+                                        <option value="modern_capsule_dock">Modern Capsule Dock</option>
+                                        <option value="circular_medallion_badge">Circular Medallion</option>
+                                        <option value="saffron_wave_banner">Saffron Wave Banner</option>
+                                        <option value="tricolor_angled_blade">Tricolor Angled Blade</option>
+                                        <option value="royal_maroon_heritage">Royal Maroon Heritage</option>
+                                    </select>
                                 </div>
-                                <div class="col-6">
-                                    <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Post / Designation</label>
-                                    <input type="text" id="panel-candidate-designation" name="candidate_designation" class="form-control form-control-sm rounded-2" value="{{ $userBranding?->designation }}" placeholder="e.g. जिला महामंत्री" style="font-size: 12.5px; height: 35px;">
-                                    <input type="hidden" id="qs-modal-candidate-designation" value="{{ $userBranding?->designation }}">
-                                </div>
-                            </div>
 
-                            {{-- Photo Cutout Selector --}}
-                            <div>
-                                <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                    <label class="form-label text-muted small mb-0" style="font-size: 10.5px;">Photo Cutout</label>
-                                    <label for="panel-upload-photo-input" class="text-primary small fw-semibold cursor-pointer mb-0" style="font-size: 11px;">
-                                        + Upload Photo
-                                    </label>
+                                {{-- 2.2 Candidate Photo Size (बड़ा / छोटा करने के लिए) --}}
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label class="form-label text-muted small mb-0" style="font-size: 10.5px;">Candidate Photo Scale</label>
+                                        <span class="text-secondary small font-monospace" id="panel-candidate-scale-label" style="font-size: 10px;">100%</span>
+                                    </div>
+                                    <input type="hidden" id="panel-candidate-scale" value="100">
+                                    <div class="d-flex gap-1" id="panel-candidate-scale-tiles">
+                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2" data-scale="85" style="border: 1px solid #E2E8F0; background: #ffffff;">
+                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Small (85%)</span>
+                                        </button>
+                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2 active" data-scale="100" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
+                                            <span class="small fw-semibold text-teal" style="font-size: 11px;">Normal (100%)</span>
+                                        </button>
+                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2" data-scale="115" style="border: 1px solid #E2E8F0; background: #ffffff;">
+                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Large (115%)</span>
+                                        </button>
+                                    </div>
                                 </div>
-                                <input type="file" id="panel-upload-photo-input" class="d-none" accept="image/jpeg,image/png,image/webp">
-                                <input type="file" id="qs-upload-photo-input" class="d-none">
-                                <input type="hidden" id="panel-cutout-url" value="{{ $activeCutout }}">
 
-                                <div class="d-flex align-items-center gap-2 overflow-x-auto py-1" id="panel-photo-chips-wrapper">
-                                    @if($activeCutout)
-                                        <div class="panel-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0"
-                                             data-url="{{ $activeCutout }}"
-                                             style="width: 36px; height: 36px; border: 2px solid #0D9488; outline: 2px solid rgba(13, 148, 136, 0.3); outline-offset: 1px;">
-                                            <img src="{{ $activeCutout }}" alt="Active Photo" class="w-100 h-100 rounded-circle object-fit-cover bg-white">
-                                        </div>
-                                    @endif
-                                    @foreach($userImages as $uImg)
-                                        @if($uImg->cutout_url !== $activeCutout)
-                                            <div class="panel-photo-chip position-relative rounded-circle cursor-pointer flex-shrink-0"
-                                                 data-url="{{ $uImg->cutout_url }}"
-                                                 style="width: 36px; height: 36px; border: 2px solid #E2E8F0;">
-                                                <img src="{{ $uImg->cutout_url }}" alt="Branding Photo" class="w-100 h-100 rounded-circle object-fit-cover bg-white">
+                                {{-- 2.3 Photo Cutout Selector --}}
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label class="form-label text-muted small mb-0" style="font-size: 10.5px;">Photo Cutout</label>
+                                        <label for="panel-upload-photo-input" class="text-primary small fw-semibold cursor-pointer mb-0" style="font-size: 11px;">
+                                            + Upload Photo
+                                        </label>
+                                    </div>
+                                    <input type="file" id="panel-upload-photo-input" class="d-none" accept="image/jpeg,image/png,image/webp">
+                                    <input type="file" id="qs-upload-photo-input" class="d-none">
+                                    <input type="hidden" id="panel-cutout-url" value="{{ $activeCutout }}">
+
+                                    <div class="d-flex align-items-center gap-2 overflow-x-auto py-1" id="panel-photo-chips-wrapper">
+                                        @if($activeCutout)
+                                            <div class="panel-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0"
+                                                 data-url="{{ $activeCutout }}"
+                                                 style="width: 38px; height: 38px; border: 2px solid #0D9488; outline: 2px solid rgba(13, 148, 136, 0.3); outline-offset: 1px;">
+                                                <img src="{{ $activeCutout }}" alt="Active Photo" class="w-100 h-100 rounded-circle object-fit-cover bg-white">
                                             </div>
                                         @endif
-                                    @endforeach
+                                        @foreach($userImages as $uImg)
+                                            @if($uImg->cutout_url !== $activeCutout)
+                                                <div class="panel-photo-chip position-relative rounded-circle cursor-pointer flex-shrink-0"
+                                                     data-url="{{ $uImg->cutout_url }}"
+                                                     style="width: 38px; height: 38px; border: 2px solid #E2E8F0;">
+                                                    <img src="{{ $uImg->cutout_url }}" alt="Branding Photo" class="w-100 h-100 rounded-circle object-fit-cover bg-white">
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
 
-                            {{-- Show Social Handles Toggle --}}
-                            <div class="mt-2.5 pt-2 border-top d-flex align-items-center justify-content-between">
-                                <span class="small text-secondary" style="font-size: 11px;">Social Media Handles</span>
-                                <div class="form-check form-switch m-0 ps-0">
-                                    <input class="form-check-input ms-0 cursor-pointer" type="checkbox" id="panel-show-social" checked style="width: 34px; height: 18px;">
-                                    <input type="checkbox" id="qs-modal-show-social" class="d-none" checked>
+                                {{-- 2.4 Candidate Details (DEFAULT HIDDEN / COLLAPSED) --}}
+                                <div class="pt-1 border-top">
+                                    <a class="d-flex align-items-center justify-content-between text-decoration-none cursor-pointer py-1.5" data-bs-toggle="collapse" href="#panel-candidate-details-collapse" role="button" aria-expanded="false" aria-controls="panel-candidate-details-collapse">
+                                        <span class="small fw-semibold text-secondary d-flex align-items-center gap-1.5" style="font-size: 11px;">
+                                            <i class="ti ti-user-edit text-muted"></i>
+                                            Candidate Details (Name & Post)
+                                        </span>
+                                        <span class="small text-muted d-flex align-items-center gap-1" style="font-size: 11px;">
+                                            <span>Edit</span>
+                                            <i class="ti ti-chevron-down" style="font-size: 12px;"></i>
+                                        </span>
+                                    </a>
+                                    <div class="collapse mt-2" id="panel-candidate-details-collapse">
+                                        <div class="p-3 rounded-3 bg-white border" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important;">
+                                            <div class="row g-2">
+                                                <div class="col-6">
+                                                    <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Name</label>
+                                                    <input type="text" id="panel-candidate-name" name="candidate_name" class="form-control form-control-sm rounded-2" value="{{ $userName }}" placeholder="e.g. राहुल शर्मा" style="font-size: 12px; height: 35px;">
+                                                    <input type="hidden" id="qs-modal-candidate-name" value="{{ $userName }}">
+                                                </div>
+                                                <div class="col-6">
+                                                    <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Post / Designation</label>
+                                                    <input type="text" id="panel-candidate-designation" name="candidate_designation" class="form-control form-control-sm rounded-2" value="{{ $userBranding?->designation }}" placeholder="e.g. जिला महामंत्री" style="font-size: 12px; height: 35px;">
+                                                    <input type="hidden" id="qs-modal-candidate-designation" value="{{ $userBranding?->designation }}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{-- 2.5 Show Social Handles Toggle --}}
+                                <div class="pt-2 border-top d-flex align-items-center justify-content-between">
+                                    <span class="small text-secondary" style="font-size: 11px;">Social Media Handles</span>
+                                    <div class="form-check form-switch m-0 ps-0">
+                                        <input class="form-check-input ms-0 cursor-pointer" type="checkbox" id="panel-show-social" checked style="width: 34px; height: 18px;">
+                                        <input type="checkbox" id="qs-modal-show-social" class="d-none" checked>
+                                    </div>
                                 </div>
                             </div>
                         </div>

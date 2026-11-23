@@ -847,8 +847,15 @@ class PosterComposer
             // ====================================================
             // 1. CIRCULAR AVATAR MODE
             // ====================================================
+            $scaleMultiplier = 1.0;
+            if (!empty($options['candidate_scale'])) {
+                $scaleMultiplier = max(0.5, min(1.6, (float)$options['candidate_scale'] / 100));
+            } elseif (!empty($candidateConfig['scale'])) {
+                $scaleMultiplier = max(0.5, min(1.6, (float)$candidateConfig['scale'] / 100));
+            }
+
             if ($shape === 'circle') {
-                $circleSize = $candidateConfig['circle_size'] ?? 240;
+                $circleSize = (int) (($candidateConfig['circle_size'] ?? 240) * $scaleMultiplier);
                 $borderColor = $candidateConfig['circle_border_color'] ?? '#ffffff';
                 $borderWidth = $candidateConfig['circle_border_width'] ?? 5;
 
@@ -875,8 +882,8 @@ class PosterComposer
             // ====================================================
             // 2. TRANSPARENT CUTOUT MODE (Dr. Dharam Singh Gold Standard)
             // ====================================================
-            $maxW = $candidateConfig['max_width'] ?? 420;
-            $maxH = $candidateConfig['max_height'] ?? 480;
+            $maxW = (int) (($candidateConfig['max_width'] ?? 420) * $scaleMultiplier);
+            $maxH = (int) (($candidateConfig['max_height'] ?? 480) * $scaleMultiplier);
 
             $origW = $photoImg->width();
             $origH = $photoImg->height();
@@ -886,7 +893,7 @@ class PosterComposer
                 $photoImg->cover($maxW, $maxH, 'top');
             } else {
                 // Portrait cutout: scale proportionally to fill height nicely
-                $targetH = min($maxH, 460);
+                $targetH = min($maxH, (int) (460 * $scaleMultiplier));
                 $scale = $targetH / $origH;
 
                 // Ensure width doesn't exceed maxW

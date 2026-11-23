@@ -415,4 +415,28 @@ class FestivalStudioTest extends TestCase
         $indexResponse->assertSee('id="qs-modal-candidate-designation"', false);
         $indexResponse->assertSee('id="qs-upload-photo-input"', false);
     }
+
+    public function test_slide_panel_has_shortened_names_and_two_sections(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $response = $this->actingAs($user)->get(route('admin.festival-studio.index'));
+        $response->assertStatus(200);
+
+        // Verify Two Clean Sections
+        $response->assertSee('Top Leadership Header');
+        $response->assertSee('Branding Bottom Strip');
+
+        // Verify Shortened Header and Footer Options
+        $response->assertSee('<option value="full_width_strip">Full-Width Strip</option>', false);
+        $response->assertSee('<option value="top_left_cluster">Top-Left Cluster</option>', false);
+        $response->assertSee('<option value="dual_ribbon_badge">Dual Ribbon Badge</option>', false);
+        $response->assertSee('<option value="solid_white_banner">Solid White Banner</option>', false);
+
+        // Verify Candidate Details Collapsible
+        $response->assertSee('id="panel-candidate-details-collapse"', false);
+        $response->assertSee('id="panel-candidate-scale"', false);
+        $response->assertSee('id="panel-leader-size"', false);
+    }
 }
