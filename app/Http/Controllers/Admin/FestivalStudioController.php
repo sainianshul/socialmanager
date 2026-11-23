@@ -153,6 +153,7 @@ class FestivalStudioController extends Controller
             'content'        => 'nullable|string|max:5000',
             'composed_image' => 'nullable|string',
             'include_strip'  => 'nullable|boolean',
+            'show_social_handles' => 'nullable|boolean',
             'strip_id'       => 'nullable|integer|exists:leader_strips,id',
             'leader_shape'   => 'nullable|string|max:30',
             'leader_border_color' => 'nullable|string|max:20',
@@ -194,10 +195,16 @@ class FestivalStudioController extends Controller
                 $stripId = $request->input('strip_id');
                 $strip = LeaderStrip::resolveFor($user, $template, $branding, $stripId ? (int)$stripId : null);
                 $includeStrip = $request->boolean('include_strip', true);
+                $showSocialHandles = $request->boolean('show_social_handles', true);
 
                 $options = [
-                    'include_strip' => $includeStrip,
-                    'layout_config' => [],
+                    'include_strip'       => $includeStrip,
+                    'show_social_handles' => $showSocialHandles,
+                    'layout_config'       => [
+                        'footer' => [
+                            'show_social_handles' => $showSocialHandles,
+                        ],
+                    ],
                 ];
 
                 $templateConfig = $template->layout_config ?? [];

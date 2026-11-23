@@ -321,4 +321,50 @@ class FestivalStudioTest extends TestCase
         $this->assertFalse($resolved->is_system);
         $this->assertEquals('My Personal Constituency Leaders', $resolved->name);
     }
+
+    public function test_festival_studio_compose_and_quick_schedule_support_show_social_handles(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $this->seed(\Database\Seeders\PoliticalPartySeeder::class);
+        $this->seed(\Database\Seeders\PoliticalLeaderSeeder::class);
+
+        $user = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $bjp = \App\Models\PoliticalParty::where('short_code', 'BJP')->first();
+
+        \App\Models\UserBranding::create([
+            'user_id' => $user->id,
+            'party_id' => $bjp->id,
+            'display_name' => 'Rahul Sharma',
+            'facebook_handle' => 'rahulsharma',
+            'instagram_handle' => 'rahulsharma',
+            'phone_number' => '9800000000',
+            'is_default' => true,
+        ]);
+
+        $template = FestivalTemplate::first();
+
+        // 1. Compose with show_social_handles = false
+        $composeResponse = $this->actingAs($user)->postJson(route('admin.festival-studio.compose'), [
+            'template_id' => $template->id,
+            'footer_style' => 'dual_ribbon_badge',
+            'show_social_handles' => false,
+        ]);
+        $composeResponse->assertStatus(200);
+        $composeResponse->assertJson(['success' => true]);
+
+        // 2. Compose with show_social_handles = true
+        $composeResponseTrue = $this->actingAs($user)->postJson(route('admin.festival-studio.compose'), [
+            'template_id' => $template->id,
+            'footer_style' => 'dual_ribbon_badge',
+            'show_social_handles' => true,
+        ]);
+        $composeResponseTrue->assertStatus(200);
+        $composeResponseTrue->assertJson(['success' => true]);
+
+        // 3. Verify modal blade has the toggle switch
+        $indexResponse = $this->actingAs($user)->get(route('admin.festival-studio.index'));
+        $indexResponse->assertStatus(200);
+        $indexResponse->assertSee('id="qs-modal-show-social"', false);
+        $indexResponse->assertSee('Social Media Handles');
+    }
 }

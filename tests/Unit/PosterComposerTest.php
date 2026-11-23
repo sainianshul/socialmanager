@@ -333,4 +333,35 @@ class PosterComposerTest extends TestCase
         $this->assertEquals(480, $defaultConfig['candidate']['max_height']);
         $this->assertEquals(1080, $defaultConfig['candidate']['anchor_bottom_y']);
     }
+
+    public function test_composer_respects_show_social_handles_option(): void
+    {
+        $user = User::factory()->create();
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'display_name' => 'Amit Shah',
+            'facebook_handle' => 'amitshah',
+            'instagram_handle' => 'amitshah',
+            'phone_number' => '9876543210',
+            'is_default' => true,
+        ]);
+
+        // When show_social_handles is true, composer renders successfully with social
+        $imageWithSocial = $this->composer->compose('non_existent_bg.jpg', $branding, null, [
+            'show_social_handles' => true,
+        ]);
+        $this->assertInstanceOf(ImageInterface::class, $imageWithSocial);
+
+        // When show_social_handles is false, composer renders successfully without social handles
+        $imageWithoutSocial = $this->composer->compose('non_existent_bg.jpg', $branding, null, [
+            'show_social_handles' => false,
+        ]);
+        $this->assertInstanceOf(ImageInterface::class, $imageWithoutSocial);
+        $this->assertEquals(1080, $imageWithoutSocial->width());
+        $this->assertEquals(1080, $imageWithoutSocial->height());
+
+        // Verify helper method
+        $this->assertTrue($this->composer->shouldRenderSocialHandles($branding, ['show_social_handles' => true]));
+        $this->assertFalse($this->composer->shouldRenderSocialHandles($branding, ['show_social_handles' => false]));
+    }
 }

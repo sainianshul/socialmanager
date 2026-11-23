@@ -800,8 +800,12 @@
                     modal.show();
                 }
 
+                // Reset Social Media Handles Toggle to Checked by Default
+                var toggleSocial = document.getElementById('qs-modal-show-social');
+                if (toggleSocial) toggleSocial.checked = true;
+
                 // Trigger Live Server-Side Poster Composition for Step 1
-                composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null, leaderSize);
+                composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, selectStrip ? selectStrip.value : null, leaderSize, true);
             });
 
             // Wizard Step Navigation
@@ -864,6 +868,10 @@
                     var selectStrip = document.getElementById('qs-modal-strip-id');
                     var inputStrip = document.getElementById('qs-input-strip-id');
                     if (inputStrip && selectStrip) inputStrip.value = selectStrip.value;
+
+                    var toggleSocial = document.getElementById('qs-modal-show-social');
+                    var inputSocial = document.getElementById('qs-input-show-social');
+                    if (inputSocial && toggleSocial) inputSocial.value = toggleSocial.checked ? '1' : '0';
                 }
             }
 
@@ -974,12 +982,16 @@
                 var lBorder = inputLeaderBorder ? inputLeaderBorder.value : '#FF9933';
                 var lSize = document.getElementById('qs-modal-leader-size')?.value || '106';
                 var stripId = selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value;
-                composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId, lSize);
+                var toggleSocial = document.getElementById('qs-modal-show-social');
+                var isSocial = toggleSocial ? toggleSocial.checked : true;
+                composeModalPoster(tplId, fStyle, hLayout, lShape, lBorder, stripId, lSize, isSocial);
             }
 
             if (selectFooterStyle) selectFooterStyle.addEventListener('change', onStyleChange);
             if (selectHeaderLayout) selectHeaderLayout.addEventListener('change', onStyleChange);
             if (selectLeaderShape) selectLeaderShape.addEventListener('change', onStyleChange);
+            var toggleSocial = document.getElementById('qs-modal-show-social');
+            if (toggleSocial) toggleSocial.addEventListener('change', onStyleChange);
             if (inputLeaderBorder) {
                 inputLeaderBorder.addEventListener('input', function () {
                     updateColorSwatchesUI(this.value);
@@ -1045,7 +1057,7 @@
             }
 
             // Helper: Compose High-Res Branded Poster via API
-            function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId, leaderSize) {
+            function composeModalPoster(templateId, footerStyle, headerLayout, leaderShape, leaderBorder, stripId, leaderSize, showSocial) {
                 var spinner = document.getElementById('qs-modal-spinner');
                 var imgEl = document.getElementById('qs-modal-img');
                 var previewLink = document.getElementById('qs-modal-preview-link');
@@ -1070,6 +1082,10 @@
                 var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 var currentStrip = stripId || (selectStrip ? selectStrip.value : document.getElementById('qs-input-strip-id')?.value);
                 var currentSize = leaderSize || document.getElementById('qs-modal-leader-size')?.value || '106';
+                var toggleSocial = document.getElementById('qs-modal-show-social');
+                var isSocial = (typeof showSocial !== 'undefined' && showSocial !== null)
+                    ? Boolean(showSocial)
+                    : (toggleSocial ? toggleSocial.checked : true);
 
                 var payload = {
                     template_id: parseInt(templateId),
@@ -1079,6 +1095,7 @@
                     leader_border_color: leaderBorder || inputLeaderBorder?.value || '#FF9933',
                     leader_size: parseInt(currentSize),
                     include_strip: (headerLayout !== 'none'),
+                    show_social_handles: isSocial,
                     strip_id: currentStrip ? parseInt(currentStrip) : null
                 };
 

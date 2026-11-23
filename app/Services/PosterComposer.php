@@ -15,6 +15,7 @@ use Intervention\Image\Interfaces\ImageInterface;
 class PosterComposer
 {
     protected ImageManager $manager;
+    protected bool $showSocialHandles = true;
 
     public function __construct(?ImageManager $manager = null)
     {
@@ -46,6 +47,9 @@ class PosterComposer
 
         $runtimeConfig = $options['layout_config'] ?? [];
         $config = array_replace_recursive($this->getDefaultPresetConfig($presetKey), $customConfig, $runtimeConfig);
+        $this->showSocialHandles = isset($options['show_social_handles'])
+            ? (bool)$options['show_social_handles']
+            : ($config['footer']['show_social_handles'] ?? true);
         $canvasWidth = $config['canvas']['width'] ?? 1080;
         $canvasHeight = $config['canvas']['height'] ?? 1080;
 
@@ -973,9 +977,10 @@ class PosterComposer
         $nativeGd = $canvas->core()->native();
 
         // 1. Left Party Ribbon (Green Bar)
-        // y: 948 to 1025, from x: 20 to x: 550
+        // y: 948 to 1025 (or 1080 if social hidden), from x: 20 to x: 550
+        $showSocial = $this->shouldRenderSocialHandles($branding, $footerConfig);
         $partyBarY = 948;
-        $partyBarH = 75;
+        $partyBarH = $showSocial ? 75 : 132;
         $partyBarW = 525;
 
         $canvas->drawRectangle(20, $partyBarY, function ($rect) use ($partySecondary, $partyBarW, $partyBarH) {
@@ -1009,7 +1014,7 @@ class PosterComposer
 
         // 2. Right Candidate Name Badge (Saffron Angled Box placed OVER candidate photo)
         $badgeTopY = 925;
-        $badgeBottomY = 1025;
+        $badgeBottomY = $showSocial ? 1025 : 1080;
         $badgeStartX = 535;
         $badgeAngleX = 575; // Angled top-left
 
@@ -1069,17 +1074,19 @@ class PosterComposer
         }
 
         // 3. Bottom Clean White Social Handles Strip (y: 1025 to 1080)
-        $socialY = 1025;
-        $socialH = 55;
-        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH);
-            $rect->background('#ffffff');
-        });
+        if ($showSocial) {
+            $socialY = 1025;
+            $socialH = 55;
+            $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+                $rect->size(1080, $socialH);
+                $rect->background('#ffffff');
+            });
 
-        $grayAlloc = imagecolorallocate($nativeGd, 226, 232, 240);
-        imageline($nativeGd, 0, $socialY, 1080, $socialY, $grayAlloc);
+            $grayAlloc = imagecolorallocate($nativeGd, 226, 232, 240);
+            imageline($nativeGd, 0, $socialY, 1080, $socialY, $grayAlloc);
 
-        $this->renderSocialIconsRow($canvas, $branding, 30, $socialY + 14, $socialY + 34, $fontEngRegular);
+            $this->renderSocialIconsRow($canvas, $branding, 30, $socialY + 14, $socialY + 34, $fontEngRegular);
+        }
     }
 
     /**
@@ -1198,17 +1205,19 @@ class PosterComposer
         }
 
         // 5. Bottom Social Media Strip with Orange Dividing Line (y: 1040 to 1080)
-        $socialY = 1040;
-        $socialH = 40;
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $socialY = 1040;
+            $socialH = 40;
 
-        imageline($nativeGd, 0, $socialY, 1080, $socialY, $saffronAlloc);
+            imageline($nativeGd, 0, $socialY, 1080, $socialY, $saffronAlloc);
 
-        $canvas->drawRectangle(0, $socialY + 1, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH - 1);
-            $rect->background('#fffaf5');
-        });
+            $canvas->drawRectangle(0, $socialY + 1, function ($rect) use ($socialH) {
+                $rect->size(1080, $socialH - 1);
+                $rect->background('#fffaf5');
+            });
 
-        $this->renderSocialIconsRow($canvas, $branding, 25, $socialY + 8, $socialY + 26, $fontEngRegular);
+            $this->renderSocialIconsRow($canvas, $branding, 25, $socialY + 8, $socialY + 26, $fontEngRegular);
+        }
     }
 
     /**
@@ -1348,22 +1357,24 @@ class PosterComposer
         }
 
         // 6. Sleek Bottom Social Handles Bar (y: 1042-1080)
-        $socialY = 1042;
-        $socialH = 38;
-        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH);
-            $rect->background('#ffffff');
-        });
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $socialY = 1042;
+            $socialH = 38;
+            $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+                $rect->size(1080, $socialH);
+                $rect->background('#ffffff');
+            });
 
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            25,
-            $socialY + 7,
-            $socialY + 25,
-            $fontEngRegular,
-            '#333333'
-        );
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                25,
+                $socialY + 7,
+                $socialY + 25,
+                $fontEngRegular,
+                '#333333'
+            );
+        }
     }
 
     /**
@@ -1464,23 +1475,24 @@ class PosterComposer
             );
         }
 
-        // 6. Thin Gold Divider Line above Social Row
-        $socialTopY = 1032;
-        $canvas->drawRectangle(0, $socialTopY, function ($rect) {
-            $rect->size(1080, 1);
-            $rect->background('#334155');
-        });
+        // 6. Thin Gold Divider Line above Social Row & 7. Dark Luxury Social Row
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $socialTopY = 1032;
+            $canvas->drawRectangle(0, $socialTopY, function ($rect) {
+                $rect->size(1080, 1);
+                $rect->background('#334155');
+            });
 
-        // 7. Dark Luxury Social Row
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            30,
-            $socialTopY + 8,
-            $socialTopY + 27,
-            $fontEngRegular,
-            '#e2e8f0'
-        );
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                30,
+                $socialTopY + 8,
+                $socialTopY + 27,
+                $fontEngRegular,
+                '#e2e8f0'
+            );
+        }
     }
 
     /**
@@ -1507,9 +1519,10 @@ class PosterComposer
         $nativeGd = $canvas->core()->native();
 
         // 1. Right Party Ribbon (Green Bar)
-        // y: 948 to 1025, from x: 530 to 1060
+        // y: 948 to 1025 (or 1080 if social hidden), from x: 530 to 1060
+        $showSocial = $this->shouldRenderSocialHandles($branding, $footerConfig);
         $partyBarY = 948;
-        $partyBarH = 75;
+        $partyBarH = $showSocial ? 75 : 132;
         $partyBarW = 530;
         $partyBarX = 530;
 
@@ -1545,7 +1558,7 @@ class PosterComposer
         // 2. Candidate Name Angled Badge (Saffron Polygon over Candidate's right chest)
         // From x: 260 to x: 680, with angled right side
         $badgeTopY = 925;
-        $badgeBottomY = 1025;
+        $badgeBottomY = $showSocial ? 1025 : 1080;
         $badgeStartX = 260;
         $badgeEndX = 680;
         $badgeAngleX = 640;
@@ -1605,19 +1618,21 @@ class PosterComposer
         }
 
         // 3. Clean White Social Media Strip at Bottom (y: 1035 to 1080)
-        $socialY = 1035;
-        $socialH = 45;
+        if ($showSocial) {
+            $socialY = 1035;
+            $socialH = 45;
 
-        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH);
-            $rect->background('#ffffff');
-        });
+            $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+                $rect->size(1080, $socialH);
+                $rect->background('#ffffff');
+            });
 
-        // Thin separator line
-        $separatorAlloc = imagecolorallocate($nativeGd, 230, 230, 230);
-        imageline($nativeGd, 0, $socialY, 1080, $socialY, $separatorAlloc);
+            // Thin separator line
+            $separatorAlloc = imagecolorallocate($nativeGd, 230, 230, 230);
+            imageline($nativeGd, 0, $socialY, 1080, $socialY, $separatorAlloc);
 
-        $this->renderSocialIconsRow($canvas, $branding, 25, $socialY + 10, $socialY + 28, $fontEngRegular, '#333333');
+            $this->renderSocialIconsRow($canvas, $branding, 25, $socialY + 10, $socialY + 28, $fontEngRegular, '#333333');
+        }
     }
 
     /**
@@ -1732,17 +1747,19 @@ class PosterComposer
         }
 
         // 7. Embedded Social Row inside the floating capsule
-        $socialPillY = $dockY + 98;
-        $socialTextY = $dockY + 115;
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            $textStartX,
-            $socialPillY,
-            $socialTextY,
-            $fontEngRegular,
-            '#475569'
-        );
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $socialPillY = $dockY + 98;
+            $socialTextY = $dockY + 115;
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                $textStartX,
+                $socialPillY,
+                $socialTextY,
+                $fontEngRegular,
+                '#475569'
+            );
+        }
     }
 
     /**
@@ -1874,27 +1891,29 @@ class PosterComposer
         }
 
         // 6. Social Handles Row at Bottom
-        $socialTopY = 1035;
-        $socialH = 45;
-        $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH);
-            $rect->background('#ffffff');
-        });
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $socialTopY = 1035;
+            $socialH = 45;
+            $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialH) {
+                $rect->size(1080, $socialH);
+                $rect->background('#ffffff');
+            });
 
-        // Thin separator
-        $nativeGd = $canvas->core()->native();
-        $sepAlloc = imagecolorallocate($nativeGd, 235, 235, 235);
-        imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $sepAlloc);
+            // Thin separator
+            $nativeGd = $canvas->core()->native();
+            $sepAlloc = imagecolorallocate($nativeGd, 235, 235, 235);
+            imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $sepAlloc);
 
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            30,
-            $socialTopY + 10,
-            $socialTopY + 28,
-            $fontEngRegular,
-            '#333333'
-        );
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                30,
+                $socialTopY + 10,
+                $socialTopY + 28,
+                $fontEngRegular,
+                '#333333'
+            );
+        }
     }
 
     /**
@@ -2017,27 +2036,29 @@ class PosterComposer
         }
 
         // 6. Clean White Social Media Strip at Bottom (y: 1036 to 1080)
-        $socialY = $bottomY;
-        $socialH = 1080 - $socialY;
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $socialY = $bottomY;
+            $socialH = 1080 - $socialY;
 
-        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH);
-            $rect->background('#ffffff');
-        });
+            $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
+                $rect->size(1080, $socialH);
+                $rect->background('#ffffff');
+            });
 
-        // Thin separator line
-        $sepAlloc = imagecolorallocate($nativeGd, 230, 230, 230);
-        imageline($nativeGd, 0, $socialY, 1080, $socialY, $sepAlloc);
+            // Thin separator line
+            $sepAlloc = imagecolorallocate($nativeGd, 230, 230, 230);
+            imageline($nativeGd, 0, $socialY, 1080, $socialY, $sepAlloc);
 
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            25,
-            $socialY + 10,
-            $socialY + 28,
-            $fontEngRegular,
-            '#333333'
-        );
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                25,
+                $socialY + 10,
+                $socialY + 28,
+                $fontEngRegular,
+                '#333333'
+            );
+        }
     }
 
     /**
@@ -2175,25 +2196,27 @@ class PosterComposer
         }
 
         // 3. Bottom Clean White Social Strip (y: 1025 to 1080)
-        $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialHeight) {
-            $rect->size(1080, $socialHeight);
-            $rect->background('#ffffff');
-        });
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialHeight) {
+                $rect->size(1080, $socialHeight);
+                $rect->background('#ffffff');
+            });
 
-        // 1px subtle top border line
-        $grayBorder = imagecolorallocate($nativeGd, 226, 232, 240);
-        imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $grayBorder);
+            // 1px subtle top border line
+            $grayBorder = imagecolorallocate($nativeGd, 226, 232, 240);
+            imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $grayBorder);
 
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            28,
-            $socialTopY + 13,
-            $socialTopY + 33,
-            $fontEngRegular,
-            '#1e293b',
-            260
-        );
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                28,
+                $socialTopY + 13,
+                $socialTopY + 33,
+                $fontEngRegular,
+                '#1e293b',
+                260
+            );
+        }
     }
 
     /**
@@ -2335,24 +2358,48 @@ class PosterComposer
         }
 
         // 3. Bottom Velvet Maroon Social Strip (y: 1025 to 1080)
-        $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialHeight) {
-            $rect->size(1080, $socialHeight);
-            $rect->background('#38030B');
-        });
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialHeight) {
+                $rect->size(1080, $socialHeight);
+                $rect->background('#38030B');
+            });
 
-        // 1.5px 24K Gold dividing line
-        imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $goldAlloc);
+            // 1.5px 24K Gold dividing line
+            imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $goldAlloc);
 
-        $this->renderSocialIconsRow(
-            $canvas,
-            $branding,
-            28,
-            $socialTopY + 13,
-            $socialTopY + 33,
-            $fontEngRegular,
-            '#FFE66D',
-            260
-        );
+            $this->renderSocialIconsRow(
+                $canvas,
+                $branding,
+                28,
+                $socialTopY + 13,
+                $socialTopY + 33,
+                $fontEngRegular,
+                '#FFE66D',
+                260
+            );
+        }
+    }
+
+    /**
+     * Determine if social media handles row should be rendered.
+     */
+    public function shouldRenderSocialHandles(?UserBranding $branding, array $footerConfig = []): bool
+    {
+        if (isset($footerConfig['show_social_handles'])) {
+            if (!$footerConfig['show_social_handles']) {
+                return false;
+            }
+        } elseif (!$this->showSocialHandles) {
+            return false;
+        }
+
+        if (!$branding) {
+            return false;
+        }
+
+        return !empty($branding->facebook_handle)
+            || !empty($branding->instagram_handle)
+            || !empty($branding->phone_number);
     }
 
     /**
@@ -2368,6 +2415,10 @@ class PosterComposer
         string $textColor = '#333333',
         int $spacing = 290
     ): void {
+        if (!$this->shouldRenderSocialHandles($branding)) {
+            return;
+        }
+
         $currX = $startX;
 
         if ($branding->facebook_handle) {
@@ -2547,63 +2598,64 @@ class PosterComposer
             }
         }
 
-        // ---- 3. Tricolor Decorative Line ----
-        $triY = $footerTop + $mainBarHeight;
-        $thirdWidth = 360;
+        // ---- 3. Tricolor Decorative Line & 4. Social Handles Bar ----
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $triY = $footerTop + $mainBarHeight;
+            $thirdWidth = 360;
 
-        $canvas->drawRectangle(0, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
-            $rect->size($thirdWidth, $tricolorHeight);
-            $rect->background('#FF9933'); // Saffron
-        });
-        $canvas->drawRectangle($thirdWidth, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
-            $rect->size($thirdWidth, $tricolorHeight);
-            $rect->background('#ffffff'); // White
-        });
-        $canvas->drawRectangle($thirdWidth * 2, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
-            $rect->size($thirdWidth, $tricolorHeight);
-            $rect->background('#138808'); // Green
-        });
-
-        // ---- 4. Social Handles Bar ----
-        $socialBarY = $triY + $tricolorHeight;
-        $canvas->drawRectangle(0, $socialBarY, function ($rect) use ($socialBarHeight) {
-            $rect->size(1080, $socialBarHeight);
-            $rect->background('#ffffff');
-        });
-
-        $startX = 25;
-        $socialTextY = $socialBarY + 30;
-
-        // Facebook
-        if ($branding->facebook_handle) {
-            $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'fb', '#1877F2');
-            $canvas->text($branding->facebook_handle, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(14);
-                $font->color('#444444');
+            $canvas->drawRectangle(0, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
+                $rect->size($thirdWidth, $tricolorHeight);
+                $rect->background('#FF9933'); // Saffron
             });
-            $startX += 290;
-        }
-
-        // Instagram
-        if ($branding->instagram_handle) {
-            $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'ig', '#E4405F');
-            $canvas->text($branding->instagram_handle, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(14);
-                $font->color('#444444');
+            $canvas->drawRectangle($thirdWidth, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
+                $rect->size($thirdWidth, $tricolorHeight);
+                $rect->background('#ffffff'); // White
             });
-            $startX += 290;
-        }
-
-        // WhatsApp / Phone
-        if ($branding->phone_number) {
-            $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'wa', '#25D366');
-            $canvas->text($branding->phone_number, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(14);
-                $font->color('#444444');
+            $canvas->drawRectangle($thirdWidth * 2, $triY, function ($rect) use ($thirdWidth, $tricolorHeight) {
+                $rect->size($thirdWidth, $tricolorHeight);
+                $rect->background('#138808'); // Green
             });
+
+            $socialBarY = $triY + $tricolorHeight;
+            $canvas->drawRectangle(0, $socialBarY, function ($rect) use ($socialBarHeight) {
+                $rect->size(1080, $socialBarHeight);
+                $rect->background('#ffffff');
+            });
+
+            $startX = 25;
+            $socialTextY = $socialBarY + 30;
+
+            // Facebook
+            if ($branding->facebook_handle) {
+                $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'fb', '#1877F2');
+                $canvas->text($branding->facebook_handle, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(14);
+                    $font->color('#444444');
+                });
+                $startX += 290;
+            }
+
+            // Instagram
+            if ($branding->instagram_handle) {
+                $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'ig', '#E4405F');
+                $canvas->text($branding->instagram_handle, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(14);
+                    $font->color('#444444');
+                });
+                $startX += 290;
+            }
+
+            // WhatsApp / Phone
+            if ($branding->phone_number) {
+                $this->drawSocialIconPill($canvas, $startX, $socialBarY + 10, 'wa', '#25D366');
+                $canvas->text($branding->phone_number, $startX + 28, $socialTextY, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(14);
+                    $font->color('#444444');
+                });
+            }
         }
     }
 
@@ -2655,41 +2707,43 @@ class PosterComposer
         });
 
         // 3. Social Media Handle Bar
-        $canvas->drawRectangle(0, 990, function ($rect) {
-            $rect->size(1080, 90);
-            $rect->background('#ffffff');
-        });
-
-        $startX = 30;
-        $socialY = 1045;
-
-        if ($branding->facebook_handle) {
-            $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'fb', '#1877F2');
-            $canvas->text($branding->facebook_handle, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(17);
-                $font->color('#333333');
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $canvas->drawRectangle(0, 990, function ($rect) {
+                $rect->size(1080, 90);
+                $rect->background('#ffffff');
             });
-            $startX += 280;
-        }
 
-        if ($branding->instagram_handle) {
-            $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'ig', '#E4405F');
-            $canvas->text($branding->instagram_handle, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(17);
-                $font->color('#333333');
-            });
-            $startX += 280;
-        }
+            $startX = 30;
+            $socialY = 1045;
 
-        if ($branding->phone_number) {
-            $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'wa', '#25D366');
-            $canvas->text($branding->phone_number, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(17);
-                $font->color('#333333');
-            });
+            if ($branding->facebook_handle) {
+                $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'fb', '#1877F2');
+                $canvas->text($branding->facebook_handle, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(17);
+                    $font->color('#333333');
+                });
+                $startX += 280;
+            }
+
+            if ($branding->instagram_handle) {
+                $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'ig', '#E4405F');
+                $canvas->text($branding->instagram_handle, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(17);
+                    $font->color('#333333');
+                });
+                $startX += 280;
+            }
+
+            if ($branding->phone_number) {
+                $this->drawSocialIconPill($canvas, $startX, $socialY - 26, 'wa', '#25D366');
+                $canvas->text($branding->phone_number, $startX + 30, $socialY - 8, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(17);
+                    $font->color('#333333');
+                });
+            }
         }
     }
 
@@ -2752,41 +2806,43 @@ class PosterComposer
         }
 
         // 5. Clean White Bottom Strip with Social Handles
-        $canvas->drawRectangle(0, 1030, function ($rect) {
-            $rect->size(1080, 50);
-            $rect->background('#ffffff');
-        });
-
-        $startX = 35;
-        $socialY = 1065;
-
-        if ($branding->facebook_handle) {
-            $this->drawSocialIconPill($canvas, $startX, $socialY - 20, 'fb', '#1877F2');
-            $canvas->text($branding->facebook_handle, $startX + 28, $socialY - 4, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(15);
-                $font->color('#444444');
+        if ($this->shouldRenderSocialHandles($branding, $footerConfig)) {
+            $canvas->drawRectangle(0, 1030, function ($rect) {
+                $rect->size(1080, 50);
+                $rect->background('#ffffff');
             });
-            $startX += 270;
-        }
 
-        if ($branding->instagram_handle) {
-            $this->drawSocialIconPill($canvas, $startX, $socialY - 20, 'ig', '#E4405F');
-            $canvas->text($branding->instagram_handle, $startX + 28, $socialY - 4, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(15);
-                $font->color('#444444');
-            });
-            $startX += 270;
-        }
+            $startX = 35;
+            $socialY = 1065;
 
-        if ($branding->phone_number) {
-            $this->drawSocialIconPill($canvas, $startX, $socialY - 20, 'wa', '#25D366');
-            $canvas->text($branding->phone_number, $startX + 28, $socialY - 4, function ($font) use ($fontEngRegular) {
-                $font->file($fontEngRegular);
-                $font->size(15);
-                $font->color('#444444');
-            });
+            if ($branding->facebook_handle) {
+                $this->drawSocialIconPill($canvas, $startX, $socialY - 20, 'fb', '#1877F2');
+                $canvas->text($branding->facebook_handle, $startX + 28, $socialY - 4, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(15);
+                    $font->color('#444444');
+                });
+                $startX += 270;
+            }
+
+            if ($branding->instagram_handle) {
+                $this->drawSocialIconPill($canvas, $startX, $socialY - 20, 'ig', '#E4405F');
+                $canvas->text($branding->instagram_handle, $startX + 28, $socialY - 4, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(15);
+                    $font->color('#444444');
+                });
+                $startX += 270;
+            }
+
+            if ($branding->phone_number) {
+                $this->drawSocialIconPill($canvas, $startX, $socialY - 20, 'wa', '#25D366');
+                $canvas->text($branding->phone_number, $startX + 28, $socialY - 4, function ($font) use ($fontEngRegular) {
+                    $font->file($fontEngRegular);
+                    $font->size(15);
+                    $font->color('#444444');
+                });
+            }
         }
     }
 

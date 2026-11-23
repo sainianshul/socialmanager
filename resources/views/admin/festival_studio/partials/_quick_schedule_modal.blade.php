@@ -261,7 +261,29 @@
                                     </div>
                                 </div>
 
-                                {{-- 5. User Branding Profile Summary Bar (Generous White Card) --}}
+                                {{-- 5. Show / Hide Social Media Handles Switch --}}
+                                <div class="d-flex align-items-center justify-content-between p-3 rounded-4" style="background: #FAFAFA; border: 1px solid #F1F5F9;">
+                                    <div class="d-flex align-items-center gap-2.5">
+                                        <div class="d-flex align-items-center justify-content-center rounded-circle flex-shrink-0" style="width: 32px; height: 32px; background: #EEF2FF; color: #4F46E5;">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <label for="qs-modal-show-social" class="form-label fw-semibold text-dark mb-0 cursor-pointer" style="font-size: 13px;">
+                                                Social Media Handles
+                                            </label>
+                                            <div class="text-secondary small" style="font-size: 11px;">
+                                                Show / Hide phone & social handles on footer strip
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-check form-switch m-0 ps-0">
+                                        <input class="form-check-input ms-0" type="checkbox" id="qs-modal-show-social" checked style="cursor: pointer; width: 42px; height: 22px;">
+                                    </div>
+                                </div>
+
+                                {{-- 6. User Branding Profile Summary Bar (Generous White Card) --}}
                                 @php
                                     $userBranding = auth()->user()->defaultBranding ?? auth()->user()->brandings()->first();
                                     $userName = $userBranding?->effective_name ?? auth()->user()->name;
@@ -305,6 +327,7 @@
                         <input type="hidden" name="leader_border_color" id="qs-input-leader-border" value="#FF9933">
                         <input type="hidden" name="leader_size" id="qs-input-leader-size" value="106">
                         <input type="hidden" name="strip_id" id="qs-input-strip-id" value="{{ $activeStrip?->id }}">
+                        <input type="hidden" name="show_social_handles" id="qs-input-show-social" value="1">
 
                         {{-- Alert Box for Dynamic Errors --}}
                         <div id="qs-alert" class="alert alert-danger py-2 px-3 small rounded-3 d-none mb-3" role="alert"></div>
