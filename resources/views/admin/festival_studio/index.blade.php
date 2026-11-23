@@ -220,12 +220,13 @@
             }
         }
 
-        /* Premium Select Styling */
+        /* Premium Select Styling (Pure Crisp White, No Dull Grey) */
         .qs-premium-select {
             height: 46px !important;
             border-radius: 12px !important;
-            border: 1.5px solid #E2E8F0 !important;
-            background-color: #FAFAFA !important;
+            border: 1px solid #E2E8F0 !important;
+            background-color: #FFFFFF !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
             font-size: 0.88rem !important;
             font-weight: 500 !important;
             color: #1E293B !important;
@@ -238,7 +239,7 @@
         }
 
         .qs-premium-select:hover {
-            border-color: #CBD5E1 !important;
+            border-color: #0D9488 !important;
             background-color: #FFFFFF !important;
         }
 
@@ -249,14 +250,27 @@
             outline: none !important;
         }
 
+        .studio-slide-panel .form-control {
+            background-color: #FFFFFF !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+        }
+
+        .studio-slide-panel .form-control:focus {
+            border-color: #0D9488 !important;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12) !important;
+        }
+
         /* Action Icon Buttons */
         .panel-icon-btn {
+            width: 36px !important;
+            height: 36px !important;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .panel-icon-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
         /* Template Switcher Chips in Panel */

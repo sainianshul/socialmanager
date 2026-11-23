@@ -114,24 +114,24 @@
                         </div>
                     </div>
 
-                    {{-- Action Icons Bar: Clean, Circular, Minimal Icons as requested --}}
-                    <div class="d-flex align-items-center justify-content-center gap-3 mt-3.5">
-                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-preview" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 44px; height: 44px; border-color: #E2E8F0; color: #475569;" title="Full-Screen Preview (1080p)">
-                            <i class="ti ti-maximize fs-2"></i>
+                    {{-- Action Icons Bar: Compact, Sleek, Clean Circular Icons --}}
+                    <div class="d-flex align-items-center justify-content-center gap-2.5 mt-3">
+                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-preview" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 36px; height: 36px; border-color: #E2E8F0; color: #475569; background: #ffffff;" title="Full-Screen Preview (1080p)">
+                            <i class="ti ti-maximize" style="font-size: 16px;"></i>
                         </a>
-                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-download" target="_blank" download="{{ Str::slug($selectedFestival->title) }}-poster.jpg" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center border-0 shadow-sm p-0 panel-icon-btn" style="width: 44px; height: 44px; background: #0D9488;" title="Download High-Res 1080p">
-                            <i class="ti ti-download fs-2 text-white"></i>
+                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-download" target="_blank" download="{{ Str::slug($selectedFestival->title) }}-poster.jpg" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center border-0 shadow-xs p-0 panel-icon-btn" style="width: 36px; height: 36px; background: #0D9488;" title="Download High-Res 1080p">
+                            <i class="ti ti-download text-white" style="font-size: 16px;"></i>
                         </a>
-                        <button type="button" id="panel-btn-whatsapp" class="btn btn-outline-success rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 44px; height: 44px; background: #ECFDF5; border-color: #A7F3D0; color: #059669;" title="Share on WhatsApp">
-                            <i class="ti ti-brand-whatsapp fs-2"></i>
+                        <button type="button" id="panel-btn-whatsapp" class="btn btn-outline-success rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 36px; height: 36px; background: #ECFDF5; border-color: #A7F3D0; color: #059669;" title="Share on WhatsApp">
+                            <i class="ti ti-brand-whatsapp" style="font-size: 17px;"></i>
                         </button>
-                        <button type="button" id="panel-btn-share" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 44px; height: 44px; border-color: #E2E8F0; color: #475569;" title="Share Poster Link">
-                            <i class="ti ti-share fs-2"></i>
+                        <button type="button" id="panel-btn-share" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 36px; height: 36px; border-color: #E2E8F0; color: #475569; background: #ffffff;" title="Share Poster Link">
+                            <i class="ti ti-share" style="font-size: 16px;"></i>
                         </button>
                     </div>
 
-                    {{-- Big Schedule Button right below preview and action icons --}}
-                    <div class="mt-3.5">
+                    {{-- Big Schedule Button with Generous Top Margin --}}
+                    <div class="mt-4 pt-1">
                         <button type="button" class="btn btn-primary rounded-pill w-100 py-3 fw-bold shadow-sm d-flex align-items-center justify-content-center gap-2" id="panel-btn-go-schedule" style="background: #0D9488; border-color: #0D9488; font-size: 15px; letter-spacing: -0.01em;">
                             <i class="ti ti-calendar-time fs-2"></i>
                             <span>Schedule Post</span>
@@ -218,8 +218,8 @@
                             </select>
                         </div>
 
-                        {{-- 4. Ring Color & Shape Toolbar Row --}}
-                        <div class="p-3 rounded-3 bg-light-subtle border">
+                        {{-- 4. Ring Color & Shape Toolbar Row (Clean Pure White Card) --}}
+                        <div class="p-3.5 rounded-4 bg-white border" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="text-muted fw-semibold small text-uppercase" style="font-size: 10.5px; letter-spacing: 0.05em;">
                                     Leader Ring & Avatar Style
@@ -234,10 +234,10 @@
                                         <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2 active" data-shape="circle" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
                                             <span class="small fw-semibold text-teal" style="font-size: 11px;">Circle</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="rounded_square" style="border: 1.5px solid #E2E8F0; background: #ffffff;">
+                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="rounded_square" style="border: 1px solid #E2E8F0; background: #ffffff;">
                                             <span class="small fw-medium text-secondary" style="font-size: 11px;">Round</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="square" style="border: 1.5px solid #E2E8F0; background: #ffffff;">
+                                        <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="square" style="border: 1px solid #E2E8F0; background: #ffffff;">
                                             <span class="small fw-medium text-secondary" style="font-size: 11px;">Square</span>
                                         </button>
                                     </div>
@@ -246,7 +246,7 @@
                                     <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Ring Color</label>
                                     <div class="d-flex align-items-center gap-1.5 flex-wrap" id="panel-color-swatches">
                                         <button type="button" class="btn p-0 panel-swatch rounded-2 active" data-color="#FF9933" style="width: 24px; height: 24px; background: #FF9933; border: 1.5px solid #0D9488;"></button>
-                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#FFFFFF" style="width: 24px; height: 24px; background: #FFFFFF; border: 1.5px solid #E2E8F0;"></button>
+                                        <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#FFFFFF" style="width: 24px; height: 24px; background: #FFFFFF; border: 1px solid #E2E8F0;"></button>
                                         <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#138808" style="width: 24px; height: 24px; background: #138808; border: 1.5px solid transparent;"></button>
                                         <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#D4AF37" style="width: 24px; height: 24px; background: #D4AF37; border: 1.5px solid transparent;"></button>
                                         <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#DC2626" style="width: 24px; height: 24px; background: #DC2626; border: 1.5px solid transparent;"></button>
@@ -258,8 +258,8 @@
                             </div>
                         </div>
 
-                        {{-- 5. Candidate Personalization --}}
-                        <div class="p-3 rounded-3 bg-light-subtle border">
+                        {{-- 5. Candidate Personalization (Clean Pure White Card) --}}
+                        <div class="p-3.5 rounded-4 bg-white border" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="text-muted fw-semibold small text-uppercase" style="font-size: 10.5px; letter-spacing: 0.05em;">
                                     Candidate Details
@@ -382,7 +382,7 @@
                                         <input type="checkbox" class="form-check-input panel-acc-cb ms-0" value="{{ $acc->id }}" checked>
                                     </div>
                                 @empty
-                                    <div class="p-3 text-center bg-light-subtle rounded-3 border">
+                                    <div class="p-3 text-center bg-white rounded-3 border" style="background: #ffffff !important; border: 1px dashed #CBD5E1 !important;">
                                         <div class="text-secondary small mb-1">No active social media accounts connected.</div>
                                         <a href="{{ route('admin.accounts.index') }}" class="btn btn-xs btn-outline-primary rounded-pill">Connect Account</a>
                                     </div>
