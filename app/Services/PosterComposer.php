@@ -247,7 +247,15 @@ class PosterComposer
                 );
             }
         } elseif ($footerStyle === 'royal_maroon_heritage') {
-            // Layer 10 (Royal Maroon Heritage): Deep temple maroon & 24K gold filigree card first, then candidate photo over card
+            // Layer 10 (Royal Maroon Heritage): Candidate photo rendered first, then royal maroon & 24K gold filigree card over lower torso
+            $this->renderCandidatePhoto(
+                $canvas,
+                $config['candidate'] ?? [],
+                $branding,
+                $options,
+                $config['footer'] ?? []
+            );
+
             if ($branding) {
                 $this->renderRoyalMaroonHeritageFooter(
                     $canvas,
@@ -257,14 +265,6 @@ class PosterComposer
                     $config['candidate'] ?? []
                 );
             }
-
-            $this->renderCandidatePhoto(
-                $canvas,
-                $config['candidate'] ?? [],
-                $branding,
-                $options,
-                $config['footer'] ?? []
-            );
         } else {
             // Default standard political footer
             if ($branding) {
@@ -2040,12 +2040,10 @@ class PosterComposer
 
     /**
      * Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)
-     * - Slanted 3-tier tricolor ribbon blade across lower torso.
-     * - Top Saffron polygon with candidate Name in pure bold white.
-     * - Middle White polygon with candidate Designation in deep navy blue.
-     * - Bottom Green band providing the tricolor completion.
-     * - Clean crisp white bottom social strip with branded icons.
-     * - Circular party logo on left at x: 24, y: 914.
+     * - Left side: India Green angled chevron with circular Party Emblem & Party Hindi Name in bold white.
+     * - Right side: Dynamic Saffron angled blade placed over candidate lower torso with Candidate Name in bold white and Designation in golden yellow.
+     * - Bottom: Clean white social handles strip.
+     * - ZERO duplicate text: single crisp auto-fit pass.
      */
     protected function renderTricolorAngledBladeFooter(
         ImageInterface $canvas,
@@ -2058,138 +2056,152 @@ class PosterComposer
         $fontHindiRegular = $this->getFontPath('hindi_regular');
         $fontEngRegular = $this->getFontPath('english_regular');
 
-        $saffronColor = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF8800');
-        $nameColor = $footerConfig['name_color'] ?? '#ffffff';
-        $desigColor = $footerConfig['desig_color'] ?? '#0A2540'; // Deep Royal Navy for stark contrast on white
-
+        $partyPrimary = $footerConfig['primary_color'] ?? ($party?->primary_color ?: '#FF8800');
+        $partySecondary = $footerConfig['secondary_color'] ?? ($party?->secondary_color ?: '#00873E');
         $nativeGd = $canvas->core()->native();
 
-        // 1. Top Saffron Angled Blade Polygon
-        $sHex = ltrim($saffronColor, '#');
+        $footerTopY = 920;
+        $footerBladeBottomY = 1025;
+        $socialTopY = 1025;
+        $socialHeight = 55;
+
+        // 1. Left Party Chevron (India Green Ribbon)
+        // Slanted right edge: (0, 920) -> (500, 920) -> (450, 1025) -> (0, 1025)
+        $gHex = ltrim($partySecondary, '#');
+        $gr = hexdec(substr($gHex, 0, 2));
+        $gg = hexdec(substr($gHex, 2, 2));
+        $gb = hexdec(substr($gHex, 4, 2));
+        $greenAlloc = imagecolorallocate($nativeGd, $gr, $gg, $gb);
+
+        imagefilledpolygon($nativeGd, [
+            0, $footerTopY,
+            500, $footerTopY,
+            450, $footerBladeBottomY,
+            0, $footerBladeBottomY
+        ], $greenAlloc);
+
+        // Continuous Gold Accent Line along top edge (0 to 1080)
+        $goldAlloc = imagecolorallocate($nativeGd, 255, 215, 0);
+        imageline($nativeGd, 0, $footerTopY, 1080, $footerTopY, $goldAlloc);
+        imageline($nativeGd, 0, $footerTopY + 1, 1080, $footerTopY + 1, $goldAlloc);
+
+        // Slanted White dividing edge between green and saffron
+        $whiteAlloc = imagecolorallocate($nativeGd, 255, 255, 255);
+        imageline($nativeGd, 500, $footerTopY + 2, 450, $footerBladeBottomY, $whiteAlloc);
+        imageline($nativeGd, 501, $footerTopY + 2, 451, $footerBladeBottomY, $whiteAlloc);
+
+        // Party Logo on Left inside Green Chevron
+        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
+        $resolvedLogo = $this->resolveFilePath($logoPath);
+        $logoSize = $footerConfig['logo_size'] ?? 64;
+        $logoX = 26;
+        $logoY = $footerTopY + (int) (($footerBladeBottomY - $footerTopY - $logoSize) / 2);
+
+        $partyTextStartX = $logoX;
+        if ($resolvedLogo && file_exists($resolvedLogo)) {
+            try {
+                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
+                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 2.5);
+                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+                $partyTextStartX = $logoX + $logoSize + 14;
+            } catch (\Throwable $e) {}
+        }
+
+        // Party Hindi Name next to logo in bold pure white
+        $partyName = $this->shapeDevanagari($party?->hindi_name ?: ($party?->name ?: 'भारतीय जनता पार्टी'));
+        $partyNameY = $footerTopY + 62;
+        $canvas->text($partyName, $partyTextStartX, $partyNameY, function ($font) use ($fontHindiBold) {
+            $font->file($fontHindiBold);
+            $font->size(23);
+            $font->color('#ffffff');
+        });
+
+        // 2. Right Candidate Name Badge (Saffron Angled Blade Ribbon over candidate photo)
+        // Slanted left edge matches: (495, 920) -> (1080, 920) -> (1080, 1025) -> (445, 1025)
+        $sHex = ltrim($partyPrimary, '#');
         $sr = hexdec(substr($sHex, 0, 2));
         $sg = hexdec(substr($sHex, 2, 2));
         $sb = hexdec(substr($sHex, 4, 2));
         $saffronAlloc = imagecolorallocate($nativeGd, $sr, $sg, $sb);
 
-        // Blade slopes across candidate chest
-        $saffronPoints = [
-            0, 904,
-            775, 920,
-            730, 966,
-            0, 966,
-        ];
-        imagefilledpolygon($nativeGd, $saffronPoints, $saffronAlloc);
+        imagefilledpolygon($nativeGd, [
+            495, $footerTopY,
+            1080, $footerTopY,
+            1080, $footerBladeBottomY,
+            445, $footerBladeBottomY
+        ], $saffronAlloc);
 
-        // Top Gold Highlight Line on Saffron Blade
-        $goldHiAlloc = imagecolorallocate($nativeGd, 255, 215, 0);
-        imageline($nativeGd, 0, 904, 775, 920, $goldHiAlloc);
-        imageline($nativeGd, 0, 905, 775, 921, $goldHiAlloc);
+        // Top White highlight line along Saffron blade
+        imageline($nativeGd, 495, $footerTopY, 1080, $footerTopY, $whiteAlloc);
+        imageline($nativeGd, 495, $footerTopY + 1, 1080, $footerTopY + 1, $whiteAlloc);
 
-        // 2. Middle Pure White Angled Blade Polygon
-        $whiteAlloc = imagecolorallocate($nativeGd, 255, 255, 255);
-        $whitePoints = [
-            0, 966,
-            730, 966,
-            685, 1014,
-            0, 1014,
-        ];
-        imagefilledpolygon($nativeGd, $whitePoints, $whiteAlloc);
+        // Candidate Name in crisp bold Pure White (Single pass auto-fit, NO duplicate text!)
+        $nameTextX = 525;
+        $nameTextY = $footerTopY + 44;
+        $maxNameW = 1080 - $nameTextX - 25;
 
-        // Angled right edge highlight on white blade
-        $saffEdge = imagecolorallocatealpha($nativeGd, $sr, $sg, $sb, 40);
-        imageline($nativeGd, 730, 966, 685, 1014, $saffEdge);
-
-        // 3. Bottom Emerald Green Ribbon
-        $greenAlloc = imagecolorallocate($nativeGd, 19, 136, 8); // India Green #138808
-        imagefilledrectangle($nativeGd, 0, 1014, 1080, 1040, $greenAlloc);
-
-        // Thin gold separator between green & white
-        $goldSepAlloc = imagecolorallocate($nativeGd, 255, 215, 0);
-        imageline($nativeGd, 0, 1014, 685, 1014, $goldSepAlloc);
-
-        // 4. Circular Party Logo on Left (Anchored across Saffron & White blade)
-        $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
-        $resolvedLogo = $this->resolveFilePath($logoPath);
-        $logoSize = $footerConfig['logo_size'] ?? 68;
-        $logoX = 24;
-        $logoY = 918;
-
-        if ($resolvedLogo && file_exists($resolvedLogo)) {
-            try {
-                $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
-                $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#ffffff', 3);
-                $canvas->place($logoImg, 'top-left', $logoX, $logoY);
-            } catch (\Throwable $e) {}
-        }
-
-        $textStartX = $logoX + $logoSize + 16;
-        $maxTextW = 560;
-
-        // 5. Candidate Name on Saffron Band (Bold Crisp White)
         $displayName = $this->shapeDevanagari($branding->effective_name);
-        $nameY = 948;
-        $nameFontSize = $footerConfig['name_font_size'] ?? 32;
-
-        // Subtle dark shadow for 3D punch
-        $shadowAlloc = imagecolorallocatealpha($nativeGd, 40, 20, 0, 60);
-        imagettftext($nativeGd, $nameFontSize, 0, $textStartX + 2, $nameY + 2, $shadowAlloc, $fontHindiBold, $displayName);
-
         $this->renderAutoFitText(
             $canvas,
             $displayName,
-            $textStartX,
-            $nameY,
-            $maxTextW,
-            $nameFontSize,
+            $nameTextX,
+            $nameTextY,
+            $maxNameW,
+            33,
             18,
             $fontHindiBold,
-            $nameColor,
+            '#ffffff',
             'left'
         );
 
-        // 6. Designation on White Band (Deep Navy Bold)
+        // Candidate Designation in Warm Golden Yellow
         if (!empty($branding->designation)) {
             $desigText = $this->shapeDevanagari($branding->designation);
-            $desigY = 998;
+            $desigY = $nameTextY + 34;
             $this->renderAutoFitText(
                 $canvas,
                 $desigText,
-                $textStartX,
+                $nameTextX,
                 $desigY,
-                $maxTextW,
-                20,
-                13,
-                $fontHindiBold,
-                $desigColor,
+                $maxNameW,
+                19,
+                12,
+                $fontHindiRegular,
+                '#FFE57F',
                 'left'
             );
         }
 
-        // 7. Clean Social Media Row at Bottom (y: 1040 to 1080)
-        $canvas->drawRectangle(0, 1040, function ($rect) {
-            $rect->size(1080, 40);
+        // 3. Bottom Clean White Social Strip (y: 1025 to 1080)
+        $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialHeight) {
+            $rect->size(1080, $socialHeight);
             $rect->background('#ffffff');
         });
+
+        // 1px subtle top border line
+        $grayBorder = imagecolorallocate($nativeGd, 226, 232, 240);
+        imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $grayBorder);
 
         $this->renderSocialIconsRow(
             $canvas,
             $branding,
-            24,
-            1048,
-            1066,
+            28,
+            $socialTopY + 13,
+            $socialTopY + 33,
             $fontEngRegular,
-            '#1e293b'
+            '#1e293b',
+            260
         );
     }
 
     /**
      * Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)
      * - Auspicious temple maroon card (y: 915 to 1080).
-     * - Intricate 24K gold filigree jewel border along top edge (interspaced diamond & bead pattern).
-     * - Circular party emblem with dual gold ring border on left.
-     * - Candidate Name in 24K Gilded Champagne Gold with 3D embossed shadow.
-     * - Designation in Pearl Ivory.
-     * - Bottom velvet maroon social strip with 1px gold separator and bright champagne icons.
+     * - 24K Gold Crown Header Trim along top edge (Antique Gold #D4AF37 & Champagne Gold #FFE66D).
+     * - Left side: Circular party emblem with 24K gold ring + Party Hindi Name in shimmering gold.
+     * - Right side: Angled Royal Crimson & Gold blade over candidate photo with Candidate Name in Gilded Gold/Pure White and Designation in Pearl Ivory.
+     * - Bottom: Deep velvet maroon social strip with 1px gold separator and bright gold handles.
+     * - ZERO duplicate text: single crisp auto-fit pass.
      */
     protected function renderRoyalMaroonHeritageFooter(
         ImageInterface $canvas,
@@ -2203,120 +2215,141 @@ class PosterComposer
         $fontEngRegular = $this->getFontPath('english_regular');
 
         $goldColor = '#D4AF37'; // 24K Antique Gold
-        $cardBg = $footerConfig['card_bg'] ?? '#6B0F1A'; // Sacred Temple Maroon
-        $nameColor = $footerConfig['name_color'] ?? '#FFE66D';
-        $desigColor = $footerConfig['desig_color'] ?? '#F5EBE1'; // Pearl Ivory
-
-        $cardTopY = 915;
-        $cardHeight = 165;
+        $brightGold = '#FFE66D'; // Champagne Bright Gold
+        $cardBg = $footerConfig['card_bg'] ?? '#5A0914'; // Imperial Temple Maroon
+        $bladeBg = '#6E0D1B'; // Rich Crimson Maroon
         $nativeGd = $canvas->core()->native();
 
-        // 1. Solid Deep Temple Maroon Card
-        $canvas->drawRectangle(0, $cardTopY, function ($rect) use ($cardBg, $cardHeight) {
-            $rect->size(1080, $cardHeight);
-            $rect->background($cardBg);
-        });
+        $footerTopY = 915;
+        $footerBladeBottomY = 1025;
+        $socialTopY = 1025;
+        $socialHeight = 55;
 
-        // 2. 24K Gold Filigree Jewel Top Border
-        $goldAlloc = imagecolorallocate($nativeGd, 212, 175, 55);       // #D4AF37
-        $brightGoldAlloc = imagecolorallocate($nativeGd, 255, 230, 109); // #FFE66D
+        // 1. Left Party Royal Chevron (Imperial Maroon with 24K Gold Trim)
+        // Slanted right edge: (0, 915) -> (500, 915) -> (450, 1025) -> (0, 1025)
+        $mHex = ltrim($cardBg, '#');
+        $mr = hexdec(substr($mHex, 0, 2));
+        $mg = hexdec(substr($mHex, 2, 2));
+        $mb = hexdec(substr($mHex, 4, 2));
+        $maroonAlloc = imagecolorallocate($nativeGd, $mr, $mg, $mb);
 
-        // Top solid gold line (3px)
-        imagefilledrectangle($nativeGd, 0, $cardTopY, 1080, $cardTopY + 2, $goldAlloc);
+        imagefilledpolygon($nativeGd, [
+            0, $footerTopY,
+            500, $footerTopY,
+            450, $footerBladeBottomY,
+            0, $footerBladeBottomY
+        ], $maroonAlloc);
 
-        // Filigree jewel row (interspaced diamonds & beads)
-        for ($x = 8; $x < 1075; $x += 18) {
-            $diamondPoints = [
-                $x, $cardTopY + 6,
-                $x + 4, $cardTopY + 3,
-                $x + 8, $cardTopY + 6,
-                $x + 4, $cardTopY + 9,
-            ];
-            imagefilledpolygon($nativeGd, $diamondPoints, $brightGoldAlloc);
-            imagefilledellipse($nativeGd, $x + 13, $cardTopY + 6, 2, 2, $goldAlloc);
-        }
+        // Top 24K Gold Double Trim on Left Chevron
+        $goldAlloc = imagecolorallocate($nativeGd, 212, 175, 55);
+        $brightGoldAlloc = imagecolorallocate($nativeGd, 255, 230, 109);
+        imagefilledrectangle($nativeGd, 0, $footerTopY, 500, $footerTopY + 2, $goldAlloc);
+        imagefilledrectangle($nativeGd, 0, $footerTopY + 4, 498, $footerTopY + 5, $brightGoldAlloc);
 
-        // Secondary gold line (2px)
-        imagefilledrectangle($nativeGd, 0, $cardTopY + 11, 1080, $cardTopY + 12, $goldAlloc);
+        // Slanted Gold dividing edge between left chevron and right blade
+        imageline($nativeGd, 500, $footerTopY, 450, $footerBladeBottomY, $goldAlloc);
+        imageline($nativeGd, 501, $footerTopY, 451, $footerBladeBottomY, $brightGoldAlloc);
 
-        // 3. Circular Party Emblem with Dual Gold Ring
+        // Circular Party Emblem with 24K Gold Ring on Left
         $logoPath = $party?->symbol_logo ?: 'images/parties/bjp.jpeg';
         $resolvedLogo = $this->resolveFilePath($logoPath);
-        $logoSize = $footerConfig['logo_size'] ?? 68;
+        $logoSize = $footerConfig['logo_size'] ?? 64;
         $logoX = 28;
-        $logoY = $cardTopY + 20;
+        $logoY = $footerTopY + (int) (($footerBladeBottomY - $footerTopY - $logoSize) / 2);
 
+        $partyTextStartX = $logoX;
         if ($resolvedLogo && file_exists($resolvedLogo)) {
             try {
                 $logoImg = $this->manager->read($resolvedLogo)->cover($logoSize, $logoSize);
                 $logoImg = $this->makeCircularAvatar($logoImg, $logoSize, '#D4AF37', 3);
                 $canvas->place($logoImg, 'top-left', $logoX, $logoY);
+                $partyTextStartX = $logoX + $logoSize + 14;
             } catch (\Throwable $e) {}
         }
 
-        $textStartX = $logoX + $logoSize + 18;
-        $maxTextW = 550;
+        // Party Hindi Name in shimmering Champagne Gold
+        $partyName = $this->shapeDevanagari($party?->hindi_name ?: ($party?->name ?: 'भारतीय जनता पार्टी'));
+        $partyNameY = $footerTopY + 62;
+        $canvas->text($partyName, $partyTextStartX, $partyNameY, function ($font) use ($fontHindiBold, $brightGold) {
+            $font->file($fontHindiBold);
+            $font->size(23);
+            $font->color($brightGold);
+        });
 
-        // 4. Candidate Name (24K Gilded Gold with 3D Embossed Effect)
+        // 2. Right Candidate Name Badge (Rich Crimson Maroon Blade over candidate photo)
+        // Slanted left edge: (495, 915) -> (1080, 915) -> (1080, 1025) -> (445, 1025)
+        $bHex = ltrim($bladeBg, '#');
+        $br = hexdec(substr($bHex, 0, 2));
+        $bg = hexdec(substr($bHex, 2, 2));
+        $bb = hexdec(substr($bHex, 4, 2));
+        $bladeAlloc = imagecolorallocate($nativeGd, $br, $bg, $bb);
+
+        imagefilledpolygon($nativeGd, [
+            495, $footerTopY,
+            1080, $footerTopY,
+            1080, $footerBladeBottomY,
+            445, $footerBladeBottomY
+        ], $bladeAlloc);
+
+        // Top 24K Gold highlight lines along Saffron/Crimson blade
+        imagefilledrectangle($nativeGd, 495, $footerTopY, 1080, $footerTopY + 2, $goldAlloc);
+        imagefilledrectangle($nativeGd, 495, $footerTopY + 4, 1080, $footerTopY + 5, $brightGoldAlloc);
+
+        // Candidate Name in Gilded Warm White / Gold (Single pass auto-fit, NO duplicate text!)
+        $nameTextX = 525;
+        $nameTextY = $footerTopY + 44;
+        $maxNameW = 1080 - $nameTextX - 25;
+
         $displayName = $this->shapeDevanagari($branding->effective_name);
-        $nameY = $cardTopY + 56;
-        $nameFontSize = $footerConfig['name_font_size'] ?? 34;
-
-        // Dark maroon drop shadow for 3D gold embossed appearance
-        $maroonShadowAlloc = imagecolorallocate($nativeGd, 50, 4, 8);
-        imagettftext($nativeGd, $nameFontSize, 0, $textStartX + 2, $nameY + 2, $maroonShadowAlloc, $fontHindiBold, $displayName);
-
         $this->renderAutoFitText(
             $canvas,
             $displayName,
-            $textStartX,
-            $nameY,
-            $maxTextW,
-            $nameFontSize,
+            $nameTextX,
+            $nameTextY,
+            $maxNameW,
+            33,
             18,
             $fontHindiBold,
-            $nameColor,
+            '#FFF6D6',
             'left'
         );
 
-        // 5. Designation (Pearl Ivory)
+        // Candidate Designation in Pearl Ivory
         if (!empty($branding->designation)) {
             $desigText = $this->shapeDevanagari($branding->designation);
-            $desigY = $nameY + 30;
+            $desigY = $nameTextY + 34;
             $this->renderAutoFitText(
                 $canvas,
                 $desigText,
-                $textStartX,
+                $nameTextX,
                 $desigY,
-                $maxTextW,
-                18,
+                $maxNameW,
+                19,
                 12,
                 $fontHindiRegular,
-                $desigColor,
+                '#F5EBE1',
                 'left'
             );
         }
 
-        // 6. Deep Velvet Maroon Social Bar at Bottom (y: 1032 to 1080)
-        $socialY = 1032;
-        $socialH = 1080 - $socialY;
-
-        $canvas->drawRectangle(0, $socialY, function ($rect) use ($socialH) {
-            $rect->size(1080, $socialH);
-            $rect->background('#3D050E');
+        // 3. Bottom Velvet Maroon Social Strip (y: 1025 to 1080)
+        $canvas->drawRectangle(0, $socialTopY, function ($rect) use ($socialHeight) {
+            $rect->size(1080, $socialHeight);
+            $rect->background('#38030B');
         });
 
-        // 1px gold separator line
-        imagefilledrectangle($nativeGd, 0, $socialY, 1080, $socialY, $goldAlloc);
+        // 1.5px 24K Gold dividing line
+        imageline($nativeGd, 0, $socialTopY, 1080, $socialTopY, $goldAlloc);
 
         $this->renderSocialIconsRow(
             $canvas,
             $branding,
             28,
-            $socialY + 9,
-            $socialY + 27,
+            $socialTopY + 13,
+            $socialTopY + 33,
             $fontEngRegular,
-            '#FFE66D'
+            '#FFE66D',
+            260
         );
     }
 
@@ -2330,7 +2363,8 @@ class PosterComposer
         int $pillY,
         int $textY,
         string $fontPath,
-        string $textColor = '#333333'
+        string $textColor = '#333333',
+        int $spacing = 290
     ): void {
         $currX = $startX;
 
@@ -2341,7 +2375,7 @@ class PosterComposer
                 $font->size(14);
                 $font->color($textColor);
             });
-            $currX += 290;
+            $currX += $spacing;
         }
 
         if ($branding->instagram_handle) {
@@ -2351,7 +2385,7 @@ class PosterComposer
                 $font->size(14);
                 $font->color($textColor);
             });
-            $currX += 290;
+            $currX += $spacing;
         }
 
         if ($branding->phone_number) {

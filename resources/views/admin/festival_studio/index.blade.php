@@ -395,20 +395,43 @@
 
         /* Minimalist Modal UI Enhancements */
         #quickScheduleModal .modal-content {
-            border-radius: 20px !important;
-            border: 1px solid rgba(0, 0, 0, 0.08) !important;
-            box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25) !important;
+            border-radius: 24px !important;
+            border: 1px solid rgba(0, 0, 0, 0.06) !important;
+            box-shadow: 0 30px 80px -20px rgba(15, 23, 42, 0.2) !important;
         }
-        #quickScheduleModal .form-select,
+        .qs-premium-select {
+            height: 48px !important;
+            border-radius: 12px !important;
+            border: 1.5px solid #E2E8F0 !important;
+            background-color: #FAFAFA !important;
+            font-size: 0.9rem !important;
+            font-weight: 500 !important;
+            color: #1E293B !important;
+            padding: 0 16px !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2364748B' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 14px center !important;
+            background-size: 14px 10px !important;
+        }
+        .qs-premium-select:hover {
+            border-color: #CBD5E1 !important;
+            background-color: #FFFFFF !important;
+        }
+        .qs-premium-select:focus {
+            border-color: #0D9488 !important;
+            background-color: #FFFFFF !important;
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1) !important;
+            outline: none !important;
+        }
         #quickScheduleModal .form-control {
             border-color: #e2e8f0;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             transition: all 0.2s ease;
         }
-        #quickScheduleModal .form-select:focus,
         #quickScheduleModal .form-control:focus {
             border-color: #0d9488;
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1);
         }
         .qs-account-row {
             transition: all 0.18s ease;
@@ -787,11 +810,11 @@
                     if (actions2) actions2.classList.add('d-none');
                     if (ind1) {
                         ind1.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
-                        ind1.innerHTML = '<i class="ti ti-palette me-1"></i> 1. Poster Style';
+                        ind1.innerText = '1. Poster Style';
                     }
                     if (ind2) {
-                        ind2.className = 'badge bg-transparent text-secondary px-3 py-1.5 rounded-pill fw-semibold';
-                        ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
+                        ind2.className = 'badge bg-transparent text-secondary px-3 py-1.5 rounded-pill fw-medium';
+                        ind2.innerText = '2. Schedule Details';
                     }
                     if (footerText) footerText.innerText = 'Step 1 of 2: Choose poster design styles';
                 } else if (step === 2) {
@@ -801,11 +824,11 @@
                     if (actions2) actions2.classList.remove('d-none');
                     if (ind1) {
                         ind1.className = 'badge bg-success text-white px-3 py-1.5 rounded-pill fw-semibold';
-                        ind1.innerHTML = '<i class="ti ti-check me-1"></i> 1. Poster Ready';
+                        ind1.innerText = '1. Poster Ready';
                     }
                     if (ind2) {
                         ind2.className = 'badge bg-primary text-white px-3 py-1.5 rounded-pill fw-semibold';
-                        ind2.innerHTML = '<i class="ti ti-send me-1"></i> 2. Schedule Details';
+                        ind2.innerText = '2. Schedule Details';
                     }
                     if (footerText) footerText.innerText = 'Step 2 of 2: Review schedule time, accounts & caption';
 
