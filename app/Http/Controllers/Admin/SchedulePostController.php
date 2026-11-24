@@ -552,6 +552,30 @@ class SchedulePostController extends Controller
             }
         }
 
+        foreach ($createdPosts as $p) {
+            $postTitle = $p->title ?: ($p->content ? \Illuminate\Support\Str::limit($p->content, 40) : 'Post #' . $p->id);
+            $actionLabel = $status === ScheduledPost::STATUS_DRAFT
+                ? "Saved draft post for {$p->account->name}"
+                : "Scheduled post '{$postTitle}' for {$p->account->name} on " . $scheduledAt->format('d M, h:i A');
+
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                $actionLabel,
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                [
+                    'scheduled_post_id' => $p->id,
+                    'platform'          => $p->platform,
+                    'post_type'         => $p->post_type,
+                    'scheduled_at'      => $p->scheduled_at,
+                    'status'            => $status,
+                ],
+                ['title' => $p->title],
+                null,
+                $p->account_id,
+                $p->user_id
+            );
+        }
+
         if (count($createdPosts) === 1) {
             $msg = $status === ScheduledPost::STATUS_DRAFT
                 ? 'Post saved as draft.'

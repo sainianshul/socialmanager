@@ -37,7 +37,8 @@ class SystemActivityController extends Controller
         // Filter Dropdown options
         $eventTypes = [
             SystemActivityLog::EVENT_ACCOUNT_SYNC    => 'Account Sync',
-            SystemActivityLog::EVENT_POST_PUBLISH    => 'Post Publish',
+            SystemActivityLog::EVENT_POST_PUBLISH    => 'Post & Video Publish',
+            SystemActivityLog::EVENT_CANVA           => 'Canva Studio',
             SystemActivityLog::EVENT_AUTO_DM         => 'Auto DM',
             SystemActivityLog::EVENT_COMMENT_PROCESS => 'Comment Process',
             SystemActivityLog::EVENT_WEBHOOK         => 'Meta Webhook',

@@ -33,6 +33,7 @@ class MetaPublishingService
 
         $scheduledPost->update(['status' => ScheduledPost::STATUS_PUBLISHING]);
 
+        $startTime = microtime(true);
         try {
             if ($account->account_type == Account::TYPE_FACEBOOK) {
                 $result = $this->publishToFacebookPage($scheduledPost, $account);
@@ -69,12 +70,44 @@ class MetaPublishingService
                     $this->publishFirstComment($scheduledPost, $account, $metaPostId, $localPost);
                 }
 
+                $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                    "Published {$scheduledPost->post_type} post to {$account->name} ({$account->account_type_name})",
+                    \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                    [
+                        'scheduled_post_id' => $scheduledPost->id,
+                        'meta_post_id'      => $metaPostId,
+                        'post_type'         => $scheduledPost->post_type,
+                    ],
+                    $result,
+                    $durationMs,
+                    $account->id,
+                    $scheduledPost->user_id
+                );
+
                 return ['success' => true, 'meta_post_id' => $metaPostId, 'message' => 'Post published successfully on Meta.'];
             } else {
                 $scheduledPost->update([
                     'status' => ScheduledPost::STATUS_FAILED,
                     'error_message' => $result['message'],
                 ]);
+
+                $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                    "Failed publishing {$scheduledPost->post_type} post to {$account->name}",
+                    \App\Models\SystemActivityLog::STATUS_FAILED,
+                    [
+                        'scheduled_post_id' => $scheduledPost->id,
+                        'post_type'         => $scheduledPost->post_type,
+                    ],
+                    $result['message'],
+                    $durationMs,
+                    $account->id,
+                    $scheduledPost->user_id
+                );
+
                 return ['success' => false, 'message' => $result['message']];
             }
         } catch (\Throwable $e) {
@@ -83,6 +116,22 @@ class MetaPublishingService
                 'status' => ScheduledPost::STATUS_FAILED,
                 'error_message' => $e->getMessage(),
             ]);
+
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                "Exception publishing {$scheduledPost->post_type} post to {$account->name}",
+                \App\Models\SystemActivityLog::STATUS_FAILED,
+                [
+                    'scheduled_post_id' => $scheduledPost->id,
+                    'post_type'         => $scheduledPost->post_type,
+                ],
+                $e->getMessage(),
+                $durationMs,
+                $account->id,
+                $scheduledPost->user_id
+            );
+
             return ['success' => false, 'message' => $e->getMessage()];
         }
     }

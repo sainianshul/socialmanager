@@ -76,6 +76,17 @@ class CanvaController extends Controller
                 Cache::put('canva_refresh_token_' . $userId, $tokens['refresh_token'], now()->addDays(30));
             }
 
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_CANVA,
+                "Connected Canva account via OAuth",
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                null,
+                ['expires_in' => $tokens['expires_in'] ?? null],
+                null,
+                null,
+                $userId !== 'guest' ? $userId : null
+            );
+
             return redirect()->route('admin.posts.create')
                 ->with('success', 'Canva successfully connected! You can now create designs and auto-import them into your posts.');
         } catch (\Throwable $e) {
@@ -132,9 +143,21 @@ class CanvaController extends Controller
             $height = (int) ($request->input('height', 1080));
             $preset = $request->input('preset');
 
+            $startTime = microtime(true);
             $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
-
             $design = $result['design'] ?? [];
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_CANVA,
+                "Created new Canva design '{$title}' ({$width}x{$height})",
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                ['title' => $title, 'preset' => $preset, 'width' => $width, 'height' => $height],
+                ['design_id' => $design['id'] ?? null, 'title' => $design['title'] ?? $title],
+                $durationMs,
+                null,
+                $userId !== 'guest' ? $userId : null
+            );
 
             return response()->json([
                 'success'   => true,
@@ -144,6 +167,17 @@ class CanvaController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::error('Canva Create Design Controller Error: ' . $e->getMessage());
+
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_CANVA,
+                "Failed to create Canva design",
+                \App\Models\SystemActivityLog::STATUS_FAILED,
+                ['preset' => $request->input('preset')],
+                $e->getMessage(),
+                null,
+                null,
+                $userId !== 'guest' ? $userId : null
+            );
 
             return response()->json([
                 'success' => false,
@@ -177,7 +211,24 @@ class CanvaController extends Controller
             $designId = $request->input('design_id');
             $format = $request->input('format', 'jpg');
 
+            $startTime = microtime(true);
             $downloadResult = $this->canvaService->exportAndDownloadDesign($token, $designId, $format);
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_CANVA,
+                "Exported Canva design '{$downloadResult['filename']}' for post thumbnail",
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                ['design_id' => $designId, 'format' => $format],
+                [
+                    'filename' => $downloadResult['filename'],
+                    'size'     => $downloadResult['size'],
+                    'url'      => $downloadResult['url'],
+                ],
+                $durationMs,
+                null,
+                $userId !== 'guest' ? $userId : null
+            );
 
             return response()->json([
                 'success'       => true,
@@ -188,6 +239,17 @@ class CanvaController extends Controller
             ]);
         } catch (\Throwable $e) {
             Log::error('Canva Export Controller Error: ' . $e->getMessage());
+
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_CANVA,
+                "Failed to export Canva design #{$request->input('design_id')}",
+                \App\Models\SystemActivityLog::STATUS_FAILED,
+                ['design_id' => $request->input('design_id')],
+                $e->getMessage(),
+                null,
+                null,
+                $userId !== 'guest' ? $userId : null
+            );
 
             return response()->json([
                 'success' => false,
@@ -206,6 +268,17 @@ class CanvaController extends Controller
         session()->forget(['canva_access_token', 'canva_refresh_token', 'canva_connected']);
         Cache::forget('canva_token_' . $userId);
         Cache::forget('canva_refresh_token_' . $userId);
+
+        \App\Services\ActivityLogger::log(
+            \App\Models\SystemActivityLog::EVENT_CANVA,
+            "Disconnected Canva account",
+            \App\Models\SystemActivityLog::STATUS_SUCCESS,
+            null,
+            null,
+            null,
+            null,
+            $userId !== 'guest' ? $userId : null
+        );
 
         return response()->json([
             'success' => true,

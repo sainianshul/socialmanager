@@ -43,6 +43,7 @@ class YouTubePublishingService
 
         $scheduledPost->update(['status' => ScheduledPost::STATUS_PUBLISHING]);
 
+        $startTime = microtime(true);
         try {
             $accessToken = $this->ensureFreshAccessToken($account);
 
@@ -88,12 +89,50 @@ class YouTubePublishingService
                     $this->publishFirstComment($scheduledPost, $account, $videoId, $accessToken, $localPost);
                 }
 
+                $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                    "Uploaded YouTube video '{$scheduledPost->title}' to {$account->name}",
+                    \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                    [
+                        'scheduled_post_id' => $scheduledPost->id,
+                        'title'             => $scheduledPost->title,
+                        'video_id'          => $videoId,
+                        'has_thumbnail'     => !empty($scheduledPost->thumbnail_path),
+                        'privacy_status'    => $scheduledPost->privacy_status ?: 'public',
+                    ],
+                    [
+                        'video_id'  => $videoId,
+                        'watch_url' => "https://www.youtube.com/watch?v={$videoId}",
+                        'message'   => 'Video uploaded to YouTube successfully.',
+                    ],
+                    $durationMs,
+                    $account->id,
+                    $scheduledPost->user_id
+                );
+
                 return ['success' => true, 'video_id' => $videoId, 'message' => 'Video uploaded to YouTube successfully.'];
             } else {
                 $scheduledPost->update([
                     'status' => ScheduledPost::STATUS_FAILED,
                     'error_message' => $result['message'],
                 ]);
+
+                $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                    "Failed uploading YouTube video '{$scheduledPost->title}' to {$account->name}",
+                    \App\Models\SystemActivityLog::STATUS_FAILED,
+                    [
+                        'scheduled_post_id' => $scheduledPost->id,
+                        'title'             => $scheduledPost->title,
+                    ],
+                    $result['message'],
+                    $durationMs,
+                    $account->id,
+                    $scheduledPost->user_id
+                );
+
                 return ['success' => false, 'message' => $result['message']];
             }
         } catch (\Throwable $e) {
@@ -106,6 +145,21 @@ class YouTubePublishingService
                 'status' => ScheduledPost::STATUS_FAILED,
                 'error_message' => 'Exception publishing to YouTube: ' . $e->getMessage(),
             ]);
+
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                "Exception uploading YouTube video '{$scheduledPost->title}' to {$account->name}",
+                \App\Models\SystemActivityLog::STATUS_FAILED,
+                [
+                    'scheduled_post_id' => $scheduledPost->id,
+                    'title'             => $scheduledPost->title,
+                ],
+                $e->getMessage(),
+                $durationMs,
+                $account->id,
+                $scheduledPost->user_id
+            );
 
             return ['success' => false, 'message' => $e->getMessage()];
         }

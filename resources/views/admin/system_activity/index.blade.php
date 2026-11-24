@@ -234,6 +234,7 @@
                                         $badgeColor = match($log->event_type) {
                                             'account_sync'    => 'primary',
                                             'post_publish'    => 'success',
+                                            'canva'           => 'cyan',
                                             'auto_dm'         => 'purple',
                                             'comment_process' => 'teal',
                                             'webhook'         => 'azure',

@@ -39,6 +39,7 @@ class SystemActivityLog extends Model
     // Event Type Constants
     public const EVENT_ACCOUNT_SYNC    = 'account_sync';
     public const EVENT_POST_PUBLISH    = 'post_publish';
+    public const EVENT_CANVA           = 'canva';
     public const EVENT_AUTO_DM         = 'auto_dm';
     public const EVENT_COMMENT_PROCESS = 'comment_process';
     public const EVENT_WEBHOOK         = 'webhook';
