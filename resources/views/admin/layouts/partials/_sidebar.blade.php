@@ -228,6 +228,7 @@
                             <span class="nav-link-title">New Post</span>
                         </a>
                     </li>
+                    @if(auth()->user()->canUseFestivalStudio())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.festival-studio.*') ? 'active' : '' }}" href="{{ route('admin.festival-studio.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Festival Studio">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-warning">
@@ -237,6 +238,7 @@
                             <span class="badge bg-warning-lt ms-auto">Auto</span>
                         </a>
                     </li>
+                    @endif
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.posts.instagram') ? 'active' : '' }}" href="{{ route('admin.posts.instagram') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Instagram Posts">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-pink">
@@ -261,6 +263,7 @@
                             <span class="nav-link-title">YouTube Videos</span>
                         </a>
                     </li>
+                    @if(auth()->user()->canSchedulePosts())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.posts.schedule*') ? 'active' : '' }}" href="{{ route('admin.posts.schedule') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Schedule & Publish">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
@@ -269,6 +272,7 @@
                             <span class="nav-link-title">Schedule & Publish</span>
                         </a>
                     </li>
+                    @endif
 
 
                     {{-- ENGAGEMENT & AI MODERATION --}}
@@ -297,6 +301,7 @@
                             <span class="nav-link-title">YouTube Comments</span>
                         </a>
                     </li>
+                    @if(auth()->user()->canUseAutoDm())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.auto-dm.*') ? 'active' : '' }}" href="{{ route('admin.auto-dm.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Auto DM">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -305,6 +310,7 @@
                             <span class="nav-link-title">Auto DM</span>
                         </a>
                     </li>
+                    @endif
 
                     {{-- HELP & SUPPORT --}}
                     <li class="nav-section-title">Help & Support</li>

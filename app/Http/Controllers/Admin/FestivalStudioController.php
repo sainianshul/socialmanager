@@ -16,6 +16,11 @@ class FestivalStudioController extends Controller
 {
     public function index(Request $request)
     {
+        if (auth()->check() && !auth()->user()->canUseFestivalStudio()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Festival Poster Studio is not enabled on your plan. Please contact admin to upgrade.');
+        }
+
         $upcomingFestivals = Festival::active()
             ->where('festival_date', '>=', now()->toDateString())
             ->orderBy('festival_date', 'asc')
@@ -189,6 +194,13 @@ class FestivalStudioController extends Controller
      */
     public function quickSchedule(Request $request)
     {
+        if (auth()->check() && !auth()->user()->canUseFestivalStudio()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Festival Poster Studio is not enabled on your plan.',
+            ], 403);
+        }
+
         $validated = $request->validate([
             'template_id'           => 'required|exists:festival_templates,id',
             'festival_id'           => 'nullable|exists:festivals,id',

@@ -220,6 +220,55 @@
                                 </div>
                             </div>
                         </div>
+
+                        {{-- PLAN FEATURES & TOKEN QUOTA CARD --}}
+                        <div class="col-12 mt-4">
+                            <div class="card border shadow-sm">
+                                <div class="card-header bg-light py-2.5 d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title text-dark mb-0 d-flex align-items-center">
+                                        <i class="ti ti-crown me-2 text-warning fs-3"></i>Plan Features & AI Usage
+                                    </h4>
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="ti ti-edit me-1"></i>Manage Plan
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-md-7">
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <span class="badge {{ $user->canSchedulePosts() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                                    <i class="ti {{ $user->canSchedulePosts() ? 'ti-check' : 'ti-x' }} me-1"></i>Post Scheduling
+                                                </span>
+                                                <span class="badge {{ $user->canUseFestivalStudio() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                                    <i class="ti {{ $user->canUseFestivalStudio() ? 'ti-check' : 'ti-x' }} me-1"></i>Festival Studio
+                                                </span>
+                                                <span class="badge {{ $user->canUseAutoDm() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                                    <i class="ti {{ $user->canUseAutoDm() ? 'ti-check' : 'ti-x' }} me-1"></i>Auto DM
+                                                </span>
+                                                <span class="badge {{ $user->canUseAi() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                                    <i class="ti {{ $user->canUseAi() ? 'ti-check' : 'ti-x' }} me-1"></i>AI Features
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="small fw-bold text-dark">
+                                                    <i class="ti ti-cpu me-1 text-primary"></i>AI Tokens: {{ number_format($user->ai_tokens_used ?? 0) }} / {{ $user->ai_token_quota ? number_format($user->ai_token_quota) : 'Unlimited' }}
+                                                </span>
+                                                <span class="badge bg-azure-lt">Est. ₹{{ number_format($user->estimatedAiCostInr(), 2) }}</span>
+                                            </div>
+                                            <div class="progress progress-sm">
+                                                <div class="progress-bar {{ $user->aiQuotaPercentage() > 80 ? 'bg-danger' : 'bg-primary' }}" style="width: {{ $user->aiQuotaPercentage() }}%" role="progressbar"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between small text-muted mt-1">
+                                                <span>{{ $user->aiQuotaPercentage() }}% Used</span>
+                                                <span>Resets: {{ $user->ai_quota_resets_at ? $user->ai_quota_resets_at->format('d M') : '1st of month' }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

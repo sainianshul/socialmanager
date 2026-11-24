@@ -21,6 +21,11 @@ class SchedulePostController extends Controller
     {
         $user = auth()->user();
 
+        if ($user && !$user->canSchedulePosts()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Post scheduling is not enabled on your plan. Please contact admin to upgrade.');
+        }
+
         $accountsQuery = Account::query();
         if (!$user->isAdmin()) {
             $accountsQuery->where('user_id', $user->id);
@@ -1133,6 +1138,21 @@ class SchedulePostController extends Controller
      */
     public function generateAiDescription(Request $request)
     {
+        $user = auth()->user();
+        if ($user && !$user->canUseAi()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'AI features are not enabled on your plan. Please contact admin to upgrade.',
+            ], 403);
+        }
+
+        if ($user && $user->hasExceededAiQuota()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Monthly AI token quota exceeded. Please upgrade your plan or wait for next billing cycle.',
+            ], 429);
+        }
+
         $request->validate([
             'title' => 'required|string|min:3|max:100',
         ]);
@@ -1163,6 +1183,10 @@ class SchedulePostController extends Controller
                 $hashtags[] = '#YouTube';
                 $hashtags[] = '#Updates';
                 $description .= "\n\n" . implode(' ', array_unique($hashtags));
+            }
+
+            if ($user && !empty($description)) {
+                $user->recordAiTokenUsage(400);
             }
 
             return response()->json([
@@ -1215,6 +1239,21 @@ class SchedulePostController extends Controller
      */
     public function generateAiCaption(Request $request)
     {
+        $user = auth()->user();
+        if ($user && !$user->canUseAi()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'AI features are not enabled on your plan. Please contact admin to upgrade.',
+            ], 403);
+        }
+
+        if ($user && $user->hasExceededAiQuota()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Monthly AI token quota exceeded. Please upgrade your plan or wait for next billing cycle.',
+            ], 429);
+        }
+
         $request->validate([
             'topic'    => 'required|string|min:2|max:500',
             'platform' => 'nullable|string|in:facebook,instagram,youtube,all',
@@ -1239,6 +1278,11 @@ class SchedulePostController extends Controller
 
             if (empty($result) || empty($result['caption'])) {
                 $result = $this->generateFallbackCaption($topic, $options);
+            }
+
+            if ($user && !empty($result)) {
+                $tokens = (int) ($result['tokens_used'] ?? 800);
+                $user->recordAiTokenUsage($tokens);
             }
 
             return response()->json([

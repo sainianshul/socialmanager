@@ -134,7 +134,10 @@ class ProcessCommentJob implements ShouldQueue
         $aiService = app(AIServiceInterface::class);
         $aiResult = null;
 
-        if ($aiService->isConfigured() && !empty($rawText)) {
+        $user = $account?->user;
+        $canUseAi = $user ? ($user->canUseAi() && !$user->hasExceededAiQuota()) : true;
+
+        if ($canUseAi && $aiService->isConfigured() && !empty($rawText)) {
             $aiResult = $aiService->analyzeAndDraftReply($rawText, [
                 'commenter_name' => $comment->commenter_name,
                 'post_caption'   => $post?->caption ?: $post?->title ?: '',
@@ -142,6 +145,11 @@ class ProcessCommentJob implements ShouldQueue
                 'tone'           => $aiTone,
                 'language'       => $aiLang,
             ]);
+
+            if ($user && $aiResult) {
+                $tokens = (int) ($aiResult['tokens_used'] ?? 300);
+                $user->recordAiTokenUsage($tokens);
+            }
         }
 
         // 2. Fallback to Local Smart Rules if Gemini is unconfigured or unavailable
@@ -219,8 +227,9 @@ class ProcessCommentJob implements ShouldQueue
         $autoDmTriggered = false;
         // Meta Policy: Private replies (DM) are strictly restricted to comments under 7 days old
         $isWithin7Days = empty($comment->commented_at) || $comment->commented_at->greaterThanOrEqualTo(now()->subDays(7));
+        $canAutoDm = $user ? $user->canUseAutoDm() : true;
 
-        if (!$shouldHide && empty($repliedAt) && $account && ($account->isFacebook() || $account->isInstagram()) && $isWithin7Days) {
+        if ($canAutoDm && !$shouldHide && empty($repliedAt) && $account && ($account->isFacebook() || $account->isInstagram()) && $isWithin7Days) {
             $matchedRule = $this->findMatchingAutoDmRule($account, $comment);
             if ($matchedRule) {
                 // Rule matched: Handled by Auto DM flow, prevents generic AI auto-comment from clashing

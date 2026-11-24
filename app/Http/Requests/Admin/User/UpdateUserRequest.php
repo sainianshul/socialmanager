@@ -25,6 +25,11 @@ class UpdateUserRequest extends FormRequest
             'client_type' => ['required', 'string', Rule::in(array_keys(User::getClientTypeList()))],
             'role' => ['nullable', 'integer', Rule::in(array_keys(User::getRoleList()))],
             'status' => ['required', 'integer', Rule::in(array_keys(User::getStatusList()))],
+            'can_schedule_posts' => ['nullable', 'boolean'],
+            'can_use_festival_studio' => ['nullable', 'boolean'],
+            'can_use_auto_dm' => ['nullable', 'boolean'],
+            'can_use_ai' => ['nullable', 'boolean'],
+            'ai_token_quota' => ['nullable', 'integer', 'min:0'],
         ];
     }
 }

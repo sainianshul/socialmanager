@@ -53,6 +53,13 @@ class User extends Authenticatable
         'canva_access_token',
         'canva_refresh_token',
         'canva_token_expires_at',
+        'can_schedule_posts',
+        'can_use_festival_studio',
+        'can_use_auto_dm',
+        'can_use_ai',
+        'ai_token_quota',
+        'ai_tokens_used',
+        'ai_quota_resets_at',
     ];
 
     protected $hidden = [
@@ -74,6 +81,13 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'location_updated_at' => 'datetime',
             'canva_token_expires_at' => 'datetime',
+            'can_schedule_posts' => 'boolean',
+            'can_use_festival_studio' => 'boolean',
+            'can_use_auto_dm' => 'boolean',
+            'can_use_ai' => 'boolean',
+            'ai_token_quota' => 'integer',
+            'ai_tokens_used' => 'integer',
+            'ai_quota_resets_at' => 'datetime',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
@@ -247,6 +261,126 @@ class User extends Authenticatable
     public function defaultLeaderStrip(): \Illuminate\Database\Eloquent\Relations\HasOne
     {
         return $this->hasOne(LeaderStrip::class)->where('is_default', true);
+    }
+
+    // ─── Plan Features & Token Quota Helpers ────────────────
+
+    public function canSchedulePosts(): bool
+    {
+        if ($this->isAdmin() || $this->isManager()) {
+            return true;
+        }
+
+        return (bool) ($this->can_schedule_posts ?? true);
+    }
+
+    public function canUseFestivalStudio(): bool
+    {
+        if ($this->isAdmin() || $this->isManager()) {
+            return true;
+        }
+
+        return (bool) ($this->can_use_festival_studio ?? true);
+    }
+
+    public function canUseAutoDm(): bool
+    {
+        if ($this->isAdmin() || $this->isManager()) {
+            return true;
+        }
+
+        return (bool) ($this->can_use_auto_dm ?? true);
+    }
+
+    public function canUseAi(): bool
+    {
+        if ($this->isAdmin() || $this->isManager()) {
+            return true;
+        }
+
+        return (bool) ($this->can_use_ai ?? true);
+    }
+
+    /**
+     * Check if user has exceeded their monthly AI token quota.
+     * Includes self-healing auto-reset when monthly cycle lapses.
+     */
+    public function hasExceededAiQuota(): bool
+    {
+        if ($this->isAdmin() || $this->isManager()) {
+            return false;
+        }
+
+        if (!$this->canUseAi()) {
+            return true;
+        }
+
+        // Unlimited quota if null
+        if ($this->ai_token_quota === null) {
+            return false;
+        }
+
+        // Lazy Monthly Reset: If billing reset date has passed, reset usage to 0 and push next reset
+        if ($this->ai_quota_resets_at && now()->greaterThanOrEqualTo($this->ai_quota_resets_at)) {
+            $this->update([
+                'ai_tokens_used'     => 0,
+                'ai_quota_resets_at' => now()->addMonth()->startOfMonth(),
+            ]);
+            return false;
+        }
+
+        return (int) $this->ai_tokens_used >= (int) $this->ai_token_quota;
+    }
+
+    /**
+     * Record AI tokens consumed by this user.
+     */
+    public function recordAiTokenUsage(int $tokens): void
+    {
+        if ($tokens <= 0) {
+            return;
+        }
+
+        // Check if cycle reset is due before incrementing
+        if ($this->ai_quota_resets_at && now()->greaterThanOrEqualTo($this->ai_quota_resets_at)) {
+            $this->update([
+                'ai_tokens_used'     => 0,
+                'ai_quota_resets_at' => now()->addMonth()->startOfMonth(),
+            ]);
+        }
+
+        $this->increment('ai_tokens_used', $tokens);
+
+        if ($this->ai_quota_resets_at === null) {
+            $this->update([
+                'ai_quota_resets_at' => now()->addMonth()->startOfMonth(),
+            ]);
+        }
+    }
+
+    /**
+     * Calculate percentage of monthly AI quota consumed.
+     */
+    public function aiQuotaPercentage(): float
+    {
+        if (!$this->ai_token_quota || $this->ai_token_quota <= 0) {
+            return 0.0;
+        }
+
+        return (float) min(100.0, round(($this->ai_tokens_used / $this->ai_token_quota) * 100, 1));
+    }
+
+    /**
+     * Estimated cost spent on AI tokens (in INR, based on DeepSeek/Gemini average ~ ₹12/M tokens)
+     */
+    public function estimatedAiCostInr(): float
+    {
+        if (!$this->ai_tokens_used || $this->ai_tokens_used <= 0) {
+            return 0.0;
+        }
+
+        // ~ ₹12 per 1,000,000 tokens (1 token = ₹0.000012)
+        return round(($this->ai_tokens_used / 1000000) * 12, 2);
     }
 
     // ─── API Response ────────────────────────

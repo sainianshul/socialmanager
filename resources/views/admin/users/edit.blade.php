@@ -102,6 +102,58 @@
                         @enderror
                     </div>
 
+                    {{-- PLAN FEATURES & AI TOKEN QUOTA --}}
+                    <div class="col-12 mt-4">
+                        <div class="card bg-light-lt border shadow-none">
+                            <div class="card-header bg-transparent py-2.5">
+                                <h4 class="card-title text-dark mb-0 d-flex align-items-center">
+                                    <i class="ti ti-toggle-right me-2 text-primary fs-3"></i>Plan Features & AI Quota
+                                </h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-12 col-sm-6 col-md-3">
+                                        <label class="form-check form-switch cursor-pointer mb-1">
+                                            <input class="form-check-input" type="checkbox" name="can_schedule_posts" value="1" {{ old('can_schedule_posts', $user->can_schedule_posts ?? true) ? 'checked' : '' }}>
+                                            <span class="form-check-label fw-bold text-dark">Post Scheduling</span>
+                                        </label>
+                                        <small class="form-hint text-muted d-block">Multi-account scheduling & publishing</small>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-3">
+                                        <label class="form-check form-switch cursor-pointer mb-1">
+                                            <input class="form-check-input" type="checkbox" name="can_use_festival_studio" value="1" {{ old('can_use_festival_studio', $user->can_use_festival_studio ?? true) ? 'checked' : '' }}>
+                                            <span class="form-check-label fw-bold text-dark">Festival Studio</span>
+                                        </label>
+                                        <small class="form-hint text-muted d-block">Branded festival posters & templates</small>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-3">
+                                        <label class="form-check form-switch cursor-pointer mb-1">
+                                            <input class="form-check-input" type="checkbox" name="can_use_auto_dm" value="1" {{ old('can_use_auto_dm', $user->can_use_auto_dm ?? true) ? 'checked' : '' }}>
+                                            <span class="form-check-label fw-bold text-dark">Auto DM</span>
+                                        </label>
+                                        <small class="form-hint text-muted d-block">Comment-to-DM automated reply</small>
+                                    </div>
+                                    <div class="col-12 col-sm-6 col-md-3">
+                                        <label class="form-check form-switch cursor-pointer mb-1">
+                                            <input class="form-check-input" type="checkbox" name="can_use_ai" value="1" {{ old('can_use_ai', $user->can_use_ai ?? true) ? 'checked' : '' }}>
+                                            <span class="form-check-label fw-bold text-dark">AI Features</span>
+                                        </label>
+                                        <small class="form-hint text-muted d-block">Sentiment & caption generators</small>
+                                    </div>
+                                    <div class="col-12 col-md-6 mt-3">
+                                        <label class="form-label fw-bold text-dark">Monthly AI Token Quota</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="ti ti-cpu"></i></span>
+                                            <input type="number" name="ai_token_quota" class="form-control" value="{{ old('ai_token_quota', $user->ai_token_quota) }}" placeholder="e.g. 100000 (leave blank for unlimited)" min="0" step="5000">
+                                            <span class="input-group-text">Tokens / mo</span>
+                                        </div>
+                                        <small class="form-hint text-muted">100,000 tokens ≈ 300 comments/captions. Leave empty for unlimited.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 

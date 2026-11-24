@@ -18,6 +18,11 @@ class AutoDmController extends Controller
     {
         $user = auth()->user();
 
+        if ($user && !$user->canUseAutoDm()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Auto DM feature is not enabled on your plan. Please contact admin to upgrade.');
+        }
+
         // Only Facebook and Instagram accounts support comment-to-DM
         $accountsQuery = Account::whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM])->orderBy('name');
         if (!$user->isAdmin()) {
@@ -66,6 +71,11 @@ class AutoDmController extends Controller
     public function create(Request $request)
     {
         $user = auth()->user();
+
+        if ($user && !$user->canUseAutoDm()) {
+            return redirect()->route('admin.dashboard')
+                ->with('error', 'Auto DM feature is not enabled on your plan. Please contact admin to upgrade.');
+        }
 
         $accountsQuery = Account::whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM])->orderBy('name');
         if (!$user->isAdmin()) {

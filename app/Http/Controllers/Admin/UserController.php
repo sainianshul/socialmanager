@@ -45,6 +45,14 @@ class UserController extends Controller
             $data['password'] = Hash::make(Str::random(12));
         }
 
+        // Plan Features & AI Quota initialization
+        $data['can_schedule_posts'] = $request->boolean('can_schedule_posts', true);
+        $data['can_use_festival_studio'] = $request->boolean('can_use_festival_studio', true);
+        $data['can_use_auto_dm'] = $request->boolean('can_use_auto_dm', true);
+        $data['can_use_ai'] = $request->boolean('can_use_ai', true);
+        $data['ai_token_quota'] = $request->filled('ai_token_quota') ? (int) $request->input('ai_token_quota') : null;
+        $data['ai_quota_resets_at'] = now()->addMonth()->startOfMonth();
+
         User::create($data);
 
         return redirect()->route('admin.users.index')
@@ -274,6 +282,13 @@ class UserController extends Controller
         } else {
             unset($data['password']);
         }
+
+        // Plan Features & AI Quota updates
+        $data['can_schedule_posts'] = $request->boolean('can_schedule_posts');
+        $data['can_use_festival_studio'] = $request->boolean('can_use_festival_studio');
+        $data['can_use_auto_dm'] = $request->boolean('can_use_auto_dm');
+        $data['can_use_ai'] = $request->boolean('can_use_ai');
+        $data['ai_token_quota'] = $request->filled('ai_token_quota') ? (int) $request->input('ai_token_quota') : null;
 
         $user->update($data);
 
