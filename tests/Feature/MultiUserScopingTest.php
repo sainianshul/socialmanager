@@ -186,4 +186,23 @@ class MultiUserScopingTest extends TestCase
         $createResponse = $this->actingAs($user)->get(route('admin.users.create'));
         $createResponse->assertStatus(403);
     }
+
+    public function test_regular_user_cannot_access_webhook_logs(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $response = $this->actingAs($user)->get(route('admin.webhook-logs.index'));
+        $response->assertStatus(403);
+
+        $clearResponse = $this->actingAs($user)->post(route('admin.webhook-logs.clear'));
+        $clearResponse->assertStatus(403);
+    }
+
+    public function test_admin_can_access_webhook_logs(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $response = $this->actingAs($admin)->get(route('admin.webhook-logs.index'));
+        $response->assertStatus(200);
+    }
 }

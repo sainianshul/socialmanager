@@ -11,10 +11,10 @@ Route::get('/health', function () {
 
 Route::prefix('v1')->group(function () {
     
-    // Public Auth Routes
+    // Public Auth Routes (Rate limited against SMS spam and brute-force attacks)
     Route::prefix('auth')->group(function () {
-        Route::post('send-otp', [\App\Http\Controllers\Api\V1\AuthController::class, 'sendOtp']);
-        Route::post('verify-otp', [\App\Http\Controllers\Api\V1\AuthController::class, 'verifyOtp']);
+        Route::post('send-otp', [\App\Http\Controllers\Api\V1\AuthController::class, 'sendOtp'])->middleware('throttle:5,1');
+        Route::post('verify-otp', [\App\Http\Controllers\Api\V1\AuthController::class, 'verifyOtp'])->middleware('throttle:10,1');
     });
 
     // Authenticated API Routes

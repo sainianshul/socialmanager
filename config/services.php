@@ -92,4 +92,16 @@ return [
         'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1'),
     ],
 
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'base_url' => env('GROQ_BASE_URL', 'https://api.groq.com/openai/v1'),
+    ],
+
+    'ollama' => [
+        'api_key' => env('OLLAMA_API_KEY', 'ollama-local'),
+        'model' => env('OLLAMA_MODEL', 'llama3.2'),
+        'base_url' => env('OLLAMA_BASE_URL', 'http://localhost:11434/v1'),
+    ],
+
 ];

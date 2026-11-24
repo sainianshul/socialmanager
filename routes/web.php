@@ -12,7 +12,7 @@ Route::get('/', function () {
 Route::prefix('admin')->group(function () {
     // Auth Routes
     Route::get('login', [\App\Http\Controllers\Admin\AuthController::class, 'showLogin'])->name('login');
-    Route::post('login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->name('login.post');
+    Route::post('login', [\App\Http\Controllers\Admin\AuthController::class, 'login'])->middleware('throttle:10,1')->name('login.post');
     Route::post('logout', [\App\Http\Controllers\Admin\AuthController::class, 'logout'])->name('logout');
 
     Route::name('admin.')->group(function () {
@@ -116,12 +116,6 @@ Route::prefix('admin')->group(function () {
                 Route::get('accounts/{account}/posts', [\App\Http\Controllers\Admin\AutoDmController::class, 'getPosts'])->name('account-posts');
             });
 
-            // Webhook Testing & Activity Logs
-            Route::prefix('webhook-logs')->name('webhook-logs.')->group(function () {
-                Route::get('/', [\App\Http\Controllers\MetaWebhookController::class, 'viewLogs'])->name('index');
-                Route::post('/clear', [\App\Http\Controllers\MetaWebhookController::class, 'clearLogs'])->name('clear');
-            });
-
             // Constituent Comments & AI Moderation
             Route::prefix('comments')->name('comments.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\CommentController::class, 'index'])->name('index');
@@ -189,6 +183,12 @@ Route::prefix('admin')->group(function () {
                     Route::delete('/failed-job/{id}', [\App\Http\Controllers\Admin\SystemActivityController::class, 'deleteFailedJob'])->name('delete-failed');
                     Route::post('/clear-failed', [\App\Http\Controllers\Admin\SystemActivityController::class, 'clearAllFailed'])->name('clear-failed');
                     Route::post('/clear-logs', [\App\Http\Controllers\Admin\SystemActivityController::class, 'clearLogs'])->name('clear-logs');
+                });
+
+                // Webhook Testing & Activity Logs (Admin / Manager only)
+                Route::prefix('webhook-logs')->name('webhook-logs.')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\MetaWebhookController::class, 'viewLogs'])->name('index');
+                    Route::post('/clear', [\App\Http\Controllers\MetaWebhookController::class, 'clearLogs'])->name('clear');
                 });
             });
         });

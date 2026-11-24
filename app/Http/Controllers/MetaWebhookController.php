@@ -229,6 +229,11 @@ class MetaWebhookController extends Controller
      */
     public function viewLogs(Request $request)
     {
+        $user = auth()->user();
+        if (!$user || (!$user->isAdmin() && !$user->isManager())) {
+            abort(403, 'Unauthorized access to webhook activity logs.');
+        }
+
         $logPath = storage_path('logs/webhook.log');
         $rawLogs = '';
         $fileSize = '0 KB';
@@ -254,6 +259,11 @@ class MetaWebhookController extends Controller
      */
     public function clearLogs()
     {
+        $user = auth()->user();
+        if (!$user || (!$user->isAdmin() && !$user->isManager())) {
+            abort(403, 'Unauthorized access to webhook activity logs.');
+        }
+
         $logPath = storage_path('logs/webhook.log');
         if (File::exists($logPath)) {
             File::put($logPath, '');

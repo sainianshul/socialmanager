@@ -19,6 +19,8 @@ class AppServiceProvider extends ServiceProvider
                 'openai'   => new \App\Services\AI\OpenAICompatibleAIService('openai'),
                 'qwen'     => new \App\Services\AI\OpenAICompatibleAIService('qwen'),
                 'deepseek' => new \App\Services\AI\OpenAICompatibleAIService('deepseek'),
+                'groq'     => new \App\Services\AI\OpenAICompatibleAIService('groq'),
+                'ollama'   => new \App\Services\AI\OpenAICompatibleAIService('ollama'),
                 default    => $app->make(\App\Services\GeminiAIService::class),
             };
         });

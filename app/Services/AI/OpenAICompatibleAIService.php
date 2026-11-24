@@ -29,12 +29,16 @@ class OpenAICompatibleAIService implements AIServiceInterface
         $defaultModel = match ($this->providerName) {
             'qwen'     => 'qwen-plus',
             'deepseek' => 'deepseek-chat',
+            'groq'     => 'llama-3.3-70b-versatile',
+            'ollama'   => 'llama3.2',
             default    => 'gpt-4o-mini',
         };
 
         $defaultBaseUrl = match ($this->providerName) {
             'qwen'     => 'https://dashscope.aliyuncs.com/compatible-mode/v1',
             'deepseek' => 'https://api.deepseek.com/v1',
+            'groq'     => 'https://api.groq.com/openai/v1',
+            'ollama'   => 'http://localhost:11434/v1',
             default    => 'https://api.openai.com/v1',
         };
 
@@ -49,6 +53,10 @@ class OpenAICompatibleAIService implements AIServiceInterface
 
     public function isConfigured(): bool
     {
+        if ($this->providerName === 'ollama') {
+            return !empty($this->baseUrl);
+        }
+
         return !empty($this->apiKey);
     }
 

@@ -357,8 +357,8 @@ class SchedulePostController extends Controller
                 $thumbName = time() . '_thumb_' . Str::random(10) . '.' . $thumb->getClientOriginalExtension();
                 $thumbnailPath = $thumb->storeAs('uploads/thumbnails', $thumbName, 'public');
             } elseif ($request->filled('canva_thumbnail')) {
-                $canvaThumb = $request->input('canva_thumbnail');
-                if (is_string($canvaThumb) && Storage::disk('public')->exists($canvaThumb)) {
+                $canvaThumb = $this->sanitizeCanvaPath($request->input('canva_thumbnail'));
+                if ($canvaThumb) {
                     $thumbnailPath = $canvaThumb;
                 }
             }
@@ -385,16 +385,18 @@ class SchedulePostController extends Controller
 
             if ($request->filled('canva_media_paths')) {
                 foreach ((array) $request->input('canva_media_paths') as $cPath) {
-                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
-                        $mediaUrls[] = $cPath;
+                    $clean = $this->sanitizeCanvaPath($cPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
 
             if ($request->filled('readymade_poster_paths')) {
                 foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
-                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
-                        $mediaUrls[] = $rPath;
+                    $clean = $this->sanitizeReadymadePosterPath($rPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
@@ -431,16 +433,18 @@ class SchedulePostController extends Controller
 
             if ($request->filled('canva_media_paths')) {
                 foreach ((array) $request->input('canva_media_paths') as $cPath) {
-                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
-                        $mediaUrls[] = $cPath;
+                    $clean = $this->sanitizeCanvaPath($cPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
 
             if ($request->filled('readymade_poster_paths')) {
                 foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
-                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
-                        $mediaUrls[] = $rPath;
+                    $clean = $this->sanitizeReadymadePosterPath($rPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
@@ -726,13 +730,11 @@ class SchedulePostController extends Controller
                 'scheduled_at'   => 'nullable|date',
             ]);
 
-            // If user uploads a new video file, delete old video and save new
+            // If user uploads a new video file, safely delete old user video and save new
             if ($request->hasFile('video_file')) {
                 if (!empty($mediaUrls)) {
                     foreach ($mediaUrls as $oldFile) {
-                        if (Storage::disk('public')->exists($oldFile)) {
-                            Storage::disk('public')->delete($oldFile);
-                        }
+                        $this->safelyDeleteMediaFile($oldFile);
                     }
                 }
                 $file = $request->file('video_file');
@@ -745,17 +747,17 @@ class SchedulePostController extends Controller
                     ->withInput();
             }
 
-            // If user uploads a new thumbnail, delete old thumbnail and save new
+            // If user uploads a new thumbnail, safely delete old thumbnail and save new
             if ($request->hasFile('thumbnail')) {
-                if ($thumbnailPath && Storage::disk('public')->exists($thumbnailPath)) {
-                    Storage::disk('public')->delete($thumbnailPath);
+                if ($thumbnailPath) {
+                    $this->safelyDeleteThumbnailFile($thumbnailPath);
                 }
                 $thumb = $request->file('thumbnail');
                 $thumbName = time() . '_thumb_' . Str::random(10) . '.' . $thumb->getClientOriginalExtension();
                 $thumbnailPath = $thumb->storeAs('uploads/thumbnails', $thumbName, 'public');
             } elseif ($request->filled('canva_thumbnail')) {
-                $canvaThumb = $request->input('canva_thumbnail');
-                if (is_string($canvaThumb) && Storage::disk('public')->exists($canvaThumb)) {
+                $canvaThumb = $this->sanitizeCanvaPath($request->input('canva_thumbnail'));
+                if ($canvaThumb) {
                     $thumbnailPath = $canvaThumb;
                 }
             }
@@ -789,9 +791,7 @@ class SchedulePostController extends Controller
             if ($request->hasFile('media_files')) {
                 if (!empty($mediaUrls)) {
                     foreach ($mediaUrls as $oldFile) {
-                        if (Storage::disk('public')->exists($oldFile)) {
-                            Storage::disk('public')->delete($oldFile);
-                        }
+                        $this->safelyDeleteMediaFile($oldFile);
                     }
                 }
                 $mediaUrls = [];
@@ -804,16 +804,18 @@ class SchedulePostController extends Controller
 
             if ($request->filled('canva_media_paths')) {
                 foreach ((array) $request->input('canva_media_paths') as $cPath) {
-                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
-                        $mediaUrls[] = $cPath;
+                    $clean = $this->sanitizeCanvaPath($cPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
 
             if ($request->filled('readymade_poster_paths')) {
                 foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
-                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
-                        $mediaUrls[] = $rPath;
+                    $clean = $this->sanitizeReadymadePosterPath($rPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
@@ -849,9 +851,7 @@ class SchedulePostController extends Controller
             if ($request->hasFile('media_files')) {
                 if (!empty($mediaUrls)) {
                     foreach ($mediaUrls as $oldFile) {
-                        if (Storage::disk('public')->exists($oldFile)) {
-                            Storage::disk('public')->delete($oldFile);
-                        }
+                        $this->safelyDeleteMediaFile($oldFile);
                     }
                 }
                 $mediaUrls = [];
@@ -864,16 +864,18 @@ class SchedulePostController extends Controller
 
             if ($request->filled('canva_media_paths')) {
                 foreach ((array) $request->input('canva_media_paths') as $cPath) {
-                    if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
-                        $mediaUrls[] = $cPath;
+                    $clean = $this->sanitizeCanvaPath($cPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
 
             if ($request->filled('readymade_poster_paths')) {
                 foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
-                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
-                        $mediaUrls[] = $rPath;
+                    $clean = $this->sanitizeReadymadePosterPath($rPath);
+                    if ($clean) {
+                        $mediaUrls[] = $clean;
                     }
                 }
             }
@@ -1022,18 +1024,16 @@ class SchedulePostController extends Controller
     {
         $this->authorizePost($scheduledPost);
 
-        // Remove media files from storage if present
+        // Safely remove user-uploaded media files from storage without touching shared templates/posters
         if (is_array($scheduledPost->media_urls)) {
             foreach ($scheduledPost->media_urls as $path) {
-                if (Storage::disk('public')->exists($path)) {
-                    Storage::disk('public')->delete($path);
-                }
+                $this->safelyDeleteMediaFile($path);
             }
         }
 
-        // Remove thumbnail if present
-        if ($scheduledPost->thumbnail_path && Storage::disk('public')->exists($scheduledPost->thumbnail_path)) {
-            Storage::disk('public')->delete($scheduledPost->thumbnail_path);
+        // Safely remove user thumbnail if present
+        if ($scheduledPost->thumbnail_path) {
+            $this->safelyDeleteThumbnailFile($scheduledPost->thumbnail_path);
         }
 
         $scheduledPost->delete();
@@ -1053,6 +1053,78 @@ class SchedulePostController extends Controller
 
         if ($post->user_id !== $user->id && $post->account->user_id !== $user->id) {
             abort(403, 'Unauthorized access to this scheduled post.');
+        }
+    }
+
+    /**
+     * Safely validate and sanitize a Canva-exported media path against traversal.
+     */
+    private function sanitizeCanvaPath(?string $path): ?string
+    {
+        if (empty($path) || !is_string($path)) {
+            return null;
+        }
+        $path = str_replace('\\', '/', trim($path));
+        if (str_contains($path, '..') || !str_starts_with($path, 'posts/canva/')) {
+            return null;
+        }
+        return Storage::disk('public')->exists($path) ? $path : null;
+    }
+
+    /**
+     * Safely validate and sanitize a readymade poster media path against traversal.
+     */
+    private function sanitizeReadymadePosterPath(?string $path): ?string
+    {
+        if (empty($path) || !is_string($path)) {
+            return null;
+        }
+        $path = str_replace('\\', '/', trim($path));
+        if (str_contains($path, '..') || !str_starts_with($path, 'posters/')) {
+            return null;
+        }
+        return Storage::disk('public')->exists($path) ? $path : null;
+    }
+
+    /**
+     * Safely delete a user-uploaded post media file from storage without touching shared assets.
+     */
+    private function safelyDeleteMediaFile(?string $path): void
+    {
+        if (empty($path) || !is_string($path)) {
+            return;
+        }
+        $path = str_replace('\\', '/', trim($path));
+        if (str_contains($path, '..')) {
+            return;
+        }
+        // Never delete shared templates or readymade posters
+        $isDisposableUserMedia = str_starts_with($path, 'uploads/scheduled_posts/')
+            || str_starts_with($path, 'uploads/youtube_videos/')
+            || str_starts_with($path, 'posts/canva/');
+
+        if ($isDisposableUserMedia && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
+    /**
+     * Safely delete a user thumbnail file from storage without touching shared assets.
+     */
+    private function safelyDeleteThumbnailFile(?string $path): void
+    {
+        if (empty($path) || !is_string($path)) {
+            return;
+        }
+        $path = str_replace('\\', '/', trim($path));
+        if (str_contains($path, '..')) {
+            return;
+        }
+        $isDisposableThumbnail = str_starts_with($path, 'uploads/thumbnails/')
+            || str_starts_with($path, 'posts/canva/');
+
+        if ($isDisposableThumbnail && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
     }
 

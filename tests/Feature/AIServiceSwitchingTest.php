@@ -50,6 +50,27 @@ class AIServiceSwitchingTest extends TestCase
         $this->assertEquals('deepseek', $service->getProviderName());
     }
 
+    public function test_groq_provider_resolves_groq_compatible_service(): void
+    {
+        config(['services.ai.default' => 'groq']);
+
+        $service = app(AIServiceInterface::class);
+
+        $this->assertInstanceOf(OpenAICompatibleAIService::class, $service);
+        $this->assertEquals('groq', $service->getProviderName());
+    }
+
+    public function test_ollama_provider_resolves_ollama_compatible_service(): void
+    {
+        config(['services.ai.default' => 'ollama']);
+
+        $service = app(AIServiceInterface::class);
+
+        $this->assertInstanceOf(OpenAICompatibleAIService::class, $service);
+        $this->assertEquals('ollama', $service->getProviderName());
+        $this->assertTrue($service->isConfigured());
+    }
+
     public function test_openai_compatible_service_analyzes_and_drafts_reply(): void
     {
         config([
