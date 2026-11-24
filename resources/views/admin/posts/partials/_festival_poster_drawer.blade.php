@@ -1,16 +1,16 @@
-{{-- Festival Poster Right-Side Drawer (Offcanvas) --}}
-<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="drawer-festival-posters" aria-labelledby="drawer-festival-posters-label" style="width: 460px; max-width: 90vw; border-left: 1px solid rgba(0, 0, 0, 0.08);">
+{{-- Readymade Poster Right-Side Drawer (Offcanvas) --}}
+<div class="offcanvas offcanvas-end shadow-lg" tabindex="-1" id="drawer-festival-posters" aria-labelledby="drawer-festival-posters-label" style="width: 640px; max-width: 95vw; border-left: 1px solid rgba(0, 0, 0, 0.08);">
     {{-- Drawer Header --}}
     <div class="offcanvas-header border-bottom py-3 px-4 bg-white d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2.5">
-            <span class="avatar avatar-sm rounded-circle bg-warning-lt text-warning fw-bold">
-                <i class="ti ti-sparkles fs-2"></i>
+            <span class="avatar avatar-sm rounded-circle bg-primary-lt text-primary fw-bold">
+                <i class="ti ti-template fs-2"></i>
             </span>
             <div>
                 <h4 class="offcanvas-title fw-bold mb-0 text-dark" id="drawer-festival-posters-label" style="font-size: 1.05rem; letter-spacing: -0.2px;">
-                    Festival & Campaign Posters
+                    Readymade Posters
                 </h4>
-                <div class="text-secondary small" style="font-size: 11.5px;">Ready-to-use celebration & event templates</div>
+                <div class="text-secondary small" style="font-size: 11.5px;">Ready-to-use awareness, celebration & campaign templates</div>
             </div>
         </div>
         <button type="button" class="btn btn-sm btn-light border rounded-pill px-3 py-1 text-secondary" data-bs-dismiss="offcanvas" style="font-size: 0.85rem;">
@@ -26,7 +26,7 @@
                 <span class="input-icon-addon">
                     <i class="ti ti-search text-secondary"></i>
                 </span>
-                <input type="text" class="form-control rounded-2" id="festival-poster-search" placeholder="Search festival or event templates..." style="height: 40px; font-size: 0.9rem;">
+                <input type="text" class="form-control rounded-2" id="festival-poster-search" placeholder="Search readymade poster templates..." style="height: 40px; font-size: 0.9rem;">
             </div>
         </div>
 
