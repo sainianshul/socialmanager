@@ -412,48 +412,67 @@
         {{-- ================================================================= --}}
         <div id="panel-step-pane-2" class="d-none">
             
-            <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                <button type="button" class="btn btn-sm btn-link text-body-secondary text-decoration-none p-0 d-flex align-items-center gap-1.5" id="panel-btn-back-step">
+            {{-- Navigation Bar --}}
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
+                <button type="button" class="btn btn-sm btn-white border shadow-xs rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 studio-back-btn" id="panel-btn-back-step" style="font-size: 12px; font-weight: 600;">
                     <i class="ti ti-arrow-left"></i>
-                    <span class="fw-semibold">Back to Poster Style</span>
+                    <span>Back to Poster Style</span>
                 </button>
-                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-1 font-monospace small" id="panel-schedule-festival-date">
-                    {{ $selectedFestival->festival_date->format('d M Y') }}
-                </span>
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-teal-lt text-teal rounded-pill px-3 py-1.5 fw-bold" id="panel-schedule-festival-date" style="font-size: 11.5px;">
+                        <i class="ti ti-calendar-event me-1"></i>{{ $selectedFestival->title }} ({{ $selectedFestival->festival_date->format('d M Y') }})
+                    </span>
+                </div>
             </div>
 
-            <div class="row g-4 align-items-start">
+            <div class="row g-4 g-lg-5 align-items-start">
                 
-                {{-- Left Side: Compact Poster Thumbnail preview --}}
-                <div class="col-md-4 text-center">
-                    <div class="position-relative rounded-4 overflow-hidden shadow-sm mx-auto" style="max-width: 240px; aspect-ratio: 1 / 1; background: #0f172a; border: 1px solid rgba(0,0,0,0.08);">
-                        <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
+                {{-- Left Side: Compact Poster Thumbnail preview Card --}}
+                <div class="col-md-5 col-lg-4">
+                    <div class="card studio-panel-card p-3 text-center mb-3">
+                        <div class="position-relative rounded-3 overflow-hidden shadow-sm mx-auto w-100" style="aspect-ratio: 1 / 1; background: #0f172a; border: 1px solid rgba(0,0,0,0.08);">
+                            <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
+                        </div>
+                        <div class="small fw-bold text-body mt-2.5 text-truncate" id="panel-schedule-template-title" style="font-size: 13px;">
+                            {{ $firstTemplate?->title }}
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center gap-1.5 mt-1">
+                            <span class="badge bg-teal-lt text-teal rounded-pill px-2.5 py-0.5 fw-bold" style="font-size: 10.5px;">
+                                1080p Ultra HD
+                            </span>
+                            <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 10.5px;">
+                                Personalized
+                            </span>
+                        </div>
                     </div>
-                    <div class="small fw-bold text-body mt-2.5 text-truncate" id="panel-schedule-template-title">
-                        {{ $firstTemplate?->title }}
-                    </div>
-                    <div class="text-secondary small" style="font-size: 11px;">1080p Personalized Artwork</div>
                 </div>
 
-                {{-- Right Side: Accounts, Date/Time & Caption --}}
-                <div class="col-md-8">
-                    <div class="d-flex flex-column gap-3">
+                {{-- Right Side: Structured Cards with Generous Padding --}}
+                <div class="col-md-7 col-lg-8">
+                    <div class="d-flex flex-column gap-3.5">
                         
-                        {{-- Social Media Accounts --}}
-                        <div>
-                            <label class="form-label text-muted fw-bold small text-uppercase mb-2" style="font-size: 11px; letter-spacing: 0.05em;">
-                                Publish to Social Accounts
-                            </label>
-                            <div class="d-flex flex-column gap-2" id="panel-accounts-container">
+                        {{-- CARD 1: Connected Social Media Accounts --}}
+                        <div class="card studio-panel-card p-3.5 mb-0">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
+                                    <i class="ti ti-share text-primary" style="font-size: 14px;"></i>
+                                    Publish to Social Accounts
+                                </span>
+                                <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 10.5px;">
+                                    Auto-Selected
+                                </span>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2.5" id="panel-accounts-container">
                                 @forelse($accounts as $acc)
-                                    <div class="p-2.5 rounded-3 d-flex align-items-center justify-content-between panel-account-item active cursor-pointer" data-id="{{ $acc->id }}">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <span class="badge rounded-circle p-1 {{ $acc->account_type == 1 ? 'bg-primary' : 'bg-danger' }}">
-                                                <i class="ti {{ $acc->account_type == 1 ? 'ti-brand-facebook' : 'ti-brand-instagram' }} text-white"></i>
-                                            </span>
+                                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between panel-account-item active cursor-pointer" data-id="{{ $acc->id }}">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 38px; height: 38px; background: {{ $acc->account_type == 1 ? '#1877F2' : 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' }};">
+                                                <i class="ti {{ $acc->account_type == 1 ? 'ti-brand-facebook' : 'ti-brand-instagram' }} text-white" style="font-size: 19px;"></i>
+                                            </div>
                                             <div>
-                                                <div class="fw-semibold text-body small" style="font-size: 12px;">{{ $acc->name }}</div>
-                                                <div class="text-secondary" style="font-size: 10px;">{{ $acc->account_type == 1 ? 'Facebook Page' : 'Instagram Professional' }}</div>
+                                                <div class="fw-bold text-body" style="font-size: 13.5px; line-height: 1.2;">{{ $acc->name }}</div>
+                                                <div class="text-secondary small mt-0.5" style="font-size: 11px;">{{ $acc->account_type == 1 ? 'Facebook Page' : 'Instagram Professional' }}</div>
                                             </div>
                                         </div>
                                         <input type="checkbox" class="form-check-input panel-acc-cb ms-0" value="{{ $acc->id }}" checked>
@@ -467,36 +486,58 @@
                             </div>
                         </div>
 
-                        {{-- Date & Time --}}
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <label class="form-label text-muted small mb-1" style="font-size: 11px;">Publish Date</label>
-                                <input type="date" id="panel-schedule-date" class="form-control form-control-sm rounded-2" value="{{ $selectedFestival->festival_date->format('Y-m-d') }}" style="font-size: 12.5px;">
+                        {{-- CARD 2: Date, Time & Caption --}}
+                        <div class="card studio-panel-card p-3.5 mb-0">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
+                                <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
+                                    <i class="ti ti-calendar-time text-primary" style="font-size: 14px;"></i>
+                                    Schedule Timing & Caption
+                                </span>
                             </div>
-                            <div class="col-6">
-                                <label class="form-label text-muted small mb-1" style="font-size: 11px;">Publish Time</label>
-                                <input type="time" id="panel-schedule-time" class="form-control form-control-sm rounded-2" value="{{ $targetTime }}" style="font-size: 12.5px;">
-                            </div>
-                        </div>
 
-                        {{-- Caption & Hashtags --}}
-                        <div>
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <label class="form-label text-muted small mb-0" style="font-size: 11px;">Caption & Hashtags</label>
-                                <button type="button" class="btn btn-link text-primary p-0 small text-decoration-none" id="panel-btn-copy-caption" style="font-size: 11px;">
-                                    <i class="ti ti-copy me-1"></i>Copy
-                                </button>
+                            <div class="d-flex flex-column gap-3">
+                                {{-- Date & Time Inputs with crisp spacing & labels --}}
+                                <div class="row g-2.5">
+                                    <div class="col-6">
+                                        <label class="form-label text-muted small fw-bold text-uppercase mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
+                                            <i class="ti ti-calendar me-1 text-primary"></i> Publish Date
+                                        </label>
+                                        <input type="date" id="panel-schedule-date" class="form-control rounded-2" value="{{ $selectedFestival->festival_date->format('Y-m-d') }}" style="height: 42px; font-size: 12.5px; font-weight: 500;">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label text-muted small fw-bold text-uppercase mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
+                                            <i class="ti ti-clock me-1 text-primary"></i> Publish Time
+                                        </label>
+                                        <input type="time" id="panel-schedule-time" class="form-control rounded-2" value="{{ $targetTime }}" style="height: 42px; font-size: 12.5px; font-weight: 500;">
+                                    </div>
+                                </div>
+
+                                {{-- Caption & Hashtags with comfortable padding --}}
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                        <label class="form-label text-muted small fw-bold text-uppercase mb-0" style="font-size: 10.5px; letter-spacing: 0.04em;">
+                                            <i class="ti ti-message-2 me-1 text-primary"></i> Caption & Hashtags
+                                        </label>
+                                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-primary text-decoration-none d-flex align-items-center gap-1 shadow-none" id="panel-btn-copy-caption" style="font-size: 11px;">
+                                            <i class="ti ti-copy"></i>
+                                            <span>Copy</span>
+                                        </button>
+                                    </div>
+                                    <textarea id="panel-caption-text" class="form-control rounded-2 p-2.5" rows="4" style="font-size: 12px; line-height: 1.6; resize: vertical;">{{ $captionText }}</textarea>
+                                </div>
                             </div>
-                            <textarea id="panel-caption-text" class="form-control rounded-2" rows="4" style="font-size: 12px;">{{ $captionText }}</textarea>
                         </div>
 
                         {{-- Alert Slot --}}
-                        <div id="panel-schedule-alert" class="d-none alert alert-danger small p-2 rounded-2 mb-0"></div>
+                        <div id="panel-schedule-alert" class="d-none alert alert-danger small p-2.5 rounded-3 mb-0"></div>
 
-                        {{-- Final Confirm & Schedule Button --}}
-                        <button type="button" class="btn btn-success rounded-pill w-100 py-3 fw-bold shadow-sm" id="panel-btn-confirm-schedule">
-                            <i class="ti ti-calendar-check me-1.5"></i>Confirm & Schedule Post
-                        </button>
+                        {{-- Final Confirm & Schedule Button with generous breathing room --}}
+                        <div class="pt-2">
+                            <button type="button" class="btn btn-success w-100 py-3 fw-bold rounded-pill shadow-sm d-flex align-items-center justify-content-center gap-2" id="panel-btn-confirm-schedule" style="height: 52px; font-size: 15px; letter-spacing: 0.02em; background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; border: none; box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.4) !important;">
+                                <i class="ti ti-calendar-check" style="font-size: 20px;"></i>
+                                <span>Confirm & Schedule Post</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
 

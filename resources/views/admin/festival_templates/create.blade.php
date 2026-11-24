@@ -128,16 +128,16 @@
                 <div class="col-md-12">
                     <label class="form-label required">Branding Frame Layer (Footer Style)</label>
                     <select name="footer_style" class="form-select @error('footer_style') is-invalid @enderror" id="field-footer-style">
-                        <option value="dual_ribbon_badge" {{ old('footer_style', 'dual_ribbon_badge') == 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Orange Box Over Photo + Green Party Strip) - [Bhai Dooj Style]</option>
-                        <option value="solid_white_banner" {{ old('footer_style') == 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Ethnic Pattern + Saffron Text) - [Milkha Singh Style]</option>
-                        <option value="floating_tricolor_badge" {{ old('footer_style') == 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor Badge (Minimalist + Tiranga Divider) - [Diwali Style]</option>
-                        <option value="royal_gold_dock" {{ old('footer_style') == 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Deep Midnight Card + Gold Borders) - [Ceremonial Style]</option>
-                        <option value="candidate_left_ribbon" {{ old('footer_style') == 'candidate_left_ribbon' ? 'selected' : '' }}>Layer 5: Candidate Left Ribbon (Mirrored Ribbon for Right-Focus Artwork)</option>
-                        <option value="modern_capsule_dock" {{ old('footer_style') == 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Rounded Pill Card + Inset Socials)</option>
-                        <option value="circular_medallion_badge" {{ old('footer_style') == 'circular_medallion_badge' ? 'selected' : '' }}>Layer 7: Circular Medallion Badge (Framed Portrait & Dual-Tier Card)</option>
-                        <option value="saffron_wave_banner" {{ old('footer_style') == 'saffron_wave_banner' ? 'selected' : '' }}>Layer 8: Saffron Wave Banner (Dynamic Diagonal Wave + Tricolor Accent)</option>
-                        <option value="tricolor_angled_blade" {{ old('footer_style') == 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Dynamic Patriotic Sash & Sharp Contrast)</option>
-                        <option value="royal_maroon_heritage" {{ old('footer_style') == 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Temple Vermilion & 24K Gold Filigree)</option>
+                        <option value="dual_ribbon_badge" {{ old('footer_style', 'dual_ribbon_badge') == 'dual_ribbon_badge' ? 'selected' : '' }}>Layer 1: Dual Ribbon Badge (Classic Political)</option>
+                        <option value="solid_white_banner" {{ old('footer_style') == 'solid_white_banner' ? 'selected' : '' }}>Layer 2: Solid White Banner (Minimal Card)</option>
+                        <option value="floating_tricolor_badge" {{ old('footer_style') == 'floating_tricolor_badge' ? 'selected' : '' }}>Layer 3: Floating Tricolor (Festive Glow)</option>
+                        <option value="royal_gold_dock" {{ old('footer_style') == 'royal_gold_dock' ? 'selected' : '' }}>Layer 4: Royal Gold Banner (Midnight Slate)</option>
+                        <option value="candidate_left_ribbon" {{ old('footer_style') == 'candidate_left_ribbon' ? 'selected' : '' }}>Layer 5: Candidate Left Ribbon (Mirrored Style)</option>
+                        <option value="modern_capsule_dock" {{ old('footer_style') == 'modern_capsule_dock' ? 'selected' : '' }}>Layer 6: Modern Capsule Dock (Floating Pill)</option>
+                        <option value="circular_medallion_badge" {{ old('footer_style') == 'circular_medallion_badge' ? 'selected' : '' }}>Layer 7: Circular Medallion (Framed Portrait)</option>
+                        <option value="saffron_wave_banner" {{ old('footer_style') == 'saffron_wave_banner' ? 'selected' : '' }}>Layer 8: Saffron Wave Banner (Dynamic Wave)</option>
+                        <option value="tricolor_angled_blade" {{ old('footer_style') == 'tricolor_angled_blade' ? 'selected' : '' }}>Layer 9: Tricolor Angled Blade (Patriotic Blade)</option>
+                        <option value="royal_maroon_heritage" {{ old('footer_style') == 'royal_maroon_heritage' ? 'selected' : '' }}>Layer 10: Royal Maroon Heritage (Sacred Gold & Maroon)</option>
                     </select>
                     <div class="mt-1 d-flex align-items-center justify-content-between">
                         <div class="form-check m-0">
@@ -155,15 +155,15 @@
                 <div class="col-md-6">
                     <label class="form-label required">Top Leadership Header (Header Style)</label>
                     <select name="header_layout" class="form-select @error('header_layout') is-invalid @enderror" id="field-header-layout">
-                        <option value="full_width_strip" {{ old('header_layout', 'full_width_strip') == 'full_width_strip' ? 'selected' : '' }}>Header 1: Full-Width Strip (6-7 Leaders Across Top)</option>
-                        <option value="top_left_cluster" {{ old('header_layout') == 'top_left_cluster' ? 'selected' : '' }}>Header 2: Top-Left Cluster (3-4 Leaders + Right Party Logo)</option>
-                        <option value="top_right_cluster" {{ old('header_layout') == 'top_right_cluster' ? 'selected' : '' }}>Header 3: Top-Right Cluster (3-4 Leaders + Left Party Logo)</option>
-                        <option value="split_wings" {{ old('header_layout') == 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right, Center Grand Opening)</option>
-                        <option value="vertical_capsule_strip" {{ old('header_layout') == 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Strip (Tall Rounded Cards + Party Pill Badge)</option>
-                        <option value="party_group_cutout" {{ old('header_layout') == 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout (Official High-Command Standing Cutout + Logo)</option>
-                        <option value="frosted_glass_dock" {{ old('header_layout') == 'frosted_glass_dock' ? 'selected' : '' }}>Header 7: Modern Frosted Glass Dock (Translucent Pill Card with Saffron Accent)</option>
-                        <option value="tricolor_ribbon_canopy" {{ old('header_layout') == 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Ribbon Canopy (Patriotic Indian Tiranga Top Arch & Gold Rings)</option>
-                        <option value="none" {{ old('header_layout') == 'none' ? 'selected' : '' }}>None: Hide Leadership Strip (Artwork Only)</option>
+                        <option value="full_width_strip" {{ old('header_layout', 'full_width_strip') == 'full_width_strip' ? 'selected' : '' }}>Header 1: Full-Width Strip (6-7 Leaders)</option>
+                        <option value="top_left_cluster" {{ old('header_layout') == 'top_left_cluster' ? 'selected' : '' }}>Header 2: Top-Left Cluster (3-4 Leaders + Logo)</option>
+                        <option value="top_right_cluster" {{ old('header_layout') == 'top_right_cluster' ? 'selected' : '' }}>Header 3: Top-Right Cluster (3-4 Leaders + Logo)</option>
+                        <option value="split_wings" {{ old('header_layout') == 'split_wings' ? 'selected' : '' }}>Header 4: Split Wings (3 Left + 3 Right)</option>
+                        <option value="vertical_capsule_strip" {{ old('header_layout') == 'vertical_capsule_strip' ? 'selected' : '' }}>Header 5: Vertical Capsule Cards</option>
+                        <option value="party_group_cutout" {{ old('header_layout') == 'party_group_cutout' ? 'selected' : '' }}>Header 6: Joint Group Cutout</option>
+                        <option value="frosted_glass_dock" {{ old('header_layout') == 'frosted_glass_dock' ? 'selected' : '' }}>Header 7: Frosted Glass Dock</option>
+                        <option value="tricolor_ribbon_canopy" {{ old('header_layout') == 'tricolor_ribbon_canopy' ? 'selected' : '' }}>Header 8: Tricolor Canopy</option>
+                        <option value="none" {{ old('header_layout') == 'none' ? 'selected' : '' }}>None (Hide Leadership Strip)</option>
                     </select>
                     <div class="mt-1 d-flex align-items-center justify-content-between">
                         <div class="form-check m-0">
