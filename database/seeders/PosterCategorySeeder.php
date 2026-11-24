@@ -14,7 +14,7 @@ class PosterCategorySeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'सामाजिक जागरूकता (Social Awareness)',
+                'name' => 'Social Awareness',
                 'slug' => 'social-awareness',
                 'icon' => 'ti ti-heart-handshake',
                 'show_as_collection' => true,
@@ -22,7 +22,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'दैनिक सुविचार एवं प्रेरक विचार (Daily Quotes & Suvichar)',
+                'name' => 'Daily Quotes & Suvichar',
                 'slug' => 'suvichar',
                 'icon' => 'ti ti-sun',
                 'show_as_collection' => true,
@@ -30,7 +30,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'जन्मदिन एवं वर्षगांठ शुभकामनाएं (Birthday & Anniversary)',
+                'name' => 'Birthday & Anniversary',
                 'slug' => 'birthday-anniversary',
                 'icon' => 'ti ti-cake',
                 'show_as_collection' => true,
@@ -38,7 +38,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'शोक संदेश एवं विनम्र श्रद्धांजलि (Condolence & Tribute)',
+                'name' => 'Condolence & Tribute',
                 'slug' => 'shok-sandesh',
                 'icon' => 'ti ti-candle',
                 'show_as_collection' => true,
@@ -46,7 +46,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'शुभकामनाएं एवं बधाई (Greetings & Congratulations)',
+                'name' => 'Greetings & Congratulations',
                 'slug' => 'greetings',
                 'icon' => 'ti ti-confetti',
                 'show_as_collection' => true,
@@ -54,7 +54,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'राजनीतिक एवं संगठनात्मक कार्यक्रम (Political & Org Events)',
+                'name' => 'Political & Organization Events',
                 'slug' => 'political-events',
                 'icon' => 'ti ti-users-group',
                 'show_as_collection' => true,
@@ -62,7 +62,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'राष्ट्रीय एवं देशभक्ति (National & Patriotic)',
+                'name' => 'National & Patriotic',
                 'slug' => 'patriotic',
                 'icon' => 'ti ti-flag',
                 'show_as_collection' => true,
@@ -70,7 +70,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'महिला सशक्तिकरण एवं नारी शक्ति (Women Empowerment)',
+                'name' => 'Women Empowerment',
                 'slug' => 'nari-shakti',
                 'icon' => 'ti ti-woman',
                 'show_as_collection' => false,
@@ -78,7 +78,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'किसान कल्याण एवं अन्नदाता (Farmers & Agriculture)',
+                'name' => 'Farmers & Agriculture',
                 'slug' => 'kisan-kalyan',
                 'icon' => 'ti ti-plant-2',
                 'show_as_collection' => false,
@@ -86,7 +86,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'धार्मिक एवं आध्यात्मिक विचार (Spiritual & Devotion)',
+                'name' => 'Spiritual & Devotion',
                 'slug' => 'spiritual-devotion',
                 'icon' => 'ti ti-bell-ringing',
                 'show_as_collection' => false,
@@ -94,7 +94,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'सरकारी योजनाएं एवं विकास कार्य (Govt Schemes & Development)',
+                'name' => 'Govt Schemes & Development',
                 'slug' => 'govt-schemes',
                 'icon' => 'ti ti-building-estate',
                 'show_as_collection' => false,
@@ -102,7 +102,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'पर्यावरण एवं प्रकृति संरक्षण (Environment & Nature)',
+                'name' => 'Environment & Nature',
                 'slug' => 'environment',
                 'icon' => 'ti ti-leaf',
                 'show_as_collection' => false,
@@ -110,7 +110,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'स्वास्थ्य एवं रक्तदान जागरूकता (Health & Blood Donation)',
+                'name' => 'Health & Blood Donation',
                 'slug' => 'health-blood-donation',
                 'icon' => 'ti ti-first-aid-kit',
                 'show_as_collection' => false,
@@ -118,7 +118,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'युवा एवं खेल कूद (Youth & Sports)',
+                'name' => 'Youth & Sports',
                 'slug' => 'youth-sports',
                 'icon' => 'ti ti-trophy',
                 'show_as_collection' => false,
@@ -126,7 +126,7 @@ class PosterCategorySeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'name' => 'व्यापार एवं आत्मनिर्भर भारत (Local Business & MSME)',
+                'name' => 'Business & Self-Reliant India',
                 'slug' => 'aatmanirbhar-bharat',
                 'icon' => 'ti ti-shopping-bag',
                 'show_as_collection' => false,
