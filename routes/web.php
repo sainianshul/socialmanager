@@ -81,6 +81,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('schedule', [\App\Http\Controllers\Admin\SchedulePostController::class, 'index'])->name('schedule');
                 Route::get('schedule/events', [\App\Http\Controllers\Admin\SchedulePostController::class, 'events'])->name('schedule.events');
                 Route::post('schedule/store', [\App\Http\Controllers\Admin\SchedulePostController::class, 'store'])->name('schedule.store');
+                Route::post('schedule/check-guard', [\App\Http\Controllers\Admin\SchedulePostController::class, 'checkSafetyGuard'])->name('schedule.check-guard');
                 Route::get('schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'show'])->name('schedule.show');
                 Route::get('schedule/{scheduledPost}/edit', [\App\Http\Controllers\Admin\SchedulePostController::class, 'edit'])->name('schedule.edit');
                 Route::match(['put', 'post'], 'schedule/{scheduledPost}', [\App\Http\Controllers\Admin\SchedulePostController::class, 'update'])->name('schedule.update');

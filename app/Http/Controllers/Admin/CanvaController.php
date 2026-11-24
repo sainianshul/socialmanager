@@ -258,9 +258,14 @@ class CanvaController extends Controller
                 if (str_contains($apiEx->getMessage(), 'invalid_access_token') || str_contains($apiEx->getMessage(), '401')) {
                     $token = $this->getValidAccessToken($userId, true);
                     if ($token) {
-                        $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
+                        try {
+                            $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
+                        } catch (\Throwable $retryEx) {
+                            $this->clearTokens(null, $userId);
+                            throw new \RuntimeException('Canva session expired or rejected. Please click "Connect Canva" to re-authorize.');
+                        }
                     } else {
-                        $this->clearTokens($userId);
+                        $this->clearTokens(null, $userId);
                         throw new \RuntimeException('Canva session expired. Please click "Connect Canva" to re-authorize.');
                     }
                 } else {

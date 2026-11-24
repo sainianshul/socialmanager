@@ -117,10 +117,15 @@ class CanvaService
             'title' => Str::limit($title, 100),
         ];
 
-        if ($preset) {
+        // Canva Connect API only accepts these specific preset names: doc, email, presentation, whiteboard.
+        // All others (e.g., youtube_thumbnail, instagram_post) require custom width & height.
+        $validPresets = ['doc', 'email', 'presentation', 'whiteboard'];
+        $normalizedPreset = $preset ? strtolower(trim($preset)) : null;
+
+        if ($normalizedPreset && in_array($normalizedPreset, $validPresets, true)) {
             $payload['design_type'] = [
                 'type' => 'preset',
-                'name' => $preset,
+                'name' => $normalizedPreset,
             ];
         } else {
             $payload['design_type'] = [
@@ -135,7 +140,7 @@ class CanvaService
             ->post('https://api.canva.com/rest/v1/designs', $payload);
 
         // If preset request fails, fallback safely to custom dimensions
-        if (!$response->successful() && $preset) {
+        if (!$response->successful() && $normalizedPreset && in_array($normalizedPreset, $validPresets, true)) {
             Log::warning('Canva preset failed (' . $preset . '), falling back to custom dimensions: ' . $response->body());
             $fallbackPayload = [
                 'title' => Str::limit($title, 100),

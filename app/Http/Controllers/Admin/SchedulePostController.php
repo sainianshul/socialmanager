@@ -468,6 +468,22 @@ class SchedulePostController extends Controller
             $content = $validated['content'] ?? '';
         }
 
+        // PostSafetyGuard Check 1: Block hazardous URL shorteners & locker links
+        $blockedDomain = \App\Services\PostSafetyGuard::checkBlockedDomains($content, $firstComment, $description, $title);
+        if ($blockedDomain) {
+            return redirect()->back()
+                ->withErrors(['content' => "Link shorteners/lockers like '{$blockedDomain}' are not allowed for account safety."])
+                ->withInput();
+        }
+
+        // PostSafetyGuard Check 2: Max 20 hashtags across content & first comment
+        $hashtagCount = \App\Services\PostSafetyGuard::countHashtags($content, $firstComment, $description);
+        if ($hashtagCount > \App\Services\PostSafetyGuard::MAX_HASHTAGS) {
+            return redirect()->back()
+                ->withErrors(['content' => "Too many hashtags ({$hashtagCount}). Maximum " . \App\Services\PostSafetyGuard::MAX_HASHTAGS . " hashtags allowed per post."])
+                ->withInput();
+        }
+
         // Determine scheduled time
         $scheduledAt = now();
         $status = ScheduledPost::STATUS_SCHEDULED;
@@ -478,6 +494,24 @@ class SchedulePostController extends Controller
             }
             $scheduledAt = Carbon::parse($validated['scheduled_at']);
             $status = ScheduledPost::STATUS_SCHEDULED;
+
+            // PostSafetyGuard Check 3 & 4: Daily Limit (<= 20/day) & Collision (10 min gap) per selected account
+            foreach ($accounts as $account) {
+                $dailyCount = \App\Services\PostSafetyGuard::checkDailyLimit($account->id, $scheduledAt);
+                if ($dailyCount !== null) {
+                    return redirect()->back()
+                        ->with('error', "Daily limit reached for account '{$account->name}': 20 Posts Allowed per day ({$dailyCount} posts already scheduled/published).")
+                        ->withInput();
+                }
+
+                $collision = \App\Services\PostSafetyGuard::checkCollision($account->id, $scheduledAt);
+                if ($collision) {
+                    $existingTime = $collision->scheduled_at->format('h:i A');
+                    return redirect()->back()
+                        ->with('error', "Time collision for account '{$account->name}': There is already a post scheduled at {$existingTime}. Please keep at least a 10-minute gap.")
+                        ->withInput();
+                }
+            }
         } elseif ($publishMode === 'draft') {
             $status = ScheduledPost::STATUS_DRAFT;
         }
@@ -851,12 +885,56 @@ class SchedulePostController extends Controller
 
         $scheduledPost->first_comment = $request->input('first_comment');
 
+        // PostSafetyGuard Check 1: Block hazardous URL shorteners & locker links
+        $blockedDomain = \App\Services\PostSafetyGuard::checkBlockedDomains(
+            $scheduledPost->content,
+            $scheduledPost->first_comment,
+            $scheduledPost->description,
+            $scheduledPost->title
+        );
+        if ($blockedDomain) {
+            return redirect()->back()
+                ->withErrors(['content' => "Link shorteners/lockers like '{$blockedDomain}' are not allowed for account safety."])
+                ->withInput();
+        }
+
+        // PostSafetyGuard Check 2: Max 20 hashtags
+        $hashtagCount = \App\Services\PostSafetyGuard::countHashtags(
+            $scheduledPost->content,
+            $scheduledPost->first_comment,
+            $scheduledPost->description
+        );
+        if ($hashtagCount > \App\Services\PostSafetyGuard::MAX_HASHTAGS) {
+            return redirect()->back()
+                ->withErrors(['content' => "Too many hashtags ({$hashtagCount}). Maximum " . \App\Services\PostSafetyGuard::MAX_HASHTAGS . " hashtags allowed per post."])
+                ->withInput();
+        }
+
         // Determine schedule time & status
         if ($publishMode === 'schedule') {
             if (empty($validated['scheduled_at'])) {
                 return redirect()->back()->with('error', 'Please choose a valid date & time for scheduling.')->withInput();
             }
-            $scheduledPost->scheduled_at = Carbon::parse($validated['scheduled_at']);
+            $targetScheduledAt = Carbon::parse($validated['scheduled_at']);
+
+            // PostSafetyGuard Check 3: Daily Limit (<= 20/day)
+            $dailyCount = \App\Services\PostSafetyGuard::checkDailyLimit($scheduledPost->account_id, $targetScheduledAt, $scheduledPost->id);
+            if ($dailyCount !== null) {
+                return redirect()->back()
+                    ->with('error', "Daily limit reached for this account: 20 Posts Allowed per day ({$dailyCount} posts on this day).")
+                    ->withInput();
+            }
+
+            // PostSafetyGuard Check 4: Collision (10 min gap)
+            $collision = \App\Services\PostSafetyGuard::checkCollision($scheduledPost->account_id, $targetScheduledAt, $scheduledPost->id);
+            if ($collision) {
+                $existingTime = $collision->scheduled_at->format('h:i A');
+                return redirect()->back()
+                    ->with('error', "Time collision: There is already a post scheduled at {$existingTime} for this account. Please keep at least a 10-minute gap.")
+                    ->withInput();
+            }
+
+            $scheduledPost->scheduled_at = $targetScheduledAt;
             $scheduledPost->status = ScheduledPost::STATUS_SCHEDULED;
         } elseif ($publishMode === 'draft') {
             $scheduledPost->status = ScheduledPost::STATUS_DRAFT;
@@ -1161,5 +1239,78 @@ class SchedulePostController extends Controller
             'variations'     => $variations,
             'full_text'      => $caption . "\n\n" . $hashtagsString,
         ];
+    }
+
+    /**
+     * Real-time client-side safety guard verification endpoint (Collision & Daily limit check)
+     */
+    public function checkSafetyGuard(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $accountIds = $request->input('account_ids', []);
+        if (!is_array($accountIds)) {
+            $accountIds = $accountIds ? [(int) $accountIds] : [];
+        }
+        if ($request->filled('account_id')) {
+            $accountIds[] = (int) $request->input('account_id');
+        }
+        $accountIds = array_values(array_unique(array_filter(array_map('intval', $accountIds))));
+
+        $scheduledAtStr = $request->input('scheduled_at');
+        $excludeId = $request->filled('exclude_id') ? (int) $request->input('exclude_id') : null;
+        $content = $request->input('content', '');
+        $firstComment = $request->input('first_comment', '');
+        $title = $request->input('title', '');
+        $description = $request->input('description', '');
+
+        // 1. Check blocked domain
+        $blockedDomain = \App\Services\PostSafetyGuard::checkBlockedDomains($content, $firstComment, $description, $title);
+
+        // 2. Count hashtags
+        $hashtagCount = \App\Services\PostSafetyGuard::countHashtags($content, $firstComment, $description);
+
+        $warnings = [];
+        $errors = [];
+
+        if ($blockedDomain) {
+            $errors[] = "Link shorteners/lockers like '{$blockedDomain}' are not allowed.";
+        }
+
+        if ($hashtagCount > \App\Services\PostSafetyGuard::MAX_HASHTAGS) {
+            $errors[] = "Maximum " . \App\Services\PostSafetyGuard::MAX_HASHTAGS . " hashtags allowed ({$hashtagCount} detected).";
+        }
+
+        if (!empty($scheduledAtStr) && !empty($accountIds)) {
+            try {
+                $scheduledAt = Carbon::parse($scheduledAtStr);
+                $accounts = Account::whereIn('id', $accountIds)->get();
+
+                foreach ($accounts as $account) {
+                    // Daily limit check
+                    $dailyCount = \App\Services\PostSafetyGuard::checkDailyLimit($account->id, $scheduledAt, $excludeId);
+                    if ($dailyCount !== null) {
+                        $errors[] = "Daily limit reached for '{$account->name}': 20 Posts Allowed per day ({$dailyCount} posts on this day).";
+                    }
+
+                    // Collision check
+                    $collision = \App\Services\PostSafetyGuard::checkCollision($account->id, $scheduledAt, $excludeId);
+                    if ($collision) {
+                        $timeStr = $collision->scheduled_at->format('h:i A');
+                        $warnings[] = "There is already a post scheduled at {$timeStr} for '{$account->name}'. Please keep at least a 10-minute gap.";
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Invalid date parse
+            }
+        }
+
+        return response()->json([
+            'valid'         => empty($errors),
+            'has_collision' => !empty($warnings),
+            'errors'        => $errors,
+            'warnings'      => $warnings,
+            'hashtag_count' => $hashtagCount,
+            'max_hashtags'  => \App\Services\PostSafetyGuard::MAX_HASHTAGS,
+            'blocked_domain'=> $blockedDomain,
+        ]);
     }
 }

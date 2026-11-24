@@ -508,19 +508,22 @@
             });
 
             // Activity Log Inspector Modal
-            const userLogModalEl = document.getElementById('userLogDetailModal');
-            const userLogModal = userLogModalEl ? new bootstrap.Modal(userLogModalEl) : null;
             let currentLogResponse = '';
 
-            $(document).on('click', '.view-user-log-btn', function () {
-                const action = $(this).data('action');
-                const event = $(this).data('event');
-                const status = $(this).data('status');
-                const time = $(this).data('time');
-                const duration = $(this).data('duration');
-                const account = $(this).data('account');
-                const payload = $(this).data('payload');
-                const response = $(this).data('response');
+            function populateUserLogModal(btn) {
+                if (!btn) return;
+                const logId = btn.getAttribute('data-log-id') || $(btn).data('log-id');
+                const action = btn.getAttribute('data-action') || $(btn).data('action') || 'Activity Details';
+                const event = btn.getAttribute('data-event') || $(btn).data('event') || '';
+                const status = btn.getAttribute('data-status') || $(btn).data('status') || '';
+                const time = btn.getAttribute('data-time') || $(btn).data('time') || '';
+                const duration = btn.getAttribute('data-duration') || $(btn).data('duration') || 'N/A';
+                const account = btn.getAttribute('data-account') || $(btn).data('account') || 'System';
+
+                const payloadEl = document.getElementById('user-log-raw-payload-' + logId);
+                const responseEl = document.getElementById('user-log-raw-response-' + logId);
+                const payload = payloadEl ? payloadEl.textContent.trim() : '';
+                const response = responseEl ? responseEl.textContent.trim() : '';
 
                 $('#modalUserLogAction').text(action);
                 $('#modalUserLogSubtitle').text(`${event} • ${time}`);
@@ -528,15 +531,17 @@
                 $('#modalUserLogAccount').text(account);
 
                 const statusBadge = document.getElementById('modalUserLogStatusBadge');
-                if (status === 'success') {
-                    statusBadge.className = 'badge border border-success bg-transparent text-success';
-                    statusBadge.innerHTML = '<i class="ti ti-check me-1"></i> Success';
-                } else if (status === 'failed') {
-                    statusBadge.className = 'badge border border-danger bg-transparent text-danger';
-                    statusBadge.innerHTML = '<i class="ti ti-x me-1"></i> Failed';
-                } else {
-                    statusBadge.className = 'badge border border-warning bg-transparent text-warning';
-                    statusBadge.innerHTML = status;
+                if (statusBadge) {
+                    if (status === 'success') {
+                        statusBadge.className = 'badge border border-success bg-transparent text-success';
+                        statusBadge.innerHTML = '<i class="ti ti-check me-1"></i> Success';
+                    } else if (status === 'failed') {
+                        statusBadge.className = 'badge border border-danger bg-transparent text-danger';
+                        statusBadge.innerHTML = '<i class="ti ti-x me-1"></i> Failed';
+                    } else {
+                        statusBadge.className = 'badge border border-warning bg-transparent text-warning';
+                        statusBadge.innerHTML = status;
+                    }
                 }
 
                 if (payload && payload !== 'null' && payload !== '[]') {
@@ -548,8 +553,16 @@
 
                 currentLogResponse = response || 'No response data recorded.';
                 $('#modalUserLogResponse').text(currentLogResponse);
+            }
 
-                if (userLogModal) userLogModal.show();
+            $(document).on('click', '.view-user-log-btn', function (e) {
+                e.preventDefault();
+                populateUserLogModal(this);
+                const modalEl = document.getElementById('userLogDetailModal');
+                if (modalEl && window.bootstrap && bootstrap.Modal) {
+                    const inst = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                    inst.show();
+                }
             });
 
             $('#copyUserLogBtn').on('click', function () {

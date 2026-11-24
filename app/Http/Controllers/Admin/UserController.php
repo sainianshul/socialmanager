@@ -242,18 +242,18 @@ class UserController extends Controller
                 return '
                     <button type="button" 
                             class="btn btn-sm btn-ghost-secondary px-2 view-user-log-btn"
+                            data-log-id="' . $log->id . '"
                             data-action="' . e($log->action) . '"
                             data-event="' . e($eventLabel) . '"
                             data-status="' . e($log->status) . '"
                             data-time="' . e($log->created_at->format('d M Y, h:i:s A')) . '"
                             data-duration="' . ($log->duration_ms ? $log->duration_ms . ' ms' : 'N/A') . '"
                             data-account="' . e($log->account->name ?? 'System') . '"
-                            data-ip="' . e($log->ip_address ?? 'N/A') . '"
-                            data-payload="' . e(json_encode($log->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . '"
-                            data-response="' . e($log->response) . '"
                             title="View Payload & Response">
-                        <i class="ti ti-code fs-3"></i>
+                        <i class="ti ti-code fs-3 pointer-events-none"></i>
                     </button>
+                    <div id="user-log-raw-payload-' . $log->id . '" class="d-none">' . e(json_encode($log->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)) . '</div>
+                    <div id="user-log-raw-response-' . $log->id . '" class="d-none">' . e($log->response) . '</div>
                 ';
             })
             ->rawColumns(['created_at', 'event_type', 'action', 'target', 'duration_ms', 'status', 'actions'])

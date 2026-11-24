@@ -268,6 +268,9 @@
                         <div class="d-flex justify-content-between align-items-center mb-1 flex-wrap gap-2">
                             <label class="form-label fw-bold text-dark m-0">Caption</label>
                             <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-light text-secondary border rounded-pill" id="hashtag-counter-badge" title="Maximum 20 hashtags allowed for safety">
+                                    <i class="ti ti-hash me-0.5"></i> <span id="hashtag-count">0</span> / 20
+                                </span>
                                 <button type="button" class="btn btn-xs btn-outline-primary d-inline-flex align-items-center gap-1.5 py-1 px-2.5 rounded-2 shadow-xs" id="btn-toggle-ai-caption" data-bs-toggle="modal" data-bs-target="#modal-ai-caption" title="Generate AI Captions & Viral Hashtags">
                                     <i class="ti ti-sparkles text-primary"></i>
                                     <span class="fw-semibold">AI Caption & Hashtags</span>
@@ -277,6 +280,14 @@
                         </div>
 
                         <textarea name="content" id="composer-content" class="form-control" rows="5" placeholder="Write caption or message...">{{ old('content', $scheduledPost->content) }}</textarea>
+
+                        {{-- Real-time Safety Guard Warnings --}}
+                        <div id="composer-safety-warning" class="alert alert-danger py-2 px-3 mt-2 mb-0 d-none" role="alert">
+                            <i class="ti ti-alert-triangle me-1.5"></i> <span id="safety-warning-text"></span>
+                        </div>
+                        <div id="composer-schedule-collision-warning" class="alert alert-warning py-2 px-3 mt-2 mb-0 d-none" role="alert">
+                            <i class="ti ti-clock-exclamation me-1.5"></i> <span id="schedule-warning-text"></span>
+                        </div>
                     </div>
 
                     {{-- Current Media Gallery Preview + New Media Upload --}}
@@ -569,6 +580,107 @@ document.addEventListener('DOMContentLoaded', function () {
         let max = {{ $platform === 2 ? 2200 : 5000 }};
         $('#caption-counter').text($(this).val().length + ' / ' + max);
     });
+
+    // =========================================================================
+    // POST SAFETY GUARDS: Real-time Shortener Blocker, Hashtags & Collision Check
+    // =========================================================================
+    const BLOCKED_SHORTENER_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:bit\.ly|tinyurl\.com|mega\.nz|cutt\.ly|t\.co|goo\.gl|ow\.ly|is\.gd|buff\.ly|adf\.ly|shorturl\.at|rebrand\.ly|bl\.ink|trib\.al)(?:[^\s/$.?#].[^\s]*)?/i;
+
+    function countHashtags(text) {
+        if (!text) return 0;
+        const matches = text.match(/#[\p{L}\p{N}_]+/gu);
+        return matches ? matches.length : 0;
+    }
+
+    let guardAjaxTimer = null;
+
+    function runClientSafetyCheck() {
+        const caption = $('#composer-content').val() || '';
+        const firstComment = $('#composer-first-comment').val() || '';
+        const ytTitle = $('#youtube-title').val() || '';
+        const ytDesc = $('#youtube-description').val() || '';
+
+        const fullText = `${caption} ${firstComment} ${ytTitle} ${ytDesc}`;
+
+        // 1. Hashtag Count
+        const tagCount = countHashtags(fullText);
+        $('#hashtag-count').text(tagCount);
+        const $badge = $('#hashtag-counter-badge');
+        
+        let clientError = null;
+
+        if (tagCount > 20) {
+            $badge.removeClass('bg-light text-secondary border').addClass('bg-danger-subtle text-danger border-danger fw-bold');
+            clientError = `Too many hashtags (${tagCount} / 20). Maximum 20 hashtags allowed for account safety.`;
+        } else {
+            $badge.removeClass('bg-danger-subtle text-danger border-danger fw-bold').addClass('bg-light text-secondary border');
+        }
+
+        // 2. Blocked Domains / Link Shorteners
+        const shortenerMatch = fullText.match(BLOCKED_SHORTENER_REGEX);
+        if (shortenerMatch && !clientError) {
+            clientError = `Link shortener / locker detected ("${shortenerMatch[0]}"). Generic shorteners like bit.ly, tinyurl, and mega are heavily flagged as spam/phishing by Instagram & Meta. Please use standard direct links.`;
+        }
+
+        if (clientError) {
+            $('#safety-warning-text').text(clientError);
+            $('#composer-safety-warning').removeClass('d-none');
+            $('#btn-submit-post').prop('disabled', true);
+        } else {
+            $('#composer-safety-warning').addClass('d-none');
+            $('#btn-submit-post').prop('disabled', false);
+        }
+
+        // 3. Debounced Collision & Daily Limit Check with Server
+        clearTimeout(guardAjaxTimer);
+        guardAjaxTimer = setTimeout(checkServerCollisionAndDailyLimit, 400);
+    }
+
+    function checkServerCollisionAndDailyLimit() {
+        const publishMode = $('input[name="publish_mode"]:checked').val();
+        if (publishMode !== 'schedule') {
+            $('#composer-schedule-collision-warning').addClass('d-none');
+            return;
+        }
+
+        const scheduledAt = $('#composer-scheduled-at').val();
+        if (!scheduledAt) {
+            $('#composer-schedule-collision-warning').addClass('d-none');
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('admin.posts.schedule.check-guard') }}",
+            type: "POST",
+            data: {
+                _token: "{{ csrf_token() }}",
+                account_id: {{ $scheduledPost->account_id }},
+                exclude_id: {{ $scheduledPost->id }},
+                scheduled_at: scheduledAt,
+                content: $('#composer-content').val(),
+                first_comment: $('#composer-first-comment').val(),
+                title: $('#youtube-title').val(),
+                description: $('#youtube-description').val()
+            },
+            success: function (res) {
+                if (res.errors && res.errors.length > 0) {
+                    $('#safety-warning-text').text(res.errors[0]);
+                    $('#composer-safety-warning').removeClass('d-none');
+                    $('#btn-submit-post').prop('disabled', true);
+                } else if (res.warnings && res.warnings.length > 0) {
+                    $('#schedule-warning-text').text(res.warnings[0]);
+                    $('#composer-schedule-collision-warning').removeClass('d-none');
+                } else {
+                    $('#composer-schedule-collision-warning').addClass('d-none');
+                }
+            }
+        });
+    }
+
+    $('#composer-content, #composer-first-comment, #youtube-title, #youtube-description').on('input paste', runClientSafetyCheck);
+    $('#composer-scheduled-at').on('change', runClientSafetyCheck);
+    $('input[name="publish_mode"]').on('change', runClientSafetyCheck);
+    runClientSafetyCheck();
 
     // First Comment toggle handler
     $('#check-enable-first-comment').on('change', function () {

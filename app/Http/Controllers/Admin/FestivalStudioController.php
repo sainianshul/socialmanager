@@ -318,6 +318,46 @@ class FestivalStudioController extends Controller
             $scheduledAt = now()->addMinutes(5);
         }
 
+        $content = $validated['content'] ?? '';
+
+        // PostSafetyGuard Check 1: Blocked domain shorteners
+        $blockedDomain = \App\Services\PostSafetyGuard::checkBlockedDomains($content);
+        if ($blockedDomain) {
+            return response()->json([
+                'success' => false,
+                'message' => "Link shorteners/lockers like '{$blockedDomain}' are not allowed for account safety.",
+            ], 422);
+        }
+
+        // PostSafetyGuard Check 2: Max 20 hashtags
+        $hashtagCount = \App\Services\PostSafetyGuard::countHashtags($content);
+        if ($hashtagCount > \App\Services\PostSafetyGuard::MAX_HASHTAGS) {
+            return response()->json([
+                'success' => false,
+                'message' => "Too many hashtags ({$hashtagCount}). Maximum " . \App\Services\PostSafetyGuard::MAX_HASHTAGS . " hashtags allowed per post.",
+            ], 422);
+        }
+
+        // PostSafetyGuard Check 3 & 4: Daily limit & Collision gap check per account
+        foreach ($accounts as $account) {
+            $dailyCount = \App\Services\PostSafetyGuard::checkDailyLimit($account->id, $scheduledAt);
+            if ($dailyCount !== null) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Daily limit reached for '{$account->name}': 20 Posts Allowed per day ({$dailyCount} posts already scheduled/published).",
+                ], 422);
+            }
+
+            $collision = \App\Services\PostSafetyGuard::checkCollision($account->id, $scheduledAt);
+            if ($collision) {
+                $timeStr = $collision->scheduled_at->format('h:i A');
+                return response()->json([
+                    'success' => false,
+                    'message' => "Time collision for '{$account->name}': There is already a post scheduled at {$timeStr}. Please keep at least a 10-minute gap.",
+                ], 422);
+            }
+        }
+
         $festivalId = $validated['festival_id'] ?? $template->festival_id;
 
         $createdPosts = [];

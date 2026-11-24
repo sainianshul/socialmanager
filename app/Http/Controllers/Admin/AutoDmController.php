@@ -106,6 +106,14 @@ class AutoDmController extends Controller
             abort(403, 'Unauthorized account selection.');
         }
 
+        // PostSafetyGuard: Block hazardous URL shorteners & locker links to avoid Meta spam/phishing flags
+        $blockedDomain = \App\Services\PostSafetyGuard::checkBlockedDomains($validated['dm_message'], $validated['public_reply'] ?? null);
+        if ($blockedDomain) {
+            return redirect()->back()
+                ->withErrors(['dm_message' => "Link shorteners and locker domains like '{$blockedDomain}' are not allowed for security and account safety."])
+                ->withInput();
+        }
+
         $postId = null;
         if ($validated['target_type'] === 'specific' && !empty($request->post_id)) {
             $post = Post::where('account_id', $account->id)->findOrFail($request->post_id);
@@ -200,6 +208,14 @@ class AutoDmController extends Controller
         $account = Account::findOrFail($validated['account_id']);
         if (!$user->isAdmin() && $account->user_id !== $user->id) {
             abort(403, 'Unauthorized account selection.');
+        }
+
+        // PostSafetyGuard: Block hazardous URL shorteners & locker links to avoid Meta spam/phishing flags
+        $blockedDomain = \App\Services\PostSafetyGuard::checkBlockedDomains($validated['dm_message'], $validated['public_reply'] ?? null);
+        if ($blockedDomain) {
+            return redirect()->back()
+                ->withErrors(['dm_message' => "Link shorteners and locker domains like '{$blockedDomain}' are not allowed for security and account safety."])
+                ->withInput();
         }
 
         $postId = null;

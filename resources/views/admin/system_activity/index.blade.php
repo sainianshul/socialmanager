@@ -338,8 +338,6 @@
                                 <td class="text-end">
                                     <button type="button" 
                                             class="btn btn-sm btn-ghost-secondary px-2 view-log-btn"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#logDetailModal"
                                             data-log-id="{{ $log->id }}"
                                             data-action="{{ $log->action }}"
                                             data-event="{{ $eventLabel }}"
@@ -475,8 +473,6 @@
                                         {{-- View Exception Modal Trigger --}}
                                         <button type="button" 
                                                 class="btn btn-sm btn-ghost-secondary px-2 view-job-btn"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#jobDetailModal"
                                                 data-job-id="{{ $job->id }}"
                                                 data-uuid="{{ $job->uuid }}"
                                                 data-name="{{ $job->display_name }}"

@@ -170,6 +170,9 @@
                         <span class="text-secondary small" id="dm-counter">0 / 1000</span>
                     </div>
                     <textarea name="dm_message" id="dm-message" class="form-control @error('dm_message') is-invalid @enderror" rows="4" placeholder="Write message to send in DM..." required maxlength="1000">{{ old('dm_message') }}</textarea>
+                    <div id="dm-link-warning" class="alert alert-danger py-2 px-3 mt-2 mb-0 d-none" role="alert">
+                        <i class="ti ti-alert-triangle me-1"></i> <span id="dm-link-warning-text"></span>
+                    </div>
                     <div class="form-text text-secondary mt-1"><i class="ti ti-info-circle me-1"></i>Tip: You can use <code>{name}</code> for full constituent name or <code>{first_name}</code> for personal greeting.</div>
                     @error('dm_message')
                         <div class="invalid-feedback">{{ $message }}</div>
@@ -282,12 +285,23 @@
 @push('scripts')
 <script>
 $(document).ready(function () {
-    // 1. Character counter
+    // 1. Character counter & Link Shortener Blocker
+    const BLOCKED_SHORTENER_REGEX = /(?:https?:\/\/)?(?:www\.)?(?:bit\.ly|tinyurl\.com|mega\.nz|cutt\.ly|t\.co|goo\.gl|ow\.ly|is\.gd|buff\.ly|adf\.ly|shorturl\.at|rebrand\.ly|bl\.ink|trib\.al)(?:[^\s/$.?#].[^\s]*)?/i;
+
     function updateCounter() {
-        const len = $('#dm-message').val().length;
-        $('#dm-counter').text(len + ' / 1000');
+        const val = $('#dm-message').val() || '';
+        $('#dm-counter').text(val.length + ' / 1000');
+        const match = val.match(BLOCKED_SHORTENER_REGEX);
+        if (match) {
+            $('#dm-link-warning-text').text(`Blocked link detected ("${match[0]}"). Link shorteners/lockers are heavily flagged by Meta in direct messages. Please use standard direct links.`);
+            $('#dm-link-warning').removeClass('d-none');
+            $('button[type="submit"]').prop('disabled', true);
+        } else {
+            $('#dm-link-warning').addClass('d-none');
+            $('button[type="submit"]').prop('disabled', false);
+        }
     }
-    $('#dm-message').on('input', updateCounter);
+    $('#dm-message').on('input paste', updateCounter);
     updateCounter();
 
     // 2. Platform Filter logic
