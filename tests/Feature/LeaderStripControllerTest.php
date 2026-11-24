@@ -296,23 +296,27 @@ class LeaderStripControllerTest extends TestCase
         ]);
     }
 
-    public function test_admin_cannot_create_duplicate_system_strip_for_same_party(): void
+    public function test_admin_can_create_multiple_system_strips_for_same_party(): void
     {
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
         $modi = PoliticalLeader::where('name', 'Narendra Modi')->first();
 
-        // BJP already has a system strip from PoliticalPartySeeder
+        // Multiple official strips for same party (e.g. BJP National, BJP Haryana) are permitted
         $response = $this->actingAs($admin)
             ->postJson(route('admin.leader-strips.store'), [
-                'name' => 'Duplicate BJP Strip',
+                'name' => 'BJP Haryana Official Strip',
                 'party_id' => $this->bjp->id,
                 'items' => [
                     ['leader_id' => $modi->id, 'order' => 1],
                 ],
             ]);
 
-        $response->assertStatus(422);
-        $response->assertJsonValidationErrors(['party_id']);
+        $response->assertStatus(201);
+        $this->assertDatabaseHas('leader_strips', [
+            'name' => 'BJP Haryana Official Strip',
+            'party_id' => $this->bjp->id,
+            'is_system' => true,
+        ]);
     }
 
     public function test_admin_can_update_and_delete_official_system_strip(): void

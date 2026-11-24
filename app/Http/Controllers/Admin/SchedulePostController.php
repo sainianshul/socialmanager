@@ -391,6 +391,14 @@ class SchedulePostController extends Controller
                 }
             }
 
+            if ($request->filled('readymade_poster_paths')) {
+                foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
+                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
+                        $mediaUrls[] = $rPath;
+                    }
+                }
+            }
+
             if ($publishMode !== 'draft' && !$request->hasFile('media_files') && empty($mediaUrls)) {
                 return redirect()->back()
                     ->withErrors(['media_files' => 'At least one photo or video file is required for Instagram posts.'])
@@ -425,6 +433,14 @@ class SchedulePostController extends Controller
                 foreach ((array) $request->input('canva_media_paths') as $cPath) {
                     if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
                         $mediaUrls[] = $cPath;
+                    }
+                }
+            }
+
+            if ($request->filled('readymade_poster_paths')) {
+                foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
+                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
+                        $mediaUrls[] = $rPath;
                     }
                 }
             }
@@ -496,6 +512,10 @@ class SchedulePostController extends Controller
             ]);
 
             $createdPosts[] = $scheduledPost;
+        }
+
+        if ($request->filled('readymade_poster_id')) {
+            \App\Models\Poster::where('id', $request->input('readymade_poster_id'))->increment('usage_count');
         }
 
         // If Publish Now chosen, dispatch immediately to each account
@@ -732,6 +752,14 @@ class SchedulePostController extends Controller
                 }
             }
 
+            if ($request->filled('readymade_poster_paths')) {
+                foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
+                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
+                        $mediaUrls[] = $rPath;
+                    }
+                }
+            }
+
             if ($publishMode !== 'draft' && empty($mediaUrls)) {
                 return redirect()->back()
                     ->withErrors(['media_files' => 'At least one photo or video file is required for Instagram posts.'])
@@ -780,6 +808,14 @@ class SchedulePostController extends Controller
                 foreach ((array) $request->input('canva_media_paths') as $cPath) {
                     if (is_string($cPath) && !empty($cPath) && Storage::disk('public')->exists($cPath)) {
                         $mediaUrls[] = $cPath;
+                    }
+                }
+            }
+
+            if ($request->filled('readymade_poster_paths')) {
+                foreach ((array) $request->input('readymade_poster_paths') as $rPath) {
+                    if (is_string($rPath) && !empty($rPath) && Storage::disk('public')->exists($rPath)) {
+                        $mediaUrls[] = $rPath;
                     }
                 }
             }

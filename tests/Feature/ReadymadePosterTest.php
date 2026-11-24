@@ -222,4 +222,80 @@ class ReadymadePosterTest extends TestCase
         $response = $this->actingAs($this->regularUser)->get(route('admin.posters.index'));
         $response->assertStatus(403);
     }
+
+    public function test_readymade_posters_api_list_returns_active_categories_and_posters(): void
+    {
+        $category = PosterCategory::create([
+            'name' => 'सामाजिक जागरूकता',
+            'slug' => 'social-awareness',
+            'is_active' => true,
+        ]);
+
+        $poster = Poster::create([
+            'category_id' => $category->id,
+            'name' => 'बेटी बचाओ',
+            'slug' => 'beti-bachao',
+            'image_path' => 'uploads/posters/sample.jpg',
+            'default_caption' => 'Beti Bachao Caption',
+            'is_active' => true,
+        ]);
+
+        $response = $this->actingAs($this->regularUser)->get(route('admin.readymade-posters.list'));
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+        ]);
+        $response->assertJsonFragment(['name' => 'बेटी बचाओ']);
+        $response->assertJsonFragment(['name' => 'सामाजिक जागरूकता']);
+    }
+
+    public function test_user_can_schedule_post_with_readymade_poster_and_increments_usage_count(): void
+    {
+        Storage::fake('public');
+        Storage::disk('public')->put('uploads/posters/beti_bachao.jpg', 'fake-image-content');
+
+        $category = PosterCategory::create([
+            'name' => 'जागरूकता',
+            'slug' => 'awareness',
+            'is_active' => true,
+        ]);
+
+        $poster = Poster::create([
+            'category_id' => $category->id,
+            'name' => 'बेटी बचाओ बेटी पढ़ाओ',
+            'slug' => 'beti-bachao-beti-padhao',
+            'image_path' => 'uploads/posters/beti_bachao.jpg',
+            'default_caption' => 'Official Beti Bachao Caption',
+            'usage_count' => 0,
+            'is_active' => true,
+        ]);
+
+        $account = \App\Models\Account::create([
+            'user_id' => $this->regularUser->id,
+            'account_type' => \App\Models\Account::TYPE_FACEBOOK,
+            'account_id' => '1234567890',
+            'name' => 'Test FB Page',
+            'status' => 1,
+            'access_token' => 'dummy_token',
+        ]);
+
+        $response = $this->actingAs($this->regularUser)->post(route('admin.posts.schedule.store'), [
+            'platform' => 1,
+            'account_id' => $account->id,
+            'post_type' => 'photo',
+            'content' => 'Support women empowerment!',
+            'publish_mode' => 'schedule',
+            'scheduled_at' => now()->addDays(2)->format('Y-m-d H:i:s'),
+            'readymade_poster_paths' => ['uploads/posters/beti_bachao.jpg'],
+            'readymade_poster_id' => $poster->id,
+        ]);
+
+        $response->assertRedirect(route('admin.posts.schedule'));
+
+        $scheduledPost = \App\Models\ScheduledPost::where('user_id', $this->regularUser->id)->firstOrFail();
+        $this->assertContains('uploads/posters/beti_bachao.jpg', $scheduledPost->media_urls);
+
+        $poster->refresh();
+        $this->assertEquals(1, $poster->usage_count);
+    }
 }

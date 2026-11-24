@@ -1215,6 +1215,13 @@
                     if (pane1) pane1.classList.add('d-none');
                     if (pane2) pane2.classList.remove('d-none');
 
+                    // Guarantee Step 2 thumbnail always matches the exact styled image composed in Step 1
+                    var liveImg = document.getElementById('panel-canvas-img');
+                    var schedThumb = document.getElementById('panel-schedule-thumb');
+                    if (schedThumb && liveImg && liveImg.src) {
+                        schedThumb.src = liveImg.src;
+                    }
+
                     if (ind1) {
                         ind1.classList.remove('active', 'text-white');
                         ind1.classList.add('bg-transparent', 'text-secondary');

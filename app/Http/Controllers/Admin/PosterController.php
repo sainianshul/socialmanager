@@ -192,4 +192,75 @@ class PosterController extends Controller
         return redirect()->route('admin.posters.index')
             ->with('success', "Poster '{$name}' deleted successfully.");
     }
+
+    /**
+     * API endpoint to list active categories and posters for user composer modal/drawer.
+     */
+    public function apiList(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $user = auth()->user();
+        $branding = $user?->defaultBranding ?? $user?->brandings()->first();
+        $userPartyId = $branding?->party_id;
+
+        $categories = PosterCategory::active()
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get(['id', 'name', 'slug', 'icon', 'show_as_collection']);
+
+        $query = Poster::query()
+            ->active()
+            ->with(['category:id,name,slug', 'party:id,name,short_code']);
+
+        if ($categoryId = $request->input('category_id')) {
+            $query->where('category_id', $categoryId);
+        }
+
+        if ($search = trim((string) $request->input('search'))) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('default_caption', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('party_id')) {
+            $pId = $request->input('party_id');
+            if ($pId === 'universal') {
+                $query->whereNull('party_id');
+            } elseif ($pId !== 'all') {
+                $query->where('party_id', $pId);
+            }
+        } else {
+            $query->forParty($userPartyId);
+        }
+
+        $posters = $query->orderByDesc('show_on_top')
+            ->orderBy('sort_order')
+            ->orderByDesc('usage_count')
+            ->orderByDesc('id')
+            ->get();
+
+        $posters->transform(function ($poster) {
+            return [
+                'id'              => $poster->id,
+                'name'            => $poster->name,
+                'category_id'     => $poster->category_id,
+                'category_name'   => $poster->category?->name,
+                'party_id'        => $poster->party_id,
+                'party_name'      => $poster->party?->name,
+                'party_code'      => $poster->party?->short_code,
+                'image_path'      => $poster->image_path,
+                'image_url'       => asset('storage/' . $poster->image_path),
+                'thumbnail_url'   => $poster->thumbnail_path ? asset('storage/' . $poster->thumbnail_path) : asset('storage/' . $poster->image_path),
+                'default_caption' => $poster->default_caption,
+                'usage_count'     => $poster->usage_count,
+                'show_on_top'     => (bool) $poster->show_on_top,
+            ];
+        });
+
+        return response()->json([
+            'success'    => true,
+            'categories' => $categories,
+            'posters'    => $posters,
+        ]);
+    }
 }

@@ -171,7 +171,8 @@ $(document).ready(function() {
             localCount = fileInput.files.length;
         }
         let canvaCount = $('input[name="canva_media_paths[]"]').length;
-        let total = localCount + canvaCount;
+        let readymadeCount = $('input[name="readymade_poster_paths[]"]').length;
+        let total = localCount + canvaCount + readymadeCount;
 
         $('#media-attached-count').text(total + ' attached');
 
@@ -195,6 +196,7 @@ $(document).ready(function() {
         if (fileInput) fileInput.value = '';
         $('.local-media-preview-item').remove();
         $('.canva-imported-item').remove();
+        $('.readymade-imported-item').remove();
         $('#canva-imported-media-container').empty();
         updateAttachmentCount();
     });

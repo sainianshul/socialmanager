@@ -657,5 +657,6 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 @include('admin.posts.partials._ai_caption_script')
 @include('admin.posts.partials._canva_studio_script')
+@include('admin.posts.partials._readymade_poster_script')
 @endpush
 

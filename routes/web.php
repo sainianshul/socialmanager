@@ -88,6 +88,9 @@ Route::prefix('admin')->group(function () {
                 Route::post('generate-ai-caption', [\App\Http\Controllers\Admin\SchedulePostController::class, 'generateAiCaption'])->name('generate-ai-caption');
             });
 
+            // Readymade Posters JSON API for Composer
+            Route::get('readymade-posters/list', [\App\Http\Controllers\Admin\PosterController::class, 'apiList'])->name('readymade-posters.list');
+
             // Canva Connect Integration
             Route::prefix('canva')->name('canva.')->group(function () {
                 Route::get('auth', [\App\Http\Controllers\Admin\CanvaController::class, 'auth'])->name('auth');
