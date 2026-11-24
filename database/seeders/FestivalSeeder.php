@@ -171,9 +171,15 @@ class FestivalSeeder extends Seeder
                 'preset_key' => 'classic_political_right',
                 'additional_templates' => [
                     [
-                        'template_image_path' => 'images/templates/gopashtami-vrindavan-divine.jpg',
-                        'title' => 'Gopashtami Vrindavan Divine Edition',
-                        'thumbnail_path' => 'images/templates/gopashtami-vrindavan-divine.jpg',
+                        'template_image_path' => 'images/templates/gopashtami-kamadhenu-grace.jpg',
+                        'title' => 'Gopashtami Kamadhenu Grace Edition',
+                        'thumbnail_path' => 'images/templates/gopashtami-kamadhenu-grace.jpg',
+                        'preset_key' => 'classic_political_right',
+                    ],
+                    [
+                        'template_image_path' => 'images/templates/gopashtami-krishna-divine.jpg',
+                        'title' => 'Gopashtami Krishna Gau Prema Edition',
+                        'thumbnail_path' => 'images/templates/gopashtami-krishna-divine.jpg',
                         'preset_key' => 'classic_political_right',
                     ],
                 ],
@@ -223,8 +229,10 @@ class FestivalSeeder extends Seeder
             ],
         ];
 
-        // Delete all old blurry dummy cropped templates
-        FestivalTemplate::where('template_image_path', 'like', '%template-%')->delete();
+        // Delete all old blurry dummy cropped templates & removed templates
+        FestivalTemplate::where('template_image_path', 'like', '%template-%')
+            ->orWhere('template_image_path', 'images/templates/gopashtami-vrindavan-divine.jpg')
+            ->delete();
 
         foreach ($festivals as $fest) {
             $primaryTemplate = $fest['primary_template'] ?? null;
