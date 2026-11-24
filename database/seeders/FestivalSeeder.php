@@ -169,6 +169,14 @@ class FestivalSeeder extends Seeder
                 'primary_template' => 'images/templates/gopashtami.jpg',
                 'primary_title' => 'Gopashtami Gau Pujan Royal Edition',
                 'preset_key' => 'classic_political_right',
+                'additional_templates' => [
+                    [
+                        'template_image_path' => 'images/templates/gopashtami-vrindavan-divine.jpg',
+                        'title' => 'Gopashtami Vrindavan Divine Edition',
+                        'thumbnail_path' => 'images/templates/gopashtami-vrindavan-divine.jpg',
+                        'preset_key' => 'classic_political_right',
+                    ],
+                ],
             ],
             [
                 'title' => 'Samvidhan Diwas (Constitution Day)',
@@ -223,7 +231,8 @@ class FestivalSeeder extends Seeder
             $primaryTitle = $fest['primary_title'] ?? null;
             $presetKey = $fest['preset_key'] ?? 'classic_political_right';
 
-            unset($fest['primary_template'], $fest['primary_title'], $fest['preset_key']);
+            $additionalTemplates = $fest['additional_templates'] ?? [];
+            unset($fest['primary_template'], $fest['primary_title'], $fest['preset_key'], $fest['additional_templates']);
 
             $festival = Festival::updateOrCreate(
                 ['title' => $fest['title'], 'festival_date' => $fest['festival_date']],
@@ -246,6 +255,25 @@ class FestivalSeeder extends Seeder
                         'is_active' => true,
                     ]
                 );
+            }
+
+            if (!empty($additionalTemplates)) {
+                foreach ($additionalTemplates as $addTpl) {
+                    FestivalTemplate::updateOrCreate(
+                        [
+                            'festival_id' => $festival->id,
+                            'template_image_path' => $addTpl['template_image_path'],
+                        ],
+                        [
+                            'party_id' => $bjp?->id,
+                            'title' => $addTpl['title'],
+                            'thumbnail_path' => $addTpl['thumbnail_path'] ?? $addTpl['template_image_path'],
+                            'photo_position' => $addTpl['photo_position'] ?? 'bottom-right',
+                            'preset_key' => $addTpl['preset_key'] ?? $presetKey,
+                            'is_active' => true,
+                        ]
+                    );
+                }
             }
         }
     }
