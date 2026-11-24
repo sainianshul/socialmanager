@@ -183,6 +183,25 @@
                             <span class="nav-link-title">Card Templates</span>
                         </a>
                     </li>
+
+                    {{-- READYMADE POSTERS (Admin / Manager) --}}
+                    <li class="nav-section-title">Readymade Posters</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.poster-categories.*') ? 'active' : '' }}" href="{{ route('admin.poster-categories.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Poster Categories">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-azure">
+                                <i class="ti ti-category fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Categories</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.posters.*') ? 'active' : '' }}" href="{{ route('admin.posters.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Readymade Posters">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-indigo">
+                                <i class="ti ti-template fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">Posters</span>
+                        </a>
+                    </li>
                 @endif
 
                 {{-- CLIENT SOCIAL ACCOUNTS, CONTENT & ENGAGEMENT (Only for Regular Users / Non-Admin) --}}
