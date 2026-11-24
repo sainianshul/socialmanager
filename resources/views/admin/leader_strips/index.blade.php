@@ -483,7 +483,7 @@
                         <div class="d-flex align-items-center justify-content-between mb-1.5">
                             <span class="small fw-semibold text-dark">Selected Sequence</span>
                             <span class="badge bg-teal-lt rounded-pill px-2 py-0.5" id="builder-preview-count" style="font-size: 11px;">
-                                0 / 7 Selected (Min 5)
+                                0 / 7 Selected (Min 3)
                             </span>
                         </div>
                         <div class="border rounded-3 p-2 bg-light-subtle d-flex align-items-center gap-1.5 overflow-x-auto" id="builder-preview-bar" style="min-height: 48px;">
@@ -868,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var selected = stripBuilderState.selectedLeaders;
 
         if (elPreviewCount) {
-            elPreviewCount.textContent = selected.length + ' / 7 Selected' + (selected.length < 5 ? ' (Min 5)' : '');
+            elPreviewCount.textContent = selected.length + ' / 7 Selected' + (selected.length < 3 ? ' (Min 3)' : '');
         }
 
         if (selected.length === 0) {
@@ -998,8 +998,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            if (stripBuilderState.selectedLeaders.length < 5) {
-                showModalAlert('Please select at least 5 leaders (5 to 7 recommended) for a well-balanced leadership strip.', 'danger');
+            if (stripBuilderState.selectedLeaders.length < 3) {
+                showModalAlert('Please select at least 3 leaders for a leadership strip.', 'danger');
                 return;
             }
 
