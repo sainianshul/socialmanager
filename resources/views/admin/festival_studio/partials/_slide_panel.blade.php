@@ -12,19 +12,19 @@
 
 <div class="offcanvas offcanvas-end border-0 studio-slide-panel" tabindex="-1" id="studioSlidePanel" aria-labelledby="studioSlidePanelLabel" data-bs-backdrop="true">
     {{-- Panel Header --}}
-    <div class="offcanvas-header border-bottom py-3 px-4 px-lg-5 bg-white d-flex align-items-center justify-content-between" style="border-color: #F1F5F9 !important;">
+    <div class="offcanvas-header border-bottom py-3 px-4 px-lg-5 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <h5 class="offcanvas-title fw-bold text-dark mb-0" id="studioSlidePanelLabel" style="font-size: 1.15rem; letter-spacing: -0.01em;">
+            <h5 class="offcanvas-title fw-bold text-body mb-0" id="studioSlidePanelLabel" style="font-size: 1.15rem; letter-spacing: -0.01em;">
                 Festival Poster Studio
             </h5>
-            <span class="badge px-3 py-1 rounded-pill fw-medium small" id="panel-subheading" style="background: #F1F5F9; color: #475569; border: 1px solid #E2E8F0; font-size: 11.5px;">
+            <span class="badge px-3 py-1 rounded-pill fw-medium small studio-subheading-badge" id="panel-subheading" style="font-size: 11.5px;">
                 {{ $selectedFestival->title }} ({{ $selectedFestival->festival_date->format('d M Y') }})
             </span>
         </div>
 
         {{-- Stepper Indicator & Close Button --}}
         <div class="d-flex align-items-center gap-3">
-            <div class="d-none d-sm-flex align-items-center gap-1 p-1 rounded-pill" style="background: #F8FAFC; border: 1px solid #E2E8F0;">
+            <div class="d-none d-sm-flex align-items-center gap-1 p-1 rounded-pill studio-stepper-wrap">
                 <span class="badge text-white rounded-pill px-3 py-1.5 fw-semibold cursor-pointer panel-step-badge active" id="panel-step-indicator-1" style="font-size: 11px; background: #0D9488;">
                     1. Poster Style
                 </span>
@@ -37,7 +37,7 @@
     </div>
 
     {{-- Panel Body --}}
-    <div class="offcanvas-body p-4 p-lg-5 bg-white">
+    <div class="offcanvas-body p-4 p-lg-5">
         
         {{-- ================================================================= --}}
         {{-- STEP 1: MINIMALIST POSTER PREVIEW & PRO TOOLBAR                  --}}
@@ -82,7 +82,7 @@
                                          data-leader-border="{{ $tplLeaderBorder }}"
                                          data-party-id="{{ $tpl->party_id ?? '' }}"
                                          data-strip-id="{{ $tpl->layout_config['header']['strip_id'] ?? '' }}"
-                                         style="width: 68px; height: 68px; border: 2px solid {{ $loop->first ? '#0D9488' : '#E2E8F0' }}; transition: all 0.2s ease;">
+                                         style="width: 68px; height: 68px; transition: all 0.2s ease;">
                                         <img src="{{ $tpl->image_url }}" alt="{{ $tpl->title }}" class="w-100 h-100 object-fit-cover">
                                         <span class="panel-chip-check badge bg-success rounded-circle p-1 position-absolute top-0 end-0 m-1 {{ $loop->first ? '' : 'd-none' }}" style="font-size: 7px;">
                                             <i class="ti ti-check"></i>
@@ -116,16 +116,16 @@
 
                     {{-- Action Icons Bar: Compact, Sleek, Clean Circular Icons --}}
                     <div class="d-flex align-items-center justify-content-center gap-2.5 mt-3">
-                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-preview" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 36px; height: 36px; border-color: #E2E8F0; color: #475569; background: #ffffff;" title="Full-Screen Preview (1080p)">
+                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-preview" target="_blank" rel="noopener noreferrer" class="btn rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" title="Full-Screen Preview (1080p)">
                             <i class="ti ti-maximize" style="font-size: 16px;"></i>
                         </a>
-                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-download" target="_blank" download="{{ Str::slug($selectedFestival->title) }}-poster.jpg" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center border-0 shadow-xs p-0 panel-icon-btn" style="width: 36px; height: 36px; background: #0D9488;" title="Download High-Res 1080p">
+                        <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-download" target="_blank" download="{{ Str::slug($selectedFestival->title) }}-poster.jpg" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center border-0 shadow-xs p-0 panel-icon-btn" style="background: #0D9488;" title="Download High-Res 1080p">
                             <i class="ti ti-download text-white" style="font-size: 16px;"></i>
                         </a>
-                        <button type="button" id="panel-btn-whatsapp" class="btn btn-outline-success rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 36px; height: 36px; background: #ECFDF5; border-color: #A7F3D0; color: #059669;" title="Share on WhatsApp">
+                        <button type="button" id="panel-btn-whatsapp" class="btn rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn panel-icon-whatsapp" title="Share on WhatsApp">
                             <i class="ti ti-brand-whatsapp" style="font-size: 17px;"></i>
                         </button>
-                        <button type="button" id="panel-btn-share" class="btn btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" style="width: 36px; height: 36px; border-color: #E2E8F0; color: #475569; background: #ffffff;" title="Share Poster Link">
+                        <button type="button" id="panel-btn-share" class="btn rounded-circle d-flex align-items-center justify-content-center shadow-none p-0 panel-icon-btn" title="Share Poster Link">
                             <i class="ti ti-share" style="font-size: 16px;"></i>
                         </button>
                     </div>
@@ -148,9 +148,9 @@
                         {{-- ========================================================= --}}
                         {{-- SECTION 1: TOP LEADERSHIP HEADER (शीर्ष नेतृत्व हेडर)       --}}
                         {{-- ========================================================= --}}
-                        <div class="card bg-white border rounded-4 p-3.5 shadow-none mb-0" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;">
+                        <div class="card studio-panel-card p-3.5 mb-0">
                             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                                <span class="text-uppercase fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 11px; letter-spacing: 0.06em; color: #334155 !important;">
+                                <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
                                     <i class="ti ti-crown text-primary" style="font-size: 14px;"></i>
                                     Top Leadership Header
                                 </span>
@@ -212,26 +212,26 @@
                                         <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Ring Shape</label>
                                         <input type="hidden" id="panel-leader-shape" value="circle">
                                         <div class="d-flex gap-1" id="panel-shape-tiles">
-                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2 active" data-shape="circle" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
-                                                <span class="small fw-semibold text-teal" style="font-size: 11px;">Circle</span>
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2 active" data-shape="circle">
+                                                <span class="small fw-semibold" style="font-size: 11px;">Circle</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="rounded_square" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                                <span class="small fw-medium text-secondary" style="font-size: 11px;">Round</span>
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="rounded_square">
+                                                <span class="small fw-medium" style="font-size: 11px;">Round</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="square" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                                <span class="small fw-medium text-secondary" style="font-size: 11px;">Square</span>
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1 px-1 rounded-2" data-shape="square">
+                                                <span class="small fw-medium" style="font-size: 11px;">Square</span>
                                             </button>
                                         </div>
                                     </div>
                                     <div class="col-sm-7">
                                         <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Ring Color</label>
                                         <div class="d-flex align-items-center gap-1.5 flex-wrap" id="panel-color-swatches">
-                                            <button type="button" class="btn p-0 panel-swatch rounded-2 active" data-color="#FF9933" style="width: 24px; height: 24px; background: #FF9933; border: 1.5px solid #0D9488;"></button>
-                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#FFFFFF" style="width: 24px; height: 24px; background: #FFFFFF; border: 1px solid #E2E8F0;"></button>
-                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#138808" style="width: 24px; height: 24px; background: #138808; border: 1.5px solid transparent;"></button>
-                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#D4AF37" style="width: 24px; height: 24px; background: #D4AF37; border: 1.5px solid transparent;"></button>
-                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#DC2626" style="width: 24px; height: 24px; background: #DC2626; border: 1.5px solid transparent;"></button>
-                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#1E3A8A" style="width: 24px; height: 24px; background: #1E3A8A; border: 1.5px solid transparent;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2 active" data-color="#FF9933" style="width: 24px; height: 24px; background: #FF9933;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#FFFFFF" style="width: 24px; height: 24px; background: #FFFFFF;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#138808" style="width: 24px; height: 24px; background: #138808;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#D4AF37" style="width: 24px; height: 24px; background: #D4AF37;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#DC2626" style="width: 24px; height: 24px; background: #DC2626;"></button>
+                                            <button type="button" class="btn p-0 panel-swatch rounded-2" data-color="#1E3A8A" style="width: 24px; height: 24px; background: #1E3A8A;"></button>
                                         </div>
                                         <input type="hidden" id="panel-leader-border" value="#FF9933">
                                     </div>
@@ -245,14 +245,14 @@
                                     </div>
                                     <input type="hidden" id="panel-leader-size" value="104">
                                     <div class="d-flex gap-1" id="panel-leader-size-tiles">
-                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2" data-size="88" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Small</span>
+                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2" data-size="88">
+                                            <span class="small fw-medium" style="font-size: 11px;">Small</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2 active" data-size="104" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
-                                            <span class="small fw-semibold text-teal" style="font-size: 11px;">Medium</span>
+                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2 active" data-size="104">
+                                            <span class="small fw-semibold" style="font-size: 11px;">Medium</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2" data-size="120" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Large</span>
+                                        <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1 px-1 rounded-2" data-size="120">
+                                            <span class="small fw-medium" style="font-size: 11px;">Large</span>
                                         </button>
                                     </div>
                                 </div>
@@ -262,9 +262,9 @@
                         {{-- ========================================================= --}}
                         {{-- SECTION 2: BRANDING BOTTOM STRIP (ब्रांडिंग बॉटम स्ट्रिप)    --}}
                         {{-- ========================================================= --}}
-                        <div class="card bg-white border rounded-4 p-3.5 shadow-none mb-0" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;">
+                        <div class="card studio-panel-card p-3.5 mb-0">
                             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                                <span class="text-uppercase fw-bold text-dark d-flex align-items-center gap-1.5" style="font-size: 11px; letter-spacing: 0.06em; color: #334155 !important;">
+                                <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
                                     <i class="ti ti-id-badge-2 text-primary" style="font-size: 14px;"></i>
                                     Branding Bottom Strip
                                 </span>
@@ -306,14 +306,14 @@
                                     </div>
                                     <input type="hidden" id="panel-candidate-scale" value="100">
                                     <div class="d-flex gap-1" id="panel-candidate-scale-tiles">
-                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2" data-scale="85" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Small (85%)</span>
+                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2" data-scale="85">
+                                            <span class="small fw-medium" style="font-size: 11px;">Small (85%)</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2 active" data-scale="100" style="border: 1.5px solid #0D9488; background: #F0FDFA;">
-                                            <span class="small fw-semibold text-teal" style="font-size: 11px;">Normal (100%)</span>
+                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2 active" data-scale="100">
+                                            <span class="small fw-semibold" style="font-size: 11px;">Normal (100%)</span>
                                         </button>
-                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2" data-scale="115" style="border: 1px solid #E2E8F0; background: #ffffff;">
-                                            <span class="small fw-medium text-secondary" style="font-size: 11px;">Large (115%)</span>
+                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1 px-1 rounded-2" data-scale="115">
+                                            <span class="small fw-medium" style="font-size: 11px;">Large (115%)</span>
                                         </button>
                                     </div>
                                 </div>
@@ -333,16 +333,14 @@
                                     <div class="d-flex align-items-center gap-2 overflow-x-auto py-1" id="panel-photo-chips-wrapper">
                                         @if($activeCutout)
                                             <div class="panel-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0"
-                                                 data-url="{{ $activeCutout }}"
-                                                 style="width: 38px; height: 38px; border: 2px solid #0D9488; outline: 2px solid rgba(13, 148, 136, 0.3); outline-offset: 1px;">
+                                                 data-url="{{ $activeCutout }}">
                                                 <img src="{{ $activeCutout }}" alt="Active Photo" class="w-100 h-100 rounded-circle object-fit-cover bg-white">
                                             </div>
                                         @endif
                                         @foreach($userImages as $uImg)
                                             @if($uImg->cutout_url !== $activeCutout)
                                                 <div class="panel-photo-chip position-relative rounded-circle cursor-pointer flex-shrink-0"
-                                                     data-url="{{ $uImg->cutout_url }}"
-                                                     style="width: 38px; height: 38px; border: 2px solid #E2E8F0;">
+                                                     data-url="{{ $uImg->cutout_url }}">
                                                     <img src="{{ $uImg->cutout_url }}" alt="Branding Photo" class="w-100 h-100 rounded-circle object-fit-cover bg-white">
                                                 </div>
                                             @endif
@@ -353,7 +351,7 @@
                                 {{-- 2.4 Candidate Details (DEFAULT HIDDEN / COLLAPSED) --}}
                                 <div class="pt-1 border-top">
                                     <a class="d-flex align-items-center justify-content-between text-decoration-none cursor-pointer py-1.5" data-bs-toggle="collapse" href="#panel-candidate-details-collapse" role="button" aria-expanded="false" aria-controls="panel-candidate-details-collapse">
-                                        <span class="small fw-semibold text-secondary d-flex align-items-center gap-1.5" style="font-size: 11px;">
+                                        <span class="small fw-semibold text-body d-flex align-items-center gap-1.5" style="font-size: 11px;">
                                             <i class="ti ti-user-edit text-muted"></i>
                                             Candidate Details (Name & Post)
                                         </span>
@@ -363,7 +361,7 @@
                                         </span>
                                     </a>
                                     <div class="collapse mt-2" id="panel-candidate-details-collapse">
-                                        <div class="p-3 rounded-3 bg-white border" style="background: #ffffff !important; border: 1px solid #E2E8F0 !important;">
+                                        <div class="p-3 rounded-3 studio-panel-card-inner">
                                             <div class="row g-2">
                                                 <div class="col-6">
                                                     <label class="form-label text-muted small mb-1" style="font-size: 10.5px;">Name</label>
@@ -382,7 +380,7 @@
 
                                 {{-- 2.5 Show Social Handles Toggle --}}
                                 <div class="pt-2 border-top d-flex align-items-center justify-content-between">
-                                    <span class="small text-secondary" style="font-size: 11px;">Social Media Handles</span>
+                                    <span class="small text-body-secondary" style="font-size: 11px;">Social Media Handles</span>
                                     <div class="form-check form-switch m-0 ps-0">
                                         <input class="form-check-input ms-0 cursor-pointer" type="checkbox" id="panel-show-social" checked style="width: 34px; height: 18px;">
                                         <input type="checkbox" id="qs-modal-show-social" class="d-none" checked>
@@ -403,7 +401,7 @@
         <div id="panel-step-pane-2" class="d-none">
             
             <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
-                <button type="button" class="btn btn-sm btn-link text-secondary text-decoration-none p-0 d-flex align-items-center gap-1.5" id="panel-btn-back-step">
+                <button type="button" class="btn btn-sm btn-link text-body-secondary text-decoration-none p-0 d-flex align-items-center gap-1.5" id="panel-btn-back-step">
                     <i class="ti ti-arrow-left"></i>
                     <span class="fw-semibold">Back to Poster Style</span>
                 </button>
@@ -419,7 +417,7 @@
                     <div class="position-relative rounded-4 overflow-hidden shadow-sm mx-auto" style="max-width: 240px; aspect-ratio: 1 / 1; background: #0f172a; border: 1px solid rgba(0,0,0,0.08);">
                         <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
                     </div>
-                    <div class="small fw-bold text-dark mt-2.5 text-truncate" id="panel-schedule-template-title">
+                    <div class="small fw-bold text-body mt-2.5 text-truncate" id="panel-schedule-template-title">
                         {{ $firstTemplate?->title }}
                     </div>
                     <div class="text-secondary small" style="font-size: 11px;">1080p Personalized Artwork</div>
@@ -436,20 +434,20 @@
                             </label>
                             <div class="d-flex flex-column gap-2" id="panel-accounts-container">
                                 @forelse($accounts as $acc)
-                                    <div class="p-2.5 rounded-3 border d-flex align-items-center justify-content-between panel-account-item active cursor-pointer bg-white" data-id="{{ $acc->id }}">
+                                    <div class="p-2.5 rounded-3 d-flex align-items-center justify-content-between panel-account-item active cursor-pointer" data-id="{{ $acc->id }}">
                                         <div class="d-flex align-items-center gap-2">
                                             <span class="badge rounded-circle p-1 {{ $acc->account_type == 1 ? 'bg-primary' : 'bg-danger' }}">
                                                 <i class="ti {{ $acc->account_type == 1 ? 'ti-brand-facebook' : 'ti-brand-instagram' }} text-white"></i>
                                             </span>
                                             <div>
-                                                <div class="fw-semibold text-dark small" style="font-size: 12px;">{{ $acc->name }}</div>
+                                                <div class="fw-semibold text-body small" style="font-size: 12px;">{{ $acc->name }}</div>
                                                 <div class="text-secondary" style="font-size: 10px;">{{ $acc->account_type == 1 ? 'Facebook Page' : 'Instagram Professional' }}</div>
                                             </div>
                                         </div>
                                         <input type="checkbox" class="form-check-input panel-acc-cb ms-0" value="{{ $acc->id }}" checked>
                                     </div>
                                 @empty
-                                    <div class="p-3 text-center bg-white rounded-3 border" style="background: #ffffff !important; border: 1px dashed #CBD5E1 !important;">
+                                    <div class="p-3 text-center studio-panel-card-inner rounded-3 border" style="border-style: dashed !important;">
                                         <div class="text-secondary small mb-1">No active social media accounts connected.</div>
                                         <a href="{{ route('admin.accounts.index') }}" class="btn btn-xs btn-outline-primary rounded-pill">Connect Account</a>
                                     </div>

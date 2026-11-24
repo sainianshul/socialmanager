@@ -200,16 +200,102 @@
             cursor: pointer;
         }
 
-        /* Apple-Grade Right Slide-Over Panel */
+        /* Apple-Grade Right Slide-Over Panel (Theme Adaptive) */
         .studio-slide-panel {
             width: 960px !important;
             max-width: 95vw !important;
             border-top-left-radius: 24px;
             border-bottom-left-radius: 24px;
             box-shadow: -15px 0 50px rgba(15, 23, 42, 0.16) !important;
-            background: #ffffff;
+            background-color: var(--tblr-bg-surface, #ffffff) !important;
+            color: var(--tblr-body-color, #1e293b) !important;
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
             z-index: 1055 !important;
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel {
+            background-color: #0d1527 !important;
+            color: #f8fafc !important;
+            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6) !important;
+        }
+
+        .studio-slide-panel .offcanvas-header {
+            background-color: var(--tblr-bg-surface, #ffffff);
+            border-bottom-color: var(--tblr-border-color, #f1f5f9) !important;
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel .offcanvas-header {
+            background-color: #0d1527 !important;
+            border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .studio-slide-panel .offcanvas-body {
+            background-color: var(--tblr-bg-surface, #ffffff);
+            color: var(--tblr-body-color, #1e293b);
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel .offcanvas-body {
+            background-color: #0d1527 !important;
+            color: #f8fafc !important;
+        }
+
+        /* Stepper badge wrapper in Header */
+        .studio-stepper-wrap {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+        }
+
+        [data-bs-theme="dark"] .studio-stepper-wrap {
+            background: #162238 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Subheading badge in Header */
+        .studio-subheading-badge {
+            background: #F1F5F9;
+            color: #475569;
+            border: 1px solid #E2E8F0;
+        }
+
+        [data-bs-theme="dark"] .studio-subheading-badge {
+            background: #162238 !important;
+            color: #cbd5e1 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Toolbar Section Cards (Section 1 & 2) */
+        .studio-panel-card {
+            background-color: #ffffff !important;
+            border: 1px solid #E2E8F0 !important;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+            border-radius: 18px !important;
+        }
+
+        [data-bs-theme="dark"] .studio-panel-card {
+            background-color: #141f36 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .studio-panel-card-inner {
+            background-color: #ffffff !important;
+            border: 1px solid #E2E8F0 !important;
+        }
+
+        [data-bs-theme="dark"] .studio-panel-card-inner {
+            background-color: #0d1527 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .studio-section-title {
+            color: #334155;
+            font-size: 11px;
+            letter-spacing: 0.06em;
+            font-weight: 700;
+        }
+
+        [data-bs-theme="dark"] .studio-section-title {
+            color: #f1f5f9 !important;
         }
 
         @media (max-width: 768px) {
@@ -220,7 +306,7 @@
             }
         }
 
-        /* Premium Select Styling (Pure Crisp White, No Dull Grey) */
+        /* Premium Select Styling (Theme Adaptive) */
         .qs-premium-select {
             height: 46px !important;
             border-radius: 12px !important;
@@ -238,27 +324,106 @@
             background-size: 14px 10px !important;
         }
 
+        [data-bs-theme="dark"] .qs-premium-select {
+            background-color: #0d1527 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #f8fafc !important;
+            box-shadow: none !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%2394A3B8' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e") !important;
+        }
+
         .qs-premium-select:hover {
             border-color: #0D9488 !important;
-            background-color: #FFFFFF !important;
         }
 
         .qs-premium-select:focus {
             border-color: #0D9488 !important;
-            background-color: #FFFFFF !important;
-            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1) !important;
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15) !important;
             outline: none !important;
         }
 
+        [data-bs-theme="dark"] .qs-premium-select option {
+            background-color: #0d1527 !important;
+            color: #f8fafc !important;
+        }
+
+        /* Form Controls in Slide Panel */
         .studio-slide-panel .form-control {
             background-color: #FFFFFF !important;
             border: 1px solid #E2E8F0 !important;
+            color: #1E293B !important;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel .form-control {
+            background-color: #0d1527 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #f8fafc !important;
+            box-shadow: none !important;
         }
 
         .studio-slide-panel .form-control:focus {
             border-color: #0D9488 !important;
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12) !important;
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important;
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel input[type="date"],
+        [data-bs-theme="dark"] .studio-slide-panel input[type="time"] {
+            color-scheme: dark !important;
+        }
+
+        /* Pill Buttons (Shape, Leader Size, Candidate Scale) */
+        .panel-pill-btn,
+        .panel-shape-tile,
+        .panel-leader-size-pill,
+        .panel-candidate-scale-pill {
+            background: #ffffff;
+            border: 1px solid #E2E8F0;
+            color: #475569;
+            transition: all 0.15s ease;
+        }
+
+        .panel-pill-btn:hover,
+        .panel-shape-tile:hover,
+        .panel-leader-size-pill:hover,
+        .panel-candidate-scale-pill:hover {
+            border-color: #0D9488;
+            color: #0D9488;
+        }
+
+        .panel-pill-btn.active,
+        .panel-shape-tile.active,
+        .panel-leader-size-pill.active,
+        .panel-candidate-scale-pill.active {
+            border: 1.5px solid #0D9488 !important;
+            background: #F0FDFA !important;
+            color: #0D9488 !important;
+        }
+
+        [data-bs-theme="dark"] .panel-pill-btn,
+        [data-bs-theme="dark"] .panel-shape-tile,
+        [data-bs-theme="dark"] .panel-leader-size-pill,
+        [data-bs-theme="dark"] .panel-candidate-scale-pill {
+            background: #0d1527 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #94a3b8 !important;
+        }
+
+        [data-bs-theme="dark"] .panel-pill-btn:hover,
+        [data-bs-theme="dark"] .panel-shape-tile:hover,
+        [data-bs-theme="dark"] .panel-leader-size-pill:hover,
+        [data-bs-theme="dark"] .panel-candidate-scale-pill:hover {
+            border-color: #14b8a6 !important;
+            color: #2dd4bf !important;
+        }
+
+        [data-bs-theme="dark"] .panel-pill-btn.active,
+        [data-bs-theme="dark"] .panel-shape-tile.active,
+        [data-bs-theme="dark"] .panel-leader-size-pill.active,
+        [data-bs-theme="dark"] .panel-candidate-scale-pill.active {
+            border: 1.5px solid #14b8a6 !important;
+            background: rgba(13, 148, 136, 0.22) !important;
+            color: #2dd4bf !important;
         }
 
         /* Action Icon Buttons */
@@ -266,6 +431,15 @@
             width: 36px !important;
             height: 36px !important;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #ffffff;
+            border: 1px solid #E2E8F0;
+            color: #475569;
+        }
+
+        [data-bs-theme="dark"] .panel-icon-btn {
+            background: #141f36 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #cbd5e1 !important;
         }
 
         .panel-icon-btn:hover {
@@ -273,11 +447,28 @@
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
         }
 
+        .panel-icon-whatsapp {
+            background: #ECFDF5;
+            border-color: #A7F3D0;
+            color: #059669;
+        }
+
+        [data-bs-theme="dark"] .panel-icon-whatsapp {
+            background: rgba(5, 150, 105, 0.15) !important;
+            border-color: rgba(5, 150, 105, 0.3) !important;
+            color: #34d399 !important;
+        }
+
         /* Template Switcher Chips in Panel */
         .panel-template-chip {
             cursor: pointer;
             border-radius: 12px;
+            border: 2px solid #E2E8F0;
             transition: all 0.2s ease;
+        }
+
+        [data-bs-theme="dark"] .panel-template-chip {
+            border-color: rgba(255, 255, 255, 0.12) !important;
         }
 
         .panel-template-chip:hover {
@@ -292,7 +483,14 @@
         /* Photo Chips */
         .panel-photo-chip {
             cursor: pointer;
+            width: 38px;
+            height: 38px;
+            border: 2px solid #E2E8F0;
             transition: all 0.15s ease;
+        }
+
+        [data-bs-theme="dark"] .panel-photo-chip {
+            border-color: rgba(255, 255, 255, 0.15) !important;
         }
 
         .panel-photo-chip:hover {
@@ -307,6 +505,7 @@
         /* Social Account Cards in Step 2 */
         .panel-account-item {
             transition: all 0.15s ease;
+            background-color: #ffffff;
             border: 1.5px solid #E2E8F0 !important;
         }
 
@@ -320,19 +519,33 @@
             background-color: #F0FDFA !important;
         }
 
-        /* Shape Tiles */
-        .panel-shape-tile {
-            transition: all 0.15s ease;
+        [data-bs-theme="dark"] .panel-account-item {
+            background-color: #141f36 !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        .panel-shape-tile.active {
-            border-color: #0D9488 !important;
-            background-color: #F0FDFA !important;
+        [data-bs-theme="dark"] .panel-account-item:hover {
+            border-color: #14b8a6 !important;
+            background-color: rgba(13, 148, 136, 0.12) !important;
+        }
+
+        [data-bs-theme="dark"] .panel-account-item.active {
+            border-color: #14b8a6 !important;
+            background-color: rgba(13, 148, 136, 0.18) !important;
         }
 
         /* Swatches */
         .panel-swatch {
             transition: all 0.15s ease;
+            border: 1.5px solid transparent;
+        }
+
+        .panel-swatch[data-color="#FFFFFF"] {
+            border: 1.5px solid #E2E8F0;
+        }
+
+        [data-bs-theme="dark"] .panel-swatch[data-color="#FFFFFF"] {
+            border: 1.5px solid rgba(255, 255, 255, 0.4) !important;
         }
 
         .panel-swatch:hover {
@@ -342,6 +555,19 @@
         .panel-swatch.active {
             border-color: #0D9488 !important;
             box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.35) !important;
+            transform: scale(1.08);
+        }
+
+        /* Borders & Text in Dark Theme */
+        [data-bs-theme="dark"] .studio-slide-panel .border,
+        [data-bs-theme="dark"] .studio-slide-panel .border-top,
+        [data-bs-theme="dark"] .studio-slide-panel .border-bottom {
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel .text-muted,
+        [data-bs-theme="dark"] .studio-slide-panel .form-label {
+            color: #94a3b8 !important;
         }
 
         /* Floating Clean Notification Toast */
@@ -376,7 +602,7 @@
     <div class="page-header d-print-none mb-3">
         <div class="row align-items-center">
             <div class="col">
-                <h1 class="page-title fw-bold text-dark mb-0" style="font-size: 1.6rem; letter-spacing: -0.02em;">
+                <h1 class="page-title fw-bold text-body mb-0" style="font-size: 1.6rem; letter-spacing: -0.02em;">
                     Festival Studio
                 </h1>
             </div>
@@ -636,19 +862,14 @@
                 if (hidShape && lShape) hidShape.value = lShape;
                 document.querySelectorAll('.panel-shape-tile').forEach(function (tile) {
                     var s = tile.getAttribute('data-shape');
-                    var isActive = (s === lShape);
-                    tile.classList.toggle('active', isActive);
-                    tile.style.border = isActive ? '1.5px solid #0D9488' : '1.5px solid #E2E8F0';
-                    tile.style.background = isActive ? '#F0FDFA' : '#ffffff';
+                    tile.classList.toggle('active', s === lShape);
                 });
 
                 var hidBorder = document.getElementById('panel-leader-border');
                 if (hidBorder && lBorder) hidBorder.value = lBorder;
                 document.querySelectorAll('.panel-swatch').forEach(function (sw) {
                     var c = sw.getAttribute('data-color');
-                    var isActive = (c.toLowerCase() === lBorder.toLowerCase());
-                    sw.classList.toggle('active', isActive);
-                    sw.style.border = isActive ? '1.5px solid #0D9488' : (c === '#FFFFFF' ? '1.5px solid #E2E8F0' : '1.5px solid transparent');
+                    sw.classList.toggle('active', c.toLowerCase() === lBorder.toLowerCase());
                 });
 
                 // Update Template Switcher Chips active state
@@ -656,7 +877,6 @@
                     var cid = chip.getAttribute('data-template-id');
                     var isCActive = (cid === tplId);
                     chip.classList.toggle('active', isCActive);
-                    chip.style.borderColor = isCActive ? '#0D9488' : '#E2E8F0';
                     var check = chip.querySelector('.panel-chip-check');
                     if (check) check.classList.toggle('d-none', !isCActive);
                 });
@@ -828,12 +1048,8 @@
                 var shape = tile.getAttribute('data-shape');
                 document.querySelectorAll('.panel-shape-tile').forEach(function (t) {
                     t.classList.remove('active');
-                    t.style.border = '1.5px solid #E2E8F0';
-                    t.style.background = '#ffffff';
                 });
                 tile.classList.add('active');
-                tile.style.border = '1.5px solid #0D9488';
-                tile.style.background = '#F0FDFA';
 
                 var hidShape = document.getElementById('panel-leader-shape');
                 if (hidShape) hidShape.value = shape;
@@ -848,10 +1064,8 @@
                 var color = swatch.getAttribute('data-color');
                 document.querySelectorAll('.panel-swatch').forEach(function (s) {
                     s.classList.remove('active');
-                    s.style.border = (s.getAttribute('data-color') === '#FFFFFF') ? '1.5px solid #E2E8F0' : '1.5px solid transparent';
                 });
                 swatch.classList.add('active');
-                swatch.style.border = '1.5px solid #0D9488';
 
                 var hidBorder = document.getElementById('panel-leader-border');
                 if (hidBorder) hidBorder.value = color;
@@ -866,23 +1080,8 @@
                 var size = pill.getAttribute('data-size');
                 document.querySelectorAll('.panel-leader-size-pill').forEach(function (p) {
                     p.classList.remove('active');
-                    p.style.border = '1px solid #E2E8F0';
-                    p.style.background = '#ffffff';
-                    var span = p.querySelector('span');
-                    if (span) {
-                        span.classList.remove('fw-semibold', 'text-teal');
-                        span.classList.add('fw-medium', 'text-secondary');
-                    }
                 });
-
                 pill.classList.add('active');
-                pill.style.border = '1.5px solid #0D9488';
-                pill.style.background = '#F0FDFA';
-                var span = pill.querySelector('span');
-                if (span) {
-                    span.classList.remove('fw-medium', 'text-secondary');
-                    span.classList.add('fw-semibold', 'text-teal');
-                }
 
                 var hidSize = document.getElementById('panel-leader-size');
                 if (hidSize) hidSize.value = size;
@@ -903,23 +1102,8 @@
                 var scale = pill.getAttribute('data-scale');
                 document.querySelectorAll('.panel-candidate-scale-pill').forEach(function (p) {
                     p.classList.remove('active');
-                    p.style.border = '1px solid #E2E8F0';
-                    p.style.background = '#ffffff';
-                    var span = p.querySelector('span');
-                    if (span) {
-                        span.classList.remove('fw-semibold', 'text-teal');
-                        span.classList.add('fw-medium', 'text-secondary');
-                    }
                 });
-
                 pill.classList.add('active');
-                pill.style.border = '1.5px solid #0D9488';
-                pill.style.background = '#F0FDFA';
-                var span = pill.querySelector('span');
-                if (span) {
-                    span.classList.remove('fw-medium', 'text-secondary');
-                    span.classList.add('fw-semibold', 'text-teal');
-                }
 
                 var hidScale = document.getElementById('panel-candidate-scale');
                 if (hidScale) hidScale.value = scale;
@@ -942,13 +1126,8 @@
 
                 document.querySelectorAll('.panel-photo-chip').forEach(function (c) {
                     c.classList.remove('active');
-                    c.style.border = '2px solid #E2E8F0';
-                    c.style.outline = 'none';
                 });
                 chip.classList.add('active');
-                chip.style.border = '2px solid #0D9488';
-                chip.style.outline = '2px solid rgba(13, 148, 136, 0.3)';
-                chip.style.outlineOffset = '1px';
 
                 var hidCutout = document.getElementById('panel-cutout-url');
                 if (hidCutout) hidCutout.value = url;
@@ -983,14 +1162,11 @@
                             if (wrapper) {
                                 document.querySelectorAll('.panel-photo-chip').forEach(function (c) {
                                     c.classList.remove('active');
-                                    c.style.border = '2px solid #E2E8F0';
-                                    c.style.outline = 'none';
                                 });
 
                                 var newChip = document.createElement('div');
                                 newChip.className = 'panel-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0';
                                 newChip.setAttribute('data-url', data.path);
-                                newChip.style.cssText = 'width: 36px; height: 36px; border: 2px solid #0D9488; outline: 2px solid rgba(13, 148, 136, 0.3); outline-offset: 1px;';
                                 newChip.innerHTML = '<img src="' + data.url + '" class="w-100 h-100 rounded-circle object-fit-cover bg-white">';
                                 wrapper.insertBefore(newChip, wrapper.firstChild);
                             }

@@ -12,7 +12,7 @@
         <div class="d-flex align-items-center gap-3">
             <div>
                 <div class="d-flex align-items-center gap-2 flex-wrap">
-                    <h2 class="fw-bold m-0 text-dark" style="font-size: 1.45rem; letter-spacing: -0.02em;">
+                    <h2 class="fw-bold m-0 text-body" style="font-size: 1.45rem; letter-spacing: -0.02em;">
                         {{ $selectedFestival->title }}
                     </h2>
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 font-monospace small">
@@ -109,8 +109,8 @@
                         </div>
 
                         {{-- Card Footer with Title & Schedule Status --}}
-                        <div class="p-3 d-flex align-items-center justify-content-between bg-white border-top">
-                            <span class="fw-bold text-dark text-truncate me-2" title="{{ $template->title }}" id="card-title-{{ $template->id }}" style="font-size: 0.95rem;">
+                        <div class="p-3 d-flex align-items-center justify-content-between border-top" style="background: var(--tblr-card-bg, #ffffff);">
+                            <span class="fw-bold text-body text-truncate me-2" title="{{ $template->title }}" id="card-title-{{ $template->id }}" style="font-size: 0.95rem;">
                                 {{ $template->title }}
                             </span>
                             <div class="d-flex align-items-center gap-2 flex-shrink-0" id="card-action-{{ $template->id }}">
@@ -146,7 +146,7 @@
             <div class="avatar avatar-md bg-secondary-lt rounded-circle mb-2">
                 <i class="ti ti-photo-off text-secondary fs-3"></i>
             </div>
-            <div class="fw-semibold text-dark mb-1">No templates found for this festival</div>
+            <div class="fw-semibold text-body mb-1">No templates found for this festival</div>
             <div class="text-secondary small">Select another upcoming festival date to explore designs.</div>
         </div>
     @endif
@@ -159,7 +159,7 @@
         <div class="avatar avatar-md bg-secondary-lt rounded-circle mb-2">
             <i class="ti ti-calendar-off text-secondary fs-3"></i>
         </div>
-        <div class="fw-semibold text-dark mb-1">No upcoming festivals found</div>
+        <div class="fw-semibold text-body mb-1">No upcoming festivals found</div>
         <div class="text-secondary small">Please add festival events to manage posters.</div>
     </div>
 @endif
