@@ -92,10 +92,9 @@ class PosterSeeder extends Seeder
                 'sort_order'      => 1,
             ],
         ];
-                'party_id'        => null,
-                'sort_order'      => 1,
-            ],
-        ];
+
+        // Clean up any old obsolete posters with hindi names
+        Poster::whereNotIn('slug', array_column($samplePosters, 'slug'))->delete();
 
         foreach ($samplePosters as $data) {
             $category = PosterCategory::where('slug', $data['category_slug'])->first();
