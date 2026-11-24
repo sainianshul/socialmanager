@@ -218,6 +218,92 @@ class CanvaIntegrationTest extends TestCase
         });
     }
 
+    public function test_expired_canva_token_is_automatically_refreshed_from_database(): void
+    {
+        $user = User::factory()->create([
+            'canva_access_token'     => 'expired_token_123',
+            'canva_refresh_token'    => 'valid_refresh_token_abc',
+            'canva_token_expires_at' => now()->subHours(2),
+        ]);
+
+        Http::fake([
+            'https://api.canva.com/rest/v1/oauth/token' => Http::response([
+                'access_token'  => 'brand_new_token_789',
+                'refresh_token' => 'brand_new_refresh_999',
+                'expires_in'    => 14400,
+            ], 200),
+            'https://api.canva.com/rest/v1/designs' => Http::response([
+                'design' => [
+                    'id'    => 'DAFAutoRefreshed',
+                    'title' => 'Auto Refreshed Design',
+                    'urls'  => [
+                        'edit_url' => 'https://www.canva.com/api/design/mock/edit',
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('admin.canva.create-design'), [
+            'title' => 'Auto Refreshed Design',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success'   => true,
+            'design_id' => 'DAFAutoRefreshed',
+        ]);
+
+        // Verify the database was updated with the new token
+        $user->refresh();
+        $this->assertEquals('brand_new_token_789', $user->canva_access_token);
+        $this->assertEquals('brand_new_refresh_999', $user->canva_refresh_token);
+        $this->assertTrue($user->canva_token_expires_at->gt(now()));
+    }
+
+    public function test_canva_auto_refreshes_and_retries_when_api_returns_invalid_access_token(): void
+    {
+        $user = User::factory()->create([
+            'canva_access_token'     => 'stale_token',
+            'canva_refresh_token'    => 'good_refresh_token',
+            'canva_token_expires_at' => now()->addHour(), // App thought it was valid, but Canva rejected it
+        ]);
+
+        $attempt = 0;
+        Http::fake([
+            'https://api.canva.com/rest/v1/oauth/token' => Http::response([
+                'access_token'  => 'recovered_token_555',
+                'refresh_token' => 'good_refresh_token',
+                'expires_in'    => 14400,
+            ], 200),
+            'https://api.canva.com/rest/v1/designs' => function () use (&$attempt) {
+                $attempt++;
+                if ($attempt === 1) {
+                    return Http::response(['code' => 'invalid_access_token', 'message' => 'Access token is invalid'], 401);
+                }
+                return Http::response([
+                    'design' => [
+                        'id'    => 'DAFRecovered',
+                        'title' => 'Recovered Design',
+                        'urls'  => ['edit_url' => 'https://www.canva.com/api/design/recovered/edit'],
+                    ],
+                ], 200);
+            },
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('admin.canva.create-design'), [
+            'title' => 'Recovered Design',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success'   => true,
+            'design_id' => 'DAFRecovered',
+        ]);
+
+        $user->refresh();
+        $this->assertEquals('recovered_token_555', $user->canva_access_token);
+    }
+
     public function test_post_create_view_renders_canva_button_and_modal(): void
     {
         $user = User::factory()->create();

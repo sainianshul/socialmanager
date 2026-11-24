@@ -62,8 +62,18 @@ class CanvaController extends Controller
         try {
             $tokens = $this->canvaService->exchangeCodeForToken($code, $verifier);
 
-            $userId = auth()->id() ?? 'guest';
+            $user = auth()->user();
+            $userId = $user ? $user->id : 'guest';
             $ttl = $tokens['expires_in'] ?? 14400;
+            $expiresAt = now()->addSeconds($ttl);
+
+            if ($user) {
+                $user->update([
+                    'canva_access_token'     => $tokens['access_token'],
+                    'canva_refresh_token'    => $tokens['refresh_token'] ?? $user->canva_refresh_token,
+                    'canva_token_expires_at' => $expiresAt,
+                ]);
+            }
 
             session([
                 'canva_access_token'  => $tokens['access_token'],
@@ -71,7 +81,7 @@ class CanvaController extends Controller
                 'canva_connected'     => true,
             ]);
 
-            Cache::put('canva_token_' . $userId, $tokens['access_token'], now()->addSeconds($ttl));
+            Cache::put('canva_token_' . $userId, $tokens['access_token'], $expiresAt);
             if (!empty($tokens['refresh_token'])) {
                 Cache::put('canva_refresh_token_' . $userId, $tokens['refresh_token'], now()->addDays(30));
             }
@@ -84,7 +94,7 @@ class CanvaController extends Controller
                 ['expires_in' => $tokens['expires_in'] ?? null],
                 null,
                 null,
-                $userId !== 'guest' ? $userId : null
+                $user ? $user->id : null
             );
 
             return redirect()->route('admin.posts.create')
@@ -100,50 +110,95 @@ class CanvaController extends Controller
     /**
      * Retrieve a valid Canva access token, automatically refreshing using refresh_token if needed.
      */
-    protected function getValidAccessToken($userId, bool $forceRefresh = false): ?string
+    protected function getValidAccessToken($userOrId = null, bool $forceRefresh = false): ?string
     {
+        $user = $userOrId instanceof \App\Models\User 
+            ? $userOrId 
+            : (auth()->user() ?? (is_numeric($userOrId) ? \App\Models\User::find($userOrId) : null));
+        $userId = $user ? $user->id : (is_scalar($userOrId) ? $userOrId : 'guest');
+
+        // 1. Check if unexpired in-database or cache token is available
         if (!$forceRefresh) {
+            if ($user && !empty($user->canva_access_token)) {
+                // If token expires in more than 2 minutes, return it directly
+                if (!$user->canva_token_expires_at || $user->canva_token_expires_at->gt(now()->addMinutes(2))) {
+                    return $user->canva_access_token;
+                }
+            }
+
             $token = session('canva_access_token') ?? Cache::get('canva_token_' . $userId);
             if (!empty($token)) {
                 return $token;
             }
         }
 
-        $refreshToken = session('canva_refresh_token') ?? Cache::get('canva_refresh_token_' . $userId);
-        if (!empty($refreshToken)) {
-            try {
-                $tokens = $this->canvaService->refreshToken($refreshToken);
-                $newToken = $tokens['access_token'] ?? null;
-                if ($newToken) {
-                    $ttl = $tokens['expires_in'] ?? 14400;
+        // 2. Token needs refresh — retrieve refresh token from DB or Cache/Session
+        $refreshToken = null;
+        if ($user && !empty($user->canva_refresh_token)) {
+            $refreshToken = $user->canva_refresh_token;
+        }
+        if (empty($refreshToken)) {
+            $refreshToken = session('canva_refresh_token') ?? Cache::get('canva_refresh_token_' . $userId);
+        }
 
-                    session([
-                        'canva_access_token'  => $newToken,
-                        'canva_refresh_token' => $tokens['refresh_token'] ?? $refreshToken,
-                        'canva_connected'     => true,
+        if (empty($refreshToken)) {
+            return null;
+        }
+
+        // 3. Perform atomic token refresh with Canva API
+        try {
+            $tokens = $this->canvaService->refreshToken($refreshToken);
+            $newToken = $tokens['access_token'] ?? null;
+            if ($newToken) {
+                $ttl = $tokens['expires_in'] ?? 14400;
+                $newRefresh = $tokens['refresh_token'] ?? $refreshToken;
+                $expiresAt = now()->addSeconds($ttl);
+
+                if ($user) {
+                    $user->update([
+                        'canva_access_token'     => $newToken,
+                        'canva_refresh_token'    => $newRefresh,
+                        'canva_token_expires_at' => $expiresAt,
                     ]);
-
-                    Cache::put('canva_token_' . $userId, $newToken, now()->addSeconds($ttl));
-                    if (!empty($tokens['refresh_token'])) {
-                        Cache::put('canva_refresh_token_' . $userId, $tokens['refresh_token'], now()->addDays(30));
-                    }
-
-                    return $newToken;
                 }
-            } catch (\Throwable $e) {
-                Log::warning('Canva auto token refresh failed: ' . $e->getMessage());
-                $this->clearTokens($userId);
+
+                session([
+                    'canva_access_token'  => $newToken,
+                    'canva_refresh_token' => $newRefresh,
+                    'canva_connected'     => true,
+                ]);
+
+                Cache::put('canva_token_' . $userId, $newToken, $expiresAt);
+                Cache::put('canva_refresh_token_' . $userId, $newRefresh, now()->addDays(30));
+
+                Log::info("Canva token refreshed successfully for User #{$userId}");
+
+                return $newToken;
             }
+        } catch (\Throwable $e) {
+            Log::warning("Canva auto token refresh failed for User #{$userId}: " . $e->getMessage());
+            $this->clearTokens($user, $userId);
         }
 
         return null;
     }
 
     /**
-     * Clear cached and session Canva tokens when invalidated.
+     * Clear cached, session and database Canva tokens when invalidated.
      */
-    protected function clearTokens($userId): void
+    protected function clearTokens($user = null, $userId = null): void
     {
+        $user = $user instanceof \App\Models\User ? $user : auth()->user();
+        $userId = $userId ?? ($user ? $user->id : 'guest');
+
+        if ($user) {
+            $user->update([
+                'canva_access_token'     => null,
+                'canva_refresh_token'    => null,
+                'canva_token_expires_at' => null,
+            ]);
+        }
+
         session()->forget(['canva_access_token', 'canva_refresh_token', 'canva_connected']);
         Cache::forget('canva_token_' . $userId);
         Cache::forget('canva_refresh_token_' . $userId);
@@ -347,11 +402,10 @@ class CanvaController extends Controller
      */
     public function disconnect(Request $request): JsonResponse
     {
-        $userId = auth()->id() ?? 'guest';
+        $user = auth()->user();
+        $userId = $user ? $user->id : 'guest';
 
-        session()->forget(['canva_access_token', 'canva_refresh_token', 'canva_connected']);
-        Cache::forget('canva_token_' . $userId);
-        Cache::forget('canva_refresh_token_' . $userId);
+        $this->clearTokens($user, $userId);
 
         \App\Services\ActivityLogger::log(
             \App\Models\SystemActivityLog::EVENT_CANVA,
@@ -361,7 +415,7 @@ class CanvaController extends Controller
             null,
             null,
             null,
-            $userId !== 'guest' ? $userId : null
+            $user ? $user->id : null
         );
 
         return response()->json([

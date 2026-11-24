@@ -50,11 +50,16 @@ class User extends Authenticatable
         'latitude',
         'longitude',
         'location_updated_at',
+        'canva_access_token',
+        'canva_refresh_token',
+        'canva_token_expires_at',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
+        'canva_access_token',
+        'canva_refresh_token',
     ];
 
     protected function casts(): array
@@ -68,6 +73,7 @@ class User extends Authenticatable
             'phone_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'location_updated_at' => 'datetime',
+            'canva_token_expires_at' => 'datetime',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
