@@ -16,14 +16,15 @@ class SyncMetaCommentsCommand extends Command
     protected $signature = 'sync:meta-comments 
                             {--account_id= : Sync comments for a specific account ID} 
                             {--post_limit=10 : Number of recent posts to inspect per account}
-                            {--comment_limit=25 : Number of comments to fetch per post}';
+                            {--comment_limit=25 : Number of comments to fetch per post}
+                            {--force : Force sync regardless of adaptive interval window}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Synchronize latest comments from connected Facebook Pages and Instagram accounts via Meta Graph API';
+    protected $description = 'Synchronize latest comments from connected Facebook Pages and Instagram accounts via Meta Graph API using Smart Adaptive Polling';
 
     /**
      * Execute the console command.
@@ -33,6 +34,7 @@ class SyncMetaCommentsCommand extends Command
         $accountId = $this->option('account_id');
         $postLimit = (int) ($this->option('post_limit') ?: 10);
         $commentLimit = (int) ($this->option('comment_limit') ?: 25);
+        $force = (bool) $this->option('force');
 
         $query = Account::whereIn('account_type', [Account::TYPE_FACEBOOK, Account::TYPE_INSTAGRAM])
             ->where('is_active', true);
@@ -48,14 +50,24 @@ class SyncMetaCommentsCommand extends Command
             return Command::SUCCESS;
         }
 
-        $this->info("Found {$accounts->count()} active Meta account(s) to synchronize comments.");
+        $this->info("Found {$accounts->count()} active Meta account(s) to inspect for comment sync.");
 
         $totalSynced = 0;
         $failedCount = 0;
+        $skippedCount = 0;
 
         foreach ($accounts as $account) {
             $platformName = $account->isFacebook() ? 'Facebook' : 'Instagram';
-            $this->line("Fetching comments for [{$platformName}] {$account->name} (Account #{$account->id})...");
+
+            // Smart Adaptive check: skip if not due yet
+            if (!$force && !$account->isDueForSync()) {
+                $lastSynced = $account->last_synced_at ? $account->last_synced_at->diffForHumans() : 'Never';
+                $this->line("⊘ Skipped [{$platformName}] {$account->name} (Adaptive interval: {$account->sync_status_label}, last synced: {$lastSynced})");
+                $skippedCount++;
+                continue;
+            }
+
+            $this->line("Fetching comments for [{$platformName}] {$account->name} (Account #{$account->id}, Interval: {$account->sync_status_label})...");
 
             $result = $syncService->syncAccountComments($account, $postLimit, $commentLimit);
 
@@ -70,7 +82,7 @@ class SyncMetaCommentsCommand extends Command
         }
 
         $this->newLine();
-        $this->info("Meta comment sync completed! Total comments synced: {$totalSynced}, Accounts with notices/failures: {$failedCount}");
+        $this->info("Meta comment sync completed! Total comments synced: {$totalSynced}, Skipped (not due): {$skippedCount}, Accounts with notices/failures: {$failedCount}");
 
         return Command::SUCCESS;
     }

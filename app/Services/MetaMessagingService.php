@@ -61,6 +61,17 @@ class MetaMessagingService
 
         $commenterId = $comment->commenter_meta_id ?: $comment->commenter_name;
 
+        // Meta Platform Policy Compliance Guard: Private reply (DM) must be to a comment posted within 7 days
+        if (!empty($comment->commented_at) && $comment->commented_at->lt(now()->subDays(7))) {
+            Log::info("Auto DM Policy Guard: Skipped DM for comment #{$comment->id} because comment is older than 7 days ({$comment->commented_at->diffForHumans()}).");
+            return [
+                'success'           => false,
+                'message'           => 'Meta Platform Policy restriction: Cannot send private reply to comments older than 7 days.',
+                'dm_sent'           => false,
+                'public_reply_sent' => false,
+            ];
+        }
+
         // Frequency Capping: Maximum 1 Auto-DM per recipient per account within 24 hours
         // Protects against Instagram & Facebook spam blocks caused by repeated DMs to the same user
         if (!empty($commenterId) && AutoDmRecipient::isCapped($account->id, (string) $commenterId, 24)) {

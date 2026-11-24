@@ -142,6 +142,11 @@
                                             <i class="ti ti-clock-pause"></i>Expires in {{ max(1, (int)$account->token_expires_at->diffInDays(now())) }}d
                                         </span>
                                     @endif
+
+                                    {{-- Smart Adaptive Polling Interval Badge --}}
+                                    <span class="badge badge-outline text-azure d-inline-flex align-items-center gap-1 py-0.5 px-2 fs-7" title="Smart Polling Interval: {{ $account->sync_status_label }}">
+                                        <i class="ti ti-clock-play"></i>{{ $account->sync_status_label }}
+                                    </span>
                                 </div>
                             </div>
 
@@ -157,6 +162,7 @@
                                         data-autoreply="{{ $account->auto_reply_mode }}"
                                         data-autohide="{{ $account->auto_hide_trolls ? 1 : 0 }}"
                                         data-commenttodm="{{ $account->comment_to_dm ? 1 : 0 }}"
+                                        data-syncinterval="{{ $account->sync_interval_minutes ?? 0 }}"
                                         style="height: 34px;">
                                         <i class="ti ti-adjustments fs-3"></i>Configure
                                     </button>
@@ -372,6 +378,22 @@
                     </select>
                 </div>
 
+                {{-- Comment Sync Frequency (Dropdown) --}}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small text-muted text-uppercase mb-1">
+                        Comment Sync Frequency
+                        <i class="ti ti-info-circle text-muted ms-1" data-bs-toggle="tooltip" title="How frequently background sync checks this channel for new comments. Auto-Adaptive dynamically adjusts polling frequency based on recent posting and comment activity."></i>
+                    </label>
+                    <select name="sync_interval_minutes" id="offcanvas-sync-interval" class="form-select">
+                        <option value="0">Auto-Adaptive (Recommended)</option>
+                        <option value="15">Every 15 minutes</option>
+                        <option value="30">Every 30 minutes</option>
+                        <option value="60">Every 1 hour</option>
+                        <option value="120">Every 2 hours</option>
+                        <option value="360">Every 6 hours</option>
+                    </select>
+                </div>
+
                 {{-- Auto-Hide Abusive Comments --}}
                 <div class="card card-sm border bg-light-subtle mb-3">
                     <div class="card-body p-3">
@@ -457,6 +479,7 @@
             let autoReply = $(this).data('autoreply');
             let autoHide = $(this).data('autohide') == 1;
             let commentToDm = $(this).data('commenttodm') == 1;
+            let syncInterval = $(this).data('syncinterval');
 
             $('#offcanvas-account-name').text(name);
             $('#offcanvas-ai-tone').val(tone);
@@ -464,6 +487,7 @@
             $('#offcanvas-auto-reply').val(autoReply !== undefined ? autoReply : 1);
             $('#offcanvas-auto-hide').prop('checked', autoHide);
             $('#offcanvas-comment-to-dm').prop('checked', commentToDm);
+            $('#offcanvas-sync-interval').val(syncInterval !== undefined ? syncInterval : 0);
 
             $('#settings-form').attr('action', '/admin/accounts/' + id + '/settings');
 

@@ -84,5 +84,78 @@ class AccountModelTest extends TestCase
         $this->assertFalse($youtubeAccount->isTokenExpiringSoon(7));
         $this->assertStringContainsString('Auto-Renewing', $youtubeAccount->token_status_badge);
     }
+
+    public function test_manual_sync_interval_is_respected_and_clamped(): void
+    {
+        // Manual 15m
+        $acc1 = new Account(['sync_interval_minutes' => 15]);
+        $this->assertEquals(15, $acc1->getEffectiveSyncIntervalMinutes());
+        $this->assertEquals('Manual (15m)', $acc1->sync_status_label);
+
+        // Manual 120m (2 hours)
+        $acc2 = new Account(['sync_interval_minutes' => 120]);
+        $this->assertEquals(120, $acc2->getEffectiveSyncIntervalMinutes());
+        $this->assertEquals('Manual (2h)', $acc2->sync_status_label);
+
+        // Manual 360m (6 hours)
+        $acc3 = new Account(['sync_interval_minutes' => 360]);
+        $this->assertEquals(360, $acc3->getEffectiveSyncIntervalMinutes());
+        $this->assertEquals('Manual (6h)', $acc3->sync_status_label);
+
+        // Clamped minimum (below 10 clamped to 10)
+        $accLow = new Account(['sync_interval_minutes' => 5]);
+        $this->assertEquals(10, $accLow->getEffectiveSyncIntervalMinutes());
+
+        // Clamped maximum (above 360 clamped to 360)
+        $accHigh = new Account(['sync_interval_minutes' => 999]);
+        $this->assertEquals(360, $accHigh->getEffectiveSyncIntervalMinutes());
+    }
+
+    public function test_adaptive_sync_interval_scales_based_on_activity_and_defaults_cleanly(): void
+    {
+        // Default new account with no history -> 30m
+        $newAcc = new Account(['sync_interval_minutes' => 0]);
+        $this->assertEquals(30, $newAcc->getEffectiveSyncIntervalMinutes());
+        $this->assertEquals('Auto (30m)', $newAcc->sync_status_label);
+    }
+
+    public function test_is_due_for_sync_evaluates_correctly(): void
+    {
+        // Account never synced before is always due
+        $accNeverSynced = new Account([
+            'is_active' => true,
+            'access_token' => 'token_xyz',
+            'last_synced_at' => null,
+            'sync_interval_minutes' => 30,
+        ]);
+        $this->assertTrue($accNeverSynced->isDueForSync());
+
+        // Account synced 10m ago with 30m interval is NOT due
+        $accRecentlySynced = new Account([
+            'is_active' => true,
+            'access_token' => 'token_xyz',
+            'last_synced_at' => now()->subMinutes(10),
+            'sync_interval_minutes' => 30,
+        ]);
+        $this->assertFalse($accRecentlySynced->isDueForSync());
+
+        // Account synced 45m ago with 30m interval IS due
+        $accDue = new Account([
+            'is_active' => true,
+            'access_token' => 'token_xyz',
+            'last_synced_at' => now()->subMinutes(45),
+            'sync_interval_minutes' => 30,
+        ]);
+        $this->assertTrue($accDue->isDueForSync());
+
+        // Inactive account is NEVER due
+        $accInactive = new Account([
+            'is_active' => false,
+            'access_token' => 'token_xyz',
+            'last_synced_at' => now()->subDays(2),
+            'sync_interval_minutes' => 30,
+        ]);
+        $this->assertFalse($accInactive->isDueForSync());
+    }
 }
 

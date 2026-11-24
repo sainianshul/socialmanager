@@ -11,11 +11,11 @@ Artisan::command('inspire', function () {
 // 1. Background automatic publisher for scheduled social posts (every minute)
 Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping();
 
-// 2. Automatically sync latest YouTube comments & queue AI analysis (every 20 minutes)
-Schedule::command('sync:youtube-comments --queue-ai')->cron('*/20 * * * *')->withoutOverlapping();
+// 2. Automatically sync latest YouTube comments via Smart Adaptive Polling (inspects every 15 minutes)
+Schedule::command('sync:youtube-comments --queue-ai')->everyFifteenMinutes()->withoutOverlapping();
 
-// 3. Automatically sync latest Facebook Page & Instagram comments as polling backup to webhooks (every 30 minutes)
-Schedule::command('sync:meta-comments')->everyThirtyMinutes()->withoutOverlapping();
+// 3. Automatically sync latest Facebook Page & Instagram comments via Smart Adaptive Polling (inspects every 15 minutes)
+Schedule::command('sync:meta-comments')->everyFifteenMinutes()->withoutOverlapping();
 
 // 4. Automatically sync latest YouTube videos and analytics (every hour)
 Schedule::command('sync:youtube-videos')->hourly()->withoutOverlapping();

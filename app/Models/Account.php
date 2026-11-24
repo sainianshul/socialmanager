@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -46,6 +47,7 @@ class Account extends Model
         'is_active',
         'webhook_active',
         'last_synced_at',
+        'sync_interval_minutes',
         'ai_tone',
         'ai_language',
         'auto_reply_mode',
@@ -69,6 +71,7 @@ class Account extends Model
         'settings' => 'array',
         'token_expires_at' => 'datetime',
         'last_synced_at' => 'datetime',
+        'sync_interval_minutes' => 'integer',
     ];
 
     /**
@@ -383,6 +386,112 @@ class Account extends Model
     public function autoDmRules(): HasMany
     {
         return $this->hasMany(AutoDmRule::class);
+    }
+
+    /**
+     * Calculate the effective sync polling interval in minutes:
+     * - If manual interval is configured (> 0), respects user choice (10m to 360m / 6 hours).
+     * - Otherwise (0 = Smart Auto-Adaptive), dynamically scales based on activity:
+     *   * Hot (Active in last 6 hours)  -> 15 minutes
+     *   * Warm (Active in last 24 hours) -> 30 minutes
+     *   * Moderate (Active in last 3 days) -> 60 minutes (1 hour)
+     *   * Cool (Active in last 7 days)   -> 120 minutes (2 hours)
+     *   * Cold / Dormant (> 7 days inactive) -> 360 minutes (6 hours)
+     */
+    public function getEffectiveSyncIntervalMinutes(): int
+    {
+        // 1. If user set an explicit manual interval (> 0), respect it (clamped between 10m and 360m)
+        if (!empty($this->sync_interval_minutes) && $this->sync_interval_minutes > 0) {
+            return max(10, min(360, (int) $this->sync_interval_minutes));
+        }
+
+        // 2. Smart Auto-Adaptive:
+        // Find most recent post or comment activity timestamp
+        $latestPostAt = null;
+        try {
+            $latestPostAt = $this->posts()->max('published_at');
+        } catch (\Throwable $e) {}
+
+        $latestCommentAt = null;
+        try {
+            $latestCommentAt = $this->comments()->max('commented_at');
+        } catch (\Throwable $e) {}
+
+        $mostRecent = null;
+        if ($latestPostAt && $latestCommentAt) {
+            $mostRecent = max(Carbon::parse($latestPostAt), Carbon::parse($latestCommentAt));
+        } elseif ($latestPostAt) {
+            $mostRecent = Carbon::parse($latestPostAt);
+        } elseif ($latestCommentAt) {
+            $mostRecent = Carbon::parse($latestCommentAt);
+        }
+
+        // If new account with no history, start with standard 30 minutes
+        if (!$mostRecent) {
+            return 30;
+        }
+
+        $hoursSince = now()->diffInHours($mostRecent);
+
+        // Tier A: Hot (activity within last 6 hours) -> 15 min
+        if ($hoursSince <= 6) {
+            return 15;
+        }
+
+        // Tier B: Warm (activity within last 24 hours) -> 30 min
+        if ($hoursSince <= 24) {
+            return 30;
+        }
+
+        // Tier C: Moderate (activity within last 3 days) -> 1 hour
+        if ($hoursSince <= 72) {
+            return 60;
+        }
+
+        // Tier D: Cool (activity within last 7 days) -> 2 hours
+        if ($hoursSince <= 168) {
+            return 120;
+        }
+
+        // Tier E: Cold / Dormant (> 7 days inactive) -> 6 hours (Max relaxation to save API calls)
+        return 360;
+    }
+
+    /**
+     * Determine if this account is due for polling sync right now
+     */
+    public function isDueForSync(): bool
+    {
+        if (!$this->is_active || empty($this->access_token)) {
+            return false;
+        }
+
+        if (empty($this->last_synced_at)) {
+            return true;
+        }
+
+        $intervalMinutes = $this->getEffectiveSyncIntervalMinutes();
+
+        return $this->last_synced_at->lessThanOrEqualTo(now()->subMinutes($intervalMinutes));
+    }
+
+    /**
+     * Human-readable sync status and interval label
+     */
+    public function getSyncStatusLabelAttribute(): string
+    {
+        $minutes = $this->getEffectiveSyncIntervalMinutes();
+        $isAuto = empty($this->sync_interval_minutes) || $this->sync_interval_minutes == 0;
+
+        $timeStr = match (true) {
+            $minutes < 60 => "{$minutes}m",
+            $minutes == 60 => '1h',
+            $minutes == 120 => '2h',
+            $minutes == 360 => '6h',
+            default => round($minutes / 60, 1) . 'h',
+        };
+
+        return $isAuto ? "Auto ({$timeStr})" : "Manual ({$timeStr})";
     }
 }
 

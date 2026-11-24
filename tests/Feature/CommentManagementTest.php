@@ -878,6 +878,21 @@ class CommentManagementTest extends TestCase
             'status' => Comment::STATUS_PENDING_REVIEW,
         ]);
 
+        $mockAi = \Mockery::mock(\App\Contracts\AIServiceInterface::class);
+        $mockAi->shouldReceive('isConfigured')->andReturn(true);
+        $mockAi->shouldReceive('analyzeAndDraftReply')->andReturn([
+            'sentiment' => 'positive',
+            'sentiment_score' => 0.85,
+            'category' => 'appreciation',
+            'is_abusive' => false,
+            'abuse_confidence' => 0.05,
+            'is_complaint' => false,
+            'is_favor' => true,
+            'is_against' => false,
+            'ai_reply' => 'Thank you for your warm words Anita ji!',
+        ]);
+        $this->app->instance(\App\Contracts\AIServiceInterface::class, $mockAi);
+
         (new ProcessCommentJob($comment))->handle();
 
         $fresh = $comment->fresh();
@@ -885,8 +900,48 @@ class CommentManagementTest extends TestCase
         $this->assertEquals('appreciation', $fresh->category);
         $this->assertFalse((bool) $fresh->is_abusive);
         $this->assertTrue((bool) $fresh->is_favor);
-        $this->assertNotNull($fresh->ai_reply);
-        $this->assertNotEmpty($fresh->ai_reply);
+        $this->assertEquals('Thank you for your warm words Anita ji!', $fresh->ai_reply);
+    }
+
+    public function test_process_comment_job_does_not_generate_fallback_dummy_reply_when_ai_is_unavailable(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_YOUTUBE,
+            'youtube_channel_id' => 'UC_ai_job_chan_no_ai',
+            'name' => 'Education Portal',
+            'access_token' => 'mock_token',
+        ]);
+
+        $post = Post::create([
+            'account_id' => $account->id,
+            'platform_post_id' => 'vid_job_2',
+            'title' => 'School Infrastructure Update',
+        ]);
+
+        $comment = Comment::create([
+            'post_id' => $post->id,
+            'account_id' => $account->id,
+            'platform_comment_id' => 'c_job_pos_2',
+            'commenter_name' => 'Citizen Anita',
+            'message' => 'Awesome initiative! Great work done by the education team, thank you!',
+            'status' => Comment::STATUS_PENDING_REVIEW,
+        ]);
+
+        // AI service returns null (simulating 403 or unconfigured state)
+        $mockAi = \Mockery::mock(\App\Contracts\AIServiceInterface::class);
+        $mockAi->shouldReceive('isConfigured')->andReturn(false);
+        $this->app->instance(\App\Contracts\AIServiceInterface::class, $mockAi);
+
+        (new ProcessCommentJob($comment))->handle();
+
+        $fresh = $comment->fresh();
+        $this->assertEquals('positive', $fresh->sentiment);
+        $this->assertEquals('appreciation', $fresh->category);
+        // Strictly no dummy/template reply generated
+        $this->assertNull($fresh->ai_reply);
     }
 
     public function test_process_comment_job_auto_hides_abusive_troll_when_enabled(): void
@@ -971,7 +1026,7 @@ class CommentManagementTest extends TestCase
         ]);
 
         $this->artisan('sync:youtube-comments', ['--account_id' => $account->id])
-            ->expectsOutputToContain('Found 1 active YouTube channel(s) to synchronize comments.')
+            ->expectsOutputToContain('Found 1 active YouTube channel(s) to inspect for comment sync.')
             ->expectsOutputToContain('✓ Successfully synced 1 comment(s) for Council Live.')
             ->assertExitCode(0);
 

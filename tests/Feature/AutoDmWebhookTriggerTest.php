@@ -437,4 +437,41 @@ class AutoDmWebhookTriggerTest extends TestCase
                    $request['message'] === 'Dhanyawad Amitabh ji, check your inbox.';
         });
     }
+
+    public function test_auto_dm_is_skipped_for_comments_older_than_7_days_for_meta_compliance(): void
+    {
+        Http::fake();
+
+        $rule = AutoDmRule::create([
+            'user_id'      => $this->user->id,
+            'account_id'   => $this->facebookAccount->id,
+            'name'         => '7-Day Compliance Rule',
+            'keywords'     => ['scheme'],
+            'match_type'   => 'contains',
+            'dm_message'   => 'Details here',
+            'is_active'    => true,
+        ]);
+
+        // Comment posted 8 days ago
+        $oldComment = Comment::create([
+            'account_id'        => $this->facebookAccount->id,
+            'post_id'           => $this->facebookPost->id,
+            'meta_comment_id'   => 'fb_comm_old_8days',
+            'commenter_name'    => 'Rahul Old',
+            'commenter_meta_id' => 'constituent_old_999',
+            'message'           => 'Please share details of this scheme',
+            'status'            => Comment::STATUS_NEW,
+            'commented_at'      => now()->subDays(8),
+        ]);
+
+        ProcessCommentJob::dispatchSync($oldComment);
+
+        $rule->refresh();
+        $oldComment->refresh();
+
+        // Must not trigger Auto DM
+        $this->assertEquals(0, $rule->trigger_count);
+        $this->assertNull($oldComment->replied_at);
+        Http::assertNothingSent();
+    }
 }

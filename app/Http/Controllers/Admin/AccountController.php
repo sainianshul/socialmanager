@@ -102,6 +102,7 @@ class AccountController extends Controller
             'auto_reply_mode' => ['required', 'integer', 'in:0,1,2'],
             'auto_hide_trolls' => ['nullable', 'boolean'],
             'comment_to_dm' => ['nullable', 'boolean'],
+            'sync_interval_minutes' => ['nullable', 'integer', 'min:0', 'max:360'],
         ]);
 
         $account->update([
@@ -110,6 +111,7 @@ class AccountController extends Controller
             'auto_reply_mode' => (int) $validated['auto_reply_mode'],
             'auto_hide_trolls' => $request->boolean('auto_hide_trolls'),
             'comment_to_dm' => $request->boolean('comment_to_dm'),
+            'sync_interval_minutes' => (int) $request->input('sync_interval_minutes', 0),
         ]);
 
         if ($request->wantsJson()) {

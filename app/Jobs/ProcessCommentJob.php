@@ -12,6 +12,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Redis;
@@ -157,10 +158,10 @@ class ProcessCommentJob implements ShouldQueue
             $isFavor = $analysis['is_favor'];
             $isAgainst = $analysis['is_against'];
 
+            // Anti-Spam Directive: If AI returned 403, error, or is unconfigured,
+            // strictly DO NOT generate a fallback dummy/template reply.
+            // Leaving ai_reply as null guarantees zero canned/dummy comments ever get posted.
             $aiReply = null;
-            if (!$isAbusive) {
-                $aiReply = $this->generateDraftReply($category, $aiTone, $aiLang, $comment->commenter_name);
-            }
         }
 
         $shouldHide = $isAbusive || ($category === 'troll');
@@ -183,8 +184,16 @@ class ProcessCommentJob implements ShouldQueue
             $status = Comment::STATUS_HIDDEN;
             $hiddenAt = now();
 
-            // Also hide on Meta / YouTube via live API
+            // Also hide on Meta / YouTube via live API with rate spacing & protection
             try {
+                // Micro-spacing for hide actions to prevent rapid bursts (min 3s gap)
+                $hideKey = "account_last_hide_pace_{$account->id}";
+                $lastHide = Cache::get($hideKey);
+                if ($lastHide && (now()->timestamp - $lastHide < 3) && app()->environment() !== 'testing') {
+                    sleep(rand(2, 4));
+                }
+                Cache::put($hideKey, now()->timestamp, 60);
+
                 if ($account->isYouTube()) {
                     app(\App\Services\YouTubeCommentSyncService::class)->setModerationStatus($comment, true);
                 } else {
@@ -199,7 +208,10 @@ class ProcessCommentJob implements ShouldQueue
 
         // 3.5 Auto DM Trigger (Comment-to-DM Automation for Facebook & Instagram)
         $autoDmTriggered = false;
-        if (!$shouldHide && empty($repliedAt) && $account && ($account->isFacebook() || $account->isInstagram())) {
+        // Meta Policy: Private replies (DM) are strictly restricted to comments under 7 days old
+        $isWithin7Days = empty($comment->commented_at) || $comment->commented_at->greaterThanOrEqualTo(now()->subDays(7));
+
+        if (!$shouldHide && empty($repliedAt) && $account && ($account->isFacebook() || $account->isInstagram()) && $isWithin7Days) {
             $matchedRule = $this->findMatchingAutoDmRule($account, $comment);
             if ($matchedRule) {
                 // Rule matched: Handled by Auto DM flow, prevents generic AI auto-comment from clashing
@@ -275,6 +287,31 @@ class ProcessCommentJob implements ShouldQueue
         $isFreshComment = empty($comment->commented_at) || $comment->commented_at->greaterThanOrEqualTo(now()->subDays(2));
 
         if (!$autoDmTriggered && $autoReplyMode === Account::AUTO_REPLY_AUTO_APPROVED && !$shouldHide && !empty($aiReply) && $status !== Comment::STATUS_HIDDEN && !$alreadyReplied && $isFreshComment) {
+            // Anti-Burst Protection: Maximum 1-2 replies per minute per account (min 35s gap between replies)
+            if ($account) {
+                $pacingKey = "account_live_reply_pace_{$account->id}";
+                $lastPaceTime = Cache::get($pacingKey);
+                $elapsed = $lastPaceTime ? (now()->timestamp - $lastPaceTime) : 999;
+                $requiredGap = 35; // 35-second gap ensures 1-2 replies/min maximum
+
+                if ($elapsed < $requiredGap) {
+                    $releaseDelay = ($requiredGap - $elapsed) + rand(2, 6);
+                    Log::info("ProcessCommentJob: Burst protection active on account #{$account->id}. Releasing job back to queue with {$releaseDelay}s delay (Pacing: 1-2 replies/min).");
+                    if ($this->job) {
+                        $this->release($releaseDelay);
+                        return;
+                    }
+                }
+
+                // Mark this account's pacing timestamp
+                Cache::put($pacingKey, now()->timestamp, 300);
+
+                // Add natural human jitter delay (1-3 seconds)
+                if (app()->environment() !== 'testing') {
+                    sleep(rand(1, 3));
+                }
+            }
+
             try {
                 $publishSuccess = false;
                 if ($account->isYouTube()) {
