@@ -399,8 +399,28 @@ class PostController extends Controller
 
             if ($result['success']) {
                 $totalSynced += $result['synced_count'];
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                    "Synced {$result['synced_count']} posts from {$account->name}",
+                    \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                    ['account_id' => $account->id, 'type' => $account->account_type],
+                    $result,
+                    null,
+                    $account->id,
+                    $account->user_id
+                );
             } else {
                 $errorMessages[] = "{$account->name}: {$result['message']}";
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                    "Failed syncing posts from {$account->name}",
+                    \App\Models\SystemActivityLog::STATUS_FAILED,
+                    ['account_id' => $account->id],
+                    $result['message'],
+                    null,
+                    $account->id,
+                    $account->user_id
+                );
             }
         }
 

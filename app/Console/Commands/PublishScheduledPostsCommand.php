@@ -58,9 +58,29 @@ class PublishScheduledPostsCommand extends Command
             if ($result['success']) {
                 $successCount++;
                 $this->info("✓ Post #{$post->id} published successfully! {$idLabel}: {$idVal}");
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                    "Published scheduled post #{$post->id} ({$post->post_type}) to {$post->account->name}",
+                    \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                    ['post_id' => $post->id, 'account_id' => $post->account_id, 'type' => $post->post_type],
+                    $result,
+                    null,
+                    $post->account_id,
+                    $post->user_id
+                );
             } else {
                 $failedCount++;
                 $this->error("✗ Post #{$post->id} failed: {$result['message']}");
+                \App\Services\ActivityLogger::log(
+                    \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                    "Failed publishing scheduled post #{$post->id} ({$post->post_type}) to {$post->account->name}",
+                    \App\Models\SystemActivityLog::STATUS_FAILED,
+                    ['post_id' => $post->id, 'account_id' => $post->account_id],
+                    $result['message'],
+                    null,
+                    $post->account_id,
+                    $post->user_id
+                );
             }
         }
 

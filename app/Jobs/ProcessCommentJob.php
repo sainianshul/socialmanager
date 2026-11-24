@@ -202,16 +202,28 @@ class ProcessCommentJob implements ShouldQueue
         if (!$shouldHide && empty($repliedAt) && $account && ($account->isFacebook() || $account->isInstagram())) {
             $matchedRule = $this->findMatchingAutoDmRule($account, $comment);
             if ($matchedRule) {
+                // Rule matched: Handled by Auto DM flow, prevents generic AI auto-comment from clashing
+                $autoDmTriggered = true;
                 try {
                     $messagingService = app(MetaMessagingService::class);
                     $dmResult = $messagingService->sendAutoDm($matchedRule, $comment);
                     if ($dmResult['success']) {
-                        $autoDmTriggered = true;
                         $repliedAt = now();
                         if (!empty($dmResult['public_reply_sent'])) {
                             $status = Comment::STATUS_REPLIED;
                             $aiReply = $dmResult['public_reply'] ?? $matchedRule->public_reply;
                         }
+
+                        \App\Services\ActivityLogger::log(
+                            \App\Models\SystemActivityLog::EVENT_AUTO_DM,
+                            "Auto DM triggered for rule '{$matchedRule->name}' to {$comment->commenter_name}",
+                            \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                            ['comment_id' => $comment->id, 'rule_id' => $matchedRule->id, 'trigger_keyword' => $matchedRule->trigger_keyword],
+                            $dmResult,
+                            null,
+                            $account->id,
+                            $account->user_id
+                        );
 
                         try {
                             Log::channel('webhook')->info("Auto DM Executed: Delivered to commenter for comment #{$comment->id}", [
@@ -225,8 +237,29 @@ class ProcessCommentJob implements ShouldQueue
                         } catch (\Throwable $logEx) {}
 
                         Log::info("ProcessCommentJob: Auto DM delivered to commenter for comment #{$comment->id} via rule #{$matchedRule->id} [{$matchedRule->name}]");
+                    } else {
+                        \App\Services\ActivityLogger::log(
+                            \App\Models\SystemActivityLog::EVENT_AUTO_DM,
+                            "Auto DM delivery failed for rule '{$matchedRule->name}'",
+                            \App\Models\SystemActivityLog::STATUS_FAILED,
+                            ['comment_id' => $comment->id, 'rule_id' => $matchedRule->id],
+                            $dmResult['message'] ?? 'Unknown error',
+                            null,
+                            $account->id,
+                            $account->user_id
+                        );
                     }
                 } catch (\Throwable $dmEx) {
+                    \App\Services\ActivityLogger::log(
+                        \App\Models\SystemActivityLog::EVENT_AUTO_DM,
+                        "Auto DM exception for rule '{$matchedRule->name}'",
+                        \App\Models\SystemActivityLog::STATUS_FAILED,
+                        ['comment_id' => $comment->id, 'rule_id' => $matchedRule->id],
+                        $dmEx->getMessage(),
+                        null,
+                        $account->id,
+                        $account->user_id
+                    );
                     try {
                         Log::channel('webhook')->warning("Auto DM Failed: Comment #{$comment->id} - " . $dmEx->getMessage());
                     } catch (\Throwable $logEx) {}

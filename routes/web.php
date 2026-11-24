@@ -176,6 +176,16 @@ Route::prefix('admin')->group(function () {
                 // Readymade Posters Management (Categories & Posters)
                 Route::resource('poster-categories', \App\Http\Controllers\Admin\PosterCategoryController::class)->names('poster-categories');
                 Route::resource('posters', \App\Http\Controllers\Admin\PosterController::class)->names('posters');
+
+                // System Activity & Queue Monitor (Admin / Manager)
+                Route::prefix('system-activity')->name('system-activity.')->group(function () {
+                    Route::get('/', [\App\Http\Controllers\Admin\SystemActivityController::class, 'index'])->name('index');
+                    Route::post('/retry-all', [\App\Http\Controllers\Admin\SystemActivityController::class, 'retryAll'])->name('retry-all');
+                    Route::post('/retry/{id}', [\App\Http\Controllers\Admin\SystemActivityController::class, 'retryJob'])->name('retry');
+                    Route::delete('/failed-job/{id}', [\App\Http\Controllers\Admin\SystemActivityController::class, 'deleteFailedJob'])->name('delete-failed');
+                    Route::post('/clear-failed', [\App\Http\Controllers\Admin\SystemActivityController::class, 'clearAllFailed'])->name('clear-failed');
+                    Route::post('/clear-logs', [\App\Http\Controllers\Admin\SystemActivityController::class, 'clearLogs'])->name('clear-logs');
+                });
             });
         });
     });

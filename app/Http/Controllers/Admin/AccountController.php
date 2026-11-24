@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Account;
+use App\Models\SystemActivityLog;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -153,6 +155,7 @@ class AccountController extends Controller
             return redirect()->back()->with('error', 'No active access token found for this account. Please reconnect.');
         }
 
+        $startTime = microtime(true);
         try {
             // Instagram accounts use the Instagram Graph API endpoint
             if ($account->isInstagram()) {
@@ -223,6 +226,18 @@ class AccountController extends Controller
                 $account->last_synced_at = now();
                 $account->save();
 
+                $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                ActivityLogger::log(
+                    SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                    "Synced Facebook Page '{$account->name}'",
+                    SystemActivityLog::STATUS_SUCCESS,
+                    ['meta_account_id' => $account->meta_account_id, 'linked_ig' => $igId],
+                    ['name' => $account->name, 'followers' => $account->followers_count, 'category' => $account->category],
+                    $durationMs,
+                    $account->id,
+                    $account->user_id
+                );
+
                 $msg = $igId
                     ? "{$account->name} and linked Instagram account (@" . ($igData['username'] ?? 'Instagram') . ") synced successfully!"
                     : "{$account->name} synced successfully with Meta!";
@@ -231,10 +246,33 @@ class AccountController extends Controller
             }
 
             $errMsg = $response['error']['message'] ?? 'Unable to fetch updated page details.';
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            ActivityLogger::log(
+                SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                "Failed syncing Facebook Page '{$account->name}'",
+                SystemActivityLog::STATUS_FAILED,
+                ['meta_account_id' => $account->meta_account_id],
+                $errMsg,
+                $durationMs,
+                $account->id,
+                $account->user_id
+            );
+
             return redirect()->back()->with('error', 'Meta Sync Error: ' . $errMsg);
 
         } catch (\Throwable $e) {
             Log::error('Account sync error: ' . $e->getMessage());
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            ActivityLogger::log(
+                SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                "Exception while syncing account '{$account->name}'",
+                SystemActivityLog::STATUS_FAILED,
+                ['meta_account_id' => $account->meta_account_id],
+                $e->getMessage(),
+                $durationMs,
+                $account->id,
+                $account->user_id
+            );
             return redirect()->back()->with('error', 'Sync failed: ' . $e->getMessage());
         }
     }
@@ -248,6 +286,7 @@ class AccountController extends Controller
      */
     private function syncInstagramAccount(Account $account)
     {
+        $startTime = microtime(true);
         try {
             // Detect connection method:
             // FB-linked: instagram_business_account_id holds the parent FB Page ID (different from meta_account_id)
@@ -277,10 +316,32 @@ class AccountController extends Controller
                         $account->refresh();
                         return $this->syncInstagramAccount($account);
                     }
+                    $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                    ActivityLogger::log(
+                        SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                        "Instagram token expired for '@{$account->username}'",
+                        SystemActivityLog::STATUS_FAILED,
+                        ['meta_account_id' => $account->meta_account_id],
+                        $response['error'],
+                        $durationMs,
+                        $account->id,
+                        $account->user_id
+                    );
                     return redirect()->back()->with('error', 'Instagram token expired. Please reconnect your account.');
                 }
 
                 $errMsg = $response['error']['message'] ?? 'Failed to fetch Instagram profile.';
+                $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+                ActivityLogger::log(
+                    SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                    "Failed syncing Instagram Profile '@{$account->username}'",
+                    SystemActivityLog::STATUS_FAILED,
+                    ['meta_account_id' => $account->meta_account_id],
+                    $errMsg,
+                    $durationMs,
+                    $account->id,
+                    $account->user_id
+                );
                 return redirect()->back()->with('error', 'Instagram Sync Error: ' . $errMsg);
             }
 
@@ -292,10 +353,33 @@ class AccountController extends Controller
             $account->last_synced_at = now();
             $account->save();
 
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            ActivityLogger::log(
+                SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                "Synced Instagram Profile '@{$account->username}'",
+                SystemActivityLog::STATUS_SUCCESS,
+                ['meta_account_id' => $account->meta_account_id, 'is_direct' => $isDirectLogin],
+                ['username' => $account->username, 'followers' => $account->followers_count],
+                $durationMs,
+                $account->id,
+                $account->user_id
+            );
+
             return redirect()->back()->with('success', "@{$account->username} synced successfully with Instagram!");
 
         } catch (\Throwable $e) {
             Log::error('Instagram sync error: ' . $e->getMessage());
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            ActivityLogger::log(
+                SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                "Exception syncing Instagram Profile '@{$account->username}'",
+                SystemActivityLog::STATUS_FAILED,
+                ['meta_account_id' => $account->meta_account_id],
+                $e->getMessage(),
+                $durationMs,
+                $account->id,
+                $account->user_id
+            );
             return redirect()->back()->with('error', 'Instagram sync failed: ' . $e->getMessage());
         }
     }

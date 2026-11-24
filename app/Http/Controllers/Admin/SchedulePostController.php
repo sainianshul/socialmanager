@@ -887,9 +887,29 @@ class SchedulePostController extends Controller
         }
 
         if ($result['success']) {
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+                "Published live post #{$scheduledPost->id} to {$scheduledPost->account->name}",
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                ['post_id' => $scheduledPost->id, 'type' => $scheduledPost->post_type],
+                $result,
+                null,
+                $scheduledPost->account_id,
+                $scheduledPost->user_id
+            );
             return redirect()->back()->with('success', 'Post published live successfully!');
         }
 
+        \App\Services\ActivityLogger::log(
+            \App\Models\SystemActivityLog::EVENT_POST_PUBLISH,
+            "Failed publishing post #{$scheduledPost->id} to {$scheduledPost->account->name}",
+            \App\Models\SystemActivityLog::STATUS_FAILED,
+            ['post_id' => $scheduledPost->id],
+            $result['message'],
+            null,
+            $scheduledPost->account_id,
+            $scheduledPost->user_id
+        );
         return redirect()->back()->with('error', 'Failed to publish post: ' . $result['message']);
     }
 

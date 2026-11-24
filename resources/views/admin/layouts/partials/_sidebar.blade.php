@@ -327,8 +327,16 @@
                 @endif
 
                 {{-- SYSTEM & API (Admin only) --}}
-                @if(auth()->check() && auth()->user()->isAdmin())
+                @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isManager()))
                     <li class="nav-section-title">System & API</li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.system-activity.*') ? 'active' : '' }}" href="{{ route('admin.system-activity.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="System Activity & Queues">
+                            <span class="nav-link-icon d-md-none d-lg-inline-block text-primary">
+                                <i class="ti ti-activity fs-2"></i>
+                            </span>
+                            <span class="nav-link-title">System Activity</span>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="tooltip" data-bs-placement="right" title="Settings">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
