@@ -1209,6 +1209,21 @@ class CommentManagementTest extends TestCase
             ], 200),
         ]);
 
+        $mockAi = \Mockery::mock(\App\Contracts\AIServiceInterface::class);
+        $mockAi->shouldReceive('isConfigured')->andReturn(true);
+        $mockAi->shouldReceive('analyzeAndDraftReply')->andReturn([
+            'sentiment' => 'positive',
+            'sentiment_score' => 0.9,
+            'category' => 'appreciation',
+            'is_abusive' => false,
+            'abuse_confidence' => 0.05,
+            'is_complaint' => false,
+            'is_favor' => true,
+            'is_against' => false,
+            'ai_reply' => 'Dhanyawad Verma ji aapke samarthan ke liye!',
+        ]);
+        $this->app->instance(\App\Contracts\AIServiceInterface::class, $mockAi);
+
         (new \App\Jobs\ProcessCommentJob($comment))->handle();
 
         $comment->refresh();
