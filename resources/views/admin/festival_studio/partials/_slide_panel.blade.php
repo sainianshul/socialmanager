@@ -413,133 +413,91 @@
         <div id="panel-step-pane-2" class="d-none">
             
             {{-- Navigation Bar --}}
-            <div class="d-flex align-items-center justify-content-between mb-4 pb-3 border-bottom">
-                <button type="button" class="btn btn-sm btn-white border shadow-xs rounded-pill px-3 py-1.5 d-flex align-items-center gap-2 studio-back-btn" id="panel-btn-back-step" style="font-size: 12px; font-weight: 600;">
-                    <i class="ti ti-arrow-left"></i>
-                    <span>Back to Poster Style</span>
+            <div class="d-flex align-items-center justify-content-between mb-4 pb-2 border-bottom">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="panel-btn-back-step">
+                    <i class="ti ti-arrow-left me-1"></i> Back to Poster Style
                 </button>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="badge bg-teal-lt text-teal rounded-pill px-3 py-1.5 fw-bold" id="panel-schedule-festival-date" style="font-size: 11.5px;">
-                        <i class="ti ti-calendar-event me-1"></i>{{ $selectedFestival->title }} ({{ $selectedFestival->festival_date->format('d M Y') }})
-                    </span>
-                </div>
+                <span class="badge bg-teal-lt text-teal rounded-pill px-3 py-1 font-monospace" id="panel-schedule-festival-date">
+                    {{ $selectedFestival->festival_date->format('d M Y') }}
+                </span>
             </div>
 
-            <div class="row g-4 g-lg-5 align-items-start">
+            <div class="row g-4 align-items-start">
                 
-                {{-- Left Side: Compact Poster Thumbnail preview Card --}}
-                <div class="col-md-5 col-lg-4">
-                    <div class="card studio-panel-card p-3 text-center mb-3">
-                        <div class="position-relative rounded-3 overflow-hidden shadow-sm mx-auto w-100" style="aspect-ratio: 1 / 1; background: #0f172a; border: 1px solid rgba(0,0,0,0.08);">
-                            <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
-                        </div>
-                        <div class="small fw-bold text-body mt-2.5 text-truncate" id="panel-schedule-template-title" style="font-size: 13px;">
-                            {{ $firstTemplate?->title }}
-                        </div>
-                        <div class="d-flex align-items-center justify-content-center gap-1.5 mt-1">
-                            <span class="badge bg-teal-lt text-teal rounded-pill px-2.5 py-0.5 fw-bold" style="font-size: 10.5px;">
-                                1080p Ultra HD
-                            </span>
-                            <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 10.5px;">
-                                Personalized
-                            </span>
-                        </div>
+                {{-- Left Side: Compact Poster Thumbnail preview --}}
+                <div class="col-md-5 col-lg-4 text-center">
+                    <div class="rounded-2 overflow-hidden border shadow-sm mx-auto" style="max-width: 260px; aspect-ratio: 1 / 1; background: #0f172a;">
+                        <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
                     </div>
+                    <div class="fw-bold text-body mt-2 text-truncate" id="panel-schedule-template-title" style="font-size: 13px;">
+                        {{ $firstTemplate?->title }}
+                    </div>
+                    <div class="text-muted small" style="font-size: 11px;">1080p Ultra HD Personalized Poster</div>
                 </div>
 
-                {{-- Right Side: Structured Cards with Generous Padding --}}
+                {{-- Right Side: Standard Normal Form Layout (Like Add Political Leader) --}}
                 <div class="col-md-7 col-lg-8">
-                    <div class="d-flex flex-column gap-3.5">
-                        
-                        {{-- CARD 1: Connected Social Media Accounts --}}
-                        <div class="card studio-panel-card p-3.5 mb-0">
-                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                                <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
-                                    <i class="ti ti-share text-primary" style="font-size: 14px;"></i>
-                                    Publish to Social Accounts
-                                </span>
-                                <span class="badge bg-light text-secondary border rounded-pill px-2 py-0.5" style="font-size: 10.5px;">
-                                    Auto-Selected
-                                </span>
-                            </div>
-
-                            <div class="d-flex flex-column gap-2.5" id="panel-accounts-container">
-                                @forelse($accounts as $acc)
-                                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between panel-account-item active cursor-pointer" data-id="{{ $acc->id }}">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 38px; height: 38px; background: {{ $acc->account_type == 1 ? '#1877F2' : 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)' }};">
-                                                <i class="ti {{ $acc->account_type == 1 ? 'ti-brand-facebook' : 'ti-brand-instagram' }} text-white" style="font-size: 19px;"></i>
-                                            </div>
-                                            <div>
-                                                <div class="fw-bold text-body" style="font-size: 13.5px; line-height: 1.2;">{{ $acc->name }}</div>
-                                                <div class="text-secondary small mt-0.5" style="font-size: 11px;">{{ $acc->account_type == 1 ? 'Facebook Page' : 'Instagram Professional' }}</div>
-                                            </div>
-                                        </div>
-                                        <input type="checkbox" class="form-check-input panel-acc-cb ms-0" value="{{ $acc->id }}" checked>
-                                    </div>
-                                @empty
-                                    <div class="p-3 text-center studio-panel-card-inner rounded-3 border" style="border-style: dashed !important;">
-                                        <div class="text-secondary small mb-1">No active social media accounts connected.</div>
-                                        <a href="{{ route('admin.accounts.index') }}" class="btn btn-xs btn-outline-primary rounded-pill">Connect Account</a>
-                                    </div>
-                                @endforelse
-                            </div>
-                        </div>
-
-                        {{-- CARD 2: Date, Time & Caption --}}
-                        <div class="card studio-panel-card p-3.5 mb-0">
-                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
-                                <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
-                                    <i class="ti ti-calendar-time text-primary" style="font-size: 14px;"></i>
-                                    Schedule Timing & Caption
-                                </span>
-                            </div>
-
-                            <div class="d-flex flex-column gap-3">
-                                {{-- Date & Time Inputs with crisp spacing & labels --}}
-                                <div class="row g-2.5">
-                                    <div class="col-6">
-                                        <label class="form-label text-muted small fw-bold text-uppercase mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                                            <i class="ti ti-calendar me-1 text-primary"></i> Publish Date
-                                        </label>
-                                        <input type="date" id="panel-schedule-date" class="form-control rounded-2" value="{{ $selectedFestival->festival_date->format('Y-m-d') }}" style="height: 42px; font-size: 12.5px; font-weight: 500;">
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label text-muted small fw-bold text-uppercase mb-1" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                                            <i class="ti ti-clock me-1 text-primary"></i> Publish Time
-                                        </label>
-                                        <input type="time" id="panel-schedule-time" class="form-control rounded-2" value="{{ $targetTime }}" style="height: 42px; font-size: 12.5px; font-weight: 500;">
-                                    </div>
+                    
+                    {{-- 1. Connected Social Media Accounts --}}
+                    <div class="mb-3">
+                        <label class="form-label required mb-2">Publish to Social Accounts</label>
+                        <div class="d-flex flex-column gap-2" id="panel-accounts-container">
+                            @forelse($accounts as $acc)
+                                <label class="form-check m-0 cursor-pointer">
+                                    <input type="checkbox" class="form-check-input panel-acc-cb" value="{{ $acc->id }}" checked>
+                                    <span class="form-check-label">
+                                        <span class="fw-medium text-body">{{ $acc->name }}</span>
+                                        <span class="text-muted small ms-1">({{ $acc->account_type == 1 ? 'Facebook Page' : 'Instagram Professional' }})</span>
+                                    </span>
+                                </label>
+                            @empty
+                                <div class="text-muted small">
+                                    No active social media accounts connected. <a href="{{ route('admin.accounts.index') }}">Connect Account</a>
                                 </div>
-
-                                {{-- Caption & Hashtags with comfortable padding --}}
-                                <div>
-                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                        <label class="form-label text-muted small fw-bold text-uppercase mb-0" style="font-size: 10.5px; letter-spacing: 0.04em;">
-                                            <i class="ti ti-message-2 me-1 text-primary"></i> Caption & Hashtags
-                                        </label>
-                                        <button type="button" class="btn btn-sm btn-light border rounded-pill px-2.5 py-0.5 text-primary text-decoration-none d-flex align-items-center gap-1 shadow-none" id="panel-btn-copy-caption" style="font-size: 11px;">
-                                            <i class="ti ti-copy"></i>
-                                            <span>Copy</span>
-                                        </button>
-                                    </div>
-                                    <textarea id="panel-caption-text" class="form-control rounded-2 p-2.5" rows="4" style="font-size: 12px; line-height: 1.6; resize: vertical;">{{ $captionText }}</textarea>
-                                </div>
-                            </div>
+                            @endforelse
                         </div>
+                    </div>
 
-                        {{-- Alert Slot --}}
-                        <div id="panel-schedule-alert" class="d-none alert alert-danger small p-2.5 rounded-3 mb-0"></div>
+                    {{-- 2. Date & Time Inputs --}}
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <label class="form-label required" for="panel-schedule-date">Publish Date</label>
+                            <input type="date" id="panel-schedule-date" class="form-control" value="{{ $selectedFestival->festival_date->format('Y-m-d') }}">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label required" for="panel-schedule-time">Publish Time</label>
+                            <input type="time" id="panel-schedule-time" class="form-control" value="{{ $targetTime }}">
+                        </div>
+                    </div>
 
-                        {{-- Final Confirm & Schedule Button with generous breathing room --}}
-                        <div class="pt-2">
-                            <button type="button" class="btn btn-success w-100 py-3 fw-bold rounded-pill shadow-sm d-flex align-items-center justify-content-center gap-2" id="panel-btn-confirm-schedule" style="height: 52px; font-size: 15px; letter-spacing: 0.02em; background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; border: none; box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.4) !important;">
-                                <i class="ti ti-calendar-check" style="font-size: 20px;"></i>
-                                <span>Confirm & Schedule Post</span>
+                    {{-- 3. Caption & Hashtags --}}
+                    <div class="mb-3">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <label class="form-label mb-0" for="panel-caption-text">Caption & Hashtags</label>
+                            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" id="panel-btn-copy-caption">
+                                <i class="ti ti-copy me-1"></i>Copy
                             </button>
                         </div>
+                        <textarea id="panel-caption-text" class="form-control" rows="4" placeholder="Enter post caption...">{{ $captionText }}</textarea>
                     </div>
+
+                    {{-- Alert Slot --}}
+                    <div id="panel-schedule-alert" class="d-none alert alert-danger mb-3"></div>
+
+                    {{-- Normal Form Action Buttons --}}
+                    <div class="d-flex align-items-center justify-content-end gap-2 pt-3 border-top mt-4">
+                        <button type="button" class="btn btn-outline-secondary" id="panel-btn-cancel-step">
+                            Cancel
+                        </button>
+                        <button type="button" class="btn btn-primary" id="panel-btn-confirm-schedule">
+                            <i class="ti ti-calendar-check me-1"></i> Confirm & Schedule Post
+                        </button>
+                    </div>
+
                 </div>
+
+            </div>
+        </div>
 
             </div>
         </div>

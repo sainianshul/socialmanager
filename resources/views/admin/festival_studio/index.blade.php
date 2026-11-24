@@ -532,74 +532,6 @@
             box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3) !important;
         }
 
-        /* Social Account Cards in Step 2 */
-        .studio-back-btn {
-            background-color: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            color: #334155 !important;
-            transition: all 0.15s ease;
-        }
-
-        .studio-back-btn:hover {
-            background-color: #f1f5f9 !important;
-            border-color: #94a3b8 !important;
-            color: #0f172a !important;
-        }
-
-        [data-bs-theme="dark"] .studio-back-btn {
-            background-color: #1e293b !important;
-            border-color: rgba(255, 255, 255, 0.15) !important;
-            color: #e2e8f0 !important;
-        }
-
-        [data-bs-theme="dark"] .studio-back-btn:hover {
-            background-color: #334155 !important;
-            border-color: rgba(255, 255, 255, 0.25) !important;
-            color: #ffffff !important;
-        }
-
-        .panel-account-item {
-            transition: all 0.2s ease;
-            background-color: #ffffff;
-            border: 1.5px solid #E2E8F0 !important;
-            border-radius: 14px !important;
-        }
-
-        .panel-account-item:hover {
-            border-color: #0D9488 !important;
-            background-color: #F0FDFA !important;
-            transform: translateY(-1px);
-        }
-
-        .panel-account-item.active {
-            border-color: #0D9488 !important;
-            background-color: #F0FDFA !important;
-            box-shadow: 0 4px 12px rgba(13, 148, 136, 0.08) !important;
-        }
-
-        .panel-acc-cb {
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            accent-color: #0D9488;
-        }
-
-        [data-bs-theme="dark"] .panel-account-item {
-            background-color: #141f36 !important;
-            border-color: rgba(255, 255, 255, 0.12) !important;
-        }
-
-        [data-bs-theme="dark"] .panel-account-item:hover {
-            border-color: #14b8a6 !important;
-            background-color: rgba(13, 148, 136, 0.15) !important;
-        }
-
-        [data-bs-theme="dark"] .panel-account-item.active {
-            border-color: #14b8a6 !important;
-            background-color: rgba(13, 148, 136, 0.22) !important;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
-        }
-
         /* Swatches */
         .panel-swatch {
             transition: all 0.15s ease;
@@ -1301,7 +1233,7 @@
                 if (e.target.closest('#panel-btn-go-schedule')) {
                     switchPanelStep(2);
                 }
-                if (e.target.closest('#panel-btn-back-step')) {
+                if (e.target.closest('#panel-btn-back-step') || e.target.closest('#panel-btn-cancel-step')) {
                     switchPanelStep(1);
                 }
                 if (e.target.closest('#panel-step-indicator-1')) {
