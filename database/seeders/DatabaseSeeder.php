@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             PoliticalLeaderSeeder::class,
             FestivalSeeder::class,
             PosterCategorySeeder::class,
+            PosterSeeder::class,
         ]);
     }
 }
