@@ -95,22 +95,22 @@ $(document).ready(function() {
                     window.allReadymadePostersById[p.id] = p;
 
                     gridHtml += `
-                        <div class="col-6 col-sm-6">
-                            <div class="card card-sm border shadow-xs h-100 readymade-poster-card cursor-pointer position-relative overflow-hidden" data-id="${p.id}" style="border-radius: 12px; cursor: pointer;">
+                        <div class="col-6 col-sm-4">
+                            <div class="card card-sm border shadow-xs h-100 readymade-poster-card cursor-pointer position-relative overflow-hidden" data-id="${p.id}" style="border-radius: 10px; cursor: pointer;">
                                 <div class="position-relative overflow-hidden" style="aspect-ratio: 1 / 1; background: #f1f5f9;">
                                     <img src="${p.thumbnail_url || p.image_url}" class="w-100 h-100 object-fit-cover" alt="${p.name}" loading="lazy">
-                                    <div class="position-absolute top-0 start-0 m-2 d-flex flex-column gap-1" style="z-index: 2;">
-                                        ${p.category_name ? `<span class="badge bg-dark bg-opacity-75 text-white rounded-pill px-2 py-0.5 shadow-xs" style="font-size: 10px;">${p.category_name}</span>` : ''}
-                                        ${p.party_code ? `<span class="badge bg-primary text-white rounded-pill px-2 py-0.5 shadow-xs" style="font-size: 10px;">${p.party_code}</span>` : ''}
+                                    <div class="position-absolute top-0 start-0 m-1.5 d-flex flex-column gap-1" style="z-index: 2;">
+                                        ${p.category_name ? `<span class="badge bg-dark bg-opacity-75 text-white rounded-pill px-1.5 py-0.5 shadow-xs" style="font-size: 9px;">${p.category_name}</span>` : ''}
+                                        ${p.party_code ? `<span class="badge bg-primary text-white rounded-pill px-1.5 py-0.5 shadow-xs" style="font-size: 9px;">${p.party_code}</span>` : ''}
                                     </div>
                                     <div class="readymade-hover-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-50 opacity-0 text-white fw-bold gap-1" style="transition: opacity 0.2s ease; z-index: 3;">
-                                        <i class="ti ti-circle-plus fs-1 text-white"></i>
-                                        <span class="small">Click to Use</span>
+                                        <i class="ti ti-circle-plus fs-2 text-white"></i>
+                                        <span style="font-size: 11px;">Click to Use</span>
                                     </div>
                                 </div>
-                                <div class="p-2.5 bg-white border-top">
-                                    <div class="fw-semibold text-dark text-truncate small" title="${p.name}">${p.name}</div>
-                                    ${p.default_caption ? `<div class="text-secondary small text-truncate mt-0.5" style="font-size: 11px;">${p.default_caption}</div>` : ''}
+                                <div class="p-2 bg-white border-top">
+                                    <div class="fw-semibold text-dark text-truncate" style="font-size: 12px;" title="${p.name}">${p.name}</div>
+                                    ${p.default_caption ? `<div class="text-secondary text-truncate mt-0.5" style="font-size: 10.5px;">${p.default_caption}</div>` : ''}
                                 </div>
                             </div>
                         </div>

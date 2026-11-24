@@ -19,14 +19,14 @@
     </div>
 
     {{-- Drawer Body --}}
-    <div class="offcanvas-body p-4 bg-light-subtle d-flex flex-column" style="overflow-y: auto;">
+    <div class="offcanvas-body p-3 bg-light-subtle d-flex flex-column" style="overflow-y: auto;">
         {{-- Search Input --}}
         <div class="mb-3">
             <div class="input-icon">
                 <span class="input-icon-addon">
                     <i class="ti ti-search text-secondary"></i>
                 </span>
-                <input type="text" class="form-control rounded-2 bg-white" id="readymade-poster-search" placeholder="Search readymade posters by title or caption..." style="height: 42px; font-size: 0.9rem;">
+                <input type="text" class="form-control rounded-2 bg-white" id="readymade-poster-search" placeholder="Search readymade posters by title or caption..." style="height: 40px; font-size: 0.9rem;">
             </div>
         </div>
 
@@ -50,7 +50,7 @@
             <div class="text-secondary small mt-1">Try another category or search keyword.</div>
         </div>
 
-        <div class="row g-3" id="readymade-posters-grid"></div>
+        <div class="row g-2.5" id="readymade-posters-grid"></div>
     </div>
 
     {{-- Drawer Footer --}}
