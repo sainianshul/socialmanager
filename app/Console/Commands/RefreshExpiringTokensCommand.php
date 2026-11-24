@@ -67,6 +67,28 @@ class RefreshExpiringTokensCommand extends Command
                 $r = $data['result'];
                 $status = $r['success'] ? ($r['refreshed'] ? '✓ Refreshed' : '— Valid') : '✗ Failed';
                 $rows[] = [$accId, $data['name'], $status, $r['message']];
+
+                if (!empty($r['refreshed'])) {
+                    \App\Services\ActivityLogger::log(
+                        \App\Models\SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                        "Proactively refreshed OAuth token for YouTube channel '{$data['name']}'",
+                        \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                        ['account_id' => $accId],
+                        $r['message'],
+                        null,
+                        (int) $accId
+                    );
+                } elseif (!$r['success']) {
+                    \App\Services\ActivityLogger::log(
+                        \App\Models\SystemActivityLog::EVENT_ACCOUNT_SYNC,
+                        "Failed refreshing OAuth token for YouTube channel '{$data['name']}'",
+                        \App\Models\SystemActivityLog::STATUS_FAILED,
+                        ['account_id' => $accId],
+                        $r['message'],
+                        null,
+                        (int) $accId
+                    );
+                }
             }
             $this->table(['ID', 'Account Name', 'Status', 'Details'], $rows);
         }

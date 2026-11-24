@@ -20,3 +20,9 @@ Schedule::command('sync:youtube-videos')->hourly()->withoutOverlapping();
 // 4. Proactively refresh expiring OAuth access tokens (YouTube/Google every 30 minutes)
 Schedule::command('accounts:refresh-tokens')->everyThirtyMinutes()->withoutOverlapping();
 
+// 5. Automatically prune old system activity logs (Retains last 30 days, runs daily at 2:00 AM)
+Schedule::call(function () {
+    \App\Services\ActivityLogger::prune(30);
+})->dailyAt('02:00')->name('prune-activity-logs')->withoutOverlapping();
+
+
