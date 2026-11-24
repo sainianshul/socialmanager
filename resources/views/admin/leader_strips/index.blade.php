@@ -201,14 +201,27 @@
     @if($isAdmin)
         {{-- Admin Page Header --}}
         <div class="page-header d-print-none mb-4">
-            <div class="row align-items-center">
+            <div class="row align-items-center g-3">
                 <div class="col">
-                    <div class="page-pretitle">Political Management</div>
-                    <h2 class="page-title">Political Leadership Strips</h2>
+                    <div class="page-pretitle text-secondary">Political Management</div>
+                    <h2 class="page-title fw-bold text-dark">Political Leadership Strips</h2>
                 </div>
-                <div class="col-auto ms-auto d-print-none">
-                    <button type="button" class="btn btn-primary" id="btn-create-strip-modal">
-                        <i class="ti ti-plus me-1"></i> Add Leader Strip
+                <div class="col-auto ms-auto d-flex align-items-center flex-wrap gap-2">
+                    {{-- Party Filter Dropdown --}}
+                    <div class="d-flex align-items-center gap-2 bg-white border rounded-3 px-3 py-1.5 shadow-sm" style="min-width: 250px;">
+                        <i class="ti ti-filter text-muted"></i>
+                        <select class="form-select border-0 shadow-none p-0 small fw-medium" id="strip-party-filter" style="cursor: pointer;" onchange="window.location.href = this.value ? '{{ route('admin.leader-strips.index') }}?party_id=' + this.value : '{{ route('admin.leader-strips.index') }}'">
+                            <option value="">All Political Parties</option>
+                            @foreach($parties as $p)
+                                <option value="{{ $p->id }}" {{ ($currentPartyId == $p->id) ? 'selected' : '' }}>
+                                    {{ $p->name }} ({{ $p->short_code ?: 'General' }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="button" class="btn btn-primary d-flex align-items-center gap-1 shadow-sm px-3 py-2" id="btn-create-strip-modal">
+                        <i class="ti ti-plus"></i>
+                        <span>Add Leader Strip</span>
                     </button>
                 </div>
             </div>
@@ -439,7 +452,7 @@
                         <label class="form-label fw-semibold small text-dark mb-1" for="builder-strip-name">
                             Strip Name <span class="text-danger">*</span>
                         </label>
-                        <input type="text" id="builder-strip-name" class="form-control rounded-2" placeholder="{{ $isAdmin ? 'e.g. BJP Official Leadership Strip' : 'e.g. My Campaign Strip' }}" maxlength="150" required>
+                        <input type="text" id="builder-strip-name" class="form-control rounded-2" placeholder="{{ $isAdmin ? 'e.g. BJP Uttar Pradesh State Leadership' : 'e.g. My Campaign Strip' }}" maxlength="150" required>
                         <input type="hidden" id="builder-strip-id" value="">
                     </div>
 
@@ -711,8 +724,8 @@ document.addEventListener('DOMContentLoaded', function () {
             var selOpt = selectParty.options[selectParty.selectedIndex];
             if (isUserAdmin && !stripBuilderState.stripId && selOpt && selOpt.value) {
                 var pName = selOpt.getAttribute('data-party-name') || selOpt.text.split('(')[0].trim();
-                if (inputStripName) {
-                    inputStripName.value = pName + ' Official Leadership Strip';
+                if (inputStripName && !inputStripName.value.trim()) {
+                    inputStripName.placeholder = 'e.g. ' + pName + ' State Leadership';
                 }
             }
 
@@ -745,25 +758,23 @@ document.addEventListener('DOMContentLoaded', function () {
             if (inputStripName) inputStripName.value = '';
             if (checkIsDefault) checkIsDefault.checked = true;
 
-            if (isUserAdmin && selectParty) {
-                var firstParty = selectParty.options[1];
-                if (firstParty && !selectParty.value) {
-                    selectParty.value = firstParty.value;
-                    stripBuilderState.partyId = firstParty.value;
-                    var pName = firstParty.getAttribute('data-party-name') || firstParty.text.split('(')[0].trim();
-                    if (inputStripName) {
-                        inputStripName.value = pName + ' Leadership Strip';
-                    }
-                } else if (selectParty.value) {
+            var currentFilterParty = '{{ $currentPartyId ?? "" }}';
+            if (selectParty) {
+                if (currentFilterParty) {
+                    selectParty.value = currentFilterParty;
+                    stripBuilderState.partyId = currentFilterParty;
+                } else if (!selectParty.value && selectParty.options.length > 1) {
+                    selectParty.value = selectParty.options[1].value;
+                    stripBuilderState.partyId = selectParty.options[1].value;
+                } else {
                     stripBuilderState.partyId = selectParty.value;
-                    var selOpt = selectParty.options[selectParty.selectedIndex];
-                    var pName = selOpt ? (selOpt.getAttribute('data-party-name') || selOpt.text.split('(')[0].trim()) : '';
-                    if (inputStripName && pName) {
-                        inputStripName.value = pName + ' Leadership Strip';
-                    }
                 }
-            } else if (selectParty) {
-                stripBuilderState.partyId = selectParty.value || '{{ $currentPartyId ?? "" }}';
+
+                var selOpt = selectParty.options[selectParty.selectedIndex];
+                if (selOpt && selOpt.value && inputStripName) {
+                    var pName = selOpt.getAttribute('data-party-name') || selOpt.text.split('(')[0].trim();
+                    inputStripName.placeholder = 'e.g. ' + pName + ' State Leadership';
+                }
             }
         }
 
@@ -783,17 +794,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (inputStripName) inputStripName.value = s.name;
                     if (checkIsDefault) checkIsDefault.checked = !!s.is_default;
                     if (s.party_id && selectParty) {
-                        if (isUserAdmin) {
-                            Array.from(selectParty.options).forEach(function (opt) {
-                                if (!opt.value) return;
-                                var alreadyAdded = opt.getAttribute('data-already-added') === '1';
-                                if (opt.value == s.party_id) {
-                                    opt.disabled = false;
-                                } else {
-                                    opt.disabled = alreadyAdded;
-                                }
-                            });
-                        }
                         selectParty.value = s.party_id;
                         stripBuilderState.partyId = s.party_id;
                     }
