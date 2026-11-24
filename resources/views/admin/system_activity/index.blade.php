@@ -338,6 +338,9 @@
                                 <td class="text-end">
                                     <button type="button" 
                                             class="btn btn-sm btn-ghost-secondary px-2 view-log-btn"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#logDetailModal"
+                                            data-log-id="{{ $log->id }}"
                                             data-action="{{ $log->action }}"
                                             data-event="{{ $eventLabel }}"
                                             data-status="{{ $log->status }}"
@@ -345,12 +348,11 @@
                                             data-duration="{{ $log->duration_ms ? $log->duration_ms . ' ms' : 'N/A' }}"
                                             data-user="{{ $log->user ? $log->user->name . ' (' . $log->user->email . ')' : 'System Worker' }}"
                                             data-account="{{ $log->account->name ?? 'System' }}"
-                                            data-ip="{{ $log->ip_address ?? 'N/A' }}"
-                                            data-payload="{{ json_encode($log->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}"
-                                            data-response="{{ $log->response }}"
                                             title="View Details">
-                                        <i class="ti ti-code fs-3"></i>
+                                        <i class="ti ti-code fs-3 pointer-events-none"></i>
                                     </button>
+                                    <div id="log-raw-payload-{{ $log->id }}" class="d-none">{{ json_encode($log->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                                    <div id="log-raw-response-{{ $log->id }}" class="d-none">{{ $log->response }}</div>
                                 </td>
                             </tr>
                         @empty
@@ -473,16 +475,18 @@
                                         {{-- View Exception Modal Trigger --}}
                                         <button type="button" 
                                                 class="btn btn-sm btn-ghost-secondary px-2 view-job-btn"
-                                                data-id="{{ $job->id }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#jobDetailModal"
+                                                data-job-id="{{ $job->id }}"
                                                 data-uuid="{{ $job->uuid }}"
                                                 data-name="{{ $job->display_name }}"
                                                 data-queue="{{ $job->queue }}"
                                                 data-failed-at="{{ $job->failed_at }}"
-                                                data-payload="{{ json_encode($job->payload_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}"
-                                                data-exception="{{ $job->exception }}"
                                                 title="View Error Details">
-                                            <i class="ti ti-eye fs-3"></i>
+                                            <i class="ti ti-eye fs-3 pointer-events-none"></i>
                                         </button>
+                                        <div id="job-raw-payload-{{ $job->id }}" class="d-none">{{ json_encode($job->payload_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}</div>
+                                        <div id="job-raw-exception-{{ $job->id }}" class="d-none">{{ $job->exception }}</div>
 
                                         {{-- Retry Single Job --}}
                                         <form action="{{ route('admin.system-activity.retry', $job->id) }}" method="POST">
@@ -644,32 +648,42 @@
 
 @push('scripts')
 <script>
-document-ready: document.addEventListener('DOMContentLoaded', function () {
-    // 1. Activity Log Detail Inspector
-    const logModalEl = document.getElementById('logDetailModal');
-    const logModal = logModalEl ? new bootstrap.Modal(logModalEl) : null;
+(function() {
     let currentResponseText = '';
 
-    document.querySelectorAll('.view-log-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const action = this.dataset.action;
-            const event = this.dataset.event;
-            const status = this.dataset.status;
-            const time = this.dataset.time;
-            const duration = this.dataset.duration;
-            const user = this.dataset.user;
-            const account = this.dataset.account;
-            const payload = this.dataset.payload;
-            const response = this.dataset.response;
+    function populateLogModal(btn) {
+        if (!btn) return;
+        const logId = btn.getAttribute('data-log-id');
+        const action = btn.getAttribute('data-action') || 'Log Details';
+        const event = btn.getAttribute('data-event') || '';
+        const status = btn.getAttribute('data-status') || '';
+        const time = btn.getAttribute('data-time') || '';
+        const duration = btn.getAttribute('data-duration') || 'N/A';
+        const user = btn.getAttribute('data-user') || 'N/A';
+        const account = btn.getAttribute('data-account') || 'System';
 
-            document.getElementById('modalLogAction').textContent = action;
-            document.getElementById('modalLogSubtitle').textContent = `${event} • ${time}`;
-            document.getElementById('modalLogDuration').textContent = duration;
-            document.getElementById('modalLogUser').textContent = user;
-            document.getElementById('modalLogAccount').textContent = account;
+        const payloadEl = document.getElementById('log-raw-payload-' + logId);
+        const responseEl = document.getElementById('log-raw-response-' + logId);
+        const payload = payloadEl ? payloadEl.textContent.trim() : '';
+        const response = responseEl ? responseEl.textContent.trim() : '';
 
-            // Status Badge
-            const statusBadge = document.getElementById('modalLogStatusBadge');
+        const actionEl = document.getElementById('modalLogAction');
+        const subtitleEl = document.getElementById('modalLogSubtitle');
+        const durationEl = document.getElementById('modalLogDuration');
+        const userEl = document.getElementById('modalLogUser');
+        const accountEl = document.getElementById('modalLogAccount');
+        const statusBadge = document.getElementById('modalLogStatusBadge');
+        const payloadSection = document.getElementById('payloadSection');
+        const payloadPre = document.getElementById('modalLogPayload');
+        const responsePre = document.getElementById('modalLogResponse');
+
+        if (actionEl) actionEl.textContent = action;
+        if (subtitleEl) subtitleEl.textContent = `${event} • ${time}`;
+        if (durationEl) durationEl.textContent = duration;
+        if (userEl) userEl.textContent = user;
+        if (accountEl) accountEl.textContent = account;
+
+        if (statusBadge) {
             if (status === 'success') {
                 statusBadge.className = 'badge border border-success bg-transparent text-success';
                 statusBadge.innerHTML = '<i class="ti ti-check me-1"></i> Success';
@@ -678,63 +692,106 @@ document-ready: document.addEventListener('DOMContentLoaded', function () {
                 statusBadge.innerHTML = '<i class="ti ti-x me-1"></i> Failed';
             } else {
                 statusBadge.className = 'badge border border-warning bg-transparent text-warning';
-                statusBadge.innerHTML = status;
+                statusBadge.textContent = status;
             }
+        }
 
-            // Payload
-            const payloadSection = document.getElementById('payloadSection');
-            const payloadPre = document.getElementById('modalLogPayload');
+        if (payloadSection && payloadPre) {
             if (payload && payload !== 'null' && payload !== '[]') {
                 payloadPre.textContent = payload;
                 payloadSection.style.display = 'block';
             } else {
                 payloadSection.style.display = 'none';
             }
+        }
 
-            // Response
-            currentResponseText = response || 'No response data recorded.';
-            document.getElementById('modalLogResponse').textContent = currentResponseText;
-
-            if (logModal) logModal.show();
-        });
-    });
-
-    // Copy Response text
-    const copyBtn = document.getElementById('copyLogBtn');
-    if (copyBtn) {
-        copyBtn.addEventListener('click', function () {
-            if (!currentResponseText) return;
-            navigator.clipboard.writeText(currentResponseText).then(() => {
-                const orig = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<i class="ti ti-check me-1"></i> Copied!';
-                setTimeout(() => copyBtn.innerHTML = orig, 2000);
-            });
-        });
+        currentResponseText = response || 'No response data recorded.';
+        if (responsePre) {
+            responsePre.textContent = currentResponseText;
+        }
     }
 
-    // 2. Failed Queue Job Inspector
-    const jobModalEl = document.getElementById('jobDetailModal');
-    const jobModal = jobModalEl ? new bootstrap.Modal(jobModalEl) : null;
+    function populateJobModal(btn) {
+        if (!btn) return;
+        const jobId = btn.getAttribute('data-job-id');
+        const uuid = btn.getAttribute('data-uuid') || '';
+        const name = btn.getAttribute('data-name') || '';
+        const queue = btn.getAttribute('data-queue') || '';
+        const failedAt = btn.getAttribute('data-failed-at') || '';
 
-    document.querySelectorAll('.view-job-btn').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const id = this.dataset.id;
-            const uuid = this.dataset.uuid;
-            const name = this.dataset.name;
-            const queue = this.dataset.queue;
-            const failedAt = this.dataset.failedAt;
-            const payload = this.dataset.payload;
-            const exception = this.dataset.exception;
+        const payloadEl = document.getElementById('job-raw-payload-' + jobId);
+        const exceptionEl = document.getElementById('job-raw-exception-' + jobId);
+        const payload = payloadEl ? payloadEl.textContent.trim() : '';
+        const exception = exceptionEl ? exceptionEl.textContent.trim() : '';
 
-            document.getElementById('modalJobName').textContent = name;
-            document.getElementById('modalJobMeta').textContent = `Job #${id} • Queue: ${queue} • UUID: ${uuid} • Failed: ${failedAt}`;
-            document.getElementById('modalJobException').textContent = exception || 'No stack trace available.';
-            document.getElementById('modalJobPayload').textContent = payload || 'No payload data.';
+        const nameEl = document.getElementById('modalJobName');
+        const metaEl = document.getElementById('modalJobMeta');
+        const exceptionElTarget = document.getElementById('modalJobException');
+        const payloadElTarget = document.getElementById('modalJobPayload');
 
-            if (jobModal) jobModal.show();
+        if (nameEl) nameEl.textContent = name;
+        if (metaEl) metaEl.textContent = `Job #${jobId} • Queue: ${queue} • UUID: ${uuid} • Failed: ${failedAt}`;
+        if (exceptionElTarget) exceptionElTarget.textContent = exception || 'No stack trace available.';
+        if (payloadElTarget) payloadElTarget.textContent = payload || 'No payload data.';
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Bootstrap standard modal trigger listeners
+        const logModalEl = document.getElementById('logDetailModal');
+        if (logModalEl) {
+            logModalEl.addEventListener('show.bs.modal', function(event) {
+                if (event.relatedTarget) {
+                    populateLogModal(event.relatedTarget);
+                }
+            });
+        }
+
+        const jobModalEl = document.getElementById('jobDetailModal');
+        if (jobModalEl) {
+            jobModalEl.addEventListener('show.bs.modal', function(event) {
+                if (event.relatedTarget) {
+                    populateJobModal(event.relatedTarget);
+                }
+            });
+        }
+
+        // Direct delegated click handling for instant response
+        document.addEventListener('click', function(e) {
+            const logBtn = e.target.closest('.view-log-btn');
+            if (logBtn) {
+                populateLogModal(logBtn);
+                if (logModalEl && window.bootstrap && bootstrap.Modal) {
+                    const inst = bootstrap.Modal.getInstance(logModalEl) || new bootstrap.Modal(logModalEl);
+                    inst.show();
+                }
+                return;
+            }
+
+            const jobBtn = e.target.closest('.view-job-btn');
+            if (jobBtn) {
+                populateJobModal(jobBtn);
+                if (jobModalEl && window.bootstrap && bootstrap.Modal) {
+                    const inst = bootstrap.Modal.getInstance(jobModalEl) || new bootstrap.Modal(jobModalEl);
+                    inst.show();
+                }
+                return;
+            }
         });
+
+        // Copy Response text button
+        const copyBtn = document.getElementById('copyLogBtn');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function () {
+                if (!currentResponseText) return;
+                navigator.clipboard.writeText(currentResponseText).then(() => {
+                    const orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="ti ti-check me-1"></i> Copied!';
+                    setTimeout(() => copyBtn.innerHTML = orig, 2000);
+                });
+            });
+        }
     });
-});
+})();
 </script>
 @endpush
 @endsection

@@ -98,12 +98,64 @@ class CanvaController extends Controller
     }
 
     /**
+     * Retrieve a valid Canva access token, automatically refreshing using refresh_token if needed.
+     */
+    protected function getValidAccessToken($userId, bool $forceRefresh = false): ?string
+    {
+        if (!$forceRefresh) {
+            $token = session('canva_access_token') ?? Cache::get('canva_token_' . $userId);
+            if (!empty($token)) {
+                return $token;
+            }
+        }
+
+        $refreshToken = session('canva_refresh_token') ?? Cache::get('canva_refresh_token_' . $userId);
+        if (!empty($refreshToken)) {
+            try {
+                $tokens = $this->canvaService->refreshToken($refreshToken);
+                $newToken = $tokens['access_token'] ?? null;
+                if ($newToken) {
+                    $ttl = $tokens['expires_in'] ?? 14400;
+
+                    session([
+                        'canva_access_token'  => $newToken,
+                        'canva_refresh_token' => $tokens['refresh_token'] ?? $refreshToken,
+                        'canva_connected'     => true,
+                    ]);
+
+                    Cache::put('canva_token_' . $userId, $newToken, now()->addSeconds($ttl));
+                    if (!empty($tokens['refresh_token'])) {
+                        Cache::put('canva_refresh_token_' . $userId, $tokens['refresh_token'], now()->addDays(30));
+                    }
+
+                    return $newToken;
+                }
+            } catch (\Throwable $e) {
+                Log::warning('Canva auto token refresh failed: ' . $e->getMessage());
+                $this->clearTokens($userId);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Clear cached and session Canva tokens when invalidated.
+     */
+    protected function clearTokens($userId): void
+    {
+        session()->forget(['canva_access_token', 'canva_refresh_token', 'canva_connected']);
+        Cache::forget('canva_token_' . $userId);
+        Cache::forget('canva_refresh_token_' . $userId);
+    }
+
+    /**
      * Get Canva connection status & available templates.
      */
     public function status(Request $request): JsonResponse
     {
         $userId = auth()->id() ?? 'guest';
-        $token = session('canva_access_token') ?? Cache::get('canva_token_' . $userId);
+        $token = $this->getValidAccessToken($userId);
 
         return response()->json([
             'is_configured' => $this->canvaService->isConfigured(),
@@ -126,13 +178,13 @@ class CanvaController extends Controller
         ]);
 
         $userId = auth()->id() ?? 'guest';
-        $token = session('canva_access_token') ?? Cache::get('canva_token_' . $userId);
+        $token = $this->getValidAccessToken($userId);
 
         if (empty($token)) {
             return response()->json([
                 'success'      => false,
                 'is_connected' => false,
-                'message'      => 'Please connect your Canva account first.',
+                'message'      => 'Please connect your Canva account first or re-authorize.',
                 'auth_url'     => route('admin.canva.auth'),
             ], 401);
         }
@@ -144,7 +196,23 @@ class CanvaController extends Controller
             $preset = $request->input('preset');
 
             $startTime = microtime(true);
-            $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
+            try {
+                $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
+            } catch (\Throwable $apiEx) {
+                // If access token was invalid or expired, attempt one auto-refresh and retry
+                if (str_contains($apiEx->getMessage(), 'invalid_access_token') || str_contains($apiEx->getMessage(), '401')) {
+                    $token = $this->getValidAccessToken($userId, true);
+                    if ($token) {
+                        $result = $this->canvaService->createDesign($token, $title, $width, $height, $preset);
+                    } else {
+                        $this->clearTokens($userId);
+                        throw new \RuntimeException('Canva session expired. Please click "Connect Canva" to re-authorize.');
+                    }
+                } else {
+                    throw $apiEx;
+                }
+            }
+
             $design = $result['design'] ?? [];
             $durationMs = (int) round((microtime(true) - $startTime) * 1000);
 
@@ -197,7 +265,7 @@ class CanvaController extends Controller
         ]);
 
         $userId = auth()->id() ?? 'guest';
-        $token = session('canva_access_token') ?? Cache::get('canva_token_' . $userId);
+        $token = $this->getValidAccessToken($userId);
 
         if (empty($token)) {
             return response()->json([
@@ -212,7 +280,23 @@ class CanvaController extends Controller
             $format = $request->input('format', 'jpg');
 
             $startTime = microtime(true);
-            $downloadResult = $this->canvaService->exportAndDownloadDesign($token, $designId, $format);
+            try {
+                $downloadResult = $this->canvaService->exportAndDownloadDesign($token, $designId, $format);
+            } catch (\Throwable $apiEx) {
+                // If token was invalid, refresh and retry once
+                if (str_contains($apiEx->getMessage(), 'invalid_access_token') || str_contains($apiEx->getMessage(), '401')) {
+                    $token = $this->getValidAccessToken($userId, true);
+                    if ($token) {
+                        $downloadResult = $this->canvaService->exportAndDownloadDesign($token, $designId, $format);
+                    } else {
+                        $this->clearTokens($userId);
+                        throw new \RuntimeException('Canva session expired. Please reconnect your Canva account.');
+                    }
+                } else {
+                    throw $apiEx;
+                }
+            }
+
             $durationMs = (int) round((microtime(true) - $startTime) * 1000);
 
             \App\Services\ActivityLogger::log(

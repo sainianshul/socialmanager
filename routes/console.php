@@ -11,16 +11,19 @@ Artisan::command('inspire', function () {
 // 1. Background automatic publisher for scheduled social posts (every minute)
 Schedule::command('posts:publish-scheduled')->everyMinute()->withoutOverlapping();
 
-// 2. Automatically sync latest YouTube comments & queue AI analysis (every 10 minutes)
-Schedule::command('sync:youtube-comments --queue-ai')->everyTenMinutes()->withoutOverlapping();
+// 2. Automatically sync latest YouTube comments & queue AI analysis (every 20 minutes)
+Schedule::command('sync:youtube-comments --queue-ai')->cron('*/20 * * * *')->withoutOverlapping();
 
-// 3. Automatically sync latest YouTube videos and analytics (every hour)
+// 3. Automatically sync latest Facebook Page & Instagram comments as polling backup to webhooks (every 30 minutes)
+Schedule::command('sync:meta-comments')->everyThirtyMinutes()->withoutOverlapping();
+
+// 4. Automatically sync latest YouTube videos and analytics (every hour)
 Schedule::command('sync:youtube-videos')->hourly()->withoutOverlapping();
 
-// 4. Proactively refresh expiring OAuth access tokens (YouTube/Google every 30 minutes)
+// 5. Proactively refresh expiring OAuth access tokens (YouTube/Google every 30 minutes)
 Schedule::command('accounts:refresh-tokens')->everyThirtyMinutes()->withoutOverlapping();
 
-// 5. Automatically prune old system activity logs (Retains last 30 days, runs daily at 2:00 AM)
+// 6. Automatically prune old system activity logs (Retains last 30 days, runs daily at 2:00 AM)
 Schedule::call(function () {
     \App\Services\ActivityLogger::prune(30);
 })->dailyAt('02:00')->name('prune-activity-logs')->withoutOverlapping();
