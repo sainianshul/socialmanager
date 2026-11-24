@@ -28,10 +28,11 @@ class LeaderStripController extends Controller
             $systemStrips = LeaderStrip::where('is_system', true)
                 ->when($partyId, fn($q) => $q->where('party_id', $partyId))
                 ->with(['leaders', 'party'])
+                ->orderByDesc('is_default')
                 ->latest()
                 ->get();
-            $activeStrip = $systemStrips->first();
-            $existingPartyIdsWithStrips = LeaderStrip::where('is_system', true)->pluck('party_id')->toArray();
+            $activeStrip = $systemStrips->firstWhere('is_default', true) ?? $systemStrips->first();
+            $existingPartyIdsWithStrips = [];
         } else {
             $partyId = $request->query('party_id') ?? $user->defaultBranding?->party_id;
 
@@ -44,6 +45,7 @@ class LeaderStripController extends Controller
             $systemStrips = LeaderStrip::where('is_system', true)
                 ->when($partyId, fn($q) => $q->where('party_id', $partyId))
                 ->with(['leaders', 'party'])
+                ->orderByDesc('is_default')
                 ->get();
 
             $activeStrip = $userStrips->firstWhere('is_default', true) 
@@ -141,15 +143,6 @@ class LeaderStripController extends Controller
             'leader_ids.*' => 'exists:political_leaders,id',
         ]);
 
-        if ($isAdmin) {
-            // One party can only have ONE official system strip
-            if (LeaderStrip::where('is_system', true)->where('party_id', $validated['party_id'])->exists()) {
-                throw ValidationException::withMessages([
-                    'party_id' => ['An official leadership strip already exists for this party.'],
-                ]);
-            }
-        }
-
         $normalizedItems = $this->normalizeItems($validated);
 
         if (empty($normalizedItems)) {
@@ -162,11 +155,21 @@ class LeaderStripController extends Controller
 
         $strip = DB::transaction(function () use ($user, $validated, $normalizedItems, $isDefault, $isAdmin) {
             if ($isAdmin) {
+                // If set as default or if this is the first official strip for this party, make it default
+                $existingCount = LeaderStrip::where('party_id', $validated['party_id'])->where('is_system', true)->count();
+                $shouldBeDefault = $isDefault || ($existingCount === 0);
+
+                if ($shouldBeDefault) {
+                    LeaderStrip::where('party_id', $validated['party_id'])
+                        ->where('is_system', true)
+                        ->update(['is_default' => false]);
+                }
+
                 $newStrip = LeaderStrip::create([
                     'user_id' => null,
                     'party_id' => $validated['party_id'],
                     'name' => $validated['name'],
-                    'is_default' => true,
+                    'is_default' => $shouldBeDefault,
                     'is_system' => true,
                 ]);
             } else {
@@ -255,14 +258,6 @@ class LeaderStripController extends Controller
             'leader_ids.*' => 'exists:political_leaders,id',
         ]);
 
-        if ($isAdmin && !empty($validated['party_id']) && $validated['party_id'] != $strip->party_id) {
-            if (LeaderStrip::where('is_system', true)->where('party_id', $validated['party_id'])->where('id', '!=', $id)->exists()) {
-                throw ValidationException::withMessages([
-                    'party_id' => ['An official leadership strip already exists for this party.'],
-                ]);
-            }
-        }
-
         $normalizedItems = $this->normalizeItems($validated);
 
         if (empty($normalizedItems)) {
@@ -274,13 +269,22 @@ class LeaderStripController extends Controller
         $isDefault = !empty($validated['is_default']);
 
         DB::transaction(function () use ($user, $strip, $validated, $normalizedItems, $isDefault, $isAdmin) {
+            $targetPartyId = (!empty($validated['party_id'])) ? $validated['party_id'] : $strip->party_id;
             $updateData = ['name' => $validated['name']];
 
             if ($isAdmin && !empty($validated['party_id'])) {
                 $updateData['party_id'] = $validated['party_id'];
             }
 
-            if (!$isAdmin) {
+            if ($isAdmin) {
+                if ($isDefault) {
+                    LeaderStrip::where('party_id', $targetPartyId)
+                        ->where('is_system', true)
+                        ->where('id', '!=', $strip->id)
+                        ->update(['is_default' => false]);
+                    $updateData['is_default'] = true;
+                }
+            } else {
                 if ($isDefault) {
                     LeaderStrip::where('user_id', $user->id)
                         ->where('id', '!=', $strip->id)
@@ -311,18 +315,38 @@ class LeaderStripController extends Controller
     }
 
     /**
-     * Set a strip as user's active default strip (supports user and system strips)
+     * Set a strip as active default strip (supports user and system strips)
      */
     public function makeDefault(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
+        $isAdmin = $user->isAdmin() || $user->isManager();
 
-        $strip = LeaderStrip::where(function ($q) use ($user) {
-                $q->where('user_id', $user->id)
-                  ->orWhere('is_system', true);
+        $strip = LeaderStrip::where(function ($q) use ($user, $isAdmin) {
+                if ($isAdmin) {
+                    $q->where('is_system', true);
+                } else {
+                    $q->where('user_id', $user->id)
+                      ->orWhere('is_system', true);
+                }
             })
             ->with(['items', 'leaders', 'party'])
             ->findOrFail($id);
+
+        // If admin is setting an official strip as default for that party
+        if ($isAdmin && $strip->is_system) {
+            LeaderStrip::where('party_id', $strip->party_id)
+                ->where('is_system', true)
+                ->where('id', '!=', $strip->id)
+                ->update(['is_default' => false]);
+            $strip->update(['is_default' => true]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Official leadership strip set as default for ' . ($strip->party?->name ?? 'Party') . '.',
+                'strip' => $strip->fresh(['leaders', 'party']),
+            ]);
+        }
 
         // If it's already a user strip, simply toggle default flag
         if ($strip->user_id === $user->id) {
@@ -384,11 +408,20 @@ class LeaderStripController extends Controller
         $wasDefault = $strip->is_default;
 
         DB::transaction(function () use ($user, $strip, $wasDefault, $isAdmin) {
+            $partyId = $strip->party_id;
             $strip->items()->delete();
             $strip->delete();
 
-            // If regular user and deleted strip was default, fallback to another user strip
-            if (!$isAdmin && $wasDefault) {
+            // If deleted strip was default, fallback to another strip
+            if ($isAdmin && $wasDefault) {
+                $fallback = LeaderStrip::where('party_id', $partyId)
+                    ->where('is_system', true)
+                    ->latest()
+                    ->first();
+                if ($fallback) {
+                    $fallback->update(['is_default' => true]);
+                }
+            } elseif (!$isAdmin && $wasDefault) {
                 $fallback = LeaderStrip::where('user_id', $user->id)->latest()->first();
                 if ($fallback) {
                     $fallback->update(['is_default' => true]);

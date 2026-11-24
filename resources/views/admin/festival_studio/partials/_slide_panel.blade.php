@@ -169,16 +169,28 @@
                                             Select Leadership Strip
                                         </label>
                                         <select class="form-select qs-premium-select" id="panel-strip-id">
-                                            @foreach($allStrips as $s)
-                                                @php
-                                                    $isUser = !empty($s->user_id);
-                                                    $partyCode = $s->party?->short_code ?? 'Universal';
-                                                    $label = $isUser ? $s->name . ' (Custom)' : $s->name . ' (' . $partyCode . ')';
-                                                @endphp
-                                                <option value="{{ $s->id }}" {{ ($activeStrip?->id == $s->id) ? 'selected' : '' }} data-party-id="{{ $s->party_id }}">
-                                                    {{ $label }}
-                                                </option>
-                                            @endforeach
+                                            @php
+                                                $sysList = (isset($systemStrips) && $systemStrips->isNotEmpty()) ? $systemStrips : $allStrips->where('is_system', true);
+                                                $usrList = (isset($userStrips) && $userStrips->isNotEmpty()) ? $userStrips : $allStrips->where('is_system', false);
+                                            @endphp
+                                            @if($sysList->isNotEmpty())
+                                                <optgroup label="Official {{ $userParty }} Leadership Strips">
+                                                    @foreach($sysList as $s)
+                                                        <option value="{{ $s->id }}" {{ ($activeStrip?->id == $s->id) ? 'selected' : '' }} data-party-id="{{ $s->party_id }}">
+                                                            {{ $s->name }}{{ $s->is_default ? ' (Party Default)' : '' }}
+                                                        </option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endif
+                                            @if($usrList->isNotEmpty())
+                                                <optgroup label="My Custom Strips">
+                                                    @foreach($usrList as $s)
+                                                        <option value="{{ $s->id }}" {{ ($activeStrip?->id == $s->id) ? 'selected' : '' }} data-party-id="{{ $s->party_id }}">
+                                                            {{ $s->name }} (Custom){{ $s->is_default ? ' (My Default)' : '' }}
+                                                        </option>
+                                                    @endforeach
+                                                </optgroup>
+                                            @endif
                                         </select>
                                     </div>
                                 @endif

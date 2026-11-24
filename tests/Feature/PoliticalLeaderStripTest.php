@@ -115,4 +115,40 @@ class PoliticalLeaderStripTest extends TestCase
         $stripsResponse->assertStatus(200);
         $stripsResponse->assertSee('Narendra Modi');
     }
+
+    public function test_admin_can_create_multiple_official_strips_for_same_party(): void
+    {
+        $this->seed(PoliticalPartySeeder::class);
+        $this->seed(PoliticalLeaderSeeder::class);
+
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $bjp = PoliticalParty::where('short_code', 'BJP')->first();
+        $leaders = PoliticalLeader::where('party_id', $bjp->id)->take(5)->get();
+
+        // Already has 1 seeded official strip for BJP
+        $this->assertEquals(1, LeaderStrip::where('party_id', $bjp->id)->where('is_system', true)->count());
+
+        // Admin creates a second official strip for BJP (e.g. State-level strip)
+        $response = $this->actingAs($admin)->postJson(route('admin.leader-strips.store'), [
+            'name' => 'BJP Haryana State Leadership',
+            'party_id' => $bjp->id,
+            'is_default' => false,
+            'items' => $leaders->map(fn($l, $i) => ['leader_id' => $l->id, 'order' => $i + 1])->toArray(),
+        ]);
+
+        $response->assertStatus(201);
+        $response->assertJson(['success' => true]);
+
+        // Party now has 2 official strips
+        $this->assertEquals(2, LeaderStrip::where('party_id', $bjp->id)->where('is_system', true)->count());
+
+        // Admin can toggle default
+        $newStrip = LeaderStrip::where('name', 'BJP Haryana State Leadership')->first();
+        $this->assertFalse($newStrip->is_default);
+
+        $defaultResponse = $this->actingAs($admin)->postJson(route('admin.leader-strips.default', $newStrip->id));
+        $defaultResponse->assertStatus(200);
+
+        $this->assertTrue($newStrip->fresh()->is_default);
+    }
 }

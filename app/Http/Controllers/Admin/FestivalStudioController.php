@@ -80,9 +80,10 @@ class FestivalStudioController extends Controller
         $systemStrips = LeaderStrip::where('is_system', true)
             ->when($partyId, fn($q) => $q->where('party_id', $partyId))
             ->with(['leaders', 'party'])
+            ->orderByDesc('is_default')
             ->get();
         if ($systemStrips->isEmpty()) {
-            $systemStrips = LeaderStrip::where('is_system', true)->with(['leaders', 'party'])->get();
+            $systemStrips = LeaderStrip::where('is_system', true)->with(['leaders', 'party'])->orderByDesc('is_default')->get();
         }
         $allStrips = $userStrips->merge($systemStrips)->unique('id');
 
@@ -118,6 +119,8 @@ class FestivalStudioController extends Controller
                     'scheduledTemplateIds',
                     'activeStrip',
                     'allStrips',
+                    'systemStrips',
+                    'userStrips',
                     'userBranding',
                     'userCutout',
                     'userImages',
@@ -141,7 +144,9 @@ class FestivalStudioController extends Controller
             'scheduledFestivalIds',
             'scheduledTemplateIds',
             'activeStrip',
-            'allStrips'
+            'allStrips',
+            'systemStrips',
+            'userStrips'
         ));
     }
 

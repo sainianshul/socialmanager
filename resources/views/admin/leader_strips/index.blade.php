@@ -251,9 +251,15 @@
                             </span>
                         @endif
                         @if($isAdmin)
-                            <span class="badge badge-outline text-success px-2 py-0.5 fw-semibold" style="font-size: 11px;">
-                                <i class="ti ti-check me-1"></i>Official Strip
-                            </span>
+                            @if($sysStrip->is_default)
+                                <span class="badge bg-success-lt text-success px-2 py-0.5 fw-bold" style="font-size: 11px;">
+                                    <i class="ti ti-star me-1"></i>Party Default
+                                </span>
+                            @else
+                                <span class="badge badge-outline text-secondary px-2 py-0.5 fw-semibold" style="font-size: 11px;">
+                                    Official Strip
+                                </span>
+                            @endif
                         @else
                             @if($activeStrip?->id === $sysStrip->id && !$userStrips->contains('is_default', true))
                                 <span class="badge bg-teal-lt text-teal px-2 py-0.5 fw-semibold" style="font-size: 11px;">
@@ -266,7 +272,12 @@
                     <div>
                         @if($isAdmin)
                             <div class="d-flex align-items-center gap-1.5">
-                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 btn-edit-strip" data-id="{{ $sysStrip->id }}" data-name="{{ $sysStrip->name }}" data-party-id="{{ $sysStrip->party_id }}" style="font-size: 12px;">
+                                @if(!$sysStrip->is_default)
+                                    <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-1 btn-admin-make-default" data-id="{{ $sysStrip->id }}" style="font-size: 12px;" title="Set as default official strip for this party">
+                                        <i class="ti ti-star me-1"></i>Set Default
+                                    </button>
+                                @endif
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 btn-edit-strip" data-id="{{ $sysStrip->id }}" data-name="{{ $sysStrip->name }}" data-party-id="{{ $sysStrip->party_id }}" data-is-default="{{ $sysStrip->is_default ? '1' : '0' }}" style="font-size: 12px;">
                                     <i class="ti ti-pencil me-1"></i>Edit
                                 </button>
                                 <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 btn-delete-strip" data-id="{{ $sysStrip->id }}" title="Delete strip" style="font-size: 12px;">
@@ -433,37 +444,30 @@
                     </div>
 
                     <div class="row g-2 mb-3 align-items-center">
-                        <div class="{{ $isAdmin ? 'col-12' : 'col-7' }}">
+                        <div class="col-7">
                             <label class="form-label fw-semibold small text-dark mb-1" for="builder-party-id">
                                 Political Party <span class="text-danger">*</span>
                             </label>
                             <select id="builder-party-id" class="form-select rounded-2">
                                 <option value="">Select Party</option>
                                 @foreach($parties as $party)
-                                    @php
-                                        $isAlreadyAdded = in_array($party->id, $existingPartyIdsWithStrips ?? []);
-                                    @endphp
                                     <option value="{{ $party->id }}" 
-                                        data-already-added="{{ $isAlreadyAdded ? '1' : '0' }}"
                                         data-party-name="{{ $party->name }}"
                                         data-party-code="{{ $party->short_code }}"
-                                        {{ ($isAdmin && $isAlreadyAdded) ? 'disabled' : '' }}
                                         {{ ($currentPartyId == $party->id) ? 'selected' : '' }}>
-                                        {{ $party->name }} ({{ $party->short_code ?: 'General' }}){{ ($isAdmin && $isAlreadyAdded) ? ' - (Already Added)' : '' }}
+                                        {{ $party->name }} ({{ $party->short_code ?: 'General' }})
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        @if(!$isAdmin)
-                            <div class="col-5 pt-3">
-                                <div class="form-check form-switch mb-0">
-                                    <input class="form-check-input" type="checkbox" id="builder-is-default" checked>
-                                    <label class="form-check-label small fw-medium text-dark" for="builder-is-default">
-                                        Set as default
-                                    </label>
-                                </div>
+                        <div class="col-5 pt-3">
+                            <div class="form-check form-switch mb-0">
+                                <input class="form-check-input" type="checkbox" id="builder-is-default" checked>
+                                <label class="form-check-label small fw-medium text-dark" for="builder-is-default">
+                                    {{ $isAdmin ? 'Official Party Default' : 'Set as default' }}
+                                </label>
                             </div>
-                        @endif
+                        </div>
                     </div>
 
                     {{-- Selected Preview Strip (Compact Horizontal Rail) --}}
@@ -538,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Set Default Strip via AJAX
     document.addEventListener('click', async function (e) {
-        var target = e.target.closest('.btn-make-default');
+        var target = e.target.closest('.btn-make-default, .btn-admin-make-default');
         if (!target) return;
 
         var stripId = target.getAttribute('data-id');
@@ -732,33 +736,31 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (stripId) {
             if (modalTitle) modalTitle.textContent = isUserAdmin ? 'Edit Official Leadership Strip' : 'Edit Strip';
+            var editBtn = document.querySelector('.btn-edit-strip[data-id="' + stripId + '"]');
+            if (editBtn && checkIsDefault) {
+                checkIsDefault.checked = editBtn.getAttribute('data-is-default') === '1';
+            }
         } else {
             if (modalTitle) modalTitle.textContent = isUserAdmin ? 'Add Official Leadership Strip' : 'Create Strip';
             if (inputStripName) inputStripName.value = '';
             if (checkIsDefault) checkIsDefault.checked = true;
 
-            // In Admin Add mode: enforce disabled state for already-added parties and select the first available
             if (isUserAdmin && selectParty) {
-                var partyOptions = Array.from(selectParty.options);
-                partyOptions.forEach(function (opt) {
-                    if (!opt.value) return;
-                    var alreadyAdded = opt.getAttribute('data-already-added') === '1';
-                    opt.disabled = alreadyAdded;
-                });
-
-                var firstAvailable = partyOptions.find(function (opt) { return opt.value && !opt.disabled; });
-                if (firstAvailable) {
-                    selectParty.value = firstAvailable.value;
-                    stripBuilderState.partyId = firstAvailable.value;
-                    var pName = firstAvailable.getAttribute('data-party-name') || firstAvailable.text.split('(')[0].trim();
+                var firstParty = selectParty.options[1];
+                if (firstParty && !selectParty.value) {
+                    selectParty.value = firstParty.value;
+                    stripBuilderState.partyId = firstParty.value;
+                    var pName = firstParty.getAttribute('data-party-name') || firstParty.text.split('(')[0].trim();
                     if (inputStripName) {
-                        inputStripName.value = pName + ' Official Leadership Strip';
+                        inputStripName.value = pName + ' Leadership Strip';
                     }
-                } else {
-                    selectParty.value = '';
-                    stripBuilderState.partyId = null;
-                    showModalAlert('All political parties already have an official leadership strip configured.', 'warning');
-                    if (btnSaveStrip) btnSaveStrip.disabled = true;
+                } else if (selectParty.value) {
+                    stripBuilderState.partyId = selectParty.value;
+                    var selOpt = selectParty.options[selectParty.selectedIndex];
+                    var pName = selOpt ? (selOpt.getAttribute('data-party-name') || selOpt.text.split('(')[0].trim()) : '';
+                    if (inputStripName && pName) {
+                        inputStripName.value = pName + ' Leadership Strip';
+                    }
                 }
             } else if (selectParty) {
                 stripBuilderState.partyId = selectParty.value || '{{ $currentPartyId ?? "" }}';
