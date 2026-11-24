@@ -193,7 +193,21 @@ class FestivalSeeder extends Seeder
                 'is_active' => true,
                 'primary_template' => 'images/templates/samvidhan-diwas.jpg',
                 'primary_title' => 'Samvidhan Diwas National Tribute',
-                'preset_key' => 'clean_no_leaders',
+                'preset_key' => 'classic_political_right',
+                'additional_templates' => [
+                    [
+                        'template_image_path' => 'images/templates/samvidhan-diwas-ambedkar-pranam.jpg',
+                        'title' => 'Samvidhan Diwas Ambedkar Pranam Edition',
+                        'thumbnail_path' => 'images/templates/samvidhan-diwas-ambedkar-pranam.jpg',
+                        'preset_key' => 'classic_political_right',
+                    ],
+                    [
+                        'template_image_path' => 'images/templates/samvidhan-diwas-sansad-chakra.jpg',
+                        'title' => 'Samvidhan Diwas Sansad & Ashok Chakra Edition',
+                        'thumbnail_path' => 'images/templates/samvidhan-diwas-sansad-chakra.jpg',
+                        'preset_key' => 'classic_political_right',
+                    ],
+                ],
             ],
             [
                 'title' => 'Guru Nanak Jayanti (Prakash Parv)',
