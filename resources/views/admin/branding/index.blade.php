@@ -297,16 +297,6 @@
                             </div>
                         </a>
                     </div>
-
-                    {{-- Quick Info Card --}}
-                    <div class="mt-4 p-3 rounded-3 bg-white border border-light-subtle shadow-xs">
-                        <div class="small fw-bold text-dark mb-1">
-                            <i class="ti ti-info-circle text-primary me-1"></i>Quick Note
-                        </div>
-                        <p class="text-secondary small mb-0" style="font-size: 0.78rem; line-height: 1.45;">
-                            All profile changes are automatically applied when generating festival and political posters.
-                        </p>
-                    </div>
                 </div>
             </div>
 

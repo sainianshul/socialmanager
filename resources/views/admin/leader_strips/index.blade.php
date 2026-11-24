@@ -240,12 +240,7 @@
          SECTION 1: OFFICIAL PARTY STRIPS
          ====================================================================== --}}
     <div class="mb-5">
-        @if($isAdmin)
-            <div class="mb-3">
-                <h3 class="fw-bold text-dark fs-3 mb-0">Official Party Strips</h3>
-                <p class="text-secondary small mb-0">Official top leadership strips configured for each political party.</p>
-            </div>
-        @else
+        @if(!$isAdmin)
             <div class="mb-2">
                 <h3 class="fw-bold text-dark fs-3 mb-0">Official Strip</h3>
             </div>
