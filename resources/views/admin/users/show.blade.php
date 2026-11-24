@@ -100,8 +100,27 @@
                     </a>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-accounts" role="tab">
+                        <i class="ti ti-plug-connected me-1"></i>Connected Accounts
+                        <span class="badge border border-secondary bg-transparent text-secondary ms-1">{{ $accountsCount ?? 0 }}</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-posts" role="tab">
+                        <i class="ti ti-photo me-1"></i>Posts & Content
+                        <span class="badge border border-secondary bg-transparent text-secondary ms-1">{{ $postsCount ?? 0 }}</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" data-bs-toggle="tab" href="#tab-activity" role="tab">
+                        <i class="ti ti-activity me-1"></i>User Activity
+                        <span class="badge border border-primary bg-transparent text-primary ms-1">{{ $activityCount ?? 0 }}</span>
+                    </a>
+                </li>
+                <li class="nav-item" role="presentation">
                     <a class="nav-link" data-bs-toggle="tab" href="#tab-devices" role="tab">
                         <i class="ti ti-devices me-1"></i>Devices & Sessions
+                        <span class="badge border border-secondary bg-transparent text-secondary ms-1">{{ $devicesCount ?? 0 }}</span>
                     </a>
                 </li>
             </ul>
@@ -204,6 +223,66 @@
                     </div>
                 </div>
 
+                {{-- Tab: Connected Accounts --}}
+                <div class="tab-pane fade" id="tab-accounts" role="tabpanel">
+                    <div class="table-responsive py-3">
+                        <table id="user-accounts-table" class="table table-vcenter table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-1">S.No</th>
+                                    <th>Channel / Page</th>
+                                    <th>Followers</th>
+                                    <th>Connection</th>
+                                    <th>Token Status</th>
+                                    <th>Last Synced</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Tab: Posts & Content --}}
+                <div class="tab-pane fade" id="tab-posts" role="tabpanel">
+                    <div class="table-responsive py-3">
+                        <table id="user-posts-table" class="table table-vcenter table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-1">S.No</th>
+                                    <th style="width: 50px;">Media</th>
+                                    <th>Content / Title</th>
+                                    <th style="width: 120px;">Platform</th>
+                                    <th style="width: 90px;">Type</th>
+                                    <th style="width: 110px;">Status</th>
+                                    <th style="width: 140px;">Date & Time</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- Tab: User Activity Datatable --}}
+                <div class="tab-pane fade" id="tab-activity" role="tabpanel">
+                    <div class="table-responsive py-3">
+                        <table id="user-activity-table" class="table table-vcenter table-hover w-100">
+                            <thead>
+                                <tr>
+                                    <th class="w-1">S.No</th>
+                                    <th style="width: 140px;">Timestamp</th>
+                                    <th style="width: 130px;">Event</th>
+                                    <th>Action & Description</th>
+                                    <th style="width: 150px;">Target Channel</th>
+                                    <th style="width: 80px;">Duration</th>
+                                    <th style="width: 100px;">Status</th>
+                                    <th style="width: 60px;" class="text-end">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
                 {{-- Tab: Devices (Sanctum tokens) --}}
                 <div class="tab-pane fade" id="tab-devices" role="tabpanel">
                     @php
@@ -281,7 +360,210 @@
         </div>
     </div>
 
+    {{-- Activity Log Detail Inspector Modal --}}
+    <div class="modal modal-blur fade" id="userLogDetailModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title fw-bold" id="modalUserLogAction">Activity Details</h5>
+                        <div class="text-muted small" id="modalUserLogSubtitle"></div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <div class="bg-light-lt p-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="d-flex align-items-center gap-3">
+                            <span id="modalUserLogStatusBadge"></span>
+                            <span class="text-muted small">Duration: <strong id="modalUserLogDuration"></strong></span>
+                            <span class="text-muted small">Channel: <strong id="modalUserLogAccount"></strong></span>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="copyUserLogBtn">
+                            <i class="ti ti-copy me-1"></i> Copy Response
+                        </button>
+                    </div>
+                    <div class="p-3">
+                        <div class="mb-3" id="userPayloadSection">
+                            <label class="form-label fw-bold small text-muted text-uppercase">Request / Payload Data</label>
+                            <pre class="bg-dark text-white p-3 rounded font-monospace small mb-0" style="max-height: 220px; overflow-y: auto;" id="modalUserLogPayload"></pre>
+                        </div>
+                        <div>
+                            <label class="form-label fw-bold small text-muted text-uppercase">Response Output</label>
+                            <pre class="bg-dark text-white p-3 rounded font-monospace small mb-0" style="max-height: 280px; overflow-y: auto;" id="modalUserLogResponse"></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
+
+@push('datatables_css')
+    @include('admin.layouts.partials._datatable-cdn-css')
+@endpush
+
+@push('datatables_js')
+    @include('admin.layouts.partials._datatable-cdn-js')
+    <script>
+        $(function () {
+            let accountsTable = null;
+            let postsTable = null;
+            let activityTable = null;
+
+            function initAccountsTable() {
+                if (accountsTable) return;
+                accountsTable = $('#user-accounts-table').DataTable({
+                    serverSide: true,
+                    processing: false,
+                    ajax: '{{ route('admin.users.accounts-data', $user->id) }}',
+                    columns: [
+                        { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
+                        { data: 'channel', name: 'name' },
+                        { data: 'followers', name: 'followers_count' },
+                        { data: 'status', name: 'is_active', orderable: false, searchable: false },
+                        { data: 'token_status', name: 'token_expires_at', orderable: false, searchable: false },
+                        { data: 'last_synced', name: 'last_synced_at' },
+                    ],
+                    order: [[5, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50], [10, 25, 50]],
+                    language: {
+                        info: 'Showing _START_ to _END_ of _TOTAL_ accounts',
+                        paginate: { previous: '<i class="ti ti-chevron-left"></i>', next: '<i class="ti ti-chevron-right"></i>' },
+                        emptyTable: 'No social accounts connected by this user.'
+                    }
+                });
+            }
+
+            function initPostsTable() {
+                if (postsTable) return;
+                postsTable = $('#user-posts-table').DataTable({
+                    serverSide: true,
+                    processing: false,
+                    ajax: '{{ route('admin.users.posts-data', $user->id) }}',
+                    columns: [
+                        { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
+                        { data: 'media', name: 'media', orderable: false, searchable: false },
+                        { data: 'content_preview', name: 'title' },
+                        { data: 'platform', name: 'platform', orderable: false },
+                        { data: 'type', name: 'post_type' },
+                        { data: 'status', name: 'status' },
+                        { data: 'time', name: 'created_at' },
+                    ],
+                    order: [[6, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50], [10, 25, 50]],
+                    language: {
+                        info: 'Showing _START_ to _END_ of _TOTAL_ posts',
+                        paginate: { previous: '<i class="ti ti-chevron-left"></i>', next: '<i class="ti ti-chevron-right"></i>' },
+                        emptyTable: 'No posts created by this user.'
+                    }
+                });
+            }
+
+            function initActivityTable() {
+                if (activityTable) return;
+                activityTable = $('#user-activity-table').DataTable({
+                    serverSide: true,
+                    processing: false,
+                    ajax: '{{ route('admin.users.activity-data', $user->id) }}',
+                    columns: [
+                        { data: null, name: 'id', render: function (data, type, row, meta) { return meta.row + meta.settings._iDisplayStart + 1; }, orderable: false, searchable: false },
+                        { data: 'created_at', name: 'created_at' },
+                        { data: 'event_type', name: 'event_type' },
+                        { data: 'action', name: 'action' },
+                        { data: 'target', name: 'target', orderable: false, searchable: false },
+                        { data: 'duration_ms', name: 'duration_ms' },
+                        { data: 'status', name: 'status' },
+                        { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end' },
+                    ],
+                    order: [[1, 'desc']],
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50], [10, 25, 50]],
+                    language: {
+                        info: 'Showing _START_ to _END_ of _TOTAL_ activity logs',
+                        paginate: { previous: '<i class="ti ti-chevron-left"></i>', next: '<i class="ti ti-chevron-right"></i>' },
+                        emptyTable: 'No activity recorded for this user yet.'
+                    }
+                });
+            }
+
+            // Tab switch handler for responsive table drawing & lazy loading
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                let target = $(e.target).attr('href');
+                if (target === '#tab-accounts') {
+                    initAccountsTable();
+                } else if (target === '#tab-posts') {
+                    initPostsTable();
+                } else if (target === '#tab-activity') {
+                    initActivityTable();
+                }
+                setTimeout(function () {
+                    $.fn.dataTable.tables({ visible: true, api: true }).columns.adjust();
+                }, 50);
+            });
+
+            // Activity Log Inspector Modal
+            const userLogModalEl = document.getElementById('userLogDetailModal');
+            const userLogModal = userLogModalEl ? new bootstrap.Modal(userLogModalEl) : null;
+            let currentLogResponse = '';
+
+            $(document).on('click', '.view-user-log-btn', function () {
+                const action = $(this).data('action');
+                const event = $(this).data('event');
+                const status = $(this).data('status');
+                const time = $(this).data('time');
+                const duration = $(this).data('duration');
+                const account = $(this).data('account');
+                const payload = $(this).data('payload');
+                const response = $(this).data('response');
+
+                $('#modalUserLogAction').text(action);
+                $('#modalUserLogSubtitle').text(`${event} • ${time}`);
+                $('#modalUserLogDuration').text(duration);
+                $('#modalUserLogAccount').text(account);
+
+                const statusBadge = document.getElementById('modalUserLogStatusBadge');
+                if (status === 'success') {
+                    statusBadge.className = 'badge border border-success bg-transparent text-success';
+                    statusBadge.innerHTML = '<i class="ti ti-check me-1"></i> Success';
+                } else if (status === 'failed') {
+                    statusBadge.className = 'badge border border-danger bg-transparent text-danger';
+                    statusBadge.innerHTML = '<i class="ti ti-x me-1"></i> Failed';
+                } else {
+                    statusBadge.className = 'badge border border-warning bg-transparent text-warning';
+                    statusBadge.innerHTML = status;
+                }
+
+                if (payload && payload !== 'null' && payload !== '[]') {
+                    $('#modalUserLogPayload').text(payload);
+                    $('#userPayloadSection').show();
+                } else {
+                    $('#userPayloadSection').hide();
+                }
+
+                currentLogResponse = response || 'No response data recorded.';
+                $('#modalUserLogResponse').text(currentLogResponse);
+
+                if (userLogModal) userLogModal.show();
+            });
+
+            $('#copyUserLogBtn').on('click', function () {
+                if (!currentLogResponse) return;
+                navigator.clipboard.writeText(currentLogResponse).then(() => {
+                    const btn = $(this);
+                    const orig = btn.html();
+                    btn.html('<i class="ti ti-check me-1"></i> Copied!');
+                    setTimeout(() => btn.html(orig), 2000);
+                });
+            });
+        });
+    </script>
+@endpush
 
 @push('scripts')
 <script>

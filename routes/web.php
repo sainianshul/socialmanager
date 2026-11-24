@@ -160,6 +160,9 @@ Route::prefix('admin')->group(function () {
                     Route::post('{user}/restore', [\App\Http\Controllers\Admin\UserController::class, 'restore'])->name('restore');
                     Route::post('{user}/status', [\App\Http\Controllers\Admin\UserController::class, 'updateStatus'])->name('update-status');
                     Route::post('{user}/revoke-token', [\App\Http\Controllers\Admin\UserController::class, 'revokeToken'])->name('revoke-token');
+                    Route::get('{user}/accounts-data', [\App\Http\Controllers\Admin\UserController::class, 'accountsData'])->name('accounts-data');
+                    Route::get('{user}/posts-data', [\App\Http\Controllers\Admin\UserController::class, 'postsData'])->name('posts-data');
+                    Route::get('{user}/activity-data', [\App\Http\Controllers\Admin\UserController::class, 'activityData'])->name('activity-data');
                 });
                 Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
 
