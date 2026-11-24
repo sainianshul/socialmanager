@@ -208,9 +208,11 @@
                 </div>
                 <div class="col-auto ms-auto d-flex align-items-center flex-wrap gap-2">
                     {{-- Party Filter Dropdown --}}
-                    <div class="d-flex align-items-center gap-2 bg-white border rounded-3 px-3 py-1.5 shadow-sm" style="min-width: 250px;">
-                        <i class="ti ti-filter text-muted"></i>
-                        <select class="form-select border-0 shadow-none p-0 small fw-medium" id="strip-party-filter" style="cursor: pointer;" onchange="window.location.href = this.value ? '{{ route('admin.leader-strips.index') }}?party_id=' + this.value : '{{ route('admin.leader-strips.index') }}'">
+                    <div class="input-icon" style="min-width: 250px;">
+                        <span class="input-icon-addon">
+                            <i class="ti ti-filter text-secondary"></i>
+                        </span>
+                        <select class="form-select ps-5 bg-white shadow-sm fw-medium text-dark" id="strip-party-filter" style="cursor: pointer; height: 38px; border-radius: 8px; font-size: 0.875rem;" onchange="window.location.href = this.value ? '{{ route('admin.leader-strips.index') }}?party_id=' + this.value : '{{ route('admin.leader-strips.index') }}'">
                             <option value="">All Political Parties</option>
                             @foreach($parties as $p)
                                 <option value="{{ $p->id }}" {{ ($currentPartyId == $p->id) ? 'selected' : '' }}>
@@ -219,9 +221,9 @@
                             @endforeach
                         </select>
                     </div>
-                    <button type="button" class="btn btn-primary d-flex align-items-center gap-1 shadow-sm px-3 py-2" id="btn-create-strip-modal">
-                        <i class="ti ti-plus"></i>
-                        <span>Add Leader Strip</span>
+                    <button type="button" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm px-3.5 py-2" id="btn-create-strip-modal" style="height: 38px; border-radius: 8px;">
+                        <i class="ti ti-plus fs-2"></i>
+                        <span class="fw-semibold">Add Leader Strip</span>
                     </button>
                 </div>
             </div>
