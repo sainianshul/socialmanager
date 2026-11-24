@@ -166,16 +166,10 @@ class FestivalSeeder extends Seeder
                 'ready_caption' => "गौ-पूजन के पावन पर्व 'गोपाष्टमी' की आप सभी को हार्दिक शुभकामनाएं।\n\nगाय केवल एक पशु नहीं, बल्कि सनातन संस्कृति में मां स्वरूपा और समस्त देवी-देवताओं का निवास स्थान हैं। आइए, गौ सेवा और गौ संवर्धन का संकल्प लें। जय गोमाता!",
                 'hashtags' => '#Gopashtami #GauPujan #GauSeva #JaiGauMata',
                 'is_active' => true,
-                'primary_template' => 'images/templates/gopashtami.jpg',
-                'primary_title' => 'Gopashtami Gau Pujan Royal Edition',
+                'primary_template' => 'images/templates/gopashtami-kamadhenu-grace.jpg',
+                'primary_title' => 'Gopashtami Kamadhenu Grace Edition',
                 'preset_key' => 'classic_political_right',
                 'additional_templates' => [
-                    [
-                        'template_image_path' => 'images/templates/gopashtami-kamadhenu-grace.jpg',
-                        'title' => 'Gopashtami Kamadhenu Grace Edition',
-                        'thumbnail_path' => 'images/templates/gopashtami-kamadhenu-grace.jpg',
-                        'preset_key' => 'classic_political_right',
-                    ],
                     [
                         'template_image_path' => 'images/templates/gopashtami-krishna-divine.jpg',
                         'title' => 'Gopashtami Krishna Gau Prema Edition',
@@ -246,6 +240,7 @@ class FestivalSeeder extends Seeder
         // Delete all old blurry dummy cropped templates & removed templates
         FestivalTemplate::where('template_image_path', 'like', '%template-%')
             ->orWhere('template_image_path', 'images/templates/gopashtami-vrindavan-divine.jpg')
+            ->orWhere('template_image_path', 'images/templates/gopashtami.jpg')
             ->delete();
 
         foreach ($festivals as $fest) {
