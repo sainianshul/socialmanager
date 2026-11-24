@@ -10,6 +10,8 @@ use App\Models\PoliticalParty;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class LeaderStripController extends Controller
@@ -97,6 +99,14 @@ class LeaderStripController extends Controller
             $query->where('party_id', $partyId);
         }
 
+        // Global leaders (user_id IS NULL) + this user's local custom leaders (user_id = $user->id)
+        $query->where(function ($q) use ($user) {
+            $q->whereNull('user_id');
+            if ($user) {
+                $q->orWhere('user_id', $user->id);
+            }
+        });
+
         if ($search = trim((string)$request->query('search', ''))) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -105,10 +115,17 @@ class LeaderStripController extends Controller
         }
 
         if ($state = trim((string)$request->query('state', ''))) {
-            $query->where('state', $state);
+            if ($state === 'Local') {
+                $query->whereNotNull('user_id');
+            } else {
+                $query->where('state', $state);
+            }
         }
 
-        $leaders = $query->orderBy('name')->get();
+        // Show user's local leaders first, then by name
+        $leaders = $query->orderByRaw('CASE WHEN user_id IS NOT NULL THEN 0 ELSE 1 END')
+            ->orderBy('name')
+            ->get();
 
         return response()->json([
             'success' => true,
@@ -120,7 +137,74 @@ class LeaderStripController extends Controller
                 'designation' => $l->designation,
                 'state' => $l->state,
                 'image_url' => $l->image_url,
+                'is_custom' => !is_null($l->user_id),
             ]),
+        ]);
+    }
+
+    /**
+     * Quickly create a custom/local leader for the authenticated user
+     */
+    public function storeCustomLeader(Request $request): JsonResponse
+    {
+        $user = auth()->user();
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'party_id' => 'required|exists:political_parties,id',
+            'designation' => 'nullable|string|max:100',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
+        ]);
+
+        $file = $request->file('image');
+        $filename = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+        $path = $file->storeAs('uploads/leaders/custom', $filename, 'public');
+
+        $leader = PoliticalLeader::create([
+            'user_id' => $user->id,
+            'party_id' => $validated['party_id'],
+            'name' => trim($validated['name']),
+            'designation' => !empty($validated['designation']) ? trim($validated['designation']) : null,
+            'image' => $path,
+            'state' => 'Local',
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Local leader added successfully.',
+            'leader' => [
+                'id' => $leader->id,
+                'party_id' => $leader->party_id,
+                'name' => $leader->name,
+                'designation' => $leader->designation,
+                'state' => $leader->state,
+                'image_url' => $leader->image_url,
+                'is_custom' => true,
+            ],
+        ], 201);
+    }
+
+    /**
+     * Delete a custom leader owned by the authenticated user
+     */
+    public function destroyCustomLeader(int $id): JsonResponse
+    {
+        $user = auth()->user();
+        $leader = PoliticalLeader::where('id', $id)
+            ->where('user_id', $user->id)
+            ->firstOrFail();
+
+        // Delete photo file if present
+        if ($leader->image && Storage::disk('public')->exists($leader->image)) {
+            Storage::disk('public')->delete($leader->image);
+        }
+
+        $leader->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Local leader removed successfully.',
         ]);
     }
 

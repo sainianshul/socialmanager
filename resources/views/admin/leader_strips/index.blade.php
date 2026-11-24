@@ -495,6 +495,56 @@
                         </div>
                     </div>
 
+                    {{-- Available Leaders Header with Quick Add Local Leader Button --}}
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                        <span class="small fw-bold text-dark">Choose Leaders</span>
+                        <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1 d-inline-flex align-items-center gap-1 shadow-xs" id="btn-toggle-local-leader">
+                            <i class="ti ti-user-plus"></i>
+                            <span>+ Add Local Leader</span>
+                        </button>
+                    </div>
+
+                    {{-- Collapsible Quick Add Local Leader Box --}}
+                    <div id="box-add-local-leader" class="d-none border border-primary-subtle rounded-3 p-2.5 mb-2.5 bg-light-subtle shadow-xs">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="small fw-bold text-dark d-flex align-items-center gap-1">
+                                <i class="ti ti-user-plus text-primary"></i> Add Local / Custom Leader
+                            </span>
+                            <button type="button" class="btn-close" id="btn-close-local-leader" style="font-size: 10px;" aria-label="Close"></button>
+                        </div>
+                        
+                        <div class="row g-2 align-items-center">
+                            {{-- Circular Avatar Upload --}}
+                            <div class="col-auto text-center">
+                                <label for="local-leader-photo" class="cursor-pointer m-0 d-block position-relative" title="Click to choose leader photo">
+                                    <img id="preview-local-leader-avatar" src="https://ui-avatars.com/api/?name=Local+Leader&background=e0e7ff&color=4338ca&size=90" alt="Preview" class="rounded-circle border" style="width: 50px; height: 50px; object-fit: cover; border-color: #cbd5e1 !important;">
+                                    <span class="position-absolute bottom-0 end-0 bg-primary text-white rounded-circle d-flex align-items-center justify-content-center shadow-xs" style="width: 18px; height: 18px; font-size: 10px;">
+                                        <i class="ti ti-camera"></i>
+                                    </span>
+                                </label>
+                                <input type="file" id="local-leader-photo" class="d-none" accept="image/png,image/jpeg,image/webp">
+                            </div>
+
+                            {{-- Name & Designation Inputs --}}
+                            <div class="col">
+                                <input type="text" id="local-leader-name" class="form-control form-control-sm mb-1.5" placeholder="Leader Name (e.g. डॉ. सुनील शर्मा)" maxlength="100">
+                                <input type="text" id="local-leader-role" class="form-control form-control-sm" placeholder="Designation (e.g. विधायक / जिला अध्यक्ष)" maxlength="100">
+                            </div>
+
+                            {{-- Action Buttons --}}
+                            <div class="col-12 d-flex align-items-center justify-content-between pt-1 border-top mt-1">
+                                <span class="text-secondary small" style="font-size: 10.5px;">Photo & Name are required</span>
+                                <div class="d-flex gap-1.5">
+                                    <button type="button" class="btn btn-xs btn-light border rounded-pill px-2.5" id="btn-cancel-local-leader">Cancel</button>
+                                    <button type="button" class="btn btn-xs btn-primary rounded-pill px-3 fw-semibold" id="btn-submit-local-leader">
+                                        <i class="ti ti-check me-1"></i>Save & Add to Strip
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="local-leader-alert" class="text-danger small mt-1.5 d-none" style="font-size: 11px;"></div>
+                    </div>
+
                     {{-- Search Input --}}
                     <div class="mb-2">
                         <div class="input-group input-group-sm">
@@ -733,6 +783,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Open Builder for Create or Edit
     async function openStripBuilder(stripId) {
         hideModalAlert();
+        if (typeof resetLocalLeaderForm === 'function') resetLocalLeaderForm();
+        if (boxAddLocalLeader) boxAddLocalLeader.classList.add('d-none');
 
         if (btnSaveStrip) btnSaveStrip.disabled = false;
 
@@ -851,12 +903,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     : '<div class="bs-builder-unselected-circle"><i class="ti ti-plus text-muted" style="font-size: 11px;"></i></div>') +
                 '<img src="' + leader.image_url + '" alt="' + leader.name + '" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid ' + (isSelected ? '#0d9488' : '#e2e8f0') + ';">' +
                 '<div class="flex-grow-1 min-w-0">' +
-                    '<div class="fw-bold text-dark text-truncate" style="font-size: 0.84rem;">' + leader.name + '</div>' +
+                    '<div class="d-flex align-items-center gap-1.5">' +
+                        '<span class="fw-bold text-dark text-truncate" style="font-size: 0.84rem;">' + leader.name + '</span>' +
+                        (leader.is_custom ? '<span class="badge bg-purple-lt text-purple px-1.5 py-0.5 rounded-pill" style="font-size: 9px;"><i class="ti ti-star me-0.5"></i>My Leader</span>' : '') +
+                    '</div>' +
                     '<div class="text-secondary text-truncate" style="font-size: 0.72rem;">' + (leader.designation || leader.state || '') + '</div>' +
                 '</div>' +
-                (isSelected
-                    ? '<span class="badge bg-teal-lt text-teal px-2 py-0.5 rounded-pill" style="font-size: 10px;">Selected</span>'
-                    : '<span class="text-muted small" style="font-size: 11px;">Add</span>') +
+                '<div class="d-flex align-items-center gap-1">' +
+                    (isSelected
+                        ? '<span class="badge bg-teal-lt text-teal px-2 py-0.5 rounded-pill" style="font-size: 10px;">Selected</span>'
+                        : '<span class="text-muted small" style="font-size: 11px;">Add</span>') +
+                    (leader.is_custom
+                        ? '<button type="button" class="btn btn-xs btn-outline-danger p-0 ms-1 rounded-circle btn-delete-custom-leader" data-id="' + leader.id + '" title="Delete this local leader" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;"><i class="ti ti-trash" style="font-size: 11px;"></i></button>'
+                        : '') +
+                '</div>' +
             '</div>';
         });
 
@@ -931,14 +991,214 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Click handler for Leaders List
+    // Click handler for Leaders List (toggle selection & delete custom leader)
     if (elAvailableList) {
-        elAvailableList.addEventListener('click', function (e) {
+        elAvailableList.addEventListener('click', async function (e) {
+            // Delete custom leader action
+            var btnDel = e.target.closest('.btn-delete-custom-leader');
+            if (btnDel) {
+                e.stopPropagation();
+                var leaderId = parseInt(btnDel.getAttribute('data-id'), 10);
+                if (!leaderId) return;
+
+                if (!confirm('Are you sure you want to delete this local leader?')) {
+                    return;
+                }
+
+                var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+                try {
+                    var delRes = await fetch('/admin/leader-strips/custom-leader/' + leaderId, {
+                        method: 'DELETE',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        }
+                    });
+                    var delData = await delRes.json();
+                    if (delRes.ok && delData.success) {
+                        stripBuilderState.availableLeaders = stripBuilderState.availableLeaders.filter(function(l) { return l.id !== leaderId; });
+                        stripBuilderState.selectedLeaders = stripBuilderState.selectedLeaders.filter(function(l) { return l.id !== leaderId; });
+                        renderPreviewBar();
+                        renderAvailableLeaders(inputSearch ? inputSearch.value : '');
+                        showModalAlert('Local leader removed successfully.', 'info');
+                    }
+                } catch (err) {
+                    console.error('Error deleting custom leader:', err);
+                }
+                return;
+            }
+
             var row = e.target.closest('.bs-builder-leader-row');
             if (!row) return;
-            var leaderId = row.getAttribute('data-id');
-            if (leaderId) {
-                toggleLeader(leaderId);
+            var rowLeaderId = row.getAttribute('data-id');
+            if (rowLeaderId) {
+                toggleLeader(rowLeaderId);
+            }
+        });
+    }
+
+    // Quick Add Local Leader Form Controls
+    var btnToggleLocalLeader = document.getElementById('btn-toggle-local-leader');
+    var boxAddLocalLeader = document.getElementById('box-add-local-leader');
+    var btnCloseLocalLeader = document.getElementById('btn-close-local-leader');
+    var btnCancelLocalLeader = document.getElementById('btn-cancel-local-leader');
+    var btnSubmitLocalLeader = document.getElementById('btn-submit-local-leader');
+    var inputLocalPhoto = document.getElementById('local-leader-photo');
+    var previewLocalAvatar = document.getElementById('preview-local-leader-avatar');
+    var inputLocalName = document.getElementById('local-leader-name');
+    var inputLocalRole = document.getElementById('local-leader-role');
+    var localLeaderAlert = document.getElementById('local-leader-alert');
+
+    function resetLocalLeaderForm() {
+        if (inputLocalName) inputLocalName.value = '';
+        if (inputLocalRole) inputLocalRole.value = '';
+        if (inputLocalPhoto) inputLocalPhoto.value = '';
+        if (previewLocalAvatar) previewLocalAvatar.src = 'https://ui-avatars.com/api/?name=Local+Leader&background=e0e7ff&color=4338ca&size=90';
+        if (localLeaderAlert) {
+            localLeaderAlert.textContent = '';
+            localLeaderAlert.classList.add('d-none');
+        }
+    }
+
+    if (btnToggleLocalLeader && boxAddLocalLeader) {
+        btnToggleLocalLeader.addEventListener('click', function (e) {
+            e.preventDefault();
+            boxAddLocalLeader.classList.toggle('d-none');
+            if (!boxAddLocalLeader.classList.contains('d-none') && inputLocalName) {
+                inputLocalName.focus();
+            }
+        });
+    }
+
+    if (btnCloseLocalLeader) {
+        btnCloseLocalLeader.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (boxAddLocalLeader) boxAddLocalLeader.classList.add('d-none');
+            resetLocalLeaderForm();
+        });
+    }
+
+    if (btnCancelLocalLeader) {
+        btnCancelLocalLeader.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (boxAddLocalLeader) boxAddLocalLeader.classList.add('d-none');
+            resetLocalLeaderForm();
+        });
+    }
+
+    if (inputLocalPhoto && previewLocalAvatar) {
+        inputLocalPhoto.addEventListener('change', function () {
+            var file = this.files && this.files[0];
+            if (file) {
+                previewLocalAvatar.src = URL.createObjectURL(file);
+            }
+        });
+    }
+
+    if (btnSubmitLocalLeader) {
+        btnSubmitLocalLeader.addEventListener('click', async function (e) {
+            e.preventDefault();
+            var name = inputLocalName ? inputLocalName.value.trim() : '';
+            var role = inputLocalRole ? inputLocalRole.value.trim() : '';
+            var file = inputLocalPhoto ? inputLocalPhoto.files[0] : null;
+            var partyId = selectParty ? selectParty.value : stripBuilderState.partyId;
+
+            if (!partyId) {
+                if (localLeaderAlert) {
+                    localLeaderAlert.textContent = 'Please select a political party above first.';
+                    localLeaderAlert.classList.remove('d-none');
+                }
+                return;
+            }
+
+            if (!name) {
+                if (localLeaderAlert) {
+                    localLeaderAlert.textContent = 'Please enter leader full name.';
+                    localLeaderAlert.classList.remove('d-none');
+                }
+                if (inputLocalName) inputLocalName.focus();
+                return;
+            }
+
+            if (!file) {
+                if (localLeaderAlert) {
+                    localLeaderAlert.textContent = 'Please select a photo for the local leader.';
+                    localLeaderAlert.classList.remove('d-none');
+                }
+                return;
+            }
+
+            if (localLeaderAlert) {
+                localLeaderAlert.classList.add('d-none');
+            }
+
+            btnSubmitLocalLeader.disabled = true;
+            var origHtml = btnSubmitLocalLeader.innerHTML;
+            btnSubmitLocalLeader.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Saving...';
+
+            var fd = new FormData();
+            fd.append('party_id', partyId);
+            fd.append('name', name);
+            if (role) fd.append('designation', role);
+            fd.append('image', file);
+
+            var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            try {
+                var res = await fetch('{{ route("admin.leader-strips.custom-leader.store") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: fd
+                });
+
+                var data = await res.json();
+
+                if (res.ok && data.success && data.leader) {
+                    // Prepend to available leaders array
+                    stripBuilderState.availableLeaders.unshift(data.leader);
+
+                    // Auto-add to selected strip sequence if under 7
+                    if (stripBuilderState.selectedLeaders.length < 7) {
+                        stripBuilderState.selectedLeaders.push({
+                            id: data.leader.id,
+                            name: data.leader.name,
+                            designation: data.leader.designation,
+                            state: data.leader.state,
+                            image_url: data.leader.image_url,
+                            is_custom: true
+                        });
+                    }
+
+                    renderPreviewBar();
+                    renderAvailableLeaders(inputSearch ? inputSearch.value : '');
+
+                    if (boxAddLocalLeader) boxAddLocalLeader.classList.add('d-none');
+                    resetLocalLeaderForm();
+                    showModalAlert('Local leader "' + data.leader.name + '" added and selected in your strip!', 'success');
+                } else {
+                    var errMsg = data.message || 'Failed to add local leader.';
+                    if (data.errors) {
+                        var k = Object.keys(data.errors)[0];
+                        if (k) errMsg = data.errors[k][0];
+                    }
+                    if (localLeaderAlert) {
+                        localLeaderAlert.textContent = errMsg;
+                        localLeaderAlert.classList.remove('d-none');
+                    }
+                }
+            } catch (err) {
+                console.error('Error saving local leader:', err);
+                if (localLeaderAlert) {
+                    localLeaderAlert.textContent = 'Network error saving local leader.';
+                    localLeaderAlert.classList.remove('d-none');
+                }
+            } finally {
+                btnSubmitLocalLeader.disabled = false;
+                btnSubmitLocalLeader.innerHTML = origHtml;
             }
         });
     }

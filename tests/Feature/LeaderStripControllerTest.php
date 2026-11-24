@@ -349,4 +349,83 @@ class LeaderStripControllerTest extends TestCase
         $deleteRes->assertStatus(200);
         $this->assertDatabaseMissing('leader_strips', ['id' => $systemStrip->id]);
     }
+
+    public function test_user_can_create_custom_local_leader(): void
+    {
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $file = \Illuminate\Http\UploadedFile::fake()->image('mla_photo.jpg', 400, 400);
+
+        $response = $this->actingAs($this->user)
+            ->postJson(route('admin.leader-strips.custom-leader.store'), [
+                'name' => 'Dr. Ramesh Sharma (MLA)',
+                'designation' => 'MLA - Cantt Constituency',
+                'party_id' => $this->bjp->id,
+                'image' => $file,
+            ]);
+
+        $response->assertStatus(201);
+        $data = $response->json();
+        $this->assertTrue($data['success']);
+        $this->assertEquals('Dr. Ramesh Sharma (MLA)', $data['leader']['name']);
+        $this->assertTrue($data['leader']['is_custom']);
+
+        $this->assertDatabaseHas('political_leaders', [
+            'name' => 'Dr. Ramesh Sharma (MLA)',
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'state' => 'Local',
+        ]);
+    }
+
+    public function test_custom_leader_appears_for_owner_and_hidden_for_other_users(): void
+    {
+        $customLeader = PoliticalLeader::create([
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'name' => 'Local Zila Adhyaksh',
+            'designation' => 'District President',
+            'state' => 'Local',
+            'is_active' => true,
+        ]);
+
+        // Owner can see the custom leader
+        $resOwner = $this->actingAs($this->user)
+            ->getJson(route('admin.leader-strips.leaders', ['party_id' => $this->bjp->id]));
+        $resOwner->assertStatus(200);
+        $names = collect($resOwner->json('leaders'))->pluck('name')->all();
+        $this->assertContains('Local Zila Adhyaksh', $names);
+
+        // Another user cannot see this custom leader
+        $otherUser = User::factory()->create(['role' => User::ROLE_USER]);
+        $resOther = $this->actingAs($otherUser)
+            ->getJson(route('admin.leader-strips.leaders', ['party_id' => $this->bjp->id]));
+        $resOther->assertStatus(200);
+        $otherNames = collect($resOther->json('leaders'))->pluck('name')->all();
+        $this->assertNotContains('Local Zila Adhyaksh', $otherNames);
+    }
+
+    public function test_user_can_delete_own_custom_leader_but_not_others(): void
+    {
+        $customLeader = PoliticalLeader::create([
+            'user_id' => $this->user->id,
+            'party_id' => $this->bjp->id,
+            'name' => 'Temporary Leader',
+            'state' => 'Local',
+            'is_active' => true,
+        ]);
+
+        $otherUser = User::factory()->create(['role' => User::ROLE_USER]);
+
+        // Other user fails to delete
+        $otherRes = $this->actingAs($otherUser)
+            ->deleteJson(route('admin.leader-strips.custom-leader.destroy', $customLeader->id));
+        $otherRes->assertStatus(404);
+
+        // Owner successfully deletes
+        $ownerRes = $this->actingAs($this->user)
+            ->deleteJson(route('admin.leader-strips.custom-leader.destroy', $customLeader->id));
+        $ownerRes->assertStatus(200);
+        $this->assertDatabaseMissing('political_leaders', ['id' => $customLeader->id]);
+    }
 }

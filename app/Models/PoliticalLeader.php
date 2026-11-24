@@ -14,6 +14,7 @@ class PoliticalLeader extends Model
     protected $table = 'political_leaders';
 
     protected $fillable = [
+        'user_id',
         'party_id',
         'name',
         'designation',
@@ -27,6 +28,11 @@ class PoliticalLeader extends Model
         return [
             'is_active' => 'boolean',
         ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function party(): BelongsTo

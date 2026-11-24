@@ -50,6 +50,8 @@ Route::prefix('admin')->group(function () {
             Route::prefix('leader-strips')->name('leader-strips.')->group(function () {
                 Route::get('/', [\App\Http\Controllers\Admin\LeaderStripController::class, 'index'])->name('index');
                 Route::get('leaders', [\App\Http\Controllers\Admin\LeaderStripController::class, 'leaders'])->name('leaders');
+                Route::post('custom-leader', [\App\Http\Controllers\Admin\LeaderStripController::class, 'storeCustomLeader'])->name('custom-leader.store');
+                Route::delete('custom-leader/{id}', [\App\Http\Controllers\Admin\LeaderStripController::class, 'destroyCustomLeader'])->name('custom-leader.destroy');
                 Route::post('/', [\App\Http\Controllers\Admin\LeaderStripController::class, 'store'])->name('store');
                 Route::get('{strip}', [\App\Http\Controllers\Admin\LeaderStripController::class, 'show'])->name('show');
                 Route::put('{strip}', [\App\Http\Controllers\Admin\LeaderStripController::class, 'update'])->name('update');
