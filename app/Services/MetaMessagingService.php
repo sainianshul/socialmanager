@@ -74,13 +74,30 @@ class MetaMessagingService
             ];
         }
 
+        // Personalize message with commenter name placeholder if present ({name}, {first_name})
+        $commenterName = trim((string) ($comment->commenter_name ?: ''));
+        $firstName = $commenterName !== '' ? (explode(' ', $commenterName)[0] ?? '') : '';
+
+        $personalizedDm = $rule->dm_message;
+        if ($commenterName !== '') {
+            $personalizedDm = str_ireplace(['{name}', '{first_name}'], [$commenterName, $firstName], $personalizedDm);
+        } else {
+            $personalizedDm = str_ireplace(['{name}', '{first_name}'], ['friend', 'friend'], $personalizedDm);
+        }
+
         // 1. Send the Private Direct Message (DM)
-        $dmResult = $this->sendPrivateReply($account, $commentId, $rule->dm_message);
+        $dmResult = $this->sendPrivateReply($account, $commentId, $personalizedDm);
 
         // 2. Optionally publish Public Comment Reply if configured
         $publicReplyResult = ['success' => false, 'reply_id' => null];
         if (!empty($rule->public_reply)) {
-            $publicReplyResult = $this->sendPublicReply($account, $commentId, $rule->public_reply);
+            $personalizedPublicReply = $rule->public_reply;
+            if ($commenterName !== '') {
+                $personalizedPublicReply = str_ireplace(['{name}', '{first_name}'], [$commenterName, $firstName], $personalizedPublicReply);
+            } else {
+                $personalizedPublicReply = str_ireplace(['{name}', '{first_name}'], ['ji', ''], $personalizedPublicReply);
+            }
+            $publicReplyResult = $this->sendPublicReply($account, $commentId, $personalizedPublicReply);
         }
 
         // 3. If DM succeeded, record trigger on rule, track frequency cap, and update comment status
@@ -97,7 +114,7 @@ class MetaMessagingService
 
             if ($publicReplyResult['success']) {
                 $updateData['status'] = Comment::STATUS_REPLIED;
-                $updateData['ai_reply'] = $rule->public_reply;
+                $updateData['ai_reply'] = $personalizedPublicReply ?? $rule->public_reply;
                 $updateData['meta_reply_id'] = $publicReplyResult['reply_id'];
             }
 
@@ -112,6 +129,7 @@ class MetaMessagingService
                 'dm_id' => $dmResult['message_id'] ?? null,
                 'public_reply_sent' => $publicReplyResult['success'],
                 'public_reply_id' => $publicReplyResult['reply_id'] ?? null,
+                'public_reply' => $personalizedPublicReply ?? $rule->public_reply,
             ];
         }
 

@@ -221,7 +221,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <button type="button" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm px-3.5 py-2" id="btn-create-strip-modal" style="height: 38px; border-radius: 8px;">
+                    <button type="button" class="btn btn-primary d-flex align-items-center gap-1.5 shadow-sm px-3.5 py-2 btn-open-strip-builder" id="btn-create-strip-modal" data-bs-toggle="modal" data-bs-target="#stripBuilderModal" style="height: 38px; border-radius: 8px;">
                         <i class="ti ti-plus fs-2"></i>
                         <span class="fw-semibold">Add Leader Strip</span>
                     </button>
@@ -350,7 +350,7 @@
         <div class="mb-5">
             <div class="d-flex align-items-center justify-content-between mb-2">
                 <h3 class="fw-bold text-dark fs-3 mb-0">Personal Strip</h3>
-                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs" id="btn-create-strip-modal-user">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 shadow-xs btn-open-strip-builder" id="btn-create-strip-modal-user" data-bs-toggle="modal" data-bs-target="#stripBuilderModal">
                     <i class="ti ti-plus me-1"></i>Create Strip
                 </button>
             </div>
@@ -418,7 +418,7 @@
                 {{-- Notice If No Personal Strip --}}
                 <div class="clean-strip-card text-center py-4" id="no-user-strips-notice">
                     <p class="text-secondary small mb-2">No personal strip created yet.</p>
-                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" id="btn-create-first-strip">
+                    <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 btn-open-strip-builder" id="btn-create-first-strip" data-bs-toggle="modal" data-bs-target="#stripBuilderModal">
                         <i class="ti ti-plus me-1"></i>Create Personal Strip
                     </button>
                 </div>
@@ -696,7 +696,48 @@ document.addEventListener('DOMContentLoaded', function () {
     // ======================================================================
     var isUserAdmin = {{ $isAdmin ? 'true' : 'false' }};
     var stripBuilderModalEl = document.getElementById('stripBuilderModal');
-    var stripBuilderModal = stripBuilderModalEl ? bootstrap.Modal.getOrCreateInstance(stripBuilderModalEl) : null;
+
+    function getBuilderModal() {
+        if (!stripBuilderModalEl) return null;
+        try {
+            if (window.bootstrap && typeof window.bootstrap.Modal !== 'undefined') {
+                return window.bootstrap.Modal.getOrCreateInstance 
+                    ? window.bootstrap.Modal.getOrCreateInstance(stripBuilderModalEl) 
+                    : new window.bootstrap.Modal(stripBuilderModalEl);
+            }
+        } catch (e) {
+            console.warn('Bootstrap modal init error:', e);
+        }
+        return null;
+    }
+
+    function showBuilderModal() {
+        if (!stripBuilderModalEl) return;
+        var modal = getBuilderModal();
+        if (modal && typeof modal.show === 'function') {
+            modal.show();
+        } else if (window.$ && typeof $(stripBuilderModalEl).modal === 'function') {
+            $(stripBuilderModalEl).modal('show');
+        } else {
+            stripBuilderModalEl.classList.add('show');
+            stripBuilderModalEl.style.display = 'block';
+            document.body.classList.add('modal-open');
+        }
+    }
+
+    function hideBuilderModal() {
+        if (!stripBuilderModalEl) return;
+        var modal = getBuilderModal();
+        if (modal && typeof modal.hide === 'function') {
+            modal.hide();
+        } else if (window.$ && typeof $(stripBuilderModalEl).modal === 'function') {
+            $(stripBuilderModalEl).modal('hide');
+        } else {
+            stripBuilderModalEl.classList.remove('show');
+            stripBuilderModalEl.style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    }
 
     var stripBuilderState = {
         stripId: null,
@@ -827,9 +868,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        if (stripBuilderModal) {
-            stripBuilderModal.show();
-        }
+        showBuilderModal();
 
         try {
             if (stripId) {
@@ -1215,29 +1254,28 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Trigger Open Builder on Create Strip Buttons
-    var btnCreateStrip = document.getElementById('btn-create-strip-modal');
-    if (btnCreateStrip) {
-        btnCreateStrip.addEventListener('click', function () {
-            openStripBuilder(null);
-        });
-    }
-
-    var btnCreateFirst = document.getElementById('btn-create-first-strip');
-    if (btnCreateFirst) {
-        btnCreateFirst.addEventListener('click', function () {
-            openStripBuilder(null);
-        });
-    }
-
-    // Trigger Open Builder on Edit Strip Buttons
+    // Delegated event listener for all Create & Edit Strip buttons
     document.addEventListener('click', function (e) {
+        var btnCreate = e.target.closest('#btn-create-strip-modal, #btn-create-strip-modal-user, #btn-create-first-strip, .btn-open-strip-builder');
+        if (btnCreate) {
+            e.preventDefault();
+            openStripBuilder(null);
+            return;
+        }
+
         var btnEdit = e.target.closest('.btn-edit-strip');
         if (btnEdit) {
+            e.preventDefault();
             var stripId = btnEdit.getAttribute('data-id');
             if (stripId) {
                 openStripBuilder(stripId);
             }
+            return;
+        }
+
+        // Handle modal dismiss button clicks gracefully
+        if (e.target.closest('#stripBuilderModal [data-bs-dismiss="modal"]')) {
+            hideBuilderModal();
         }
     });
 
@@ -1301,9 +1339,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var result = await response.json();
 
                 if (response.ok && result.success) {
-                    if (stripBuilderModal) {
-                        stripBuilderModal.hide();
-                    }
+                    hideBuilderModal();
                     showStripAlert(result.message || 'Header strip saved successfully.', 'success');
                     setTimeout(function () {
                         window.location.reload();

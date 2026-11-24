@@ -170,6 +170,7 @@
                         <span class="text-secondary small" id="dm-counter">0 / 1000</span>
                     </div>
                     <textarea name="dm_message" id="dm-message" class="form-control @error('dm_message') is-invalid @enderror" rows="4" placeholder="Write message to send in DM..." required maxlength="1000">{{ old('dm_message') }}</textarea>
+                    <div class="form-text text-secondary mt-1"><i class="ti ti-info-circle me-1"></i>Tip: You can use <code>{name}</code> for full constituent name or <code>{first_name}</code> for personal greeting.</div>
                     @error('dm_message')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror

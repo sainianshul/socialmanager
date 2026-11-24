@@ -210,7 +210,7 @@ class ProcessCommentJob implements ShouldQueue
                         $repliedAt = now();
                         if (!empty($dmResult['public_reply_sent'])) {
                             $status = Comment::STATUS_REPLIED;
-                            $aiReply = $matchedRule->public_reply;
+                            $aiReply = $dmResult['public_reply'] ?? $matchedRule->public_reply;
                         }
 
                         try {

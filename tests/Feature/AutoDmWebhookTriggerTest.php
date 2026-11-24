@@ -385,4 +385,56 @@ class AutoDmWebhookTriggerTest extends TestCase
             return str_contains($request->url(), 'private_replies');
         });
     }
+
+    public function test_auto_dm_personalizes_message_with_commenter_name(): void
+    {
+        Http::fake([
+            'https://graph.facebook.com/v20.0/fb_comm_pers/private_replies*' => Http::response([
+                'id' => 'mid_dm_pers_11',
+            ], 200),
+            'https://graph.facebook.com/v20.0/fb_comm_pers/comments*' => Http::response([
+                'id' => 'fb_reply_pers_22',
+            ], 200),
+        ]);
+
+        $rule = AutoDmRule::create([
+            'user_id'      => $this->user->id,
+            'account_id'   => $this->facebookAccount->id,
+            'name'         => 'Personalized Rule',
+            'keywords'     => ['scheme'],
+            'match_type'   => 'contains',
+            'dm_message'   => 'Namaste {name}, thank you for asking!',
+            'public_reply' => 'Dhanyawad {first_name} ji, check your inbox.',
+            'is_active'    => true,
+        ]);
+
+        $comment = Comment::create([
+            'account_id'        => $this->facebookAccount->id,
+            'post_id'           => $this->facebookPost->id,
+            'meta_comment_id'   => 'fb_comm_pers',
+            'commenter_name'    => 'Amitabh Verma',
+            'commenter_meta_id' => 'constituent_meta_789',
+            'message'           => 'Please share details of this scheme',
+            'status'            => Comment::STATUS_NEW,
+            'commented_at'      => now(),
+        ]);
+
+        ProcessCommentJob::dispatchSync($comment);
+
+        $rule->refresh();
+        $comment->refresh();
+
+        $this->assertEquals(1, $rule->trigger_count);
+        $this->assertEquals('Dhanyawad Amitabh ji, check your inbox.', $comment->ai_reply);
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'fb_comm_pers/private_replies') &&
+                   $request['message'] === 'Namaste Amitabh Verma, thank you for asking!';
+        });
+
+        Http::assertSent(function ($request) {
+            return str_contains($request->url(), 'fb_comm_pers/comments') &&
+                   $request['message'] === 'Dhanyawad Amitabh ji, check your inbox.';
+        });
+    }
 }
