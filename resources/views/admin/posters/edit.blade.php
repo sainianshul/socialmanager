@@ -39,14 +39,13 @@
                 <div class="col-md-6">
                     <label class="form-label">Political Party</label>
                     <select name="party_id" class="form-select @error('party_id') is-invalid @enderror">
-                        <option value="">All Parties (Universal Poster for All Users)</option>
+                        <option value="">All Parties (Universal)</option>
                         @foreach($parties as $party)
                             <option value="{{ $party->id }}" {{ old('party_id', $poster->party_id) == $party->id ? 'selected' : '' }}>
                                 {{ $party->short_code }} - {{ $party->name }} ({{ $party->hindi_name }})
                             </option>
                         @endforeach
                     </select>
-                    <small class="form-hint">Leave blank if this poster is general (e.g. Suvichar, Beti Bachao) for all users.</small>
                     @error('party_id')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
@@ -63,14 +62,12 @@
                         <span class="text-body small fw-medium text-truncate" style="max-width: 200px;">{{ $poster->name }}</span>
                     </div>
                     <input type="file" name="poster_image" class="form-control @error('poster_image') is-invalid @enderror" accept="image/png,image/jpeg,image/webp">
-                    <small class="form-hint">Leave blank to keep existing artwork. Select new file to replace.</small>
                     @error('poster_image')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-12">
                     <label class="form-label">Default Caption & Hashtags</label>
-                    <textarea name="default_caption" class="form-control @error('default_caption') is-invalid @enderror" rows="3" placeholder="1-Click auto-fill caption & hashtags for users when choosing this poster...">{{ old('default_caption', $poster->default_caption) }}</textarea>
-                    <small class="form-hint">This caption will auto-populate into the post composer when selected.</small>
+                    <textarea name="default_caption" class="form-control @error('default_caption') is-invalid @enderror" rows="3" placeholder="Write default caption & hashtags...">{{ old('default_caption', $poster->default_caption) }}</textarea>
                     @error('default_caption')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
@@ -78,7 +75,7 @@
                     <label class="form-label">Pin to Top of List</label>
                     <select name="show_on_top" class="form-select @error('show_on_top') is-invalid @enderror">
                         <option value="0" {{ old('show_on_top', $poster->show_on_top ? '1' : '0') == '0' ? 'selected' : '' }}>No</option>
-                        <option value="1" {{ old('show_on_top', $poster->show_on_top ? '1' : '0') == '1' ? 'selected' : '' }}>Yes (Pinned on Top)</option>
+                        <option value="1" {{ old('show_on_top', $poster->show_on_top ? '1' : '0') == '1' ? 'selected' : '' }}>Yes</option>
                     </select>
                     @error('show_on_top')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
@@ -91,7 +88,7 @@
 
                 <div class="col-md-2">
                     <label class="form-label">Sort Order</label>
-                    <input type="number" name="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', $poster->sort_order) }}" min="0">
+                    <input type="number" name="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', $poster->sort_order) }}" placeholder="0" min="0">
                     @error('sort_order')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 

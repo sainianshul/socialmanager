@@ -35,7 +35,7 @@
             <form action="{{ route('admin.poster-categories.index') }}" method="GET" class="d-flex gap-2 flex-wrap">
                 <div class="input-icon">
                     <span class="input-icon-addon"><i class="ti ti-search"></i></span>
-                    <input type="text" name="search" class="form-control" placeholder="Search category name or slug..." value="{{ request('search') }}" style="width: 250px;">
+                    <input type="text" name="search" class="form-control" placeholder="Search category name..." value="{{ request('search') }}" style="width: 250px;">
                 </div>
                 <select name="collection" class="form-select" style="width: 170px;" onchange="this.form.submit()">
                     <option value="">All Types</option>
@@ -61,9 +61,7 @@
         <table class="table table-vcenter card-table table-striped table-hover">
             <thead>
                 <tr>
-                    <th style="width: 60px;">Icon</th>
                     <th>Category Name</th>
-                    <th>Slug</th>
                     <th>Top Collection</th>
                     <th>Total Posters</th>
                     <th>Sort Order</th>
@@ -75,27 +73,19 @@
                 @forelse($categories as $category)
                     <tr>
                         <td>
-                            <div class="avatar avatar-md rounded bg-primary-lt text-primary shadow-xs">
-                                <i class="{{ $category->icon ?: 'ti ti-category' }} fs-2"></i>
-                            </div>
-                        </td>
-                        <td>
-                            <div class="font-weight-medium fs-3">{{ $category->name }}</div>
-                        </td>
-                        <td>
-                            <code class="text-secondary small">{{ $category->slug }}</code>
+                            <div class="font-weight-medium fs-3 text-dark">{{ $category->name }}</div>
                         </td>
                         <td>
                             @if($category->show_as_collection)
-                                <span class="badge bg-purple-lt text-purple fw-bold">
+                                <span class="badge border border-purple text-purple bg-transparent fw-bold">
                                     <i class="ti ti-star me-1"></i> Top Collection
                                 </span>
                             @else
-                                <span class="badge bg-light text-secondary border">Normal</span>
+                                <span class="badge border border-secondary text-secondary bg-transparent">Normal</span>
                             @endif
                         </td>
                         <td>
-                            <a href="{{ route('admin.posters.index', ['category_id' => $category->id]) }}" class="badge bg-teal-lt text-teal text-decoration-none fw-bold px-2 py-1">
+                            <a href="{{ route('admin.posters.index', ['category_id' => $category->id]) }}" class="badge border border-teal text-teal bg-transparent text-decoration-none fw-bold px-2 py-1">
                                 {{ $category->posters_count }} Posters
                             </a>
                         </td>
@@ -104,9 +94,9 @@
                         </td>
                         <td>
                             @if($category->is_active)
-                                <span class="badge bg-success-lt text-success fw-bold">Active</span>
+                                <span class="badge border border-success text-success bg-transparent fw-bold">Active</span>
                             @else
-                                <span class="badge bg-secondary-lt text-secondary">Inactive</span>
+                                <span class="badge border border-secondary text-secondary bg-transparent">Inactive</span>
                             @endif
                         </td>
                         <td class="text-end">
@@ -126,7 +116,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="8" class="text-center py-4 text-muted">
+                        <td colspan="6" class="text-center py-4 text-muted">
                             <i class="ti ti-folder-off fs-1 d-block mb-2 text-secondary"></i>
                             No poster categories found. <a href="{{ route('admin.poster-categories.create') }}">Create first category</a>
                         </td>

@@ -24,43 +24,23 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label required">Category Name</label>
-                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="e.g. सामाजिक जागरूकता, दैनिक सुविचार" required>
-                    <small class="form-hint">Hindi or English category title for grouping readymade posters.</small>
+                    <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" placeholder="Category Name" required>
                     @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Slug (URL Identifier)</label>
-                    <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror" value="{{ old('slug') }}" placeholder="e.g. social-awareness, suvichar">
-                    <small class="form-hint">Unique identifier. Leave blank to auto-generate from name.</small>
-                    @error('slug')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Tabler Icon Class</label>
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="ti ti-icons" id="icon-preview"></i></span>
-                        <input type="text" name="icon" id="field-icon" class="form-control @error('icon') is-invalid @enderror" value="{{ old('icon', 'ti ti-template') }}" placeholder="e.g. ti ti-heart-handshake, ti ti-sun, ti ti-candle">
-                    </div>
-                    <small class="form-hint">Tabler icon name (e.g. <code>ti ti-sun</code>, <code>ti ti-heart-handshake</code>, <code>ti ti-candle</code>).</small>
-                    @error('icon')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                </div>
-
-                <div class="col-md-6">
-                    <label class="form-label">Display Sort Order</label>
-                    <input type="number" name="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', 0) }}" min="0">
-                    <small class="form-hint">Lower numbers appear first in the categories list.</small>
-                    @error('sort_order')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-6">
                     <label class="form-label">Show as Top Collection</label>
                     <select name="show_as_collection" class="form-select @error('show_as_collection') is-invalid @enderror">
-                        <option value="0" {{ old('show_as_collection', '0') == '0' ? 'selected' : '' }}>No (Standard Category)</option>
-                        <option value="1" {{ old('show_as_collection') == '1' ? 'selected' : '' }}>Yes (Pinned in Top Collections Banner)</option>
+                        <option value="0" {{ old('show_as_collection', '0') == '0' ? 'selected' : '' }}>No</option>
+                        <option value="1" {{ old('show_as_collection') == '1' ? 'selected' : '' }}>Yes</option>
                     </select>
-                    <small class="form-hint">Display prominent featured collection banner in the app/drawer.</small>
                     @error('show_as_collection')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label">Display Sort Order</label>
+                    <input type="number" name="sort_order" class="form-control @error('sort_order') is-invalid @enderror" value="{{ old('sort_order', 0) }}" min="0" placeholder="0">
+                    @error('sort_order')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="col-md-6">

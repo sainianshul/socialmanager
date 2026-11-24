@@ -60,7 +60,7 @@ class PosterCategoryController extends Controller
 
         $slug = !empty($validated['slug'])
             ? Str::slug($validated['slug'])
-            : Str::slug($validated['name']);
+            : (Str::slug($validated['name']) ?: 'category-' . time());
 
         // Ensure unique slug fallback
         if (PosterCategory::where('slug', $slug)->exists()) {
@@ -70,7 +70,7 @@ class PosterCategoryController extends Controller
         $category = PosterCategory::create([
             'name' => $validated['name'],
             'slug' => $slug,
-            'icon' => $validated['icon'] ?? 'ti ti-template',
+            'icon' => !empty($validated['icon']) ? $validated['icon'] : null,
             'show_as_collection' => $request->boolean('show_as_collection', false),
             'sort_order' => (int) ($validated['sort_order'] ?? 0),
             'is_active' => $request->boolean('is_active', true),
@@ -109,7 +109,7 @@ class PosterCategoryController extends Controller
         $posterCategory->update([
             'name' => $validated['name'],
             'slug' => $slug,
-            'icon' => $validated['icon'] ?? $posterCategory->icon,
+            'icon' => !empty($validated['icon']) ? $validated['icon'] : null,
             'show_as_collection' => $request->boolean('show_as_collection', false),
             'sort_order' => (int) ($validated['sort_order'] ?? 0),
             'is_active' => $request->boolean('is_active', true),

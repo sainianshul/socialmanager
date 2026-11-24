@@ -105,33 +105,27 @@
                             </div>
                         </td>
                         <td>
-                            <div class="font-weight-medium fs-3">{{ $poster->name }}</div>
-                            @if($poster->default_caption)
-                                <div class="text-secondary small text-truncate mt-0.5" style="max-width: 320px;" title="{{ $poster->default_caption }}">
-                                    <i class="ti ti-message-2 me-1 text-muted"></i>{{ $poster->default_caption }}
-                                </div>
-                            @endif
+                            <div class="font-weight-medium fs-3 text-dark">{{ $poster->name }}</div>
                         </td>
                         <td>
-                            <span class="badge bg-blue-lt text-blue fw-bold">
-                                <i class="{{ $poster->category?->icon ?: 'ti ti-category' }} me-1"></i>
+                            <span class="badge border border-primary text-primary bg-transparent fw-bold">
                                 {{ $poster->category?->name ?? 'Uncategorized' }}
                             </span>
                         </td>
                         <td>
                             @if($poster->party)
-                                <span class="badge badge-outline text-primary fw-bold">
+                                <span class="badge border border-azure text-azure bg-transparent fw-bold">
                                     {{ $poster->party->short_code }}
                                 </span>
-                                <span class="text-body small ms-1">{{ $poster->party->name }}</span>
+                                <span class="text-secondary small ms-1">{{ $poster->party->name }}</span>
                             @else
-                                <span class="badge bg-teal-lt text-teal fw-bold">
-                                    <i class="ti ti-world me-1"></i> Universal (All)
+                                <span class="badge border border-teal text-teal bg-transparent fw-bold">
+                                    <i class="ti ti-world me-1"></i> Universal
                                 </span>
                             @endif
                         </td>
                         <td>
-                            <span class="badge bg-light text-secondary border font-monospace">
+                            <span class="badge border border-secondary text-secondary bg-transparent font-monospace">
                                 <i class="ti ti-trending-up me-1 text-success"></i>{{ $poster->usage_count }} uses
                             </span>
                             @if($poster->auto_show_date)
@@ -145,9 +139,9 @@
                         </td>
                         <td>
                             @if($poster->is_active)
-                                <span class="badge bg-success-lt text-success fw-bold">Active</span>
+                                <span class="badge border border-success text-success bg-transparent fw-bold">Active</span>
                             @else
-                                <span class="badge bg-secondary-lt text-secondary">Inactive</span>
+                                <span class="badge border border-secondary text-secondary bg-transparent">Inactive</span>
                             @endif
                         </td>
                         <td class="text-end">
