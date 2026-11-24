@@ -331,6 +331,13 @@
                             </button>
                             <span id="composer-edit-selected-filename" class="small text-secondary ms-1"></span>
                         </div>
+
+                        {{-- Live Attachments Grid (for Canva and Readymade Posters) --}}
+                        <div class="row g-2 d-none mt-2 mb-2" id="composer-media-preview-grid"></div>
+
+                        {{-- Canva / Readymade Imported Hidden Inputs Container --}}
+                        <div id="canva-imported-media-container"></div>
+
                         <input type="file" name="media_files[]" class="d-none" id="composer-media-files" accept="image/*,video/*" multiple onchange="let n = this.files.length; $('#composer-edit-selected-filename').text(n > 0 ? (n + ' file(s) selected') : '');">
                         <div class="form-text small text-secondary">
                             <i class="ti ti-help-circle me-1"></i>Select new media file(s) only if you want to replace current attachments. Leave blank to keep existing files.

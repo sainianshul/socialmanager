@@ -188,6 +188,7 @@ $(document).ready(function() {
             $('#btn-clear-all-media').addClass('d-none');
         }
     }
+    window.updateAttachmentCount = updateAttachmentCount;
 
     // Clear all attached media
     $(document).on('click', '#btn-clear-all-media', function(e) {
