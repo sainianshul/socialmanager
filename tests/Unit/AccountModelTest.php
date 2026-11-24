@@ -113,10 +113,58 @@ class AccountModelTest extends TestCase
 
     public function test_adaptive_sync_interval_scales_based_on_activity_and_defaults_cleanly(): void
     {
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::parse('2026-11-24 14:00:00'));
+
         // Default new account with no history -> 30m
         $newAcc = new Account(['sync_interval_minutes' => 0]);
         $this->assertEquals(30, $newAcc->getEffectiveSyncIntervalMinutes());
         $this->assertEquals('Auto (30m)', $newAcc->sync_status_label);
+
+        \Carbon\Carbon::setTestNow();
+    }
+
+    public function test_night_sleep_mode_relaxes_sync_interval_between_1am_and_6am(): void
+    {
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::parse('2026-11-24 03:30:00')); // 3:30 AM night
+
+        $acc = new Account([
+            'sync_interval_minutes' => 0,
+            'consecutive_empty_syncs' => 0,
+        ]);
+
+        $this->assertEquals(180, $acc->getEffectiveSyncIntervalMinutes());
+        $this->assertStringContainsString('Night Sleep', $acc->sync_status_label);
+
+        \Carbon\Carbon::setTestNow();
+    }
+
+    public function test_exponential_backoff_scales_interval_on_consecutive_empty_syncs(): void
+    {
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::parse('2026-11-24 14:00:00')); // 2:00 PM day
+
+        $acc = new Account(['sync_interval_minutes' => 0]);
+
+        // 1 empty sync -> 30m
+        $acc->consecutive_empty_syncs = 1;
+        $this->assertEquals(30, $acc->getEffectiveSyncIntervalMinutes());
+
+        // 2 empty syncs -> 60m (1h)
+        $acc->consecutive_empty_syncs = 2;
+        $this->assertEquals(60, $acc->getEffectiveSyncIntervalMinutes());
+
+        // 3 empty syncs -> 120m (2h)
+        $acc->consecutive_empty_syncs = 3;
+        $this->assertEquals(120, $acc->getEffectiveSyncIntervalMinutes());
+
+        // 4+ empty syncs -> 360m (6h)
+        $acc->consecutive_empty_syncs = 5;
+        $this->assertEquals(360, $acc->getEffectiveSyncIntervalMinutes());
+
+        // Reset to 0 empty syncs -> back to base 30m
+        $acc->consecutive_empty_syncs = 0;
+        $this->assertEquals(30, $acc->getEffectiveSyncIntervalMinutes());
+
+        \Carbon\Carbon::setTestNow();
     }
 
     public function test_is_due_for_sync_evaluates_correctly(): void

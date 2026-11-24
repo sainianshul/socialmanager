@@ -48,6 +48,7 @@ class Account extends Model
         'webhook_active',
         'last_synced_at',
         'sync_interval_minutes',
+        'consecutive_empty_syncs',
         'ai_tone',
         'ai_language',
         'auto_reply_mode',
@@ -72,6 +73,7 @@ class Account extends Model
         'token_expires_at' => 'datetime',
         'last_synced_at' => 'datetime',
         'sync_interval_minutes' => 'integer',
+        'consecutive_empty_syncs' => 'integer',
     ];
 
     /**
@@ -389,24 +391,40 @@ class Account extends Model
     }
 
     /**
-     * Calculate the effective sync polling interval in minutes:
-     * - If manual interval is configured (> 0), respects user choice (10m to 360m / 6 hours).
-     * - Otherwise (0 = Smart Auto-Adaptive), dynamically scales based on activity:
-     *   * Hot (Active in last 6 hours)  -> 15 minutes
-     *   * Warm (Active in last 24 hours) -> 30 minutes
-     *   * Moderate (Active in last 3 days) -> 60 minutes (1 hour)
-     *   * Cool (Active in last 7 days)   -> 120 minutes (2 hours)
-     *   * Cold / Dormant (> 7 days inactive) -> 360 minutes (6 hours)
+     * Feature 3: Scheduled Post Anticipation
+     * Returns true if a post is scheduled to publish soon (within 15 mins)
+     * OR a post was published via scheduler in the last 2 hours.
      */
-    public function getEffectiveSyncIntervalMinutes(): int
+    public function hasRecentOrUpcomingScheduledPost(): bool
     {
-        // 1. If user set an explicit manual interval (> 0), respect it (clamped between 10m and 360m)
-        if (!empty($this->sync_interval_minutes) && $this->sync_interval_minutes > 0) {
-            return max(10, min(360, (int) $this->sync_interval_minutes));
-        }
+        try {
+            // Check impending post in next 15 minutes
+            $hasUpcoming = $this->scheduledPosts()
+                ->where('status', ScheduledPost::STATUS_SCHEDULED)
+                ->whereBetween('scheduled_at', [now()->subMinutes(5), now()->addMinutes(15)])
+                ->exists();
 
-        // 2. Smart Auto-Adaptive:
-        // Find most recent post or comment activity timestamp
+            if ($hasUpcoming) {
+                return true;
+            }
+
+            // Check post published within last 2 hours
+            $hasRecent = $this->scheduledPosts()
+                ->where('status', ScheduledPost::STATUS_PUBLISHED)
+                ->where('published_at', '>=', now()->subHours(2))
+                ->exists();
+
+            return $hasRecent;
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Calculate base recency interval based on latest post / comment timestamp
+     */
+    protected function calculateBaseActivityInterval(): int
+    {
         $latestPostAt = null;
         try {
             $latestPostAt = $this->posts()->max('published_at');
@@ -426,35 +444,71 @@ class Account extends Model
             $mostRecent = Carbon::parse($latestCommentAt);
         }
 
-        // If new account with no history, start with standard 30 minutes
         if (!$mostRecent) {
             return 30;
         }
 
         $hoursSince = now()->diffInHours($mostRecent);
 
-        // Tier A: Hot (activity within last 6 hours) -> 15 min
         if ($hoursSince <= 6) {
             return 15;
         }
-
-        // Tier B: Warm (activity within last 24 hours) -> 30 min
         if ($hoursSince <= 24) {
             return 30;
         }
-
-        // Tier C: Moderate (activity within last 3 days) -> 1 hour
         if ($hoursSince <= 72) {
             return 60;
         }
-
-        // Tier D: Cool (activity within last 7 days) -> 2 hours
         if ($hoursSince <= 168) {
             return 120;
         }
 
-        // Tier E: Cold / Dormant (> 7 days inactive) -> 6 hours (Max relaxation to save API calls)
         return 360;
+    }
+
+    /**
+     * Calculate the effective sync polling interval in minutes with Next-Gen Intelligence:
+     * 1. Manual Override: If user set an explicit fixed interval (> 0), respect it (10m - 360m).
+     * 2. Feature 3: Scheduled Post Anticipation (Proactive 15m Golden Window for 2h after/before post).
+     * 3. Feature 1: Night Sleep Mode (01:00 AM to 06:00 AM IST -> relaxes to at least 180m / 3h).
+     * 4. Feature 5: Smart Exponential Backoff on consecutive zero new comments (up to 360m / 6h).
+     */
+    public function getEffectiveSyncIntervalMinutes(): int
+    {
+        // 1. Manual Override check
+        if (!empty($this->sync_interval_minutes) && $this->sync_interval_minutes > 0) {
+            return max(10, min(360, (int) $this->sync_interval_minutes));
+        }
+
+        // 2. Feature 3: Scheduled Post Anticipation (Proactive Readiness)
+        if ($this->hasRecentOrUpcomingScheduledPost()) {
+            return 15;
+        }
+
+        // 3. Feature 1: Night Sleep Mode (01:00 AM to 06:00 AM IST)
+        $currentHour = (int) now()->format('G');
+        $isNightTime = ($currentHour >= 1 && $currentHour < 6);
+
+        // 4. Feature 5: Smart Exponential Backoff based on consecutive zero syncs
+        $baseInterval = $this->calculateBaseActivityInterval();
+        $emptySyncs = (int) ($this->consecutive_empty_syncs ?? 0);
+
+        if ($emptySyncs >= 4) {
+            $baseInterval = max($baseInterval, 360); // 6 hours
+        } elseif ($emptySyncs >= 3) {
+            $baseInterval = max($baseInterval, 120); // 2 hours
+        } elseif ($emptySyncs >= 2) {
+            $baseInterval = max($baseInterval, 60);  // 1 hour
+        } elseif ($emptySyncs >= 1 && $baseInterval < 30) {
+            $baseInterval = 30; // 30 minutes
+        }
+
+        // Night time enforces minimum 180 minutes (3 hours) up to 360 minutes
+        if ($isNightTime) {
+            return max($baseInterval, 180);
+        }
+
+        return min(360, max(15, $baseInterval));
     }
 
     /**
@@ -487,11 +541,25 @@ class Account extends Model
             $minutes < 60 => "{$minutes}m",
             $minutes == 60 => '1h',
             $minutes == 120 => '2h',
+            $minutes == 180 => '3h',
             $minutes == 360 => '6h',
             default => round($minutes / 60, 1) . 'h',
         };
 
-        return $isAuto ? "Auto ({$timeStr})" : "Manual ({$timeStr})";
+        if (!$isAuto) {
+            return "Manual ({$timeStr})";
+        }
+
+        if ($this->hasRecentOrUpcomingScheduledPost()) {
+            return "Auto: Post Active ({$timeStr})";
+        }
+
+        $currentHour = (int) now()->format('G');
+        if ($currentHour >= 1 && $currentHour < 6) {
+            return "Auto: Night Sleep ({$timeStr})";
+        }
+
+        return "Auto ({$timeStr})";
     }
 }
 

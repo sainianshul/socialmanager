@@ -167,6 +167,9 @@ class MetaWebhookController extends Controller
 
         $comment->save();
 
+        // Fresh activity detected: reset consecutive empty syncs counter
+        $account->update(['consecutive_empty_syncs' => 0]);
+
         // Dispatch AI processing & Auto DM job asynchronously
         ProcessCommentJob::dispatch($comment);
 

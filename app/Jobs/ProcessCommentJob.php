@@ -43,6 +43,15 @@ class ProcessCommentJob implements ShouldQueue
 
         $account = $comment->account;
 
+        // Defensive: If account is currently in a temporary Meta action block cooldown (#368), defer job
+        if ($account && Cache::has("account_action_blocked_{$account->id}")) {
+            Log::info("ProcessCommentJob: Account #{$account->id} is in a 30m Meta action cooldown. Deferring job execution.");
+            if ($this->job) {
+                $this->release(300);
+            }
+            return;
+        }
+
         // Defensive: Do not process or reply to the channel's own comments/replies
         if ($account && (
             ($comment->commenter_meta_id && $comment->commenter_meta_id === (string) $account->meta_account_id) ||
@@ -216,9 +225,44 @@ class ProcessCommentJob implements ShouldQueue
             if ($matchedRule) {
                 // Rule matched: Handled by Auto DM flow, prevents generic AI auto-comment from clashing
                 $autoDmTriggered = true;
+
+                // Anti-Burst Protection for Auto DM: Maximum 1-2 DMs per minute per account (min 25s gap)
+                // Prevents Instagram bot spam blocks when viral posts receive dozens of comments per minute
+                $dmPacingKey = "account_auto_dm_pace_{$account->id}";
+                $lastDmTime = Cache::get($dmPacingKey);
+                $elapsedDm = $lastDmTime ? (now()->timestamp - $lastDmTime) : 999;
+                $requiredDmGap = 25; // 25-second gap
+
+                if ($elapsedDm < $requiredDmGap) {
+                    $releaseDelay = ($requiredDmGap - $elapsedDm) + rand(2, 5);
+                    Log::info("ProcessCommentJob: Auto DM burst protection active on account #{$account->id}. Releasing job with {$releaseDelay}s delay (Pacing: 1-2 DMs/min).");
+                    if ($this->job) {
+                        $this->release($releaseDelay);
+                        return;
+                    }
+                }
+
+                // Mark this account's Auto DM timestamp
+                Cache::put($dmPacingKey, now()->timestamp, 300);
+
+                if (app()->environment() !== 'testing') {
+                    sleep(rand(1, 3));
+                }
+
                 try {
                     $messagingService = app(MetaMessagingService::class);
                     $dmResult = $messagingService->sendAutoDm($matchedRule, $comment);
+
+                    // Check for Meta Error #368 Action Block or Rate limits
+                    if (!empty($dmResult['action_blocked']) || (!empty($dmResult['message']) && (str_contains($dmResult['message'], '#368') || str_contains($dmResult['message'], 'temporarily blocked') || str_contains($dmResult['message'], '#613')))) {
+                        Cache::put("account_action_blocked_{$account->id}", now()->addMinutes(30)->timestamp, 1800);
+                        Log::warning("ProcessCommentJob: Meta Action Block hit during Auto DM for account #{$account->id}. 30m circuit breaker activated.");
+                        if ($this->job) {
+                            $this->release(1800);
+                            return;
+                        }
+                    }
+
                     if ($dmResult['success']) {
                         $repliedAt = now();
                         if (!empty($dmResult['public_reply_sent'])) {
@@ -331,11 +375,12 @@ class ProcessCommentJob implements ShouldQueue
                 } else {
                     $errorMsg = $publishRes['message'] ?? 'Unknown publishing error';
 
-                    // Detect Meta API rate limit (#32 Page request limit, #4 Application request limit, #17 User request limit)
-                    if (str_contains($errorMsg, '(#32)') || str_contains($errorMsg, '(#4)') || str_contains($errorMsg, 'request limit reached')) {
-                        Log::warning("ProcessCommentJob: Meta rate limit hit (#32) for account #{$account->id}. Backing off for 60s.");
+                    // Detect Meta API rate limit (#32 Page request limit, #4 Application request limit, #17 User request limit, #368 Action Blocked, #613 Rate Limit)
+                    if (str_contains($errorMsg, '(#32)') || str_contains($errorMsg, '(#4)') || str_contains($errorMsg, '(#17)') || str_contains($errorMsg, '(#368)') || str_contains($errorMsg, '(#613)') || str_contains($errorMsg, 'request limit') || str_contains($errorMsg, 'temporarily blocked')) {
+                        Cache::put("account_action_blocked_{$account->id}", now()->addMinutes(30)->timestamp, 1800);
+                        Log::warning("ProcessCommentJob: Meta rate limit/action block hit ({$errorMsg}) for account #{$account->id}. Backing off for 30m cooldown.");
                         if ($this->job) {
-                            $this->release(60);
+                            $this->release(1800);
                             return;
                         }
                     }

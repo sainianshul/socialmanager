@@ -283,4 +283,62 @@ class MetaMessagingServiceTest extends TestCase
         $this->assertStringContainsString('already sent', $result['message']);
         $this->assertEquals(0, $rule->fresh()->trigger_count);
     }
+
+    public function test_resolve_spintax_picks_random_variant_and_preserves_name(): void
+    {
+        $template = '{Namaste|Hello|Hi} {name}, check your discount!';
+        $resolved = MetaMessagingService::resolveSpintax($template);
+
+        $this->assertMatchesRegularExpression('/^(Namaste|Hello|Hi) \{name\}, check your discount!$/', $resolved);
+        $this->assertStringContainsString('{name}', $resolved);
+    }
+
+    public function test_send_auto_dm_handles_meta_action_block_368(): void
+    {
+        $user = User::factory()->create();
+        $account = Account::create([
+            'user_id' => $user->id,
+            'account_type' => Account::TYPE_FACEBOOK,
+            'meta_account_id' => 'fb_page_blocked',
+            'name' => 'Blocked FB Page',
+            'access_token' => 'fb_tok',
+        ]);
+
+        $post = Post::create([
+            'account_id' => $account->id,
+            'meta_post_id' => 'p_blk',
+        ]);
+
+        $comment = Comment::create([
+            'account_id' => $account->id,
+            'post_id' => $post->id,
+            'meta_comment_id' => 'fb_comm_blk',
+            'commenter_name' => 'BlockedUser',
+            'message' => 'link please',
+        ]);
+
+        $rule = AutoDmRule::create([
+            'user_id' => $user->id,
+            'account_id' => $account->id,
+            'name' => 'Block Test Rule',
+            'keywords' => ['link'],
+            'dm_message' => 'Here is link',
+            'is_active' => true,
+        ]);
+
+        Http::fake([
+            'https://graph.facebook.com/v20.0/fb_comm_blk/private_replies' => Http::response([
+                'error' => [
+                    'code' => 368,
+                    'message' => '(#368) It looks like you were misusing this feature by going too fast.',
+                ],
+            ], 400),
+        ]);
+
+        $result = $this->service->sendAutoDm($rule, $comment);
+
+        $this->assertFalse($result['success']);
+        $this->assertTrue($result['action_blocked'] ?? false);
+        $this->assertStringContainsString('#368', $result['message']);
+    }
 }

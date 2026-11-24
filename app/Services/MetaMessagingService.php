@@ -96,6 +96,10 @@ class MetaMessagingService
             $personalizedDm = str_ireplace(['{name}', '{first_name}'], ['friend', 'friend'], $personalizedDm);
         }
 
+        // Spintax Resolver: Automatically resolves {Namaste|Hello|Hi} or any {option1|option2}
+        // Guarantees unique wording per recipient, completely preventing Instagram repetitive message hash blocks
+        $personalizedDm = self::resolveSpintax($personalizedDm);
+
         // 1. Send the Private Direct Message (DM)
         $dmResult = $this->sendPrivateReply($account, $commentId, $personalizedDm);
 
@@ -108,6 +112,7 @@ class MetaMessagingService
             } else {
                 $personalizedPublicReply = str_ireplace(['{name}', '{first_name}'], ['ji', ''], $personalizedPublicReply);
             }
+            $personalizedPublicReply = self::resolveSpintax($personalizedPublicReply);
             $publicReplyResult = $this->sendPublicReply($account, $commentId, $personalizedPublicReply);
         }
 
@@ -146,6 +151,7 @@ class MetaMessagingService
 
         return [
             'success' => false,
+            'action_blocked' => !empty($dmResult['action_blocked']),
             'message' => $dmResult['message'] ?? 'Failed to send private direct message.',
             'dm_sent' => false,
             'public_reply_sent' => $publicReplyResult['success'],
@@ -206,6 +212,15 @@ class MetaMessagingService
                     ];
                 }
 
+                // Code 368: Meta temporary action block (going too fast)
+                if ($errorCode == 368 || str_contains($errorMsg, 'temporarily blocked')) {
+                    return [
+                        'success' => false,
+                        'action_blocked' => true,
+                        'message' => 'Meta temporary action block (#368): ' . $errorMsg,
+                    ];
+                }
+
                 return ['success' => false, 'message' => $errorMsg];
             }
 
@@ -260,11 +275,20 @@ class MetaMessagingService
                 }
 
                 $errorMsg = $response['error']['message'] ?? 'Instagram API error sending private message.';
+                $errorCode = $response['error']['code'] ?? null;
                 Log::warning("Instagram Private Reply error: {$errorMsg}", [
                     'comment_id' => $commentId,
                     'ig_id' => $igId,
                     'response' => $response,
                 ]);
+
+                if ($errorCode == 368 || str_contains($errorMsg, 'temporarily blocked') || $errorCode == 613) {
+                    return [
+                        'success' => false,
+                        'action_blocked' => true,
+                        'message' => 'Instagram temporary action block: ' . $errorMsg,
+                    ];
+                }
 
                 return ['success' => false, 'message' => $errorMsg];
             }
@@ -322,5 +346,20 @@ class MetaMessagingService
             Log::error("Public reply exception: {$e->getMessage()}");
             return ['success' => false, 'message' => $e->getMessage()];
         }
+    }
+
+    /**
+     * Resolve Spintax syntax formatted as {option1|option2|option3} into a random natural variant.
+     */
+    public static function resolveSpintax(string $text): string
+    {
+        return preg_replace_callback('/\{([^{}]+)\}/u', function ($matches) {
+            $inner = trim($matches[1]);
+            if (in_array(strtolower($inner), ['name', 'first_name'])) {
+                return $matches[0];
+            }
+            $parts = explode('|', $inner);
+            return trim($parts[array_rand($parts)]);
+        }, $text);
     }
 }

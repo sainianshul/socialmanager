@@ -153,7 +153,18 @@ class YouTubeCommentSyncService
                 }
             }
 
-            $account->update(['last_synced_at' => now()]);
+            // Smart Backoff tracking: reset to 0 if new comments arrived, else increment empty sync counter
+            if ($syncedCount > 0) {
+                $account->update([
+                    'last_synced_at' => now(),
+                    'consecutive_empty_syncs' => 0,
+                ]);
+            } else {
+                $account->update([
+                    'last_synced_at' => now(),
+                    'consecutive_empty_syncs' => ($account->consecutive_empty_syncs ?? 0) + 1,
+                ]);
+            }
 
             return [
                 'success' => true,

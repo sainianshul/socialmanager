@@ -59,7 +59,18 @@ class MetaCommentSyncService
             }
         }
 
-        $account->update(['last_synced_at' => now()]);
+        // Smart Backoff tracking: reset to 0 if new comments arrived, else increment empty sync counter
+        if ($totalSynced > 0) {
+            $account->update([
+                'last_synced_at' => now(),
+                'consecutive_empty_syncs' => 0,
+            ]);
+        } else {
+            $account->update([
+                'last_synced_at' => now(),
+                'consecutive_empty_syncs' => ($account->consecutive_empty_syncs ?? 0) + 1,
+            ]);
+        }
 
         if ($errorCount > 0 && $totalSynced === 0) {
             return [

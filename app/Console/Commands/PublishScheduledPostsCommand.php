@@ -42,7 +42,12 @@ class PublishScheduledPostsCommand extends Command
         $successCount = 0;
         $failedCount = 0;
 
-        foreach ($duePosts as $post) {
+        foreach ($duePosts as $index => $post) {
+            // Anti-ban Multi-Account Jitter: Add 1.5s - 3.0s micro-delay between consecutive posts to prevent IP burst rate flags
+            if ($index > 0 && app()->environment() !== 'testing') {
+                usleep(rand(1500000, 3000000));
+            }
+
             $this->line("Publishing Post #{$post->id} ({$post->post_type}) to channel: {$post->account->name}...");
 
             if ($post->isYouTube() || $post->account->isYouTube()) {

@@ -175,7 +175,7 @@
                     <div id="dm-link-warning" class="alert alert-danger py-2 px-3 mt-2 mb-0 d-none" role="alert">
                         <i class="ti ti-alert-triangle me-1"></i> <span id="dm-link-warning-text"></span>
                     </div>
-                    <div class="form-text text-secondary mt-1"><i class="ti ti-info-circle me-1"></i>Tip: You can use <code>{name}</code> for full constituent name or <code>{first_name}</code> for personal greeting.</div>
+                    <div class="form-text text-secondary mt-1"><i class="ti ti-info-circle me-1"></i>Tip: Use <code>{name}</code> for name, and Spintax like <code>{Namaste|Hello|Hi}</code> to send unique message variants and prevent Instagram spam detection.</div>
                     @error('dm_message')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
