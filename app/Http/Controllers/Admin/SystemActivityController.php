@@ -41,6 +41,7 @@ class SystemActivityController extends Controller
             SystemActivityLog::EVENT_CANVA           => 'Canva Studio',
             SystemActivityLog::EVENT_AUTO_DM         => 'Auto DM',
             SystemActivityLog::EVENT_COMMENT_PROCESS => 'Comment Process',
+            SystemActivityLog::EVENT_AI              => 'AI Generation',
             SystemActivityLog::EVENT_WEBHOOK         => 'Meta Webhook',
             SystemActivityLog::EVENT_QUEUE_JOB       => 'Queue Actions',
         ];

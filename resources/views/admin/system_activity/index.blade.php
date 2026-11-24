@@ -249,6 +249,7 @@
                                             'canva'           => 'cyan',
                                             'auto_dm'         => 'purple',
                                             'comment_process' => 'teal',
+                                            'ai'              => 'indigo',
                                             'webhook'         => 'azure',
                                             'queue_job'       => 'warning',
                                             default           => 'secondary',

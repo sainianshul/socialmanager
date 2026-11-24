@@ -1158,6 +1158,7 @@ class SchedulePostController extends Controller
         ]);
 
         $title = trim($request->input('title'));
+        $startTime = microtime(true);
 
         try {
             $aiService = app(\App\Contracts\AIServiceInterface::class);
@@ -1188,6 +1189,18 @@ class SchedulePostController extends Controller
             if ($user && !empty($description)) {
                 $user->recordAiTokenUsage(400);
             }
+
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_AI,
+                "Generated YouTube SEO description for '{$title}'",
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                ['title' => $title, 'platform' => 'youtube'],
+                ['description' => $description],
+                $durationMs,
+                null,
+                $user?->id
+            );
 
             return response()->json([
                 'success'         => true,
@@ -1262,6 +1275,7 @@ class SchedulePostController extends Controller
         ]);
 
         $topic = trim($request->input('topic'));
+        $startTime = microtime(true);
         $options = [
             'platform' => $request->input('platform', 'all'),
             'tone'     => $request->input('tone', 'engaging'),
@@ -1284,6 +1298,23 @@ class SchedulePostController extends Controller
                 $tokens = (int) ($result['tokens_used'] ?? 800);
                 $user->recordAiTokenUsage($tokens);
             }
+
+            $durationMs = (int) round((microtime(true) - $startTime) * 1000);
+            \App\Services\ActivityLogger::log(
+                \App\Models\SystemActivityLog::EVENT_AI,
+                "Generated social caption for '{$topic}'",
+                \App\Models\SystemActivityLog::STATUS_SUCCESS,
+                ['topic' => $topic, 'platform' => $options['platform'], 'tokens_used' => $tokens ?? null],
+                [
+                    'hook'       => $result['hook'] ?? '',
+                    'caption'    => $result['caption'] ?? '',
+                    'hashtags'   => $result['hashtags'] ?? [],
+                    'variations' => $result['variations'] ?? [],
+                ],
+                $durationMs,
+                null,
+                $user?->id
+            );
 
             return response()->json([
                 'success'    => true,

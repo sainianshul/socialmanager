@@ -42,6 +42,7 @@ class SystemActivityLog extends Model
     public const EVENT_CANVA           = 'canva';
     public const EVENT_AUTO_DM         = 'auto_dm';
     public const EVENT_COMMENT_PROCESS = 'comment_process';
+    public const EVENT_AI              = 'ai';
     public const EVENT_WEBHOOK         = 'webhook';
     public const EVENT_QUEUE_JOB       = 'queue_job';
 
