@@ -108,7 +108,7 @@ class PoliticalLeaderStripTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('General Profile Information');
         $response->assertSee('Political Party Affiliation');
-        $response->assertSee('Profile Photo');
+        $response->assertSee('Photo Cutout');
         $response->assertSee('Leadership Header Strips');
 
         $stripsResponse = $this->actingAs($user)->get(route('admin.leader-strips.index'));

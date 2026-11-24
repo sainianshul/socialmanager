@@ -349,14 +349,14 @@
                                 </div>
 
                                 {{-- 2.4 Candidate Details (DEFAULT HIDDEN / COLLAPSED) --}}
-                                <div class="pt-1 border-top">
-                                    <a class="d-flex align-items-center justify-content-between text-decoration-none cursor-pointer py-1.5" data-bs-toggle="collapse" href="#panel-candidate-details-collapse" role="button" aria-expanded="false" aria-controls="panel-candidate-details-collapse">
-                                        <span class="small fw-semibold text-body d-flex align-items-center gap-1.5" style="font-size: 11px;">
-                                            <i class="ti ti-user-edit text-muted"></i>
+                                <div class="pt-2 border-top">
+                                    <a class="d-flex align-items-center justify-content-between text-decoration-none cursor-pointer py-2 px-3 rounded-2 studio-panel-card-inner" data-bs-toggle="collapse" href="#panel-candidate-details-collapse" role="button" aria-expanded="false" aria-controls="panel-candidate-details-collapse">
+                                        <span class="small fw-bold text-body d-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-user-edit text-primary"></i>
                                             Candidate Details (Name & Post)
                                         </span>
-                                        <span class="small text-muted d-flex align-items-center gap-1" style="font-size: 11px;">
-                                            <span>Edit</span>
+                                        <span class="small text-secondary d-flex align-items-center gap-1" style="font-size: 11px;">
+                                            <span class="fw-semibold">Edit</span>
                                             <i class="ti ti-chevron-down" style="font-size: 12px;"></i>
                                         </span>
                                     </a>

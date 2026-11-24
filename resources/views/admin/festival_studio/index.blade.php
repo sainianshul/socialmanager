@@ -200,13 +200,33 @@
             cursor: pointer;
         }
 
+        /* High-Contrast Backdrop Overlay for Slide-Over Studio Panel (Eliminates Background Clutter) */
+        .offcanvas-backdrop {
+            background-color: #0b1329 !important;
+            transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), backdrop-filter 0.3s ease !important;
+        }
+
+        .offcanvas-backdrop.show {
+            opacity: 0.72 !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+        }
+
+        [data-bs-theme="dark"] .offcanvas-backdrop.show {
+            opacity: 0.88 !important;
+            background-color: #020617 !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
+        }
+
         /* Apple-Grade Right Slide-Over Panel (Theme Adaptive) */
         .studio-slide-panel {
             width: 960px !important;
             max-width: 95vw !important;
             border-top-left-radius: 24px;
             border-bottom-left-radius: 24px;
-            box-shadow: -15px 0 50px rgba(15, 23, 42, 0.16) !important;
+            border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
+            box-shadow: -20px 0 60px rgba(15, 23, 42, 0.28) !important;
             background-color: var(--tblr-bg-surface, #ffffff) !important;
             color: var(--tblr-body-color, #1e293b) !important;
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
@@ -216,7 +236,8 @@
         [data-bs-theme="dark"] .studio-slide-panel {
             background-color: #0d1527 !important;
             color: #f8fafc !important;
-            box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6) !important;
+            border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+            box-shadow: -25px 0 70px rgba(0, 0, 0, 0.75) !important;
         }
 
         .studio-slide-panel .offcanvas-header {
@@ -266,36 +287,45 @@
         /* Toolbar Section Cards (Section 1 & 2) */
         .studio-panel-card {
             background-color: #ffffff !important;
-            border: 1px solid #E2E8F0 !important;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
             border-radius: 18px !important;
         }
 
         [data-bs-theme="dark"] .studio-panel-card {
-            background-color: #141f36 !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25) !important;
+            background-color: #131d33 !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
         }
 
         .studio-panel-card-inner {
-            background-color: #ffffff !important;
-            border: 1px solid #E2E8F0 !important;
+            background-color: #f8fafc !important;
+            border: 1px solid #cbd5e1 !important;
         }
 
         [data-bs-theme="dark"] .studio-panel-card-inner {
             background-color: #0d1527 !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
         }
 
         .studio-section-title {
-            color: #334155;
-            font-size: 11px;
+            color: #0f172a !important;
+            font-size: 11.5px;
             letter-spacing: 0.06em;
             font-weight: 700;
         }
 
         [data-bs-theme="dark"] .studio-section-title {
-            color: #f1f5f9 !important;
+            color: #f8fafc !important;
+        }
+
+        .studio-slide-panel .form-label {
+            color: #334155 !important;
+            font-weight: 600 !important;
+        }
+
+        [data-bs-theme="dark"] .studio-slide-panel .form-label {
+            color: #cbd5e1 !important;
         }
 
         @media (max-width: 768px) {
