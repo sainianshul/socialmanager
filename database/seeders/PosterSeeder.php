@@ -18,9 +18,8 @@ class PosterSeeder extends Seeder
     {
         Storage::disk('public')->makeDirectory('uploads/posters');
 
-        $bjp = PoliticalParty::where('short_code', 'BJP')->first();
-
         $samplePosters = [
+            // 1. Social Awareness
             [
                 'category_slug'   => 'social-awareness',
                 'name'            => 'Beti Bachao Beti Padhao',
@@ -42,15 +41,17 @@ class PosterSeeder extends Seeder
                 'sort_order'      => 2,
             ],
             [
-                'category_slug'   => 'environment',
-                'name'            => 'Ek Ped Maa Ke Naam - Tree Plantation',
-                'slug'            => 'ek-ped-maa-ke-naam',
-                'file'            => 'ek-ped-maa-ke-naam.jpg',
-                'default_caption' => "पर्यावरण संरक्षण के संकल्प के साथ, आइए माँ के सम्मान में एक पौधा अवश्य लगाएं और उसकी रक्षा करें। #EkPedMaaKeNaam #GreenIndia #Environment",
-                'show_on_top'     => false,
+                'category_slug'   => 'social-awareness',
+                'name'            => 'Save Water, Save Life - Jal Sanrakshan',
+                'slug'            => 'save-water-save-life',
+                'file'            => 'save-water-save-life.jpg',
+                'default_caption' => "जल ही जीवन है, इसका हर एक कतरा अनमोल है। आइए, पानी की बर्बादी रोकें और जल संरक्षण को जन आंदोलन बनाएं। #SaveWater #JalShakti #WaterConservation",
+                'show_on_top'     => true,
                 'party_id'        => null,
-                'sort_order'      => 1,
+                'sort_order'      => 3,
             ],
+
+            // 2. Daily Quotes & Suvichar
             [
                 'category_slug'   => 'suvichar',
                 'name'            => 'Daily Suvichar - Karma & Success',
@@ -61,6 +62,8 @@ class PosterSeeder extends Seeder
                 'party_id'        => null,
                 'sort_order'      => 1,
             ],
+
+            // 3. Birthday & Anniversary
             [
                 'category_slug'   => 'birthday-anniversary',
                 'name'            => 'Happy Birthday Wishes',
@@ -71,6 +74,8 @@ class PosterSeeder extends Seeder
                 'party_id'        => null,
                 'sort_order'      => 1,
             ],
+
+            // 4. Condolence & Tribute
             [
                 'category_slug'   => 'shok-sandesh',
                 'name'            => 'Bhavpurna Shradhanjali - Condolence & Tribute',
@@ -81,6 +86,8 @@ class PosterSeeder extends Seeder
                 'party_id'        => null,
                 'sort_order'      => 1,
             ],
+
+            // 5. National & Patriotic
             [
                 'category_slug'   => 'patriotic',
                 'name'            => 'Vande Mataram - National Pride & Tiranga',
@@ -91,14 +98,102 @@ class PosterSeeder extends Seeder
                 'party_id'        => null,
                 'sort_order'      => 1,
             ],
+            [
+                'category_slug'   => 'patriotic',
+                'name'            => 'India Gate - National Pride & Amar Jawan',
+                'slug'            => 'india-gate-national-pride',
+                'file'            => 'india-gate-national-pride.jpg',
+                'default_caption' => "राष्ट्र रक्षा में अपने प्राणों का सर्वोच्च बलिदान देने वाले अमर बलिदानी वीरों को कोटि-कोटि नमन। वन्दे मातरम्! जय हिन्द! #IndiaGate #AmarJawan #IndianArmy #SaluteTheHeroes",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 2,
+            ],
+            [
+                'category_slug'   => 'patriotic',
+                'name'            => 'Statue of Unity - Rashtriya Ekta Diwas',
+                'slug'            => 'statue-of-unity-ekta',
+                'file'            => 'statue-of-unity-ekta.jpg',
+                'default_caption' => "अखंड भारत के निर्माता, लौह पुरुष सरदार वल्लभभाई पटेल जी को शत्-शत् नमन। 'एक भारत, श्रेष्ठ भारत' के संकल्प के साथ आगे बढ़ें। #StatueOfUnity #SardarPatel #EkBharatShreshthaBharat",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 3,
+            ],
+
+            // 6. Environment & Nature
+            [
+                'category_slug'   => 'environment',
+                'name'            => 'Ek Ped Maa Ke Naam - Tree Plantation',
+                'slug'            => 'ek-ped-maa-ke-naam',
+                'file'            => 'ek-ped-maa-ke-naam.jpg',
+                'default_caption' => "पर्यावरण संरक्षण के संकल्प के साथ, आइए माँ के सम्मान में एक पौधा अवश्य लगाएं और उसकी रक्षा करें। #EkPedMaaKeNaam #GreenIndia #Environment",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 1,
+            ],
+
+            // 7. Spiritual & Devotion
+            [
+                'category_slug'   => 'spiritual-devotion',
+                'name'            => 'Jai Shri Ram - Ayodhya Ram Mandir',
+                'slug'            => 'jai-shri-ram-ayodhya',
+                'file'            => 'jai-shri-ram-ayodhya.jpg',
+                'default_caption' => "मंगल भवन अमंगल हारी, द्रवहु सुदसरथ अजिर बिहारी। मर्यादा पुरुषोत्तम प्रभु श्री राम की कृपा आप सभी पर सदैव बनी रहे। जय श्री राम! #JaiShriRam #AyodhyaRamMandir #RamLalla",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 1,
+            ],
+            [
+                'category_slug'   => 'spiritual-devotion',
+                'name'            => 'Har Har Mahadev - Divine Adiyogi Shiva',
+                'slug'            => 'har-har-mahadev-adiyogi',
+                'file'            => 'har-har-mahadev-adiyogi.jpg',
+                'default_caption' => "कर्पूरगौरं करुणावतारं संसारसारं भुजगेन्द्रहारम्। देवाधिदेव महादेव भगवान शिव की कृपा से आपके जीवन में सुख, शांति एवं समृद्धि का वास हो। हर हर महादेव! #HarHarMahadev #Adiyogi #BholeNath",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 2,
+            ],
+            [
+                'category_slug'   => 'spiritual-devotion',
+                'name'            => 'Harmandir Sahib - Golden Temple Amritsar',
+                'slug'            => 'golden-temple-amritsar',
+                'file'            => 'golden-temple-amritsar.jpg',
+                'default_caption' => "सतिगुर नानक प्रगट्या मिटी धुंधु जगि चानणु होआ। श्री हरिमंदिर साहिब (स्वर्ण मंदिर) के पावन दर्शन। वाहेगुरु जी का खालसा, वाहेगुरु जी की फतेह! #GoldenTemple #HarmandirSahib #Amritsar #Waheguru",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 3,
+            ],
+
+            // 8. Farmers & Agriculture
+            [
+                'category_slug'   => 'kisan-kalyan',
+                'name'            => 'Kisan Samman - Annadata Pride',
+                'slug'            => 'kisan-samman-annadata',
+                'file'            => 'kisan-samman-annadata.jpg',
+                'default_caption' => "खेतों में पसीना बहाकर देश को समृद्ध बनाने वाले हमारे अन्नदाता किसान भाइयों को कोटि-कोटि नमन। जय जवान, जय किसान! #KisanSamman #Annadata #IndianFarmers #JaiKisan",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 1,
+            ],
+
+            // 9. Health & Wellness
+            [
+                'category_slug'   => 'health-blood-donation',
+                'name'            => 'International Yoga Day & Wellness',
+                'slug'            => 'international-yoga-day',
+                'file'            => 'international-yoga-day.jpg',
+                'default_caption' => "'योगः कर्मसु कौशलम्' - योग केवल व्यायाम नहीं, बल्कि स्वस्थ तन और शांत मन की साधना है। नियमित योग करें, निरोगी रहें। #InternationalYogaDay #YogaForWellness #FitIndia",
+                'show_on_top'     => true,
+                'party_id'        => null,
+                'sort_order'      => 1,
+            ],
         ];
 
-        // Clean up any old obsolete posters with hindi names
+        // Clean up any obsolete posters
         Poster::whereNotIn('slug', array_column($samplePosters, 'slug'))->delete();
 
         foreach ($samplePosters as $data) {
             $category = PosterCategory::where('slug', $data['category_slug'])->first();
-            if (!$category) {
+            if (! $category) {
                 continue;
             }
 
@@ -106,7 +201,7 @@ class PosterSeeder extends Seeder
             $destRel = 'uploads/posters/' . $data['file'];
             $destFull = Storage::disk('public')->path($destRel);
 
-            if (File::exists($srcFile) && !File::exists($destFull)) {
+            if (File::exists($srcFile) && ! File::exists($destFull)) {
                 File::copy($srcFile, $destFull);
             }
 
