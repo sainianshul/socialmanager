@@ -119,6 +119,58 @@ class SystemActivityTest extends TestCase
         $response->assertDontSee('FB Sync Action');
     }
 
+    public function test_logs_can_be_filtered_by_user_id(): void
+    {
+        $log1 = SystemActivityLog::create([
+            'user_id'    => $this->admin->id,
+            'event_type' => SystemActivityLog::EVENT_POST_PUBLISH,
+            'action'     => 'Action by SuperAdmin',
+            'status'     => SystemActivityLog::STATUS_SUCCESS,
+        ]);
+
+        $log2 = SystemActivityLog::create([
+            'user_id'    => $this->regularUser->id,
+            'event_type' => SystemActivityLog::EVENT_POST_PUBLISH,
+            'action'     => 'Action by Client User',
+            'status'     => SystemActivityLog::STATUS_SUCCESS,
+        ]);
+
+        // Filter by regular user id
+        $response = $this->actingAs($this->admin)->get(route('admin.system-activity.index', [
+            'user_id' => $this->regularUser->id,
+        ]));
+
+        $response->assertStatus(200);
+        $response->assertSee('Action by Client User');
+        $response->assertDontSee('Action by SuperAdmin');
+    }
+
+    public function test_activity_logger_auto_resolves_user_id_from_account(): void
+    {
+        $account = Account::create([
+            'user_id'      => $this->regularUser->id,
+            'account_type' => Account::TYPE_INSTAGRAM,
+            'name'         => 'Auto Resolve Test Account',
+            'access_token' => 'dummy_token',
+            'is_active'    => true,
+        ]);
+
+        // Log without passing userId explicitly
+        $log = ActivityLogger::log(
+            SystemActivityLog::EVENT_ACCOUNT_SYNC,
+            'Background Webhook Sync',
+            SystemActivityLog::STATUS_SUCCESS,
+            null,
+            null,
+            120,
+            $account->id,
+            null // Explicitly null userId
+        );
+
+        $this->assertNotNull($log);
+        $this->assertEquals($this->regularUser->id, $log->user_id);
+    }
+
     public function test_queue_monitor_displays_failed_jobs(): void
     {
         // Insert dummy failed job

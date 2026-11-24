@@ -23,6 +23,15 @@ class ActivityLogger
         try {
             $userId = $userId ?? (auth()->check() ? auth()->id() : null);
 
+            // Auto-resolve user_id from account if available and not explicitly provided
+            if (!$userId && $accountId) {
+                try {
+                    $userId = \App\Models\Account::where('id', $accountId)->value('user_id');
+                } catch (\Throwable $lookupErr) {
+                    // Safe fallback
+                }
+            }
+
             // Prepare payload safely
             $cleanPayload = is_array($payload) ? $payload : (is_string($payload) ? ['data' => $payload] : null);
 

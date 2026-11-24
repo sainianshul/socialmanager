@@ -168,14 +168,25 @@
                 <form action="{{ route('admin.system-activity.index') }}" method="GET" class="row g-2 align-items-center">
                     <input type="hidden" name="tab" value="logs">
                     
-                    <div class="col-12 col-md-4">
+                    <div class="col-12 col-md-3">
                         <div class="input-icon">
                             <span class="input-icon-addon"><i class="ti ti-search"></i></span>
-                            <input type="text" name="search" class="form-control" placeholder="Search action, response, user or account..." value="{{ request('search') }}">
+                            <input type="text" name="search" class="form-control" placeholder="Search action, response..." value="{{ request('search') }}">
                         </div>
                     </div>
 
                     <div class="col-6 col-md-3">
+                        <select name="user_id" class="form-select" onchange="this.form.submit()">
+                            <option value="">All Users</option>
+                            @foreach($users as $u)
+                                <option value="{{ $u->id }}" {{ request('user_id') == $u->id ? 'selected' : '' }}>
+                                    {{ $u->name }} ({{ $u->email }})
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-6 col-md-2">
                         <select name="event_type" class="form-select" onchange="this.form.submit()">
                             <option value="">All Event Types</option>
                             @foreach($eventTypes as $key => $label)
@@ -195,11 +206,11 @@
                         </select>
                     </div>
 
-                    <div class="col-12 col-md-3 d-flex gap-2">
+                    <div class="col-6 col-md-2 d-flex gap-2">
                         <button type="submit" class="btn btn-primary flex-grow-1">
                             <i class="ti ti-filter me-1"></i> Filter
                         </button>
-                        @if(request('search') || request('event_type') || request('status') || request('account_id'))
+                        @if(request('search') || request('event_type') || request('status') || request('account_id') || request('user_id'))
                             <a href="{{ route('admin.system-activity.index', ['tab' => 'logs']) }}" class="btn btn-outline-secondary" title="Clear filters">
                                 <i class="ti ti-x"></i>
                             </a>
@@ -213,13 +224,14 @@
                 <table class="table table-vcenter table-hover card-table">
                     <thead>
                         <tr>
-                            <th style="width: 170px;">Timestamp</th>
-                            <th style="width: 140px;">Event</th>
+                            <th style="width: 160px;">Timestamp</th>
+                            <th style="width: 130px;">Event</th>
                             <th>Action & Description</th>
-                            <th>Target / Account</th>
-                            <th style="width: 90px;">Duration</th>
-                            <th style="width: 110px;">Status</th>
-                            <th style="width: 90px;" class="text-end">Details</th>
+                            <th style="width: 160px;">User</th>
+                            <th style="width: 150px;">Target Channel</th>
+                            <th style="width: 85px;">Duration</th>
+                            <th style="width: 100px;">Status</th>
+                            <th style="width: 70px;" class="text-end">Details</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -248,12 +260,34 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold text-truncate" style="max-width: 320px;" title="{{ $log->action }}">
+                                    <div class="fw-semibold text-truncate" style="max-width: 300px;" title="{{ $log->action }}">
                                         {{ $log->action }}
                                     </div>
                                     @if($log->status === 'failed' && $log->response)
-                                        <div class="text-danger small text-truncate" style="max-width: 320px;">
+                                        <div class="text-danger small text-truncate" style="max-width: 300px;">
                                             <i class="ti ti-alert-circle me-1"></i>{{ Str::limit(strip_tags($log->response), 80) }}
+                                        </div>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($log->user)
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="avatar avatar-xs rounded-circle bg-primary-lt text-primary fw-bold" style="font-size: 0.72rem;">
+                                                {{ strtoupper(substr($log->user->name, 0, 1)) }}
+                                            </span>
+                                            <div>
+                                                <div class="fw-medium text-truncate" style="max-width: 120px;" title="{{ $log->user->name }} ({{ $log->user->email }})">
+                                                    {{ $log->user->name }}
+                                                </div>
+                                                <div class="text-muted" style="font-size: 0.68rem;">
+                                                    #{{ $log->user->id }} • {{ ucfirst($log->user->role) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="d-flex align-items-center gap-1 text-muted small">
+                                            <i class="ti ti-robot text-secondary"></i>
+                                            <span>System Worker</span>
                                         </div>
                                     @endif
                                 </td>
@@ -269,16 +303,12 @@
                                             @else
                                                 <i class="ti ti-plug text-muted"></i>
                                             @endif
-                                            <span class="fw-medium text-truncate" style="max-width: 160px;" title="{{ $log->account->name }}">
+                                            <span class="fw-medium text-truncate" style="max-width: 130px;" title="{{ $log->account->name }}">
                                                 {{ $log->account->name }}
                                             </span>
                                         </div>
-                                    @elseif($log->user)
-                                        <div class="text-muted small">
-                                            <i class="ti ti-user me-1"></i>{{ $log->user->name }}
-                                        </div>
                                     @else
-                                        <span class="text-muted small">System Worker</span>
+                                        <span class="text-muted small">—</span>
                                     @endif
                                 </td>
                                 <td>
@@ -313,6 +343,7 @@
                                             data-status="{{ $log->status }}"
                                             data-time="{{ $log->created_at->format('d M Y, h:i:s A') }}"
                                             data-duration="{{ $log->duration_ms ? $log->duration_ms . ' ms' : 'N/A' }}"
+                                            data-user="{{ $log->user ? $log->user->name . ' (' . $log->user->email . ')' : 'System Worker' }}"
                                             data-account="{{ $log->account->name ?? 'System' }}"
                                             data-ip="{{ $log->ip_address ?? 'N/A' }}"
                                             data-payload="{{ json_encode($log->payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) }}"
@@ -324,7 +355,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
+                                <td colspan="8" class="text-center py-5 text-muted">
                                     <i class="ti ti-clipboard-list fs-1 d-block mb-2 text-secondary"></i>
                                     <div>No activity logs found matching the filter criteria.</div>
                                 </td>
@@ -518,6 +549,7 @@
                 <div class="bg-light-lt p-3 border-bottom d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <div class="d-flex align-items-center gap-3">
                         <span id="modalLogStatusBadge"></span>
+                        <span class="text-muted small">User: <strong id="modalLogUser"></strong></span>
                         <span class="text-muted small">Duration: <strong id="modalLogDuration"></strong></span>
                         <span class="text-muted small">Account: <strong id="modalLogAccount"></strong></span>
                     </div>
@@ -625,6 +657,7 @@ document-ready: document.addEventListener('DOMContentLoaded', function () {
             const status = this.dataset.status;
             const time = this.dataset.time;
             const duration = this.dataset.duration;
+            const user = this.dataset.user;
             const account = this.dataset.account;
             const payload = this.dataset.payload;
             const response = this.dataset.response;
@@ -632,6 +665,7 @@ document-ready: document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('modalLogAction').textContent = action;
             document.getElementById('modalLogSubtitle').textContent = `${event} • ${time}`;
             document.getElementById('modalLogDuration').textContent = duration;
+            document.getElementById('modalLogUser').textContent = user;
             document.getElementById('modalLogAccount').textContent = account;
 
             // Status Badge

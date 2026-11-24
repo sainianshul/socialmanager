@@ -74,6 +74,10 @@ class SystemActivityLog extends Model
             $query->where('status', $filters['status']);
         }
 
+        if (!empty($filters['user_id'])) {
+            $query->where('user_id', $filters['user_id']);
+        }
+
         if (!empty($filters['search'])) {
             $search = trim($filters['search']);
             $query->where(function ($q) use ($search) {

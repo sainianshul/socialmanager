@@ -23,10 +23,10 @@ class SystemActivityController extends Controller
 
         // Paginated System Activity Logs
         $logs = SystemActivityLog::with([
-                'user:id,name,email',
+                'user:id,name,email,role',
                 'account:id,name,account_type',
             ])
-            ->filter($request->only(['status', 'event_type', 'search', 'account_id']))
+            ->filter($request->only(['status', 'event_type', 'search', 'account_id', 'user_id']))
             ->latest('id')
             ->paginate(20, ['*'], 'page')
             ->withQueryString();
@@ -46,6 +46,7 @@ class SystemActivityController extends Controller
         ];
 
         $accounts = Account::select('id', 'name', 'account_type')->orderBy('name')->get();
+        $users = \App\Models\User::select('id', 'name', 'email', 'role')->orderBy('name')->get();
 
         return view('admin.system_activity.index', compact(
             'stats',
@@ -53,7 +54,8 @@ class SystemActivityController extends Controller
             'failedJobs',
             'activeTab',
             'eventTypes',
-            'accounts'
+            'accounts',
+            'users'
         ));
     }
 
