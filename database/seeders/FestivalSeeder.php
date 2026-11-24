@@ -155,9 +155,17 @@ class FestivalSeeder extends Seeder
                 'ready_caption' => "समस्त देशवासियों को देवोत्थान (प्रबोधिनी) एकादशी के पावन पर्व की हार्दिक शुभकामनाएं।\n\nइस पावन अवसर पर भगवान श्री हरि विष्णु जी की कृपा आप सभी पर सदैव बनी रहे, यही मंगल कामना है। ॐ नमो भगवते वासुदेवाय!",
                 'hashtags' => '#DevotthanEkadashi #PrabodhiniEkadashi #VishnuPuja #Ekadashi',
                 'is_active' => true,
-                'primary_template' => 'images/templates/devotthan-ekadashi.jpg',
-                'primary_title' => 'Devotthan Ekadashi Sacred Frame',
+                'primary_template' => 'images/templates/devotthan-ekadashi-sacred-frame.jpg',
+                'primary_title' => 'Devotthan Ekadashi Sacred Tulsi Frame',
                 'preset_key' => 'classic_political_right',
+                'additional_templates' => [
+                    [
+                        'template_image_path' => 'images/templates/devotthan-ekadashi-royal-saffron.jpg',
+                        'title' => 'Devotthan Ekadashi Royal Saffron Edition',
+                        'thumbnail_path' => 'images/templates/devotthan-ekadashi-royal-saffron.jpg',
+                        'preset_key' => 'classic_political_right',
+                    ],
+                ],
             ],
             [
                 'title' => 'Gopashtami (Gau Pujan)',
@@ -241,6 +249,7 @@ class FestivalSeeder extends Seeder
         FestivalTemplate::where('template_image_path', 'like', '%template-%')
             ->orWhere('template_image_path', 'images/templates/gopashtami-vrindavan-divine.jpg')
             ->orWhere('template_image_path', 'images/templates/gopashtami.jpg')
+            ->orWhere('template_image_path', 'images/templates/devotthan-ekadashi.jpg')
             ->delete();
 
         foreach ($festivals as $fest) {
