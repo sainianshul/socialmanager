@@ -50,17 +50,35 @@ $(document).ready(function() {
                     return;
                 }
 
-                // Render category pills once
+                // Render category pills once (Show 4-5 first, then + More toggle)
                 if (!categoriesLoaded && res.categories && res.categories.length > 0) {
                     let pillsContainer = $('#readymade-category-pills');
-                    res.categories.forEach(function(cat) {
+                    let visibleLimit = 5;
+                    let totalExtra = 0;
+
+                    res.categories.forEach(function(cat, index) {
                         let iconHtml = cat.icon ? `<i class="${cat.icon} me-1"></i>` : '';
+                        let displayName = cat.name.split('(')[0].trim();
+                        let isExtra = index >= visibleLimit;
+                        if (isExtra) totalExtra++;
+
+                        let extraClass = isExtra ? 'readymade-cat-extra d-none' : '';
+
                         pillsContainer.append(
-                            `<button type="button" class="btn btn-xs rounded-pill px-3 py-1.5 fw-medium btn-light border text-secondary readymade-cat-pill" data-category-id="${cat.id}">
-                                ${iconHtml}${cat.name}
+                            `<button type="button" class="btn btn-xs rounded-pill px-3 py-1.5 fw-medium btn-light border text-secondary readymade-cat-pill ${extraClass}" data-category-id="${cat.id}" title="${cat.name}">
+                                ${iconHtml}${displayName}
                             </button>`
                         );
                     });
+
+                    if (totalExtra > 0) {
+                        pillsContainer.append(
+                            `<button type="button" class="btn btn-xs rounded-pill px-2.5 py-1.5 fw-semibold btn-outline-primary d-inline-flex align-items-center gap-1" id="btn-toggle-more-categories" data-expanded="0" title="Click to view more categories">
+                                <i class="ti ti-dots fs-3"></i>
+                                <span id="more-categories-label">+ More (${totalExtra})</span>
+                            </button>`
+                        );
+                    }
                     categoriesLoaded = true;
                 }
 
@@ -226,6 +244,28 @@ $(document).ready(function() {
         $(this).removeClass('btn-light border text-secondary fw-medium').addClass('btn-dark active fw-semibold');
         currentCategoryId = $(this).attr('data-category-id') || '';
         fetchReadymadePosters(currentCategoryId, $('#readymade-poster-search').val());
+    });
+
+    // Toggle More / Less categories
+    $(document).on('click', '#btn-toggle-more-categories', function(e) {
+        e.preventDefault();
+        let btn = $(this);
+        let isExpanded = btn.attr('data-expanded') === '1';
+        let extraCount = $('.readymade-cat-extra').length;
+
+        if (isExpanded) {
+            $('.readymade-cat-extra').not('.active').addClass('d-none');
+            btn.attr('data-expanded', '0')
+               .removeClass('btn-primary text-white')
+               .addClass('btn-outline-primary')
+               .html(`<i class="ti ti-dots fs-3"></i><span>+ More (${extraCount})</span>`);
+        } else {
+            $('.readymade-cat-extra').removeClass('d-none');
+            btn.attr('data-expanded', '1')
+               .removeClass('btn-outline-primary')
+               .addClass('btn-primary text-white')
+               .html(`<i class="ti ti-chevron-up me-1"></i><span>Less</span>`);
+        }
     });
 
     // Search filter
