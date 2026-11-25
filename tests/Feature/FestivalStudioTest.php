@@ -441,6 +441,9 @@ class FestivalStudioTest extends TestCase
         $response->assertSee('id="panel-candidate-offset-x"', false);
         $response->assertSee('id="panel-candidate-offset-y"', false);
         $response->assertSee('id="panel-candidate-pos-reset"', false);
+        $response->assertSee('id="panel-inspector-tab-branding"', false);
+        $response->assertSee('id="panel-inspector-tab-header"', false);
+        $response->assertSee('id="panel-candidate-pos-status"', false);
     }
 
     public function test_compose_accepts_and_bounds_candidate_position_offsets(): void

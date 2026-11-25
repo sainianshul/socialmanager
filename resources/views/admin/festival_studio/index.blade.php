@@ -141,7 +141,8 @@
         .fs-template-preview-wrapper {
             position: relative;
             width: 100%;
-            padding-top: 100%; /* 1:1 Aspect Ratio */
+            padding-top: 100%;
+            /* 1:1 Aspect Ratio */
             background: #0f172a;
             overflow: hidden;
         }
@@ -241,71 +242,162 @@
         }
 
         .studio-slide-panel .offcanvas-header {
-            background-color: var(--tblr-bg-surface, #ffffff);
-            border-bottom-color: var(--tblr-border-color, #f1f5f9) !important;
+            background-color: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom-color: rgba(15, 23, 42, 0.06) !important;
         }
 
         [data-bs-theme="dark"] .studio-slide-panel .offcanvas-header {
-            background-color: #0d1527 !important;
+            background-color: rgba(13, 21, 39, 0.88) !important;
             border-bottom-color: rgba(255, 255, 255, 0.08) !important;
         }
 
         .studio-slide-panel .offcanvas-body {
-            background-color: var(--tblr-bg-surface, #ffffff);
+            background-color: #f8fafc;
             color: var(--tblr-body-color, #1e293b);
         }
 
         [data-bs-theme="dark"] .studio-slide-panel .offcanvas-body {
-            background-color: #0d1527 !important;
+            background-color: #0b1220 !important;
             color: #f8fafc !important;
+        }
+
+        /* Sticky Left Poster Stage on Desktop */
+        @media (min-width: 992px) {
+            .studio-sticky-stage {
+                position: sticky;
+                top: 0;
+            }
+        }
+
+        .studio-canvas-frame {
+            box-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.06);
+        }
+
+        [data-bs-theme="dark"] .studio-canvas-frame {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        /* Apple iOS Segmented Controls & Tab Bars */
+        .studio-segmented-bar {
+            background: rgba(15, 23, 42, 0.055);
+            border: 1px solid rgba(15, 23, 42, 0.04);
+        }
+
+        [data-bs-theme="dark"] .studio-segmented-bar {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.06);
+        }
+
+        .studio-seg-tab {
+            background: transparent !important;
+            color: #64748b !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .studio-seg-tab.active {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+        }
+
+        [data-bs-theme="dark"] .studio-seg-tab {
+            color: #94a3b8 !important;
+        }
+
+        [data-bs-theme="dark"] .studio-seg-tab.active {
+            background: #1e293b !important;
+            color: #f8fafc !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .studio-primary-cta {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+            border: none !important;
+            color: #ffffff !important;
+            box-shadow: 0 6px 18px rgba(13, 148, 136, 0.28) !important;
+            transition: transform 0.15s ease, box-shadow 0.2s ease !important;
+        }
+
+        .studio-primary-cta:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 24px rgba(13, 148, 136, 0.38) !important;
         }
 
         /* Stepper badge wrapper in Header */
         .studio-stepper-wrap {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
+            background: rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(15, 23, 42, 0.06);
         }
 
         [data-bs-theme="dark"] .studio-stepper-wrap {
-            background: #162238 !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            background: rgba(255, 255, 255, 0.07) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .panel-step-badge {
+            background: transparent;
+            color: #64748b;
+            transition: all 0.2s ease;
+        }
+
+        .panel-step-badge.active {
+            background: #0d9488 !important;
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.28);
+        }
+
+        [data-bs-theme="dark"] .panel-step-badge {
+            color: #94a3b8;
         }
 
         /* Subheading badge in Header */
         .studio-subheading-badge {
-            background: #F1F5F9;
+            background: rgba(15, 23, 42, 0.05);
             color: #475569;
-            border: 1px solid #E2E8F0;
+            border: 1px solid rgba(15, 23, 42, 0.06);
         }
 
         [data-bs-theme="dark"] .studio-subheading-badge {
-            background: #162238 !important;
+            background: rgba(255, 255, 255, 0.07) !important;
             color: #cbd5e1 !important;
-            border-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
         }
 
-        /* Toolbar Section Cards (Section 1 & 2) */
+        /* Toolbar Section Cards (Clean Soft Apple Surfaces) */
         .studio-panel-card {
             background-color: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05) !important;
+            border: 1px solid rgba(15, 23, 42, 0.07) !important;
+            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
             border-radius: 18px !important;
         }
 
         [data-bs-theme="dark"] .studio-panel-card {
             background-color: #131d33 !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35) !important;
         }
 
         .studio-panel-card-inner {
             background-color: #f8fafc !important;
-            border: 1px solid #cbd5e1 !important;
+            border: 1px solid rgba(15, 23, 42, 0.06) !important;
         }
 
         [data-bs-theme="dark"] .studio-panel-card-inner {
             background-color: #0d1527 !important;
-            border: 1px solid rgba(255, 255, 255, 0.12) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+        }
+
+        .panel-pos-nudge:hover {
+            background: #ffffff !important;
+            color: #0d9488 !important;
+            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+        }
+
+        [data-bs-theme="dark"] .panel-pos-nudge:hover {
+            background: #1e293b !important;
+            color: #2dd4bf !important;
         }
 
         .studio-section-title {
@@ -402,40 +494,38 @@
             color-scheme: dark !important;
         }
 
-        /* Pill Buttons (Shape, Leader Size, Candidate Scale) */
+        /* Pill Buttons (Inside Apple Segmented Control) */
         .panel-pill-btn,
         .panel-shape-tile,
         .panel-leader-size-pill,
         .panel-candidate-scale-pill {
-            background: #ffffff;
-            border: 1px solid #E2E8F0;
-            color: #475569;
-            transition: all 0.15s ease;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .panel-pill-btn:hover,
         .panel-shape-tile:hover,
         .panel-leader-size-pill:hover,
         .panel-candidate-scale-pill:hover {
-            border-color: #0D9488;
-            color: #0D9488;
+            color: #0d9488;
         }
 
         .panel-pill-btn.active,
         .panel-shape-tile.active,
         .panel-leader-size-pill.active,
         .panel-candidate-scale-pill.active {
-            border: 1.5px solid #0D9488 !important;
-            background: #F0FDFA !important;
-            color: #0D9488 !important;
+            background: #ffffff !important;
+            color: #0d9488 !important;
+            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
         }
 
         [data-bs-theme="dark"] .panel-pill-btn,
         [data-bs-theme="dark"] .panel-shape-tile,
         [data-bs-theme="dark"] .panel-leader-size-pill,
         [data-bs-theme="dark"] .panel-candidate-scale-pill {
-            background: #0d1527 !important;
-            border-color: rgba(255, 255, 255, 0.12) !important;
+            background: transparent !important;
             color: #94a3b8 !important;
         }
 
@@ -443,7 +533,6 @@
         [data-bs-theme="dark"] .panel-shape-tile:hover,
         [data-bs-theme="dark"] .panel-leader-size-pill:hover,
         [data-bs-theme="dark"] .panel-candidate-scale-pill:hover {
-            border-color: #14b8a6 !important;
             color: #2dd4bf !important;
         }
 
@@ -451,9 +540,9 @@
         [data-bs-theme="dark"] .panel-shape-tile.active,
         [data-bs-theme="dark"] .panel-leader-size-pill.active,
         [data-bs-theme="dark"] .panel-candidate-scale-pill.active {
-            border: 1.5px solid #14b8a6 !important;
-            background: rgba(13, 148, 136, 0.22) !important;
+            background: #1e293b !important;
             color: #2dd4bf !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
         }
 
         /* Action Icon Buttons */
@@ -880,6 +969,7 @@
                 });
 
                 resetCandidatePosition(false);
+                switchInspectorTab('branding');
 
                 // 6. Open Slide-Over Panel via Bootstrap Offcanvas
                 var panelEl = document.getElementById('studioSlidePanel');
@@ -895,19 +985,26 @@
             // ======================================================================
             // 3. COMPOSE POSTER IN PANEL VIA AJAX
             // ======================================================================
+            function formatHumanOffsetStatus(x, y) {
+                var parts = [];
+                if (x < 0) parts.push('Left ' + Math.abs(x) + 'px');
+                if (x > 0) parts.push('Right ' + x + 'px');
+                if (y < 0) parts.push('Up ' + Math.abs(y) + 'px');
+                if (y > 0) parts.push('Down ' + y + 'px');
+                return parts.length ? parts.join(' • ') : 'Centered';
+            }
+
             function setCandidatePosition(x, y, triggerCompose) {
                 var clampedX = Math.max(-250, Math.min(250, parseInt(x) || 0));
                 var clampedY = Math.max(-140, Math.min(100, parseInt(y) || 0));
 
                 var hidX = document.getElementById('panel-candidate-offset-x');
                 var hidY = document.getElementById('panel-candidate-offset-y');
-                var lblX = document.getElementById('panel-candidate-offset-x-label');
-                var lblY = document.getElementById('panel-candidate-offset-y-label');
+                var statusEl = document.getElementById('panel-candidate-pos-status');
 
                 if (hidX) hidX.value = clampedX;
                 if (hidY) hidY.value = clampedY;
-                if (lblX) lblX.innerText = 'X: ' + (clampedX > 0 ? '+' + clampedX : clampedX);
-                if (lblY) lblY.innerText = 'Y: ' + (clampedY > 0 ? '+' + clampedY : clampedY);
+                if (statusEl) statusEl.innerText = formatHumanOffsetStatus(clampedX, clampedY);
 
                 if (triggerCompose) {
                     clearTimeout(panelDebounceTimer);
@@ -916,6 +1013,27 @@
                     }, 180);
                 }
             }
+
+            // Segmented Inspector Tabs (My Photo & Ribbon <-> Top Leaders)
+            function switchInspectorTab(target) {
+                document.querySelectorAll('.studio-seg-tab').forEach(function (b) {
+                    var isMatch = b.getAttribute('data-inspector-target') === target;
+                    b.classList.toggle('active', isMatch);
+                    b.classList.toggle('fw-semibold', isMatch);
+                    b.classList.toggle('fw-medium', !isMatch);
+                });
+
+                var paneBranding = document.getElementById('panel-inspector-pane-branding');
+                var paneHeader = document.getElementById('panel-inspector-pane-header');
+                if (paneBranding) paneBranding.classList.toggle('d-none', target !== 'branding');
+                if (paneHeader) paneHeader.classList.toggle('d-none', target !== 'header');
+            }
+
+            document.addEventListener('click', function (e) {
+                var segBtn = e.target.closest('.studio-seg-tab');
+                if (!segBtn) return;
+                switchInspectorTab(segBtn.getAttribute('data-inspector-target'));
+            });
 
             function resetCandidatePosition(triggerCompose) {
                 setCandidatePosition(0, 0, triggerCompose);
@@ -982,31 +1100,31 @@
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(function (res) { return res.json(); })
-                .then(function (data) {
-                    if (data.success && data.image_url) {
-                        if (imgEl) imgEl.src = data.image_url;
-                        if (linkEl) linkEl.href = data.image_url;
-                        if (btnPreview) {
-                            btnPreview.href = data.image_url;
-                            btnPreview.classList.remove('disabled');
-                        }
-                        if (btnDownload) {
-                            btnDownload.href = data.image_url;
-                            btnDownload.classList.remove('disabled');
-                        }
-                        if (schedThumb) schedThumb.src = data.image_url;
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+                        if (data.success && data.image_url) {
+                            if (imgEl) imgEl.src = data.image_url;
+                            if (linkEl) linkEl.href = data.image_url;
+                            if (btnPreview) {
+                                btnPreview.href = data.image_url;
+                                btnPreview.classList.remove('disabled');
+                            }
+                            if (btnDownload) {
+                                btnDownload.href = data.image_url;
+                                btnDownload.classList.remove('disabled');
+                            }
+                            if (schedThumb) schedThumb.src = data.image_url;
 
-                        var hiddenComposed = document.getElementById('panel-composed-path');
-                        if (hiddenComposed) hiddenComposed.value = data.relative_path || '';
-                    }
-                })
-                .catch(function (err) {
-                    console.error('Slide-over panel compose error:', err);
-                })
-                .finally(function () {
-                    if (spinner) spinner.classList.add('d-none');
-                });
+                            var hiddenComposed = document.getElementById('panel-composed-path');
+                            if (hiddenComposed) hiddenComposed.value = data.relative_path || '';
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('Slide-over panel compose error:', err);
+                    })
+                    .finally(function () {
+                        if (spinner) spinner.classList.add('d-none');
+                    });
             }
 
             // ======================================================================
@@ -1050,6 +1168,7 @@
                 if (schedTitle && tplTitle) schedTitle.innerText = tplTitle;
 
                 resetCandidatePosition(false);
+                switchInspectorTab('branding');
                 composePanelPoster();
             });
 
@@ -1209,38 +1328,38 @@
                         },
                         body: formData
                     })
-                    .then(function (res) { return res.json(); })
-                    .then(function (data) {
-                        if (data.success && data.url) {
-                            var wrapper = document.getElementById('panel-photo-chips-wrapper');
-                            if (wrapper) {
-                                document.querySelectorAll('.panel-photo-chip').forEach(function (c) {
-                                    c.classList.remove('active');
-                                });
+                        .then(function (res) { return res.json(); })
+                        .then(function (data) {
+                            if (data.success && data.url) {
+                                var wrapper = document.getElementById('panel-photo-chips-wrapper');
+                                if (wrapper) {
+                                    document.querySelectorAll('.panel-photo-chip').forEach(function (c) {
+                                        c.classList.remove('active');
+                                    });
 
-                                var newChip = document.createElement('div');
-                                newChip.className = 'panel-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0';
-                                newChip.setAttribute('data-url', data.path);
-                                newChip.innerHTML = '<img src="' + data.url + '" class="w-100 h-100 rounded-circle object-fit-cover bg-white">';
-                                wrapper.insertBefore(newChip, wrapper.firstChild);
+                                    var newChip = document.createElement('div');
+                                    newChip.className = 'panel-photo-chip position-relative rounded-circle cursor-pointer active flex-shrink-0';
+                                    newChip.setAttribute('data-url', data.path);
+                                    newChip.innerHTML = '<img src="' + data.url + '" class="w-100 h-100 rounded-circle object-fit-cover bg-white">';
+                                    wrapper.insertBefore(newChip, wrapper.firstChild);
+                                }
+
+                                var hidCutout = document.getElementById('panel-cutout-url');
+                                if (hidCutout) hidCutout.value = data.path;
+
+                                composePanelPoster();
+                            } else {
+                                alert(data.message || 'Failed to upload photo.');
                             }
-
-                            var hidCutout = document.getElementById('panel-cutout-url');
-                            if (hidCutout) hidCutout.value = data.path;
-
-                            composePanelPoster();
-                        } else {
-                            alert(data.message || 'Failed to upload photo.');
-                        }
-                    })
-                    .catch(function (err) {
-                        console.error('Photo upload error:', err);
-                        alert('Could not upload photo.');
-                    })
-                    .finally(function () {
-                        if (spinner) spinner.classList.add('d-none');
-                        e.target.value = '';
-                    });
+                        })
+                        .catch(function (err) {
+                            console.error('Photo upload error:', err);
+                            alert('Could not upload photo.');
+                        })
+                        .finally(function () {
+                            if (spinner) spinner.classList.add('d-none');
+                            e.target.value = '';
+                        });
                 }
             });
 
@@ -1256,17 +1375,8 @@
                 if (step === 1) {
                     if (pane1) pane1.classList.remove('d-none');
                     if (pane2) pane2.classList.add('d-none');
-
-                    if (ind1) {
-                        ind1.classList.add('active', 'text-white');
-                        ind1.classList.remove('bg-transparent', 'text-secondary');
-                        ind1.style.background = '#0D9488';
-                    }
-                    if (ind2) {
-                        ind2.classList.remove('active', 'text-white');
-                        ind2.classList.add('bg-transparent', 'text-secondary');
-                        ind2.style.background = 'transparent';
-                    }
+                    if (ind1) ind1.classList.add('active');
+                    if (ind2) ind2.classList.remove('active');
                 } else {
                     if (pane1) pane1.classList.add('d-none');
                     if (pane2) pane2.classList.remove('d-none');
@@ -1278,16 +1388,8 @@
                         schedThumb.src = liveImg.src;
                     }
 
-                    if (ind1) {
-                        ind1.classList.remove('active', 'text-white');
-                        ind1.classList.add('bg-transparent', 'text-secondary');
-                        ind1.style.background = 'transparent';
-                    }
-                    if (ind2) {
-                        ind2.classList.add('active', 'text-white');
-                        ind2.classList.remove('bg-transparent', 'text-secondary');
-                        ind2.style.background = '#0D9488';
-                    }
+                    if (ind1) ind1.classList.remove('active');
+                    if (ind2) ind2.classList.add('active');
                 }
             }
 
@@ -1388,67 +1490,67 @@
                     },
                     body: JSON.stringify(payload)
                 })
-                .then(function (res) {
-                    return res.json().then(function (data) {
-                        return { status: res.status, ok: res.ok, data: data };
-                    });
-                })
-                .then(function (result) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = origText;
+                    .then(function (res) {
+                        return res.json().then(function (data) {
+                            return { status: res.status, ok: res.ok, data: data };
+                        });
+                    })
+                    .then(function (result) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = origText;
 
-                    if (!result.ok) {
-                        if (alertBox) {
-                            alertBox.classList.remove('d-none');
-                            alertBox.innerText = result.data.message || 'Scheduling failed. Please try again.';
+                        if (!result.ok) {
+                            if (alertBox) {
+                                alertBox.classList.remove('d-none');
+                                alertBox.innerText = result.data.message || 'Scheduling failed. Please try again.';
+                            }
+                            return;
                         }
-                        return;
-                    }
 
-                    showStudioToast(result.data.message || 'Poster scheduled successfully!');
+                        showStudioToast(result.data.message || 'Poster scheduled successfully!');
 
-                    // Update Card Action to Scheduled badge
-                    var cardAction = document.getElementById('card-action-' + templateId);
-                    if (cardAction) {
-                        cardAction.innerHTML = '<span class="badge bg-success text-white rounded-pill px-3 py-1.5 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
-                    }
+                        // Update Card Action to Scheduled badge
+                        var cardAction = document.getElementById('card-action-' + templateId);
+                        if (cardAction) {
+                            cardAction.innerHTML = '<span class="badge bg-success text-white rounded-pill px-3 py-1.5 small fw-semibold"><i class="ti ti-check me-1"></i>Scheduled</span>';
+                        }
 
-                    // Update Date Pill
-                    var targetFestId = result.data.festival_id || festivalId;
-                    if (targetFestId) {
-                        var pillEl = document.getElementById('date-pill-' + targetFestId);
-                        if (pillEl) {
-                            pillEl.classList.add('is-scheduled');
-                            var badgeSlot = document.getElementById('pill-badge-slot-' + targetFestId);
-                            if (badgeSlot && !badgeSlot.querySelector('.badge.bg-warning')) {
-                                var setBadge = document.createElement('span');
-                                setBadge.className = 'badge bg-warning text-dark rounded-pill fw-semibold';
-                                setBadge.style.fontSize = '9px';
-                                setBadge.style.padding = '2px 7px';
-                                setBadge.innerHTML = '<i class="ti ti-check me-0.5"></i>Set';
-                                badgeSlot.prepend(setBadge);
+                        // Update Date Pill
+                        var targetFestId = result.data.festival_id || festivalId;
+                        if (targetFestId) {
+                            var pillEl = document.getElementById('date-pill-' + targetFestId);
+                            if (pillEl) {
+                                pillEl.classList.add('is-scheduled');
+                                var badgeSlot = document.getElementById('pill-badge-slot-' + targetFestId);
+                                if (badgeSlot && !badgeSlot.querySelector('.badge.bg-warning')) {
+                                    var setBadge = document.createElement('span');
+                                    setBadge.className = 'badge bg-warning text-dark rounded-pill fw-semibold';
+                                    setBadge.style.fontSize = '9px';
+                                    setBadge.style.padding = '2px 7px';
+                                    setBadge.innerHTML = '<i class="ti ti-check me-0.5"></i>Set';
+                                    badgeSlot.prepend(setBadge);
+                                }
                             }
                         }
-                    }
 
-                    // Close offcanvas after 400ms
-                    setTimeout(function () {
-                        var panelEl = document.getElementById('studioSlidePanel');
-                        if (panelEl) {
-                            var bsOffcanvas = bootstrap.Offcanvas.getInstance(panelEl);
-                            if (bsOffcanvas) bsOffcanvas.hide();
+                        // Close offcanvas after 400ms
+                        setTimeout(function () {
+                            var panelEl = document.getElementById('studioSlidePanel');
+                            if (panelEl) {
+                                var bsOffcanvas = bootstrap.Offcanvas.getInstance(panelEl);
+                                if (bsOffcanvas) bsOffcanvas.hide();
+                            }
+                        }, 400);
+                    })
+                    .catch(function (err) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = origText;
+                        if (alertBox) {
+                            alertBox.classList.remove('d-none');
+                            alertBox.innerText = 'Network error while scheduling.';
                         }
-                    }, 400);
-                })
-                .catch(function (err) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = origText;
-                    if (alertBox) {
-                        alertBox.classList.remove('d-none');
-                        alertBox.innerText = 'Network error while scheduling.';
-                    }
-                    console.error('Schedule error:', err);
-                });
+                        console.error('Schedule error:', err);
+                    });
             });
 
             // ======================================================================
@@ -1474,7 +1576,7 @@
                             title: 'Festival Greeting Poster',
                             text: caption,
                             url: shareUrl
-                        }).catch(function () {});
+                        }).catch(function () { });
                     } else {
                         navigator.clipboard.writeText(shareUrl).then(function () {
                             showStudioToast('Poster link copied to clipboard!');
