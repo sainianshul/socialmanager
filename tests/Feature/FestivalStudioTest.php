@@ -425,8 +425,8 @@ class FestivalStudioTest extends TestCase
         $response->assertStatus(200);
 
         // Verify Two Clean Sections
-        $response->assertSee('Top Leadership Header');
-        $response->assertSee('Branding Bottom Strip');
+        $response->assertSee('Top Leaders');
+        $response->assertSee('My Photo &amp; Ribbon', false);
 
         // Verify Shortened Header and Footer Options
         $response->assertSee('<option value="full_width_strip">Full-Width Strip</option>', false);

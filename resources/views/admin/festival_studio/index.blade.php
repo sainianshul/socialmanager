@@ -270,18 +270,14 @@
         }
 
         .studio-canvas-stage {
-            background-color: #ffffff;
-            background-image: radial-gradient(#E5E7EB 0.9px, transparent 0.9px);
-            background-size: 16px 16px;
-            border: 1px solid #ECEEF2;
-            border-radius: 16px;
-            padding: 12px;
+            background-color: transparent;
+            padding: 0;
+            border: none;
         }
 
         [data-bs-theme="dark"] .studio-canvas-stage {
-            background-color: #0f172a;
-            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 0.9px, transparent 0.9px);
-            border-color: rgba(255, 255, 255, 0.08);
+            background-color: transparent;
+            border: none;
         }
 
         .studio-canvas-frame {
@@ -699,23 +695,37 @@
         /* Photo Chips */
         .panel-photo-chip {
             cursor: pointer;
-            width: 38px;
-            height: 38px;
-            border: 2px solid #E2E8F0;
-            transition: all 0.15s ease;
+            width: 44px;
+            height: 44px;
+            border: 2px solid #E5E7EB;
+            padding: 2px;
+            background: #ffffff;
+            transition: all 0.16s ease;
+            flex-shrink: 0;
+            border-radius: 50%;
         }
 
         [data-bs-theme="dark"] .panel-photo-chip {
             border-color: rgba(255, 255, 255, 0.15) !important;
+            background: #1e293b !important;
         }
 
         .panel-photo-chip:hover {
-            transform: scale(1.08);
+            border-color: #0D9488 !important;
+            transform: translateY(-1px);
         }
 
         .panel-photo-chip.active {
             border-color: #0D9488 !important;
             box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.3) !important;
+            transform: translateY(-1px);
+        }
+
+        .panel-photo-chip img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         /* Swatches */
