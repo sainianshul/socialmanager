@@ -1,4 +1,4 @@
-{{-- Apple-Grade Minimalist Festival Poster Studio Slide-Over Panel --}}
+{{-- Figma & Excalidraw Inspired Pure-White Festival Poster Studio Panel --}}
 @php
     $firstTemplate = $templates->first();
     $userBranding = auth()->user()->defaultBranding ?? auth()->user()->brandings()->first();
@@ -11,114 +11,121 @@
 @endphp
 
 <div class="offcanvas offcanvas-end border-0 studio-slide-panel" tabindex="-1" id="studioSlidePanel" aria-labelledby="studioSlidePanelLabel" data-bs-backdrop="true">
-    {{-- Apple-Style Frosted Header Bar --}}
-    <div class="offcanvas-header border-bottom py-2.5 px-3 px-lg-4 d-flex align-items-center justify-content-between studio-glass-header">
+    {{-- Crisp Pure-White Top Editor Bar --}}
+    <div class="offcanvas-header border-bottom py-2.5 px-3 px-lg-4 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2 flex-wrap">
-            <span class="avatar avatar-xs rounded-circle d-inline-flex align-items-center justify-content-center text-white" style="background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%); width: 26px; height: 26px;">
-                <i class="ti ti-sparkles" style="font-size: 13px;"></i>
+            <span class="avatar avatar-xs rounded-3 d-inline-flex align-items-center justify-content-center text-white" style="background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%); width: 28px; height: 28px;">
+                <i class="ti ti-sparkles" style="font-size: 14px;"></i>
             </span>
-            <h5 class="offcanvas-title fw-bold text-body mb-0" id="studioSlidePanelLabel" style="font-size: 1.05rem; letter-spacing: -0.02em;">
+            <h5 class="offcanvas-title fw-bold text-body mb-0" id="studioSlidePanelLabel" style="font-size: 1.02rem; letter-spacing: -0.02em;">
                 Festival Poster Studio
             </h5>
-            <span class="badge px-2.5 py-1 rounded-pill fw-medium studio-subheading-badge" id="panel-subheading" style="font-size: 11px;">
-                {{ $selectedFestival->title }} ({{ $selectedFestival->festival_date->format('d M Y') }})
+            <span class="badge px-2.5 py-1 rounded-pill fw-medium studio-subheading-badge d-inline-flex align-items-center gap-1" style="font-size: 11px;">
+                <i class="ti ti-calendar-event text-teal" style="font-size: 12px;"></i>
+                <span id="panel-subheading">{{ $selectedFestival->title }} ({{ $selectedFestival->festival_date->format('d M Y') }})</span>
             </span>
         </div>
 
-        {{-- iOS-Style Segmented Stepper & Close --}}
+        {{-- Crisp Outlined Stepper & Close --}}
         <div class="d-flex align-items-center gap-2">
             <div class="d-none d-sm-flex align-items-center p-1 rounded-pill studio-stepper-wrap">
-                <button type="button" class="btn btn-sm border-0 rounded-pill px-3 py-1 fw-semibold panel-step-badge active" id="panel-step-indicator-1" style="font-size: 11px;">
-                    1. Customize
+                <button type="button" class="btn btn-sm border-0 rounded-pill px-3 py-1 fw-semibold panel-step-badge d-inline-flex align-items-center gap-1 active" id="panel-step-indicator-1" style="font-size: 11px;">
+                    <i class="ti ti-adjustments-horizontal" style="font-size: 13px;"></i>
+                    <span>1. Customize</span>
                 </button>
-                <button type="button" class="btn btn-sm border-0 rounded-pill px-3 py-1 fw-medium panel-step-badge" id="panel-step-indicator-2" style="font-size: 11px;">
-                    2. Schedule
+                <button type="button" class="btn btn-sm border-0 rounded-pill px-3 py-1 fw-medium panel-step-badge d-inline-flex align-items-center gap-1" id="panel-step-indicator-2" style="font-size: 11px;">
+                    <i class="ti ti-calendar-time" style="font-size: 13px;"></i>
+                    <span>2. Schedule</span>
                 </button>
             </div>
             <button type="button" class="btn-close ms-1" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
     </div>
 
-    {{-- Panel Body --}}
+    {{-- Panel Body (Pure White Surface) --}}
     <div class="offcanvas-body p-3 p-lg-4">
 
         {{-- ================================================================= --}}
-        {{-- STEP 1: STICKY STAGE PREVIEW + SEGMENTED APPLE INSPECTOR          --}}
+        {{-- STEP 1: DOT-GRID ARTBOARD STAGE + ICON-LED INSPECTOR TABS         --}}
         {{-- ================================================================= --}}
         <div id="panel-step-pane-1">
             <div class="row g-3 g-lg-4 align-items-start">
 
-                {{-- LEFT COLUMN: Sticky 1:1 Poster Stage + Sleek Action Dock --}}
+                {{-- LEFT COLUMN: Sticky 1:1 Artboard Stage + Action Dock --}}
                 <div class="col-lg-6 studio-sticky-stage">
-                    <div class="mx-auto" style="max-width: 420px;">
+                    <div class="mx-auto" style="max-width: 425px;">
 
-                        {{-- Compact Template Switcher Strip (if multiple designs exist) --}}
-                        @if($templates->count() > 1)
-                            <div class="mb-2.5">
-                                <div class="d-flex align-items-center justify-content-between mb-1.5 px-0.5">
-                                    <span class="text-secondary fw-semibold" style="font-size: 11px; letter-spacing: 0.01em;">
-                                        Design Variants
-                                    </span>
-                                    <span class="text-secondary small font-monospace" style="font-size: 10.5px;">
-                                        {{ $templates->count() }} Designs
+                        {{-- Crisp Excalidraw-Style Dot Canvas Wrapper --}}
+                        <div class="studio-canvas-stage">
+                            {{-- Design Variants Strip --}}
+                            @if($templates->count() > 1)
+                                <div class="mb-2.5">
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5 px-0.5">
+                                        <span class="text-secondary fw-semibold d-inline-flex align-items-center gap-1" style="font-size: 11px;">
+                                            <i class="ti ti-layout-grid text-teal" style="font-size: 13px;"></i>
+                                            Design Variants
+                                        </span>
+                                        <span class="badge studio-white-pill fw-medium font-monospace rounded-pill px-2" style="font-size: 10px;">
+                                            {{ $templates->count() }} Designs
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2 overflow-x-auto pb-1" id="panel-template-switcher">
+                                        @foreach($templates as $tpl)
+                                            @php
+                                                $tplFooterStyle = $tpl->layout_config['footer']['style'] ?? ($tpl->preset_key === 'solid_white_banner' ? 'solid_white_banner' : 'dual_ribbon_badge');
+                                                $tplHeaderLayout = $tpl->layout_config['header']['layout'] ?? ($tpl->layout_config['header']['mode'] ?? 'full_width_strip');
+                                                $tplFooterFixed = !empty($tpl->layout_config['footer']['is_fixed']) ? '1' : '0';
+                                                $tplHeaderFixed = !empty($tpl->layout_config['header']['is_fixed']) ? '1' : '0';
+                                                $tplLeaderShape = $tpl->layout_config['header']['chip_shape'] ?? 'circle';
+                                                $tplLeaderBorder = $tpl->layout_config['header']['chip_border_color'] ?? '#FF9933';
+                                            @endphp
+                                            <div class="panel-template-chip position-relative rounded-3 overflow-hidden cursor-pointer flex-shrink-0 {{ $loop->first ? 'active' : '' }}"
+                                                 id="panel-tpl-chip-{{ $tpl->id }}"
+                                                 data-template-id="{{ $tpl->id }}"
+                                                 data-template-title="{{ $tpl->title }}"
+                                                 data-template-image="{{ $tpl->image_url }}"
+                                                 data-footer-style="{{ $tplFooterStyle }}"
+                                                 data-footer-fixed="{{ $tplFooterFixed }}"
+                                                 data-header-layout="{{ $tplHeaderLayout }}"
+                                                 data-header-fixed="{{ $tplHeaderFixed }}"
+                                                 data-leader-shape="{{ $tplLeaderShape }}"
+                                                 data-leader-border="{{ $tplLeaderBorder }}"
+                                                 data-party-id="{{ $tpl->party_id ?? '' }}"
+                                                 data-strip-id="{{ $tpl->layout_config['header']['strip_id'] ?? '' }}"
+                                                 style="width: 52px; height: 52px;">
+                                                <img src="{{ $tpl->image_url }}" alt="{{ $tpl->title }}" class="w-100 h-100 object-fit-cover">
+                                                <span class="panel-chip-check badge bg-teal rounded-circle p-1 position-absolute top-0 end-0 m-0.5 {{ $loop->first ? '' : 'd-none' }}" style="font-size: 7px;">
+                                                    <i class="ti ti-check text-white"></i>
+                                                </span>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- 1:1 Poster Canvas Frame --}}
+                            <div class="studio-canvas-frame position-relative overflow-hidden rounded-3" style="aspect-ratio: 1 / 1; background: #0f172a;">
+                                <a href="#" id="panel-preview-link" target="_blank" rel="noopener noreferrer" class="d-block w-100 h-100 text-decoration-none" title="Click to inspect full 1080p image" style="cursor: zoom-in;">
+                                    <img id="panel-canvas-img" src="{{ $firstTemplate?->image_url }}" alt="Poster Preview" class="w-100 h-100 d-block" style="object-fit: contain;">
+                                </a>
+
+                                {{-- Crisp Quality Badge --}}
+                                <div class="position-absolute top-0 end-0 m-2 pointer-events-none">
+                                    <span class="badge rounded-pill px-2.5 py-1 fw-semibold" style="background: rgba(15, 23, 42, 0.72); color: #ffffff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.16); font-size: 10px; letter-spacing: 0.04em;">
+                                        1080p HD
                                     </span>
                                 </div>
-                                <div class="d-flex align-items-center gap-2 overflow-x-auto pb-1" id="panel-template-switcher">
-                                    @foreach($templates as $tpl)
-                                        @php
-                                            $tplFooterStyle = $tpl->layout_config['footer']['style'] ?? ($tpl->preset_key === 'solid_white_banner' ? 'solid_white_banner' : 'dual_ribbon_badge');
-                                            $tplHeaderLayout = $tpl->layout_config['header']['layout'] ?? ($tpl->layout_config['header']['mode'] ?? 'full_width_strip');
-                                            $tplFooterFixed = !empty($tpl->layout_config['footer']['is_fixed']) ? '1' : '0';
-                                            $tplHeaderFixed = !empty($tpl->layout_config['header']['is_fixed']) ? '1' : '0';
-                                            $tplLeaderShape = $tpl->layout_config['header']['chip_shape'] ?? 'circle';
-                                            $tplLeaderBorder = $tpl->layout_config['header']['chip_border_color'] ?? '#FF9933';
-                                        @endphp
-                                        <div class="panel-template-chip position-relative rounded-3 overflow-hidden cursor-pointer flex-shrink-0 {{ $loop->first ? 'active' : '' }}"
-                                             id="panel-tpl-chip-{{ $tpl->id }}"
-                                             data-template-id="{{ $tpl->id }}"
-                                             data-template-title="{{ $tpl->title }}"
-                                             data-template-image="{{ $tpl->image_url }}"
-                                             data-footer-style="{{ $tplFooterStyle }}"
-                                             data-footer-fixed="{{ $tplFooterFixed }}"
-                                             data-header-layout="{{ $tplHeaderLayout }}"
-                                             data-header-fixed="{{ $tplHeaderFixed }}"
-                                             data-leader-shape="{{ $tplLeaderShape }}"
-                                             data-leader-border="{{ $tplLeaderBorder }}"
-                                             data-party-id="{{ $tpl->party_id ?? '' }}"
-                                             data-strip-id="{{ $tpl->layout_config['header']['strip_id'] ?? '' }}"
-                                             style="width: 54px; height: 54px;">
-                                            <img src="{{ $tpl->image_url }}" alt="{{ $tpl->title }}" class="w-100 h-100 object-fit-cover">
-                                            <span class="panel-chip-check badge bg-teal rounded-circle p-1 position-absolute top-0 end-0 m-0.5 {{ $loop->first ? '' : 'd-none' }}" style="font-size: 7px;">
-                                                <i class="ti ti-check text-white"></i>
-                                            </span>
-                                        </div>
-                                    @endforeach
+
+                                {{-- Smooth Frosted Loading State --}}
+                                <div id="panel-canvas-spinner" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-75 text-white d-none" style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10;">
+                                    <div class="spinner-border text-teal mb-2" role="status" style="width: 2rem; height: 2rem;"></div>
+                                    <div class="small fw-semibold">Updating Poster...</div>
                                 </div>
-                            </div>
-                        @endif
-
-                        {{-- 1:1 Poster Canvas Frame --}}
-                        <div class="studio-canvas-frame position-relative overflow-hidden rounded-4" style="aspect-ratio: 1 / 1; background: #0f172a;">
-                            <a href="#" id="panel-preview-link" target="_blank" rel="noopener noreferrer" class="d-block w-100 h-100 text-decoration-none" title="Click to inspect full 1080p image" style="cursor: zoom-in;">
-                                <img id="panel-canvas-img" src="{{ $firstTemplate?->image_url }}" alt="Poster Preview" class="w-100 h-100 d-block" style="object-fit: contain;">
-                            </a>
-
-                            {{-- Subtle Glass Quality Pill --}}
-                            <div class="position-absolute top-0 end-0 m-2.5 pointer-events-none">
-                                <span class="badge rounded-pill px-2.5 py-1 fw-semibold" style="background: rgba(15, 23, 42, 0.72); color: #ffffff; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.16); font-size: 10px; letter-spacing: 0.04em;">
-                                    1080p HD
-                                </span>
-                            </div>
-
-                            {{-- Smooth Frosted Loading State --}}
-                            <div id="panel-canvas-spinner" class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center bg-dark bg-opacity-75 text-white d-none" style="backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10;">
-                                <div class="spinner-border text-teal mb-2" role="status" style="width: 2rem; height: 2rem;"></div>
-                                <div class="small fw-semibold">Updating Poster...</div>
                             </div>
                         </div>
 
-                        {{-- Unified Compact Action Dock + Primary Schedule CTA --}}
-                        <div class="d-flex align-items-center gap-2 mt-3">
+                        {{-- Crisp Floating White Action Dock + Primary Schedule CTA --}}
+                        <div class="d-flex align-items-center gap-2 mt-2.5">
                             <div class="d-flex align-items-center gap-1.5">
                                 <a href="{{ $firstTemplate?->image_url }}" id="panel-btn-preview" target="_blank" rel="noopener noreferrer" class="btn rounded-circle d-flex align-items-center justify-content-center p-0 panel-icon-btn" data-bs-toggle="tooltip" title="Full-Screen Preview">
                                     <i class="ti ti-maximize" style="font-size: 15px;"></i>
@@ -130,12 +137,12 @@
                                     <i class="ti ti-brand-whatsapp" style="font-size: 16px;"></i>
                                 </button>
                                 <button type="button" id="panel-btn-share" class="btn rounded-circle d-flex align-items-center justify-content-center p-0 panel-icon-btn" data-bs-toggle="tooltip" title="Copy Share Link">
-                                    <i class="ti ti-share" style="font-size: 15px;"></i>
+                                    <i class="ti ti-link" style="font-size: 15px;"></i>
                                 </button>
                             </div>
 
-                            <button type="button" class="btn btn-primary rounded-pill flex-grow-1 py-2.5 fw-semibold shadow-sm d-flex align-items-center justify-content-center gap-1.5 studio-primary-cta" id="panel-btn-go-schedule" style="font-size: 14px; letter-spacing: -0.01em;">
-                                <i class="ti ti-calendar-time" style="font-size: 17px;"></i>
+                            <button type="button" class="btn btn-primary rounded-pill flex-grow-1 py-2.5 fw-semibold d-flex align-items-center justify-content-center gap-1.5 studio-primary-cta" id="panel-btn-go-schedule" style="font-size: 14px; letter-spacing: -0.01em;">
+                                <i class="ti ti-calendar-plus" style="font-size: 17px;"></i>
                                 <span>Schedule Post</span>
                                 <i class="ti ti-arrow-right" style="font-size: 15px;"></i>
                             </button>
@@ -144,42 +151,49 @@
                     </div>
                 </div>
 
-                {{-- RIGHT COLUMN: Apple Segmented Inspector (Zero Clutter) --}}
+                {{-- RIGHT COLUMN: Pure-White Figma/Excalidraw Icon Inspector --}}
                 <div class="col-lg-6">
 
-                    {{-- Apple-Style Segmented Mode Switcher --}}
+                    {{-- Crisp Outlined White Tab Switcher with Icons --}}
                     <div class="studio-segmented-bar p-1 rounded-3 mb-3 d-flex gap-1">
-                        <button type="button" class="btn btn-sm flex-fill border-0 rounded-2 py-2 fw-semibold studio-seg-tab active" id="panel-inspector-tab-branding" data-inspector-target="branding">
-                            <i class="ti ti-user-circle me-1"></i>My Photo & Ribbon
+                        <button type="button" class="btn btn-sm flex-fill rounded-2 py-2 fw-semibold studio-seg-tab d-flex align-items-center justify-content-center gap-1.5 active" id="panel-inspector-tab-branding" data-inspector-target="branding">
+                            <i class="ti ti-user-circle" style="font-size: 16px;"></i>
+                            <span>My Photo &amp; Ribbon</span>
                         </button>
-                        <button type="button" class="btn btn-sm flex-fill border-0 rounded-2 py-2 fw-medium studio-seg-tab" id="panel-inspector-tab-header" data-inspector-target="header">
-                            <i class="ti ti-crown me-1"></i>Top Leaders
+                        <button type="button" class="btn btn-sm flex-fill rounded-2 py-2 fw-medium studio-seg-tab d-flex align-items-center justify-content-center gap-1.5" id="panel-inspector-tab-header" data-inspector-target="header">
+                            <i class="ti ti-users-group" style="font-size: 16px;"></i>
+                            <span>Top Leaders</span>
                         </button>
                     </div>
 
                     {{-- ===================================================== --}}
-                    {{-- INSPECTOR PANE 1: MY PHOTO, POSITION & BRANDING STRIP --}}
+                    {{-- INSPECTOR TAB 1: MY PHOTO, POSITION & BRANDING STRIP   --}}
                     {{-- ===================================================== --}}
                     <div id="panel-inspector-pane-branding">
                         <div class="card studio-panel-card p-3.5 mb-0">
                             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
                                 <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
-                                    <i class="ti ti-id-badge-2 text-primary" style="font-size: 14px;"></i>
+                                    <i class="ti ti-layout-bottombar text-teal" style="font-size: 15px;"></i>
                                     Branding Bottom Strip
                                 </span>
-                                <a href="{{ route('admin.branding.index') }}" target="_blank" class="text-primary small text-decoration-none fw-semibold" style="font-size: 11px;">
-                                    Profile Settings &rarr;
+                                <a href="{{ route('admin.branding.index') }}" target="_blank" class="text-teal small text-decoration-none fw-semibold d-inline-flex align-items-center gap-1" style="font-size: 11px;">
+                                    <span>Profile Settings</span>
+                                    <i class="ti ti-external-link" style="font-size: 12px;"></i>
                                 </a>
                             </div>
 
-                            <div class="d-flex flex-column" style="gap: 16px;">
+                            <div class="d-flex flex-column" style="gap: 14px;">
 
-                                {{-- 1. Photo Cutout Selector (Immediate visual action first!) --}}
+                                {{-- 1. Photo Cutout Selector --}}
                                 <div>
                                     <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                        <label class="form-label small mb-0" style="font-size: 11.5px;">Choose Your Photo</label>
-                                        <label for="panel-upload-photo-input" class="badge bg-teal-lt text-teal cursor-pointer mb-0 px-2.5 py-1 rounded-pill fw-semibold" style="font-size: 11px;">
-                                            <i class="ti ti-upload me-1"></i>Upload New
+                                        <label class="form-label small mb-0 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-photo text-teal" style="font-size: 14px;"></i>
+                                            <span>Choose Your Photo</span>
+                                        </label>
+                                        <label for="panel-upload-photo-input" class="btn btn-sm studio-white-pill rounded-pill cursor-pointer mb-0 px-2.5 py-1 fw-semibold text-teal d-inline-flex align-items-center gap-1" style="font-size: 11px; border-color: #99F6E4 !important;">
+                                            <i class="ti ti-cloud-upload" style="font-size: 13px;"></i>
+                                            <span>Upload Photo</span>
                                         </label>
                                     </div>
                                     <input type="file" id="panel-upload-photo-input" class="d-none" accept="image/jpeg,image/png,image/webp">
@@ -204,39 +218,47 @@
                                     </div>
                                 </div>
 
-                                {{-- 2. Photo Size & Position Control Block (Apple Grouped Box) --}}
-                                <div class="p-2.5 rounded-3 studio-panel-card-inner">
-                                    {{-- 2a. Size Segmented Pill --}}
-                                    <div class="mb-2.5">
+                                {{-- 2. Crisp White Photo Size & Adjust Position Controls --}}
+                                <div class="p-3 rounded-3 studio-panel-card-inner">
+                                    {{-- 2a. Photo Size with Visual Icons --}}
+                                    <div class="mb-3">
                                         <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                            <label class="form-label small mb-0" style="font-size: 11.5px;">Photo Size</label>
-                                            <span class="badge bg-transparent border text-secondary font-monospace" id="panel-candidate-scale-label" style="font-size: 10px;">100%</span>
+                                            <label class="form-label small mb-0 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                                <i class="ti ti-aspect-ratio text-teal" style="font-size: 14px;"></i>
+                                                <span>Photo Size</span>
+                                            </label>
+                                            <span class="badge studio-white-pill font-monospace rounded-pill px-2" id="panel-candidate-scale-label" style="font-size: 10px;">100%</span>
                                         </div>
                                         <input type="hidden" id="panel-candidate-scale" value="100">
                                         <div class="studio-segmented-bar p-1 rounded-3 d-flex gap-1" id="panel-candidate-scale-tiles">
-                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill border-0 py-1.5 px-2 rounded-2" data-scale="85">
+                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-scale="85">
+                                                <i class="ti ti-minimize" style="font-size: 13px;"></i>
                                                 <span class="small fw-medium" style="font-size: 11.5px;">Small</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill border-0 py-1.5 px-2 rounded-2 active" data-scale="100">
+                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1 active" data-scale="100">
+                                                <i class="ti ti-aspect-ratio" style="font-size: 13px;"></i>
                                                 <span class="small fw-semibold" style="font-size: 11.5px;">Normal</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill border-0 py-1.5 px-2 rounded-2" data-scale="115">
+                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-scale="115">
+                                                <i class="ti ti-maximize" style="font-size: 13px;"></i>
                                                 <span class="small fw-medium" style="font-size: 11.5px;">Large</span>
                                             </button>
                                         </div>
                                     </div>
 
-                                    {{-- 2b. Human-Friendly Move Photo Arrows --}}
-                                    <div class="pt-2 border-top">
+                                    {{-- 2b. Crisp Arrow Position Nudge Controls --}}
+                                    <div class="pt-2.5 border-top">
                                         <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                            <label class="form-label small mb-0 d-flex align-items-center" style="font-size: 11.5px;">
+                                            <label class="form-label small mb-0 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                                <i class="ti ti-arrows-move text-teal" style="font-size: 14px;"></i>
                                                 <span>Adjust Position</span>
-                                                <i class="ti ti-info-circle text-muted ms-1 cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Tap arrows to move your photo slightly Left, Right, Up or Down"></i>
+                                                <i class="ti ti-info-circle text-muted cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Tap arrows to move your photo slightly Left, Right, Up or Down"></i>
                                             </label>
                                             <div class="d-flex align-items-center gap-2">
-                                                <span class="text-secondary small" id="panel-candidate-pos-status" style="font-size: 10.5px;">Centered</span>
-                                                <button type="button" id="panel-candidate-pos-reset" class="btn btn-link btn-sm p-0 text-decoration-none text-primary fw-semibold" style="font-size: 11px;" title="Reset photo position">
-                                                    <i class="ti ti-rotate-2 me-0.5"></i>Reset
+                                                <span class="badge studio-white-pill fw-medium rounded-pill px-2" id="panel-candidate-pos-status" style="font-size: 10px;">Centered</span>
+                                                <button type="button" id="panel-candidate-pos-reset" class="btn btn-sm studio-white-pill rounded-pill px-2 py-0 text-teal fw-semibold d-inline-flex align-items-center gap-1" style="font-size: 10.5px; height: 22px;" title="Reset photo position">
+                                                    <i class="ti ti-rotate-clockwise" style="font-size: 11px;"></i>
+                                                    <span>Reset</span>
                                                 </button>
                                             </div>
                                         </div>
@@ -244,22 +266,28 @@
                                         <input type="hidden" id="panel-candidate-offset-y" value="0">
                                         <div class="row g-2">
                                             <div class="col-6">
-                                                <div class="studio-segmented-bar p-1 rounded-3 d-flex align-items-center justify-content-between gap-1">
-                                                    <button type="button" class="btn btn-sm btn-ghost-secondary border-0 panel-pos-nudge flex-fill py-1 rounded-2" data-axis="x" data-delta="-25" title="Move Left">
-                                                        <i class="ti ti-arrow-left me-1" style="font-size: 13px;"></i><span style="font-size: 11px;">Left</span>
+                                                <div class="studio-segmented-bar p-1 rounded-3 d-flex align-items-center gap-1">
+                                                    <button type="button" class="btn btn-sm border-0 panel-pos-nudge flex-fill py-1.5 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-axis="x" data-delta="-25" title="Move Left">
+                                                        <i class="ti ti-arrow-left" style="font-size: 14px;"></i>
+                                                        <span style="font-size: 11.5px;">Left</span>
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-ghost-secondary border-0 panel-pos-nudge flex-fill py-1 rounded-2" data-axis="x" data-delta="25" title="Move Right">
-                                                        <span style="font-size: 11px;">Right</span><i class="ti ti-arrow-right ms-1" style="font-size: 13px;"></i>
+                                                    <span class="border-end" style="height: 16px;"></span>
+                                                    <button type="button" class="btn btn-sm border-0 panel-pos-nudge flex-fill py-1.5 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-axis="x" data-delta="25" title="Move Right">
+                                                        <span style="font-size: 11.5px;">Right</span>
+                                                        <i class="ti ti-arrow-right" style="font-size: 14px;"></i>
                                                     </button>
                                                 </div>
                                             </div>
                                             <div class="col-6">
-                                                <div class="studio-segmented-bar p-1 rounded-3 d-flex align-items-center justify-content-between gap-1">
-                                                    <button type="button" class="btn btn-sm btn-ghost-secondary border-0 panel-pos-nudge flex-fill py-1 rounded-2" data-axis="y" data-delta="-20" title="Move Up">
-                                                        <i class="ti ti-arrow-up me-1" style="font-size: 13px;"></i><span style="font-size: 11px;">Up</span>
+                                                <div class="studio-segmented-bar p-1 rounded-3 d-flex align-items-center gap-1">
+                                                    <button type="button" class="btn btn-sm border-0 panel-pos-nudge flex-fill py-1.5 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-axis="y" data-delta="-20" title="Move Up">
+                                                        <i class="ti ti-arrow-up" style="font-size: 14px;"></i>
+                                                        <span style="font-size: 11.5px;">Up</span>
                                                     </button>
-                                                    <button type="button" class="btn btn-sm btn-ghost-secondary border-0 panel-pos-nudge flex-fill py-1 rounded-2" data-axis="y" data-delta="20" title="Move Down">
-                                                        <span style="font-size: 11px;">Down</span><i class="ti ti-arrow-down ms-1" style="font-size: 13px;"></i>
+                                                    <span class="border-end" style="height: 16px;"></span>
+                                                    <button type="button" class="btn btn-sm border-0 panel-pos-nudge flex-fill py-1.5 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-axis="y" data-delta="20" title="Move Down">
+                                                        <span style="font-size: 11.5px;">Down</span>
+                                                        <i class="ti ti-arrow-down" style="font-size: 14px;"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -269,9 +297,10 @@
 
                                 {{-- 3. Footer Ribbon Style Selection --}}
                                 <div>
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <label for="panel-footer-style" class="form-label small mb-0" style="font-size: 11.5px;">
-                                            Footer Ribbon Style
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                        <label for="panel-footer-style" class="form-label small mb-0 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-layout-bottombar text-teal" style="font-size: 14px;"></i>
+                                            <span>Footer Ribbon Style</span>
                                         </label>
                                         <span id="panel-footer-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
                                             Fixed by Admin
@@ -291,28 +320,34 @@
                                     </select>
                                 </div>
 
-                                {{-- 4. Name, Post & Social Handles (Clean Collapsible + Switch) --}}
-                                <div class="pt-2 border-top">
-                                    <a class="d-flex align-items-center justify-content-between text-decoration-none cursor-pointer py-2 px-3 rounded-3 studio-panel-card-inner" data-bs-toggle="collapse" href="#panel-candidate-details-collapse" role="button" aria-expanded="false" aria-controls="panel-candidate-details-collapse">
+                                {{-- 4. Name & Post Override (Crisp Pure-White Accordion) --}}
+                                <div>
+                                    <a class="d-flex align-items-center justify-content-between text-decoration-none cursor-pointer py-2.5 px-3 rounded-3 studio-panel-card-inner" data-bs-toggle="collapse" href="#panel-candidate-details-collapse" role="button" aria-expanded="false" aria-controls="panel-candidate-details-collapse">
                                         <span class="small fw-semibold text-body d-flex align-items-center gap-1.5" style="font-size: 12px;">
-                                            <i class="ti ti-user-edit text-primary"></i>
-                                            Edit Name & Post
+                                            <i class="ti ti-user-edit text-teal" style="font-size: 15px;"></i>
+                                            <span>Edit Name &amp; Post</span>
                                         </span>
-                                        <span class="small text-secondary d-flex align-items-center gap-1" style="font-size: 11px;">
-                                            <span class="text-truncate" style="max-width: 110px;">{{ $userName }}</span>
-                                            <i class="ti ti-chevron-down" style="font-size: 13px;"></i>
+                                        <span class="small text-secondary d-flex align-items-center gap-1.5" style="font-size: 11px;">
+                                            <span class="text-truncate" style="max-width: 115px;">{{ $userName }}</span>
+                                            <i class="ti ti-chevron-down" style="font-size: 14px;"></i>
                                         </span>
                                     </a>
                                     <div class="collapse mt-2" id="panel-candidate-details-collapse">
-                                        <div class="p-2.5 rounded-3 studio-panel-card-inner">
+                                        <div class="p-3 rounded-3 studio-panel-card-inner">
                                             <div class="row g-2">
                                                 <div class="col-6">
-                                                    <label class="form-label small mb-1" style="font-size: 10.5px;">Name</label>
+                                                    <label class="form-label small mb-1 d-inline-flex align-items-center gap-1" style="font-size: 10.5px;">
+                                                        <i class="ti ti-id-badge-2 text-teal" style="font-size: 12px;"></i>
+                                                        <span>Name</span>
+                                                    </label>
                                                     <input type="text" id="panel-candidate-name" name="candidate_name" class="form-control form-control-sm rounded-2" value="{{ $userName }}" placeholder="e.g. राहुल शर्मा" style="font-size: 12px; height: 36px;">
                                                     <input type="hidden" id="qs-modal-candidate-name" value="{{ $userName }}">
                                                 </div>
                                                 <div class="col-6">
-                                                    <label class="form-label small mb-1" style="font-size: 10.5px;">Post / Designation</label>
+                                                    <label class="form-label small mb-1 d-inline-flex align-items-center gap-1" style="font-size: 10.5px;">
+                                                        <i class="ti ti-pencil text-teal" style="font-size: 12px;"></i>
+                                                        <span>Post / Designation</span>
+                                                    </label>
                                                     <input type="text" id="panel-candidate-designation" name="candidate_designation" class="form-control form-control-sm rounded-2" value="{{ $userBranding?->designation }}" placeholder="e.g. जिला महामंत्री" style="font-size: 12px; height: 36px;">
                                                     <input type="hidden" id="qs-modal-candidate-designation" value="{{ $userBranding?->designation }}">
                                                 </div>
@@ -321,40 +356,47 @@
                                     </div>
                                 </div>
 
-                                <div class="d-flex align-items-center justify-content-between pt-2 border-top">
-                                    <span class="small fw-medium text-body" style="font-size: 12px;">Show Social Media Handles</span>
+                                {{-- 5. Social Handles Switch --}}
+                                <div class="d-flex align-items-center justify-content-between pt-2.5 border-top">
+                                    <span class="small fw-medium text-body d-inline-flex align-items-center gap-1.5" style="font-size: 12px;">
+                                        <i class="ti ti-share text-teal" style="font-size: 14px;"></i>
+                                        <span>Show Social Media Handles</span>
+                                    </span>
                                     <div class="form-check form-switch m-0 ps-0">
                                         <input class="form-check-input ms-0 cursor-pointer" type="checkbox" id="panel-show-social" checked style="width: 36px; height: 19px;">
                                         <input type="checkbox" id="qs-modal-show-social" class="d-none" checked>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
 
                     {{-- ===================================================== --}}
-                    {{-- INSPECTOR PANE 2: TOP LEADERSHIP HEADER               --}}
+                    {{-- INSPECTOR TAB 2: TOP LEADERSHIP HEADER                --}}
                     {{-- ===================================================== --}}
                     <div id="panel-inspector-pane-header" class="d-none">
                         <div class="card studio-panel-card p-3.5 mb-0">
                             <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
                                 <span class="text-uppercase fw-bold studio-section-title d-flex align-items-center gap-1.5">
-                                    <i class="ti ti-crown text-primary" style="font-size: 14px;"></i>
+                                    <i class="ti ti-crown text-teal" style="font-size: 15px;"></i>
                                     Top Leadership Header
                                 </span>
                                 @if(isset($allStrips) && $allStrips->isNotEmpty())
-                                    <a href="{{ route('admin.leader-strips.index') }}" target="_blank" class="text-primary small text-decoration-none fw-semibold" style="font-size: 11px;">
-                                        Manage Strips &rarr;
+                                    <a href="{{ route('admin.leader-strips.index') }}" target="_blank" class="text-teal small text-decoration-none fw-semibold d-inline-flex align-items-center gap-1" style="font-size: 11px;">
+                                        <span>Manage Strips</span>
+                                        <i class="ti ti-external-link" style="font-size: 12px;"></i>
                                     </a>
                                 @endif
                             </div>
 
-                            <div class="d-flex flex-column" style="gap: 16px;">
+                            <div class="d-flex flex-column" style="gap: 14px;">
                                 {{-- 1. Leadership Strip Selection --}}
                                 @if(isset($allStrips) && $allStrips->isNotEmpty())
                                     <div>
-                                        <label for="panel-strip-id" class="form-label small mb-1" style="font-size: 11.5px;">
-                                            Leadership Strip
+                                        <label for="panel-strip-id" class="form-label small mb-1.5 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-users-group text-teal" style="font-size: 14px;"></i>
+                                            <span>Leadership Strip</span>
                                         </label>
                                         <select class="form-select qs-premium-select" id="panel-strip-id">
                                             @php
@@ -385,9 +427,10 @@
 
                                 {{-- 2. Header Layout Design --}}
                                 <div>
-                                    <div class="d-flex align-items-center justify-content-between mb-1">
-                                        <label for="panel-header-layout" class="form-label small mb-0" style="font-size: 11.5px;">
-                                            Header Layout Style
+                                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                                        <label for="panel-header-layout" class="form-label small mb-0 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-layout-navbar text-teal" style="font-size: 14px;"></i>
+                                            <span>Header Layout Style</span>
                                         </label>
                                         <span id="panel-header-locked-badge" class="badge bg-danger-lt text-danger d-none" style="font-size: 10px;">
                                             Fixed by Admin
@@ -406,26 +449,35 @@
                                     </select>
                                 </div>
 
-                                {{-- 3. Leader Ring Shape & Color --}}
-                                <div class="p-2.5 rounded-3 studio-panel-card-inner">
-                                    <div class="mb-2.5">
-                                        <label class="form-label small mb-1.5" style="font-size: 11.5px;">Frame Shape</label>
+                                {{-- 3. Leader Frame Shape, Ring Color & Size (Pure White Grouped Block) --}}
+                                <div class="p-3 rounded-3 studio-panel-card-inner">
+                                    <div class="mb-3">
+                                        <label class="form-label small mb-1.5 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-square-rounded text-teal" style="font-size: 14px;"></i>
+                                            <span>Frame Shape</span>
+                                        </label>
                                         <input type="hidden" id="panel-leader-shape" value="circle">
                                         <div class="studio-segmented-bar p-1 rounded-3 d-flex gap-1" id="panel-shape-tiles">
-                                            <button type="button" class="btn btn-sm panel-shape-tile border-0 flex-fill py-1.5 px-2 rounded-2 active" data-shape="circle">
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1 active" data-shape="circle">
+                                                <i class="ti ti-circle" style="font-size: 13px;"></i>
                                                 <span class="small fw-semibold" style="font-size: 11.5px;">Circle</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-shape-tile border-0 flex-fill py-1.5 px-2 rounded-2" data-shape="rounded_square">
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-shape="rounded_square">
+                                                <i class="ti ti-square-rounded" style="font-size: 13px;"></i>
                                                 <span class="small fw-medium" style="font-size: 11.5px;">Rounded</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-shape-tile border-0 flex-fill py-1.5 px-2 rounded-2" data-shape="square">
+                                            <button type="button" class="btn btn-sm panel-shape-tile flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-shape="square">
+                                                <i class="ti ti-square" style="font-size: 13px;"></i>
                                                 <span class="small fw-medium" style="font-size: 11.5px;">Square</span>
                                             </button>
                                         </div>
                                     </div>
 
-                                    <div class="mb-2.5 pt-2 border-top">
-                                        <label class="form-label small mb-1.5" style="font-size: 11.5px;">Ring Border Color</label>
+                                    <div class="mb-3 pt-2.5 border-top">
+                                        <label class="form-label small mb-1.5 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                            <i class="ti ti-palette text-teal" style="font-size: 14px;"></i>
+                                            <span>Ring Border Color</span>
+                                        </label>
                                         <div class="d-flex align-items-center gap-2 flex-wrap" id="panel-color-swatches">
                                             <button type="button" class="btn p-0 panel-swatch rounded-circle active" data-color="#FF9933" style="width: 26px; height: 26px; background: #FF9933;"></button>
                                             <button type="button" class="btn p-0 panel-swatch rounded-circle" data-color="#FFFFFF" style="width: 26px; height: 26px; background: #FFFFFF;"></button>
@@ -437,21 +489,26 @@
                                         <input type="hidden" id="panel-leader-border" value="#FF9933">
                                     </div>
 
-                                    {{-- 4. Leader Avatar Size --}}
-                                    <div class="pt-2 border-top">
+                                    <div class="pt-2.5 border-top">
                                         <div class="d-flex align-items-center justify-content-between mb-1.5">
-                                            <label class="form-label small mb-0" style="font-size: 11.5px;">Leader Photo Size</label>
-                                            <span class="badge bg-transparent border text-secondary font-monospace" id="panel-leader-size-label" style="font-size: 10px;">Medium</span>
+                                            <label class="form-label small mb-0 d-inline-flex align-items-center gap-1.5" style="font-size: 11.5px;">
+                                                <i class="ti ti-aspect-ratio text-teal" style="font-size: 14px;"></i>
+                                                <span>Leader Photo Size</span>
+                                            </label>
+                                            <span class="badge studio-white-pill font-monospace rounded-pill px-2" id="panel-leader-size-label" style="font-size: 10px;">Medium</span>
                                         </div>
                                         <input type="hidden" id="panel-leader-size" value="104">
                                         <div class="studio-segmented-bar p-1 rounded-3 d-flex gap-1" id="panel-leader-size-tiles">
-                                            <button type="button" class="btn btn-sm panel-leader-size-pill border-0 flex-fill py-1.5 px-2 rounded-2" data-size="88">
+                                            <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-size="88">
+                                                <i class="ti ti-minimize" style="font-size: 13px;"></i>
                                                 <span class="small fw-medium" style="font-size: 11.5px;">Small</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-leader-size-pill border-0 flex-fill py-1.5 px-2 rounded-2 active" data-size="104">
+                                            <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1 active" data-size="104">
+                                                <i class="ti ti-aspect-ratio" style="font-size: 13px;"></i>
                                                 <span class="small fw-semibold" style="font-size: 11.5px;">Medium</span>
                                             </button>
-                                            <button type="button" class="btn btn-sm panel-leader-size-pill border-0 flex-fill py-1.5 px-2 rounded-2" data-size="120">
+                                            <button type="button" class="btn btn-sm panel-leader-size-pill flex-fill py-1.5 px-2 rounded-2 d-inline-flex align-items-center justify-content-center gap-1" data-size="120">
+                                                <i class="ti ti-maximize" style="font-size: 13px;"></i>
                                                 <span class="small fw-medium" style="font-size: 11.5px;">Large</span>
                                             </button>
                                         </div>
@@ -476,7 +533,7 @@
                 <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-3" id="panel-btn-back-step">
                     <i class="ti ti-arrow-left me-1"></i> Back to Design
                 </button>
-                <span class="badge bg-teal-lt text-teal rounded-pill px-3 py-1 font-monospace" id="panel-schedule-festival-date">
+                <span class="badge studio-white-pill text-teal rounded-pill px-3 py-1 font-monospace" id="panel-schedule-festival-date" style="border-color: #99F6E4 !important;">
                     {{ $selectedFestival->festival_date->format('d M Y') }}
                 </span>
             </div>
@@ -485,8 +542,10 @@
 
                 {{-- Left Side: Poster Thumbnail Preview --}}
                 <div class="col-md-5 col-lg-4 text-center">
-                    <div class="studio-canvas-frame rounded-4 overflow-hidden mx-auto" style="max-width: 260px; aspect-ratio: 1 / 1; background: #0f172a;">
-                        <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
+                    <div class="studio-canvas-stage">
+                        <div class="studio-canvas-frame rounded-3 overflow-hidden mx-auto" style="max-width: 260px; aspect-ratio: 1 / 1; background: #0f172a;">
+                            <img id="panel-schedule-thumb" src="{{ $firstTemplate?->image_url }}" alt="Scheduled Poster" class="w-100 h-100 object-fit-cover">
+                        </div>
                     </div>
                     <div class="fw-bold text-body mt-2.5 text-truncate" id="panel-schedule-template-title" style="font-size: 13px;">
                         {{ $firstTemplate?->title }}
@@ -499,10 +558,13 @@
                     <div class="card studio-panel-card p-3.5 mb-0">
                         {{-- 1. Connected Social Media Accounts --}}
                         <div class="mb-3">
-                            <label class="form-label required mb-2">Publish to Social Accounts</label>
+                            <label class="form-label required mb-2 d-inline-flex align-items-center gap-1.5">
+                                <i class="ti ti-share text-teal" style="font-size: 14px;"></i>
+                                <span>Publish to Social Accounts</span>
+                            </label>
                             <div class="d-flex flex-column gap-2" id="panel-accounts-container">
                                 @forelse($accounts as $acc)
-                                    <label class="form-check m-0 cursor-pointer p-2 rounded-3 studio-panel-card-inner d-flex align-items-center gap-2">
+                                    <label class="form-check panel-account-item active m-0 cursor-pointer p-2.5 rounded-3 d-flex align-items-center gap-2">
                                         <input type="checkbox" class="form-check-input panel-acc-cb m-0" value="{{ $acc->id }}" checked>
                                         <span class="form-check-label">
                                             <span class="fw-semibold text-body">{{ $acc->name }}</span>
@@ -520,11 +582,17 @@
                         {{-- 2. Date & Time Inputs --}}
                         <div class="row g-3 mb-3">
                             <div class="col-6">
-                                <label class="form-label required" for="panel-schedule-date">Publish Date</label>
+                                <label class="form-label required d-inline-flex align-items-center gap-1.5" for="panel-schedule-date">
+                                    <i class="ti ti-calendar-event text-teal" style="font-size: 14px;"></i>
+                                    <span>Publish Date</span>
+                                </label>
                                 <input type="date" id="panel-schedule-date" class="form-control rounded-3" value="{{ $selectedFestival->festival_date->format('Y-m-d') }}">
                             </div>
                             <div class="col-6">
-                                <label class="form-label required" for="panel-schedule-time">Publish Time</label>
+                                <label class="form-label required d-inline-flex align-items-center gap-1.5" for="panel-schedule-time">
+                                    <i class="ti ti-clock text-teal" style="font-size: 14px;"></i>
+                                    <span>Publish Time</span>
+                                </label>
                                 <input type="time" id="panel-schedule-time" class="form-control rounded-3" value="{{ $targetTime }}">
                             </div>
                         </div>
@@ -532,9 +600,13 @@
                         {{-- 3. Caption & Hashtags --}}
                         <div class="mb-3">
                             <div class="d-flex align-items-center justify-content-between mb-1">
-                                <label class="form-label mb-0" for="panel-caption-text">Caption & Hashtags</label>
-                                <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" id="panel-btn-copy-caption">
-                                    <i class="ti ti-copy me-1"></i>Copy
+                                <label class="form-label mb-0 d-inline-flex align-items-center gap-1.5" for="panel-caption-text">
+                                    <i class="ti ti-pencil text-teal" style="font-size: 14px;"></i>
+                                    <span>Caption &amp; Hashtags</span>
+                                </label>
+                                <button type="button" class="btn btn-sm studio-white-pill rounded-pill px-2.5 py-0.5 text-teal text-decoration-none d-inline-flex align-items-center gap-1" id="panel-btn-copy-caption" style="font-size: 11px;">
+                                    <i class="ti ti-copy" style="font-size: 12px;"></i>
+                                    <span>Copy</span>
                                 </button>
                             </div>
                             <textarea id="panel-caption-text" class="form-control rounded-3" rows="4" placeholder="Enter post caption...">{{ $captionText }}</textarea>
@@ -548,8 +620,9 @@
                             <button type="button" class="btn btn-outline-secondary rounded-pill px-4" id="panel-btn-cancel-step">
                                 Cancel
                             </button>
-                            <button type="button" class="btn btn-primary rounded-pill px-4 studio-primary-cta" id="panel-btn-confirm-schedule">
-                                <i class="ti ti-calendar-check me-1"></i> Confirm & Schedule Post
+                            <button type="button" class="btn btn-primary rounded-pill px-4 studio-primary-cta d-inline-flex align-items-center gap-1.5" id="panel-btn-confirm-schedule">
+                                <i class="ti ti-calendar-check"></i>
+                                <span>Confirm &amp; Schedule Post</span>
                             </button>
                         </div>
                     </div>

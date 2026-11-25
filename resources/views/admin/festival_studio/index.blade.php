@@ -220,16 +220,16 @@
             -webkit-backdrop-filter: blur(12px) !important;
         }
 
-        /* Apple-Grade Right Slide-Over Panel (Theme Adaptive) */
+        /* Figma & Excalidraw Inspired Pure White Studio Panel (Theme Adaptive) */
         .studio-slide-panel {
-            width: 960px !important;
-            max-width: 95vw !important;
-            border-top-left-radius: 24px;
-            border-bottom-left-radius: 24px;
-            border-left: 1px solid rgba(0, 0, 0, 0.08) !important;
-            box-shadow: -20px 0 60px rgba(15, 23, 42, 0.28) !important;
-            background-color: var(--tblr-bg-surface, #ffffff) !important;
-            color: var(--tblr-body-color, #1e293b) !important;
+            width: 980px !important;
+            max-width: 96vw !important;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            border-left: 1px solid #E5E7EB !important;
+            box-shadow: -24px 0 64px rgba(15, 23, 42, 0.16) !important;
+            background-color: #ffffff !important;
+            color: #0f172a !important;
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
             z-index: 1055 !important;
         }
@@ -242,20 +242,18 @@
         }
 
         .studio-slide-panel .offcanvas-header {
-            background-color: rgba(255, 255, 255, 0.88);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #ECEEF2 !important;
         }
 
         [data-bs-theme="dark"] .studio-slide-panel .offcanvas-header {
-            background-color: rgba(13, 21, 39, 0.88) !important;
+            background-color: #0d1527 !important;
             border-bottom-color: rgba(255, 255, 255, 0.08) !important;
         }
 
         .studio-slide-panel .offcanvas-body {
-            background-color: #f8fafc;
-            color: var(--tblr-body-color, #1e293b);
+            background-color: #ffffff !important;
+            color: #0f172a;
         }
 
         [data-bs-theme="dark"] .studio-slide-panel .offcanvas-body {
@@ -263,7 +261,7 @@
             color: #f8fafc !important;
         }
 
-        /* Sticky Left Poster Stage on Desktop */
+        /* Sticky Left Poster Stage + Crisp Excalidraw Dot Canvas */
         @media (min-width: 992px) {
             .studio-sticky-stage {
                 position: sticky;
@@ -271,106 +269,137 @@
             }
         }
 
+        .studio-canvas-stage {
+            background-color: #ffffff;
+            background-image: radial-gradient(#E5E7EB 0.9px, transparent 0.9px);
+            background-size: 16px 16px;
+            border: 1px solid #ECEEF2;
+            border-radius: 16px;
+            padding: 12px;
+        }
+
+        [data-bs-theme="dark"] .studio-canvas-stage {
+            background-color: #0f172a;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.08) 0.9px, transparent 0.9px);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
         .studio-canvas-frame {
-            box-shadow: 0 18px 40px -12px rgba(15, 23, 42, 0.22), 0 0 0 1px rgba(15, 23, 42, 0.06);
+            box-shadow: 0 12px 32px -8px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(15, 23, 42, 0.06);
         }
 
         [data-bs-theme="dark"] .studio-canvas-frame {
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.1);
         }
 
-        /* Apple iOS Segmented Controls & Tab Bars */
+        /* Figma / Excalidraw Pure White Tab Bar & Tool Tracks */
         .studio-segmented-bar {
-            background: rgba(15, 23, 42, 0.055);
-            border: 1px solid rgba(15, 23, 42, 0.04);
+            background: #ffffff;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
         }
 
         [data-bs-theme="dark"] .studio-segmented-bar {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.06);
+            background: #131d33;
+            border-color: rgba(255, 255, 255, 0.09);
+            box-shadow: none;
         }
 
         .studio-seg-tab {
-            background: transparent !important;
+            background: #ffffff !important;
             color: #64748b !important;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            border: 1px solid transparent !important;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        .studio-seg-tab:hover {
+            color: #0f172a !important;
+            background: #F9FAFB !important;
         }
 
         .studio-seg-tab.active {
-            background: #ffffff !important;
-            color: #0f172a !important;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+            background: #F0FDFA !important;
+            color: #0F766E !important;
+            border-color: #99F6E4 !important;
+            box-shadow: 0 1px 3px rgba(13, 148, 136, 0.08) !important;
         }
 
         [data-bs-theme="dark"] .studio-seg-tab {
+            background: transparent !important;
             color: #94a3b8 !important;
         }
 
-        [data-bs-theme="dark"] .studio-seg-tab.active {
-            background: #1e293b !important;
+        [data-bs-theme="dark"] .studio-seg-tab:hover {
+            background: rgba(255, 255, 255, 0.04) !important;
             color: #f8fafc !important;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        [data-bs-theme="dark"] .studio-seg-tab.active {
+            background: rgba(20, 184, 166, 0.14) !important;
+            color: #2dd4bf !important;
+            border-color: rgba(45, 212, 191, 0.3) !important;
+            box-shadow: none !important;
         }
 
         .studio-primary-cta {
-            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%) !important;
+            background: linear-gradient(135deg, #0D9488 0%, #0F766E 100%) !important;
             border: none !important;
             color: #ffffff !important;
-            box-shadow: 0 6px 18px rgba(13, 148, 136, 0.28) !important;
+            box-shadow: 0 4px 14px rgba(13, 148, 136, 0.25) !important;
             transition: transform 0.15s ease, box-shadow 0.2s ease !important;
         }
 
         .studio-primary-cta:hover {
             transform: translateY(-1px);
-            box-shadow: 0 10px 24px rgba(13, 148, 136, 0.38) !important;
+            box-shadow: 0 8px 20px rgba(13, 148, 136, 0.34) !important;
         }
 
-        /* Stepper badge wrapper in Header */
+        /* Pure White Stepper Pill in Header */
         .studio-stepper-wrap {
-            background: rgba(15, 23, 42, 0.05);
-            border: 1px solid rgba(15, 23, 42, 0.06);
+            background: #ffffff;
+            border: 1px solid #E5E7EB;
         }
 
         [data-bs-theme="dark"] .studio-stepper-wrap {
-            background: rgba(255, 255, 255, 0.07) !important;
-            border-color: rgba(255, 255, 255, 0.08) !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border-color: rgba(255, 255, 255, 0.09) !important;
         }
 
         .panel-step-badge {
             background: transparent;
             color: #64748b;
-            transition: all 0.2s ease;
+            transition: all 0.18s ease;
         }
 
         .panel-step-badge.active {
             background: #0d9488 !important;
             color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.28);
+            box-shadow: 0 2px 6px rgba(13, 148, 136, 0.25);
         }
 
         [data-bs-theme="dark"] .panel-step-badge {
             color: #94a3b8;
         }
 
-        /* Subheading badge in Header */
+        /* Crisp Outlined White Subheading Pill */
         .studio-subheading-badge {
-            background: rgba(15, 23, 42, 0.05);
-            color: #475569;
-            border: 1px solid rgba(15, 23, 42, 0.06);
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #E5E7EB;
         }
 
         [data-bs-theme="dark"] .studio-subheading-badge {
-            background: rgba(255, 255, 255, 0.07) !important;
+            background: rgba(255, 255, 255, 0.06) !important;
             color: #cbd5e1 !important;
-            border-color: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.09) !important;
         }
 
-        /* Toolbar Section Cards (Clean Soft Apple Surfaces) */
+        /* Crisp Pure White Inspector Panel Cards (No Grey Surfaces) */
         .studio-panel-card {
             background-color: #ffffff !important;
-            border: 1px solid rgba(15, 23, 42, 0.07) !important;
-            box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
-            border-radius: 18px !important;
+            border: 1px solid #E5E7EB !important;
+            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
+            border-radius: 16px !important;
         }
 
         [data-bs-theme="dark"] .studio-panel-card {
@@ -380,8 +409,8 @@
         }
 
         .studio-panel-card-inner {
-            background-color: #f8fafc !important;
-            border: 1px solid rgba(15, 23, 42, 0.06) !important;
+            background-color: #ffffff !important;
+            border: 1px solid #E5E7EB !important;
         }
 
         [data-bs-theme="dark"] .studio-panel-card-inner {
@@ -389,21 +418,75 @@
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
 
-        .panel-pos-nudge:hover {
+        .panel-pos-nudge {
             background: #ffffff !important;
-            color: #0d9488 !important;
-            box-shadow: 0 1px 4px rgba(15, 23, 42, 0.08);
+            color: #334155 !important;
+            transition: all 0.15s ease;
+        }
+
+        .panel-pos-nudge:hover {
+            background: #F0FDFA !important;
+            color: #0D9488 !important;
+        }
+
+        [data-bs-theme="dark"] .panel-pos-nudge {
+            background: transparent !important;
+            color: #cbd5e1 !important;
         }
 
         [data-bs-theme="dark"] .panel-pos-nudge:hover {
-            background: #1e293b !important;
+            background: rgba(20, 184, 166, 0.14) !important;
+            color: #2dd4bf !important;
+        }
+
+        .panel-account-item {
+            background: #ffffff !important;
+            border: 1px solid #E5E7EB !important;
+            transition: all 0.15s ease;
+        }
+
+        .panel-account-item.active {
+            background: #F0FDFA !important;
+            border-color: #99F6E4 !important;
+        }
+
+        [data-bs-theme="dark"] .panel-account-item {
+            background: #0d1527 !important;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+        }
+
+        [data-bs-theme="dark"] .panel-account-item.active {
+            background: rgba(20, 184, 166, 0.12) !important;
+            border-color: rgba(45, 212, 191, 0.35) !important;
+        }
+
+        .studio-white-pill {
+            background-color: #ffffff !important;
+            border: 1px solid #E2E8F0 !important;
+            color: #334155 !important;
+            transition: all 0.15s ease;
+        }
+
+        .studio-white-pill:hover {
+            border-color: #0D9488 !important;
+            color: #0D9488 !important;
+        }
+
+        [data-bs-theme="dark"] .studio-white-pill {
+            background-color: #131d33 !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+            color: #cbd5e1 !important;
+        }
+
+        [data-bs-theme="dark"] .studio-white-pill:hover {
+            border-color: #2dd4bf !important;
             color: #2dd4bf !important;
         }
 
         .studio-section-title {
             color: #0f172a !important;
             font-size: 11.5px;
-            letter-spacing: 0.06em;
+            letter-spacing: 0.04em;
             font-weight: 700;
         }
 
@@ -494,21 +577,22 @@
             color-scheme: dark !important;
         }
 
-        /* Pill Buttons (Inside Apple Segmented Control) */
+        /* Pill Buttons (Inside Crisp White Excalidraw Tool Track) */
         .panel-pill-btn,
         .panel-shape-tile,
         .panel-leader-size-pill,
         .panel-candidate-scale-pill {
-            background: transparent;
-            border: none;
-            color: #64748b;
-            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+            background: #ffffff;
+            border: 1px solid transparent;
+            color: #475569;
+            transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .panel-pill-btn:hover,
         .panel-shape-tile:hover,
         .panel-leader-size-pill:hover,
         .panel-candidate-scale-pill:hover {
+            background: #F9FAFB;
             color: #0d9488;
         }
 
@@ -516,9 +600,10 @@
         .panel-shape-tile.active,
         .panel-leader-size-pill.active,
         .panel-candidate-scale-pill.active {
-            background: #ffffff !important;
-            color: #0d9488 !important;
-            box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08) !important;
+            background: #F0FDFA !important;
+            color: #0F766E !important;
+            border: 1px solid #99F6E4 !important;
+            box-shadow: 0 1px 2px rgba(13, 148, 136, 0.08) !important;
         }
 
         [data-bs-theme="dark"] .panel-pill-btn,
@@ -526,6 +611,7 @@
         [data-bs-theme="dark"] .panel-leader-size-pill,
         [data-bs-theme="dark"] .panel-candidate-scale-pill {
             background: transparent !important;
+            border-color: transparent !important;
             color: #94a3b8 !important;
         }
 
@@ -533,6 +619,7 @@
         [data-bs-theme="dark"] .panel-shape-tile:hover,
         [data-bs-theme="dark"] .panel-leader-size-pill:hover,
         [data-bs-theme="dark"] .panel-candidate-scale-pill:hover {
+            background: rgba(255, 255, 255, 0.04) !important;
             color: #2dd4bf !important;
         }
 
@@ -540,19 +627,21 @@
         [data-bs-theme="dark"] .panel-shape-tile.active,
         [data-bs-theme="dark"] .panel-leader-size-pill.active,
         [data-bs-theme="dark"] .panel-candidate-scale-pill.active {
-            background: #1e293b !important;
+            background: rgba(20, 184, 166, 0.14) !important;
             color: #2dd4bf !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35) !important;
+            border-color: rgba(45, 212, 191, 0.3) !important;
+            box-shadow: none !important;
         }
 
-        /* Action Icon Buttons */
+        /* Action Icon Buttons (Crisp Excalidraw Toolbar Feel) */
         .panel-icon-btn {
-            width: 36px !important;
-            height: 36px !important;
-            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 38px !important;
+            height: 38px !important;
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
             background: #ffffff;
-            border: 1px solid #E2E8F0;
-            color: #475569;
+            border: 1px solid #E5E7EB;
+            color: #334155;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
         }
 
         [data-bs-theme="dark"] .panel-icon-btn {
@@ -562,14 +651,22 @@
         }
 
         .panel-icon-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+            border-color: #CBD5E1;
+            color: #0D9488;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.07);
         }
 
         .panel-icon-whatsapp {
-            background: #ECFDF5;
+            background: #FFFFFF;
             border-color: #A7F3D0;
             color: #059669;
+        }
+
+        .panel-icon-whatsapp:hover {
+            background: #ECFDF5;
+            border-color: #34D399;
+            color: #047857;
         }
 
         [data-bs-theme="dark"] .panel-icon-whatsapp {
