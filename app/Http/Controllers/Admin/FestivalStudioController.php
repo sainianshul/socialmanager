@@ -220,6 +220,8 @@ class FestivalStudioController extends Controller
             'leader_border_color'   => 'nullable|string|max:20',
             'leader_size'           => 'nullable|integer|min:50|max:200',
             'candidate_scale'       => 'nullable|integer|min:50|max:200',
+            'candidate_offset_x'    => 'nullable|integer|min:-250|max:250',
+            'candidate_offset_y'    => 'nullable|integer|min:-140|max:100',
         ]);
 
         $user = auth()->user();
@@ -309,6 +311,12 @@ class FestivalStudioController extends Controller
                 }
                 if (!empty($candidateScale)) {
                     $options['candidate_scale'] = (int) $candidateScale;
+                }
+                if ($request->filled('candidate_offset_x')) {
+                    $options['candidate_offset_x'] = (int) $request->input('candidate_offset_x');
+                }
+                if ($request->filled('candidate_offset_y')) {
+                    $options['candidate_offset_y'] = (int) $request->input('candidate_offset_y');
                 }
 
                 $composed = $composer->composeToFile($template, $branding, $strip, $options);

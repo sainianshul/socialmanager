@@ -879,6 +879,8 @@
                     if (check) check.classList.toggle('d-none', !isCActive);
                 });
 
+                resetCandidatePosition(false);
+
                 // 6. Open Slide-Over Panel via Bootstrap Offcanvas
                 var panelEl = document.getElementById('studioSlidePanel');
                 if (panelEl) {
@@ -893,6 +895,66 @@
             // ======================================================================
             // 3. COMPOSE POSTER IN PANEL VIA AJAX
             // ======================================================================
+            function setCandidatePosition(x, y, triggerCompose) {
+                var clampedX = Math.max(-250, Math.min(250, parseInt(x) || 0));
+                var clampedY = Math.max(-140, Math.min(100, parseInt(y) || 0));
+
+                var hidX = document.getElementById('panel-candidate-offset-x');
+                var hidY = document.getElementById('panel-candidate-offset-y');
+                var lblX = document.getElementById('panel-candidate-offset-x-label');
+                var lblY = document.getElementById('panel-candidate-offset-y-label');
+
+                if (hidX) hidX.value = clampedX;
+                if (hidY) hidY.value = clampedY;
+                if (lblX) lblX.innerText = 'X: ' + (clampedX > 0 ? '+' + clampedX : clampedX);
+                if (lblY) lblY.innerText = 'Y: ' + (clampedY > 0 ? '+' + clampedY : clampedY);
+
+                if (triggerCompose) {
+                    clearTimeout(panelDebounceTimer);
+                    panelDebounceTimer = setTimeout(function () {
+                        composePanelPoster();
+                    }, 180);
+                }
+            }
+
+            function resetCandidatePosition(triggerCompose) {
+                setCandidatePosition(0, 0, triggerCompose);
+            }
+
+            function collectPanelDesignPayload(tplId) {
+                var fStyle = document.getElementById('panel-footer-style')?.value || 'dual_ribbon_badge';
+                var hLayout = document.getElementById('panel-header-layout')?.value || 'full_width_strip';
+                var stripId = document.getElementById('panel-strip-id')?.value;
+                var lShape = document.getElementById('panel-leader-shape')?.value || 'circle';
+                var lBorder = document.getElementById('panel-leader-border')?.value || '#FF9933';
+                var lSize = document.getElementById('panel-leader-size')?.value || '104';
+                var candScale = document.getElementById('panel-candidate-scale')?.value || '100';
+                var candOffX = document.getElementById('panel-candidate-offset-x')?.value || '0';
+                var candOffY = document.getElementById('panel-candidate-offset-y')?.value || '0';
+                var isSocial = document.getElementById('panel-show-social')?.checked ?? true;
+                var candName = document.getElementById('panel-candidate-name')?.value?.trim();
+                var candDesig = document.getElementById('panel-candidate-designation')?.value?.trim();
+                var candCutout = document.getElementById('panel-cutout-url')?.value;
+
+                return {
+                    template_id: parseInt(tplId),
+                    footer_style: fStyle,
+                    header_layout: hLayout,
+                    leader_shape: lShape,
+                    leader_border_color: lBorder,
+                    leader_size: parseInt(lSize),
+                    candidate_scale: parseInt(candScale),
+                    candidate_offset_x: parseInt(candOffX) || 0,
+                    candidate_offset_y: parseInt(candOffY) || 0,
+                    include_strip: (hLayout !== 'none'),
+                    show_social_handles: isSocial,
+                    strip_id: stripId ? parseInt(stripId) : null,
+                    candidate_name: candName || null,
+                    candidate_designation: candDesig || null,
+                    cutout_url: candCutout || null
+                };
+            }
+
             function composePanelPoster() {
                 var tplId = currentPanelTemplateId || document.getElementById('panel-input-template-id')?.value;
                 if (!tplId) return;
@@ -909,33 +971,7 @@
                 if (btnPreview) btnPreview.classList.add('disabled');
 
                 var csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-                var fStyle = document.getElementById('panel-footer-style')?.value || 'dual_ribbon_badge';
-                var hLayout = document.getElementById('panel-header-layout')?.value || 'full_width_strip';
-                var stripId = document.getElementById('panel-strip-id')?.value;
-                var lShape = document.getElementById('panel-leader-shape')?.value || 'circle';
-                var lBorder = document.getElementById('panel-leader-border')?.value || '#FF9933';
-                var lSize = document.getElementById('panel-leader-size')?.value || '104';
-                var candScale = document.getElementById('panel-candidate-scale')?.value || '100';
-                var isSocial = document.getElementById('panel-show-social')?.checked ?? true;
-                var candName = document.getElementById('panel-candidate-name')?.value?.trim();
-                var candDesig = document.getElementById('panel-candidate-designation')?.value?.trim();
-                var candCutout = document.getElementById('panel-cutout-url')?.value;
-
-                var payload = {
-                    template_id: parseInt(tplId),
-                    footer_style: fStyle,
-                    header_layout: hLayout,
-                    leader_shape: lShape,
-                    leader_border_color: lBorder,
-                    leader_size: parseInt(lSize),
-                    candidate_scale: parseInt(candScale),
-                    include_strip: (hLayout !== 'none'),
-                    show_social_handles: isSocial,
-                    strip_id: stripId ? parseInt(stripId) : null,
-                    candidate_name: candName || null,
-                    candidate_designation: candDesig || null,
-                    cutout_url: candCutout || null
-                };
+                var payload = collectPanelDesignPayload(tplId);
 
                 fetch('{{ route('admin.festival-studio.compose') }}', {
                     method: 'POST',
@@ -1013,6 +1049,7 @@
                 var schedTitle = document.getElementById('panel-schedule-template-title');
                 if (schedTitle && tplTitle) schedTitle.innerText = tplTitle;
 
+                resetCandidatePosition(false);
                 composePanelPoster();
             });
 
@@ -1112,6 +1149,25 @@
                 }
 
                 composePanelPoster();
+            });
+
+            // Candidate Photo Position Nudge & Reset
+            document.addEventListener('click', function (e) {
+                var nudgeBtn = e.target.closest('.panel-pos-nudge');
+                if (nudgeBtn) {
+                    var axis = nudgeBtn.getAttribute('data-axis');
+                    var delta = parseInt(nudgeBtn.getAttribute('data-delta')) || 0;
+                    var curX = parseInt(document.getElementById('panel-candidate-offset-x')?.value) || 0;
+                    var curY = parseInt(document.getElementById('panel-candidate-offset-y')?.value) || 0;
+                    if (axis === 'x') curX += delta;
+                    if (axis === 'y') curY += delta;
+                    setCandidatePosition(curX, curY, true);
+                    return;
+                }
+
+                if (e.target.closest('#panel-candidate-pos-reset')) {
+                    resetCandidatePosition(true);
+                }
             });
 
             // Photo Cutout Chips
@@ -1311,40 +1367,16 @@
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1.5" role="status"></span>Scheduling...';
                 if (alertBox) alertBox.classList.add('d-none');
 
-                var fStyle = document.getElementById('panel-footer-style')?.value || 'dual_ribbon_badge';
-                var hLayout = document.getElementById('panel-header-layout')?.value || 'full_width_strip';
-                var stripId = document.getElementById('panel-strip-id')?.value;
-                var lShape = document.getElementById('panel-leader-shape')?.value || 'circle';
-                var lBorder = document.getElementById('panel-leader-border')?.value || '#FF9933';
-                var lSize = document.getElementById('panel-leader-size')?.value || '104';
-                var candScale = document.getElementById('panel-candidate-scale')?.value || '100';
-                var isSocial = document.getElementById('panel-show-social')?.checked ?? true;
-                var candName = document.getElementById('panel-candidate-name')?.value?.trim();
-                var candDesig = document.getElementById('panel-candidate-designation')?.value?.trim();
-                var candCutout = document.getElementById('panel-cutout-url')?.value;
                 var composedPath = document.getElementById('panel-composed-path')?.value || '';
 
-                var payload = {
-                    template_id: parseInt(templateId),
+                var payload = Object.assign(collectPanelDesignPayload(templateId), {
                     festival_id: festivalId ? parseInt(festivalId) : null,
                     account_ids: selectedAccountIds,
                     schedule_date: schedDate,
                     schedule_time: schedTime,
                     content: caption,
-                    composed_image: composedPath,
-                    footer_style: fStyle,
-                    header_layout: hLayout,
-                    leader_shape: lShape,
-                    leader_border_color: lBorder,
-                    leader_size: parseInt(lSize),
-                    candidate_scale: parseInt(candScale),
-                    include_strip: (hLayout !== 'none'),
-                    show_social_handles: isSocial,
-                    strip_id: stripId ? parseInt(stripId) : null,
-                    candidate_name: candName || null,
-                    candidate_designation: candDesig || null,
-                    cutout_url: candCutout || null
-                };
+                    composed_image: composedPath
+                });
 
                 fetch('{{ route('admin.festival-studio.quick-schedule') }}', {
                     method: 'POST',

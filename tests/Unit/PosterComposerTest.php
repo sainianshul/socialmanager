@@ -384,4 +384,47 @@ class PosterComposerTest extends TestCase
         $this->assertEquals(1080, $image->width());
         $this->assertEquals(1080, $image->height());
     }
+
+    public function test_composer_applies_bounded_candidate_x_y_offsets(): void
+    {
+        $manager = new \Intervention\Image\ImageManager(new \Intervention\Image\Drivers\Gd\Driver());
+        $cutout = $manager->create(300, 400)->fill('#ff00ff');
+        Storage::disk('public')->put('cutouts/test_leader.png', (string) $cutout->toPng());
+
+        $user = User::factory()->create();
+        $branding = UserBranding::create([
+            'user_id' => $user->id,
+            'display_name' => 'Test Leader',
+            'designation' => 'Adhyaksh',
+            'is_default' => true,
+        ]);
+
+        $baseImg = $this->composer->compose('non_existent_bg.jpg', $branding, null, [
+            'cutout_url' => 'cutouts/test_leader.png',
+            'candidate_offset_x' => 0,
+            'candidate_offset_y' => 0,
+        ]);
+
+        $movedImg = $this->composer->compose('non_existent_bg.jpg', $branding, null, [
+            'cutout_url' => 'cutouts/test_leader.png',
+            'candidate_offset_x' => -150,
+            'candidate_offset_y' => -80,
+        ]);
+
+        // Extreme out-of-range offsets must clamp cleanly without errors
+        $clampedImg = $this->composer->compose('non_existent_bg.jpg', $branding, null, [
+            'cutout_url' => 'cutouts/test_leader.png',
+            'candidate_offset_x' => -999,
+            'candidate_offset_y' => -999,
+            'layout_config' => [
+                'footer' => ['style' => 'circular_medallion_badge'],
+                'candidate' => ['shape' => 'circle'],
+            ],
+        ]);
+
+        $this->assertEquals(1080, $baseImg->width());
+        $this->assertEquals(1080, $movedImg->width());
+        $this->assertEquals(1080, $clampedImg->width());
+        $this->assertNotEquals((string) $baseImg->toPng(), (string) $movedImg->toPng());
+    }
 }

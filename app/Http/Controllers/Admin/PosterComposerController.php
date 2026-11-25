@@ -49,6 +49,8 @@ class PosterComposerController extends Controller
             'leader_border_color'   => 'nullable|string|max:20',
             'leader_size'           => 'nullable|integer|min:50|max:200',
             'candidate_scale'       => 'nullable|integer|min:50|max:200',
+            'candidate_offset_x'    => 'nullable|integer|min:-250|max:250',
+            'candidate_offset_y'    => 'nullable|integer|min:-140|max:100',
             'custom_config'         => 'nullable|array',
         ]);
 
@@ -117,6 +119,14 @@ class PosterComposerController extends Controller
 
         if ($request->filled('candidate_scale')) {
             $options['candidate_scale'] = (int) $request->input('candidate_scale');
+        }
+
+        if ($request->filled('candidate_offset_x')) {
+            $options['candidate_offset_x'] = (int) $request->input('candidate_offset_x');
+        }
+
+        if ($request->filled('candidate_offset_y')) {
+            $options['candidate_offset_y'] = (int) $request->input('candidate_offset_y');
         }
 
         if ($request->filled('layout_config') && is_array($request->input('layout_config'))) {

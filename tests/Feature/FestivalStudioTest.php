@@ -438,5 +438,33 @@ class FestivalStudioTest extends TestCase
         $response->assertSee('id="panel-candidate-details-collapse"', false);
         $response->assertSee('id="panel-candidate-scale"', false);
         $response->assertSee('id="panel-leader-size"', false);
+        $response->assertSee('id="panel-candidate-offset-x"', false);
+        $response->assertSee('id="panel-candidate-offset-y"', false);
+        $response->assertSee('id="panel-candidate-pos-reset"', false);
+    }
+
+    public function test_compose_accepts_and_bounds_candidate_position_offsets(): void
+    {
+        $this->seed(FestivalSeeder::class);
+        $user = User::factory()->create(['role' => User::ROLE_USER]);
+        $template = FestivalTemplate::first();
+
+        // Valid bounded position compose succeeds
+        $okRes = $this->actingAs($user)->postJson(route('admin.festival-studio.compose'), [
+            'template_id' => $template->id,
+            'candidate_offset_x' => -75,
+            'candidate_offset_y' => -40,
+        ]);
+        $okRes->assertStatus(200);
+        $okRes->assertJson(['success' => true]);
+
+        // Out-of-bounds offset fails validation safely
+        $badRes = $this->actingAs($user)->postJson(route('admin.festival-studio.compose'), [
+            'template_id' => $template->id,
+            'candidate_offset_x' => 999,
+            'candidate_offset_y' => -500,
+        ]);
+        $badRes->assertStatus(422);
+        $badRes->assertJsonValidationErrors(['candidate_offset_x', 'candidate_offset_y']);
     }
 }

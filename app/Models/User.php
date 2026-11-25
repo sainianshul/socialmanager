@@ -371,7 +371,7 @@ class User extends Authenticatable
         // Lazy Monthly Reset: If billing reset date has passed, reset usage to 0 and push next reset
         if ($this->ai_quota_resets_at && now()->greaterThanOrEqualTo($this->ai_quota_resets_at)) {
             $this->update([
-                'ai_tokens_used'     => 0,
+                'ai_tokens_used' => 0,
                 'ai_quota_resets_at' => now()->addMonth()->startOfMonth(),
             ]);
             return false;
@@ -392,7 +392,7 @@ class User extends Authenticatable
         // Check if cycle reset is due before incrementing
         if ($this->ai_quota_resets_at && now()->greaterThanOrEqualTo($this->ai_quota_resets_at)) {
             $this->update([
-                'ai_tokens_used'     => 0,
+                'ai_tokens_used' => 0,
                 'ai_quota_resets_at' => now()->addMonth()->startOfMonth(),
             ]);
         }

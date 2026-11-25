@@ -330,6 +330,45 @@
                                     </div>
                                 </div>
 
+                                {{-- 2.2b Candidate Photo Position (Left / Right / Up / Down) --}}
+                                <div>
+                                    <div class="d-flex align-items-center justify-content-between mb-1">
+                                        <label class="form-label text-muted small mb-0 d-flex align-items-center" style="font-size: 10.5px;">
+                                            <span>Photo Position</span>
+                                            <i class="ti ti-info-circle text-muted ms-1 cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Adjust photo slightly Left/Right or Up/Down so it never overlaps poster artwork or ribbon"></i>
+                                        </label>
+                                        <button type="button" id="panel-candidate-pos-reset" class="btn btn-link btn-sm p-0 text-decoration-none text-secondary" style="font-size: 10.5px;" title="Reset photo position">
+                                            <i class="ti ti-rotate-2 me-0.5"></i>Reset
+                                        </button>
+                                    </div>
+                                    <input type="hidden" id="panel-candidate-offset-x" value="0">
+                                    <input type="hidden" id="panel-candidate-offset-y" value="0">
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="input-group input-group-sm">
+                                                <button type="button" class="btn btn-outline-secondary panel-pos-nudge px-2" data-axis="x" data-delta="-25" title="Move Left">
+                                                    <i class="ti ti-chevron-left"></i>
+                                                </button>
+                                                <span class="form-control text-center font-monospace bg-transparent px-1" id="panel-candidate-offset-x-label" style="font-size: 11px; line-height: 1.5;">X: 0</span>
+                                                <button type="button" class="btn btn-outline-secondary panel-pos-nudge px-2" data-axis="x" data-delta="25" title="Move Right">
+                                                    <i class="ti ti-chevron-right"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="input-group input-group-sm">
+                                                <button type="button" class="btn btn-outline-secondary panel-pos-nudge px-2" data-axis="y" data-delta="-20" title="Move Up">
+                                                    <i class="ti ti-chevron-up"></i>
+                                                </button>
+                                                <span class="form-control text-center font-monospace bg-transparent px-1" id="panel-candidate-offset-y-label" style="font-size: 11px; line-height: 1.5;">Y: 0</span>
+                                                <button type="button" class="btn btn-outline-secondary panel-pos-nudge px-2" data-axis="y" data-delta="20" title="Move Down">
+                                                    <i class="ti ti-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 {{-- 2.3 Photo Cutout Selector --}}
                                 <div>
                                     <div class="d-flex align-items-center justify-content-between mb-1">

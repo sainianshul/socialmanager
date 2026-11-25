@@ -854,6 +854,23 @@ class PosterComposer
                 $scaleMultiplier = max(0.5, min(1.6, (float)$candidateConfig['scale'] / 100));
             }
 
+            // Bounded manual nudge offsets (X: Left/Right, Y: Up/Down)
+            $offsetX = 0;
+            if (isset($options['candidate_offset_x'])) {
+                $offsetX = max(-250, min(250, (int) $options['candidate_offset_x']));
+            } elseif (isset($candidateConfig['offset_x'])) {
+                $offsetX = max(-250, min(250, (int) $candidateConfig['offset_x']));
+            }
+
+            $offsetY = 0;
+            if (isset($options['candidate_offset_y'])) {
+                $offsetY = max(-140, min(100, (int) $options['candidate_offset_y']));
+            } elseif (isset($candidateConfig['offset_y'])) {
+                $offsetY = max(-140, min(100, (int) $candidateConfig['offset_y']));
+            }
+
+            $minY = $candidateConfig['min_y'] ?? 115;
+
             if ($shape === 'circle') {
                 $circleSize = (int) (($candidateConfig['circle_size'] ?? 240) * $scaleMultiplier);
                 $borderColor = $candidateConfig['circle_border_color'] ?? '#ffffff';
@@ -874,6 +891,9 @@ class PosterComposer
                     $x = (int) ((1080 - $circleSize) / 2);
                     $y = $footerTopY - $circleSize + $overlap;
                 }
+
+                $x = max(0, min(1080 - $circleSize, $x + $offsetX));
+                $y = max($minY, min(1080 - (int) ($circleSize * 0.4), $y + $offsetY));
 
                 $canvas->place($avatar, 'top-left', $x, $y);
                 return;
@@ -921,11 +941,9 @@ class PosterComposer
                 $x = (int) ((1080 - $pw) / 2);
             }
 
-            // Ensure candidate doesn't cover top leader strip
-            $minY = $candidateConfig['min_y'] ?? 115;
-            if ($y < $minY) {
-                $y = $minY;
-            }
+            // Apply bounded user X/Y nudge while preventing clipping off-canvas or covering top leader strip
+            $x = max(-60, min(1080 - $pw + 60, $x + $offsetX));
+            $y = max($minY, min(1080 - (int) ($ph * 0.35), $y + $offsetY));
 
             $canvas->place($photoImg, 'top-left', $x, $y);
         } catch (\Throwable $e) {
@@ -3296,6 +3314,10 @@ class PosterComposer
 
         if (file_exists(storage_path('app/public/' . $relativeToStorage))) {
             return storage_path('app/public/' . $relativeToStorage);
+        }
+
+        if (Storage::disk('public')->exists($relativeToStorage)) {
+            return Storage::disk('public')->path($relativeToStorage);
         }
 
         if (file_exists(storage_path('app/public/' . $cleanPath))) {
