@@ -396,6 +396,39 @@
             border: 1px solid #E5E7EB !important;
             box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03) !important;
             border-radius: 16px !important;
+            padding: 22px 24px !important;
+        }
+
+        @media (max-width: 576px) {
+            .studio-panel-card {
+                padding: 16px 18px !important;
+            }
+        }
+
+        .panel-scale-step {
+            background: #ffffff;
+            border: 1px solid transparent;
+            color: #475569;
+            transition: all 0.16s ease;
+        }
+
+        .panel-scale-step:hover {
+            background: #F0FDFA;
+            color: #0D9488;
+        }
+
+        .panel-scale-step:active {
+            transform: scale(0.92);
+        }
+
+        [data-bs-theme="dark"] .panel-scale-step {
+            background: transparent;
+            color: #cbd5e1;
+        }
+
+        [data-bs-theme="dark"] .panel-scale-step:hover {
+            background: rgba(20, 184, 166, 0.15);
+            color: #2dd4bf;
         }
 
         [data-bs-theme="dark"] .studio-panel-card {
@@ -1355,26 +1388,44 @@
                 composePanelPoster();
             });
 
-            // Candidate Photo Scale Pills
-            document.addEventListener('click', function (e) {
-                var pill = e.target.closest('.panel-candidate-scale-pill');
-                if (!pill) return;
-
-                var scale = pill.getAttribute('data-scale');
-                document.querySelectorAll('.panel-candidate-scale-pill').forEach(function (p) {
-                    p.classList.remove('active');
-                });
-                pill.classList.add('active');
-
+            // Candidate Photo Scale Stepper (+ / -) & Preset Pills
+            function setCandidateScale(scale, triggerCompose) {
+                var clamped = Math.max(60, Math.min(160, parseInt(scale) || 100));
                 var hidScale = document.getElementById('panel-candidate-scale');
-                if (hidScale) hidScale.value = scale;
+                if (hidScale) hidScale.value = clamped;
 
                 var label = document.getElementById('panel-candidate-scale-label');
                 if (label) {
-                    label.innerText = scale + '%';
+                    label.innerText = clamped + '%';
                 }
 
-                composePanelPoster();
+                document.querySelectorAll('.panel-candidate-scale-pill').forEach(function (p) {
+                    var pillScale = parseInt(p.getAttribute('data-scale'));
+                    p.classList.toggle('active', pillScale === clamped);
+                });
+
+                if (triggerCompose) {
+                    clearTimeout(panelDebounceTimer);
+                    panelDebounceTimer = setTimeout(function () {
+                        composePanelPoster();
+                    }, 180);
+                }
+            }
+
+            document.addEventListener('click', function (e) {
+                var stepBtn = e.target.closest('.panel-scale-step');
+                if (stepBtn) {
+                    var stepDelta = parseInt(stepBtn.getAttribute('data-step')) || 0;
+                    var curScale = parseInt(document.getElementById('panel-candidate-scale')?.value) || 100;
+                    setCandidateScale(curScale + stepDelta, true);
+                    return;
+                }
+
+                var pill = e.target.closest('.panel-candidate-scale-pill');
+                if (pill) {
+                    var scale = parseInt(pill.getAttribute('data-scale')) || 100;
+                    setCandidateScale(scale, true);
+                }
             });
 
             // Candidate Photo Position Nudge & Reset

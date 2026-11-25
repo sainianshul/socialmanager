@@ -161,7 +161,7 @@
                     {{-- TAB 1: MY PHOTO & RIBBON                              --}}
                     {{-- ===================================================== --}}
                     <div id="panel-inspector-pane-branding">
-                        <div class="card studio-panel-card p-3.5 mb-0">
+                        <div class="card studio-panel-card mb-0">
                             <div class="d-flex flex-column" style="gap: 16px;">
 
                                 {{-- 1. Choose Your Photo --}}
@@ -197,7 +197,7 @@
                                     </div>
                                 </div>
 
-                                {{-- 2. Photo Size --}}
+                                {{-- 2. Photo Size (Presets + Manual Stepper) --}}
                                 <div class="pt-2 border-top">
                                     <div class="d-flex align-items-center justify-content-between mb-1.5">
                                         <label class="form-label small mb-0 fw-semibold text-secondary" style="font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em;">
@@ -206,16 +206,26 @@
                                         <span class="badge font-monospace rounded-pill px-2" id="panel-candidate-scale-label" style="font-size: 10px; background: #F1F5F9; color: #475569;">100%</span>
                                     </div>
                                     <input type="hidden" id="panel-candidate-scale" value="100">
-                                    <div class="studio-segmented-bar p-1 rounded-2 d-flex gap-1" id="panel-candidate-scale-tiles">
-                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2" data-scale="85">
-                                            <span class="small fw-medium" style="font-size: 11.5px;">Small</span>
-                                        </button>
-                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2 active" data-scale="100">
-                                            <span class="small fw-semibold" style="font-size: 11.5px;">Normal</span>
-                                        </button>
-                                        <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2" data-scale="115">
-                                            <span class="small fw-medium" style="font-size: 11.5px;">Large</span>
-                                        </button>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="studio-segmented-bar p-1 rounded-2 d-flex gap-1 flex-grow-1" id="panel-candidate-scale-tiles">
+                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2" data-scale="85">
+                                                <span class="small fw-medium" style="font-size: 11.5px;">Small</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2 active" data-scale="100">
+                                                <span class="small fw-semibold" style="font-size: 11.5px;">Normal</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm panel-candidate-scale-pill flex-fill py-1.5 px-2 rounded-2" data-scale="115">
+                                                <span class="small fw-medium" style="font-size: 11.5px;">Large</span>
+                                            </button>
+                                        </div>
+                                        <div class="studio-segmented-bar p-1 rounded-2 d-flex align-items-center gap-0.5">
+                                            <button type="button" class="btn btn-sm border-0 panel-scale-step rounded-2 d-inline-flex align-items-center justify-content-center" id="panel-candidate-scale-down" data-step="-5" title="Decrease Size (5%)" style="width: 32px; height: 32px;">
+                                                <i class="ti ti-minus" style="font-size: 13px;"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm border-0 panel-scale-step rounded-2 d-inline-flex align-items-center justify-content-center" id="panel-candidate-scale-up" data-step="5" title="Increase Size (5%)" style="width: 32px; height: 32px;">
+                                                <i class="ti ti-plus" style="font-size: 13px;"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -330,7 +340,7 @@
                     {{-- TAB 2: TOP LEADERS                                    --}}
                     {{-- ===================================================== --}}
                     <div id="panel-inspector-pane-header" class="d-none">
-                        <div class="card studio-panel-card p-3.5 mb-0">
+                        <div class="card studio-panel-card mb-0">
                             <div class="d-flex flex-column" style="gap: 16px;">
 
                                 {{-- 1. Leadership Strip Selection --}}
@@ -485,7 +495,7 @@
 
                 {{-- Right Side: Schedule Controls --}}
                 <div class="col-md-7 col-lg-8">
-                    <div class="card studio-panel-card p-3.5 mb-0">
+                    <div class="card studio-panel-card mb-0">
                         {{-- 1. Connected Social Media Accounts --}}
                         <div class="mb-3">
                             <label class="form-label required mb-2">Publish to Social Accounts</label>
