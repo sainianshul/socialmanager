@@ -75,7 +75,7 @@
                         <span class="nav-link-title">Dashboard</span>
                     </a>
                 </li>
-                @if(auth()->check() && !auth()->user()->isAdmin())
+                @if(auth()->check() && auth()->user()->isUser())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.analytics.*') ? 'active' : '' }}" href="{{ route('admin.analytics.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Sentiment Analytics">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -86,9 +86,14 @@
                     </li>
                 @endif
 
-                {{-- USER MANAGEMENT (Admin / Manager only) --}}
+                {{-- ADMINISTRATION & CONTENT (Admin / Permissioned Manager) --}}
                 @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isManager()))
-                    <li class="nav-section-title">User Management</li>
+                    @php $authUser = auth()->user(); @endphp
+
+                    @if($authUser->canManageUsers() || $authUser->canManageTickets())
+                        <li class="nav-section-title">{{ $authUser->canManageUsers() ? 'User Management' : 'Support' }}</li>
+                    @endif
+                    @if($authUser->canManageUsers())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.users.index') ? 'active' : '' }}" href="{{ route('admin.users.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="All Users">
                             <span class="nav-link-icon d-md-none d-lg-inline-block">
@@ -113,6 +118,8 @@
                             <span class="nav-link-title">Blocked Users</span>
                         </a>
                     </li>
+                    @endif
+                    @if($authUser->canManageTickets())
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.help.*') ? 'active' : '' }}" href="{{ route('admin.help.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Support Tickets">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
@@ -121,8 +128,10 @@
                             <span class="nav-link-title">Support Tickets</span>
                         </a>
                     </li>
+                    @endif
 
-                    {{-- POLITICAL MANAGEMENT (Admin / Manager) --}}
+                    @if($authUser->canManageContent())
+                    {{-- POLITICAL MANAGEMENT --}}
                     <li class="nav-section-title">Political</li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.political-parties.*') ? 'active' : '' }}" href="{{ route('admin.political-parties.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Political Parties">
@@ -194,11 +203,11 @@
                             <span class="nav-link-title">Posters</span>
                         </a>
                     </li>
+                    @endif
                 @endif
 
-                {{-- CLIENT SOCIAL ACCOUNTS, CONTENT & ENGAGEMENT (Only for Regular Users / Non-Admin) --}}
-                {{-- SuperAdmin manages users directly and accesses user accounts via Ghost/Shadow Mode --}}
-                @if(auth()->check() && !auth()->user()->isAdmin())
+                {{-- CLIENT SOCIAL ACCOUNTS, CONTENT & ENGAGEMENT (Only for Regular Users) --}}
+                @if(auth()->check() && auth()->user()->isUser())
                     {{-- ACCOUNTS HUB --}}
                     <li class="nav-section-title">Accounts</li>
                     <li class="nav-item">
@@ -324,8 +333,8 @@
                     </li>
                 @endif
 
-                {{-- SYSTEM & API (Admin only) --}}
-                @if(auth()->check() && (auth()->user()->isAdmin() || auth()->user()->isManager()))
+                {{-- SYSTEM & API (Admin or Manager with System Access) --}}
+                @if(auth()->check() && auth()->user()->canAccessSystem())
                     <li class="nav-section-title">System & API</li>
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.system-activity.*') ? 'active' : '' }}" href="{{ route('admin.system-activity.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="System Activity & Queues">

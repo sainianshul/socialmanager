@@ -60,6 +60,10 @@ class User extends Authenticatable
         'ai_token_quota',
         'ai_tokens_used',
         'ai_quota_resets_at',
+        'can_manage_users',
+        'can_manage_content',
+        'can_manage_tickets',
+        'can_access_system',
     ];
 
     protected $hidden = [
@@ -88,6 +92,10 @@ class User extends Authenticatable
             'ai_token_quota' => 'integer',
             'ai_tokens_used' => 'integer',
             'ai_quota_resets_at' => 'datetime',
+            'can_manage_users' => 'boolean',
+            'can_manage_content' => 'boolean',
+            'can_manage_tickets' => 'boolean',
+            'can_access_system' => 'boolean',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
         ];
@@ -113,7 +121,11 @@ class User extends Authenticatable
 
     public function getClientTypeNameAttribute(): string
     {
-        return self::getClientTypeList()[$this->client_type] ?? ucfirst($this->client_type ?? self::CLIENT_TYPE_POLITICIAN);
+        if (empty($this->client_type)) {
+            return 'N/A';
+        }
+
+        return self::getClientTypeList()[$this->client_type] ?? ucfirst($this->client_type);
     }
 
     public function getClientTypeBadgeColorAttribute(): string
@@ -308,6 +320,33 @@ class User extends Authenticatable
         }
 
         return (bool) ($this->can_use_ai ?? true);
+    }
+
+    // ─── Manager Administrative Permission Helpers ──────────
+
+    public function canManageUsers(): bool
+    {
+        return $this->isAdmin() || ($this->isManager() && (bool) ($this->can_manage_users ?? false));
+    }
+
+    public function canManageContent(): bool
+    {
+        return $this->isAdmin() || ($this->isManager() && (bool) ($this->can_manage_content ?? true));
+    }
+
+    public function canManageTickets(): bool
+    {
+        return $this->isAdmin() || ($this->isManager() && (bool) ($this->can_manage_tickets ?? false));
+    }
+
+    public function canAccessSystem(): bool
+    {
+        return $this->isAdmin() || ($this->isManager() && (bool) ($this->can_access_system ?? false));
+    }
+
+    public function hasAnyManagerPermission(): bool
+    {
+        return $this->canManageUsers() || $this->canManageContent() || $this->canManageTickets() || $this->canAccessSystem();
     }
 
     /**

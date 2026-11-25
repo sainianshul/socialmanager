@@ -27,10 +27,12 @@
         ],
     ];
     $quotaValue = $hasOld ? old('ai_token_quota') : (isset($user) ? $user->ai_token_quota : 100000);
+    $currentRole = (int) ($hasOld ? old('role', $user->role ?? \App\Models\User::ROLE_USER) : ($user->role ?? \App\Models\User::ROLE_USER));
+    $isUserSelected = $currentRole === \App\Models\User::ROLE_USER;
 @endphp
 
 {{-- PLAN FEATURES & AI TOKEN QUOTA --}}
-<div class="col-12 mt-4">
+<div class="col-12 mt-4 {{ $isUserSelected ? '' : 'd-none' }}" id="plan-features-section">
     <div class="card bg-light-lt border shadow-none">
         <div class="card-header bg-transparent py-2.5">
             <h4 class="card-title text-dark mb-0 d-flex align-items-center">

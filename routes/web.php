@@ -142,8 +142,8 @@ Route::prefix('admin')->group(function () {
                 Route::patch('{ticket}/status', [\App\Http\Controllers\Admin\TicketController::class, 'updateStatus'])->name('update-status');
             });
 
-            // Users CRUD & Actions (Admin & Manager only)
-            Route::middleware(['admin.manager'])->group(function () {
+            // Users CRUD & Actions (Admin or Manager with User Management permission)
+            Route::middleware(['admin.manager:users'])->group(function () {
                 Route::prefix('users')->name('users.')->group(function () {
                     Route::get('data', [\App\Http\Controllers\Admin\UserController::class, 'data'])->name('data');
                     Route::get('search', [\App\Http\Controllers\Admin\UserController::class, 'search'])->name('search');
@@ -160,7 +160,10 @@ Route::prefix('admin')->group(function () {
                     Route::get('{user}/activity-data', [\App\Http\Controllers\Admin\UserController::class, 'activityData'])->name('activity-data');
                 });
                 Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+            });
 
+            // Content & Templates Management (Admin or Manager with Content Management permission)
+            Route::middleware(['admin.manager:content'])->group(function () {
                 // Political Management (Parties, Leaders)
                 Route::resource('political-parties', \App\Http\Controllers\Admin\PoliticalPartyController::class)->names('political-parties');
                 Route::resource('political-leaders', \App\Http\Controllers\Admin\PoliticalLeaderController::class)->names('political-leaders');
@@ -174,8 +177,11 @@ Route::prefix('admin')->group(function () {
                 // Readymade Posters Management (Categories & Posters)
                 Route::resource('poster-categories', \App\Http\Controllers\Admin\PosterCategoryController::class)->names('poster-categories');
                 Route::resource('posters', \App\Http\Controllers\Admin\PosterController::class)->names('posters');
+            });
 
-                // System Activity & Queue Monitor (Admin / Manager)
+            // System & API Logs (Admin or Manager with System Access permission)
+            Route::middleware(['admin.manager:system'])->group(function () {
+                // System Activity & Queue Monitor
                 Route::prefix('system-activity')->name('system-activity.')->group(function () {
                     Route::get('/', [\App\Http\Controllers\Admin\SystemActivityController::class, 'index'])->name('index');
                     Route::post('/retry-all', [\App\Http\Controllers\Admin\SystemActivityController::class, 'retryAll'])->name('retry-all');
@@ -185,7 +191,7 @@ Route::prefix('admin')->group(function () {
                     Route::post('/clear-logs', [\App\Http\Controllers\Admin\SystemActivityController::class, 'clearLogs'])->name('clear-logs');
                 });
 
-                // Webhook Testing & Activity Logs (Admin / Manager only)
+                // Webhook Testing & Activity Logs
                 Route::prefix('webhook-logs')->name('webhook-logs.')->group(function () {
                     Route::get('/', [\App\Http\Controllers\MetaWebhookController::class, 'viewLogs'])->name('index');
                     Route::post('/clear', [\App\Http\Controllers\MetaWebhookController::class, 'clearLogs'])->name('clear');

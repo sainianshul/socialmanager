@@ -1085,7 +1085,8 @@ class SchedulePostController extends Controller
             return null;
         }
         $path = str_replace('\\', '/', trim($path));
-        if (str_contains($path, '..') || !str_starts_with($path, 'posters/')) {
+        $isAllowedPrefix = str_starts_with($path, 'uploads/posters/') || str_starts_with($path, 'posters/');
+        if (str_contains($path, '..') || !$isAllowedPrefix) {
             return null;
         }
         return Storage::disk('public')->exists($path) ? $path : null;

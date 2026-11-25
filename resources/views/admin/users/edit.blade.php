@@ -65,24 +65,18 @@
                         @enderror
                     </div>
 
-                    <div class="col-md-4">
-                        <label class="form-label required">Client / Account Type</label>
-                        <select name="client_type" class="form-select @error('client_type') is-invalid @enderror" required>
-                            @foreach (\App\Models\User::getClientTypeList() as $val => $label)
-                                <option value="{{ $val }}" {{ old('client_type', $user->client_type ?? \App\Models\User::CLIENT_TYPE_POLITICIAN) === $val ? 'selected' : '' }}>{{ $label }}</option>
-                            @endforeach
-                        </select>
-                        <small class="form-hint">Defines branding and festival templates profile.</small>
-                        @error('client_type')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
+                    @php
+                        $selectedRole = (int) old('role', $user->role);
+                        $isUserRole = $selectedRole === \App\Models\User::ROLE_USER;
+                    @endphp
 
                     <div class="col-md-4">
                         <label class="form-label required">Role</label>
-                        <select name="role" class="form-select @error('role') is-invalid @enderror" required>
+                        <select name="role" id="user-role-select" class="form-select @error('role') is-invalid @enderror" required>
                             @foreach (\App\Models\User::getRoleList() as $val => $label)
-                                <option value="{{ $val }}" {{ old('role', $user->role) == $val ? 'selected' : '' }}>{{ $label }}</option>
+                                @if ($val !== \App\Models\User::ROLE_ADMIN || auth()->user()?->isAdmin())
+                                    <option value="{{ $val }}" {{ $selectedRole == $val ? 'selected' : '' }}>{{ $label }}</option>
+                                @endif
                             @endforeach
                         </select>
                         @error('role')
@@ -102,7 +96,23 @@
                         @enderror
                     </div>
 
+                    <div class="col-md-4 {{ $isUserRole ? '' : 'd-none' }}" id="client-type-wrapper">
+                        <label class="form-label required d-flex align-items-center">
+                            <span>Client / Account Type</span>
+                            <i class="ti ti-info-circle text-muted ms-1 cursor-pointer" data-bs-toggle="tooltip" data-bs-placement="top" title="Defines branding and festival templates profile."></i>
+                        </label>
+                        <select name="client_type" id="client-type-select" class="form-select @error('client_type') is-invalid @enderror" {{ $isUserRole ? 'required' : 'disabled' }}>
+                            @foreach (\App\Models\User::getClientTypeList() as $val => $label)
+                                <option value="{{ $val }}" {{ old('client_type', $user->client_type ?? \App\Models\User::CLIENT_TYPE_POLITICIAN) === $val ? 'selected' : '' }}>{{ $label }}</option>
+                            @endforeach
+                        </select>
+                        @error('client_type')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
                     @include('admin.users.partials._plan_features', ['user' => $user])
+                    @include('admin.users.partials._manager_permissions', ['user' => $user])
 
                 </div>
             </div>
@@ -116,3 +126,5 @@
     </div>
 
 @endsection
+
+@include('admin.users.partials._role_toggle_script')

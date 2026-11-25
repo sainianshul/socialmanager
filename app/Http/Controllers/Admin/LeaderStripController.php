@@ -17,12 +17,24 @@ use Illuminate\Validation\ValidationException;
 class LeaderStripController extends Controller
 {
     /**
+     * Resolve whether actor is a Content Admin/Manager, and block Managers lacking content permission.
+     */
+    protected function resolveContentAdminStatus($user): bool
+    {
+        if ($user->isManager() && !$user->canManageContent()) {
+            abort(403, 'You do not have permission to manage political leader strips.');
+        }
+
+        return $user->canManageContent();
+    }
+
+    /**
      * List all custom strips for authenticated user plus system strips for their party
      */
     public function index(Request $request): mixed
     {
         $user = auth()->user();
-        $isAdmin = $user->isAdmin() || $user->isManager();
+        $isAdmin = $this->resolveContentAdminStatus($user);
 
         if ($isAdmin) {
             $partyId = $request->query('party_id');
@@ -214,7 +226,7 @@ class LeaderStripController extends Controller
     public function store(Request $request): JsonResponse
     {
         $user = auth()->user();
-        $isAdmin = $user->isAdmin() || $user->isManager();
+        $isAdmin = $this->resolveContentAdminStatus($user);
 
         $validated = $request->validate([
             'name' => 'required|string|max:150',
@@ -298,7 +310,7 @@ class LeaderStripController extends Controller
     public function show(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
-        $isAdmin = $user->isAdmin() || $user->isManager();
+        $isAdmin = $this->resolveContentAdminStatus($user);
 
         $query = LeaderStrip::query()->with(['leaders', 'party']);
         if (!$isAdmin) {
@@ -322,7 +334,7 @@ class LeaderStripController extends Controller
     public function update(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
-        $isAdmin = $user->isAdmin() || $user->isManager();
+        $isAdmin = $this->resolveContentAdminStatus($user);
 
         if ($isAdmin) {
             $strip = LeaderStrip::findOrFail($id);
@@ -404,7 +416,7 @@ class LeaderStripController extends Controller
     public function makeDefault(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
-        $isAdmin = $user->isAdmin() || $user->isManager();
+        $isAdmin = $this->resolveContentAdminStatus($user);
 
         $strip = LeaderStrip::where(function ($q) use ($user, $isAdmin) {
                 if ($isAdmin) {
@@ -480,7 +492,7 @@ class LeaderStripController extends Controller
     public function destroy(Request $request, int $id): JsonResponse
     {
         $user = auth()->user();
-        $isAdmin = $user->isAdmin() || $user->isManager();
+        $isAdmin = $this->resolveContentAdminStatus($user);
 
         if ($isAdmin) {
             $strip = LeaderStrip::findOrFail($id);

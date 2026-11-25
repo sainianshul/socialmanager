@@ -221,6 +221,7 @@
                             </div>
                         </div>
 
+                        @if($user->isUser())
                         {{-- PLAN FEATURES & TOKEN QUOTA CARD --}}
                         <div class="col-12 mt-4">
                             <div class="card border shadow-sm">
@@ -269,6 +270,37 @@
                                 </div>
                             </div>
                         </div>
+                        @elseif($user->isManager())
+                        {{-- MANAGER PERMISSIONS CARD --}}
+                        <div class="col-12 mt-4">
+                            <div class="card border shadow-sm">
+                                <div class="card-header bg-light py-2.5 d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title text-dark mb-0 d-flex align-items-center">
+                                        <i class="ti ti-shield-lock me-2 text-azure fs-3"></i>Manager Permissions
+                                    </h4>
+                                    <a href="{{ route('admin.users.edit', $user->id) }}" class="btn btn-sm btn-outline-primary">
+                                        <i class="ti ti-edit me-1"></i>Edit Permissions
+                                    </a>
+                                </div>
+                                <div class="card-body">
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge {{ $user->canManageContent() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                            <i class="ti {{ $user->canManageContent() ? 'ti-check' : 'ti-x' }} me-1"></i>Content Management
+                                        </span>
+                                        <span class="badge {{ $user->canManageUsers() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                            <i class="ti {{ $user->canManageUsers() ? 'ti-check' : 'ti-x' }} me-1"></i>Manage Users
+                                        </span>
+                                        <span class="badge {{ $user->canManageTickets() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                            <i class="ti {{ $user->canManageTickets() ? 'ti-check' : 'ti-x' }} me-1"></i>Support Tickets
+                                        </span>
+                                        <span class="badge {{ $user->canAccessSystem() ? 'bg-success-lt border border-success' : 'bg-secondary-lt border border-secondary text-muted' }} p-2">
+                                            <i class="ti {{ $user->canAccessSystem() ? 'ti-check' : 'ti-x' }} me-1"></i>System Access
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
 

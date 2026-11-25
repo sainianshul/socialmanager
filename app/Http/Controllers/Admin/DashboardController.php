@@ -94,6 +94,20 @@ class DashboardController extends Controller
             ));
         }
 
+        if ($user->isManager()) {
+            $managerStats = [
+                'parties'   => $user->canManageContent() ? \App\Models\PoliticalParty::count() : 0,
+                'leaders'   => $user->canManageContent() ? \App\Models\PoliticalLeader::count() : 0,
+                'festivals' => $user->canManageContent() ? \App\Models\Festival::count() : 0,
+                'templates' => $user->canManageContent() ? (\App\Models\FestivalTemplate::count() + \App\Models\CardTemplate::count()) : 0,
+                'posters'   => $user->canManageContent() ? \App\Models\Poster::count() : 0,
+                'users'     => $user->canManageUsers() ? User::where('role', '!=', User::ROLE_ADMIN)->count() : 0,
+                'openTickets' => $user->canManageTickets() ? \App\Models\Ticket::where('status', '!=', \App\Models\Ticket::STATUS_RESOLVED)->count() : 0,
+            ];
+
+            return view('admin.dashboard', compact('managerStats'));
+        }
+
         // Scope all metrics and feeds to authenticated user's own accounts
         $userAccountIds = Account::where('user_id', $user->id)->pluck('id')->toArray();
 
@@ -159,6 +173,15 @@ class DashboardController extends Controller
     public function stats()
     {
         $user = auth()->user();
+
+        if ($user->isManager()) {
+            return response()->json([
+                'parties'   => $user->canManageContent() ? \App\Models\PoliticalParty::count() : 0,
+                'templates' => $user->canManageContent() ? (\App\Models\FestivalTemplate::count() + \App\Models\CardTemplate::count()) : 0,
+                'posters'   => $user->canManageContent() ? \App\Models\Poster::count() : 0,
+                'users'     => $user->canManageUsers() ? User::where('role', '!=', User::ROLE_ADMIN)->count() : 0,
+            ]);
+        }
 
         if (!$user->isAdmin()) {
             $userAccountIds = Account::where('user_id', $user->id)->pluck('id')->toArray();

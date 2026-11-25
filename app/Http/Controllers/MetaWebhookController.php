@@ -230,7 +230,7 @@ class MetaWebhookController extends Controller
     public function viewLogs(Request $request)
     {
         $user = auth()->user();
-        if (!$user || (!$user->isAdmin() && !$user->isManager())) {
+        if (!$user || !$user->canAccessSystem()) {
             abort(403, 'Unauthorized access to webhook activity logs.');
         }
 
@@ -260,7 +260,7 @@ class MetaWebhookController extends Controller
     public function clearLogs()
     {
         $user = auth()->user();
-        if (!$user || (!$user->isAdmin() && !$user->isManager())) {
+        if (!$user || !$user->canAccessSystem()) {
             abort(403, 'Unauthorized access to webhook activity logs.');
         }
 

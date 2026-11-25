@@ -9,15 +9,24 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
+    protected function ensureTicketAccess(): void
+    {
+        $user = auth()->user();
+        if ($user && $user->isManager() && !$user->canManageTickets()) {
+            abort(403, 'You do not have permission to access Support Tickets.');
+        }
+    }
+
     /**
      * Display Help Center & Support Tickets index
      */
     public function index(TicketDataTable $dataTable)
     {
+        $this->ensureTicketAccess();
         $user = auth()->user();
 
         $baseQuery = Ticket::query();
-        if (!$user->isAdmin()) {
+        if (!$user->canManageTickets()) {
             $baseQuery->where('user_id', $user->id);
         }
 
@@ -46,6 +55,7 @@ class TicketController extends Controller
      */
     public function data(TicketDataTable $dataTable)
     {
+        $this->ensureTicketAccess();
         return $dataTable->ajax();
     }
 
@@ -54,6 +64,7 @@ class TicketController extends Controller
      */
     public function store(Request $request)
     {
+        $this->ensureTicketAccess();
         $validCategories = implode(',', array_keys(Ticket::getCategoryList()));
         $validPriorities = implode(',', array_keys(Ticket::getPriorityList()));
 
@@ -90,8 +101,9 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
+        $this->ensureTicketAccess();
         $user = auth()->user();
-        if (!$user->isAdmin() && $ticket->user_id !== $user->id) {
+        if (!$user->canManageTickets() && $ticket->user_id !== $user->id) {
             abort(403, 'Unauthorized access to this ticket.');
         }
 
@@ -122,8 +134,9 @@ class TicketController extends Controller
      */
     public function updateStatus(Request $request, Ticket $ticket)
     {
+        $this->ensureTicketAccess();
         $user = auth()->user();
-        if (!$user->isAdmin() && $ticket->user_id !== $user->id) {
+        if (!$user->canManageTickets() && $ticket->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
 
@@ -138,7 +151,7 @@ class TicketController extends Controller
             $updateData['resolved_at'] = now();
         }
 
-        if ($user->isAdmin() && $request->filled('admin_notes')) {
+        if ($user->canManageTickets() && $request->filled('admin_notes')) {
             $updateData['admin_notes'] = trim($request->admin_notes);
         }
 

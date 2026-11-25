@@ -130,7 +130,7 @@
                     <thead>
                         <tr>
                             <th class="w-1">Ticket ID</th>
-                            @if(auth()->user()->isAdmin())
+                            @if(auth()->user()->canManageTickets())
                                 <th>User</th>
                                 <th>Email</th>
                             @endif
@@ -240,7 +240,7 @@
                 <div class="modal-body">
                     <table class="table table-sm table-borderless mb-0">
                         <tbody>
-                            @if(auth()->user()->isAdmin())
+                            @if(auth()->user()->canManageTickets())
                             <tr>
                                 <th class="text-secondary fw-medium small ps-0 py-1.5 align-middle" style="width: 130px;">Submitted by :</th>
                                 <td class="text-body fw-semibold py-1.5" id="vt-user-info">—</td>
@@ -269,7 +269,7 @@
                         </tbody>
                     </table>
 
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->canManageTickets())
                         <div class="border-top pt-3 mt-3">
                             <div class="mb-3">
                                 <label class="form-label text-secondary small fw-medium mb-1.5">Change Status :</label>
@@ -312,7 +312,7 @@
                 {{-- Modal Footer --}}
                 <div class="modal-footer d-flex justify-content-between">
                     <button type="button" class="btn btn-link link-secondary me-auto text-decoration-none" data-bs-dismiss="modal">Close</button>
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->canManageTickets())
                         <button type="button" class="btn btn-primary d-inline-flex align-items-center" id="btn-update-ticket-status">
                             <i class="ti ti-check me-1.5"></i>Save Changes
                         </button>
@@ -368,7 +368,7 @@
                 },
                 columns: [
                     { data: 'ticket_number', name: 'ticket_number', className: 'text-nowrap' },
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->canManageTickets())
                     { data: 'user', name: 'user.name', className: 'text-nowrap' },
                     { data: 'email', name: 'user.email', className: 'text-nowrap' },
                     @endif
@@ -379,7 +379,7 @@
                     { data: 'created_at', name: 'created_at', className: 'text-nowrap' },
                     { data: 'actions', name: 'actions', orderable: false, searchable: false, className: 'text-end text-nowrap' },
                 ],
-                order: [[ {{ auth()->user()->isAdmin() ? 7 : 5 }}, 'desc']],
+                order: [[ {{ auth()->user()->canManageTickets() ? 7 : 5 }}, 'desc']],
                 pageLength: 15,
                 lengthMenu: [[10, 15, 25, 50], [10, 15, 25, 50]],
                 dom: '<"top">rt<"d-flex align-items-center justify-content-between p-3 flex-wrap gap-2"li<"ms-auto"p>><"clear">',
@@ -530,7 +530,7 @@
                 $('#vt-category-badge').text(categoryName);
 
                 // Admin Controls vs Regular User view
-                @if(auth()->user()->isAdmin())
+                @if(auth()->user()->canManageTickets())
                     let currentStatus = statusVal || 'open';
                     $('input[name="vt_status_radio"][value="' + currentStatus + '"]').prop('checked', true);
                     $('#vt-admin-status-select').val(currentStatus);
@@ -548,7 +548,7 @@
                 modal.show();
             });
 
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->canManageTickets())
                 // Status radio selection change
                 $(document).on('change', 'input[name="vt_status_radio"]', function () {
                     $('#vt-admin-status-select').val($(this).val());

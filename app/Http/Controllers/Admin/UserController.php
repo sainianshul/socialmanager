@@ -31,13 +31,60 @@ class UserController extends Controller
         return view('admin.users.create');
     }
 
+    /**
+     * Populate role-conditional attributes without duplicating store/update logic.
+     */
+    protected function applyRoleAttributes(Request $request, array $data, int $role, bool $isCreate): array
+    {
+        if ($role === User::ROLE_USER) {
+            $data['can_schedule_posts'] = $request->boolean('can_schedule_posts', $isCreate);
+            $data['can_use_festival_studio'] = $request->boolean('can_use_festival_studio', $isCreate);
+            $data['can_use_auto_dm'] = $request->boolean('can_use_auto_dm', $isCreate);
+            $data['can_use_ai'] = $request->boolean('can_use_ai', $isCreate);
+            $data['ai_token_quota'] = $request->filled('ai_token_quota') ? (int) $request->input('ai_token_quota') : null;
+            if ($isCreate) {
+                $data['ai_quota_resets_at'] = now()->addMonth()->startOfMonth();
+            }
+
+            $data['can_manage_users'] = false;
+            $data['can_manage_content'] = false;
+            $data['can_manage_tickets'] = false;
+            $data['can_access_system'] = false;
+            return $data;
+        }
+
+        // Manager & Admin accounts do not hold a client profile type
+        $data['client_type'] = null;
+
+        if ($role === User::ROLE_MANAGER) {
+            $data['can_manage_users'] = $request->boolean('can_manage_users');
+            $data['can_manage_content'] = $request->boolean('can_manage_content', $isCreate);
+            $data['can_manage_tickets'] = $request->boolean('can_manage_tickets');
+            $data['can_access_system'] = $request->boolean('can_access_system');
+        }
+
+        return $data;
+    }
+
+    /**
+     * Prevent Managers with User Management access from modifying Administrator accounts.
+     */
+    protected function ensureCanModifyTargetUser(User $target): void
+    {
+        $actor = auth()->user();
+        if ($actor && $actor->isManager() && $target->isAdmin()) {
+            abort(403, 'Managers cannot view or modify Administrator accounts.');
+        }
+    }
+
     public function store(StoreUserRequest $request)
     {
         $data = $request->validated();
-        
-        $data['role'] = $data['role'] ?? User::ROLE_USER;
+
+        $role = (int) ($data['role'] ?? User::ROLE_USER);
+        $data['role'] = $role;
         $data['created_by'] = auth()->id() ?? User::CREATED_BY_ADMIN;
-        
+
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         } else {
@@ -45,13 +92,7 @@ class UserController extends Controller
             $data['password'] = Hash::make(Str::random(12));
         }
 
-        // Plan Features & AI Quota initialization
-        $data['can_schedule_posts'] = $request->boolean('can_schedule_posts', true);
-        $data['can_use_festival_studio'] = $request->boolean('can_use_festival_studio', true);
-        $data['can_use_auto_dm'] = $request->boolean('can_use_auto_dm', true);
-        $data['can_use_ai'] = $request->boolean('can_use_ai', true);
-        $data['ai_token_quota'] = $request->filled('ai_token_quota') ? (int) $request->input('ai_token_quota') : null;
-        $data['ai_quota_resets_at'] = now()->addMonth()->startOfMonth();
+        $data = $this->applyRoleAttributes($request, $data, $role, true);
 
         User::create($data);
 
@@ -61,6 +102,7 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $this->ensureCanModifyTargetUser($user);
         $accountsCount = Account::where('user_id', $user->id)->count();
         $postsCount = ScheduledPost::where('user_id', $user->id)->count();
         $activityCount = SystemActivityLog::where('user_id', $user->id)->count();
@@ -270,11 +312,13 @@ class UserController extends Controller
 
     public function edit(User $user)
     {
+        $this->ensureCanModifyTargetUser($user);
         return view('admin.users.edit', compact('user'));
     }
 
     public function update(UpdateUserRequest $request, User $user)
     {
+        $this->ensureCanModifyTargetUser($user);
         $data = $request->validated();
 
         if (!empty($data['password'])) {
@@ -283,12 +327,8 @@ class UserController extends Controller
             unset($data['password']);
         }
 
-        // Plan Features & AI Quota updates
-        $data['can_schedule_posts'] = $request->boolean('can_schedule_posts');
-        $data['can_use_festival_studio'] = $request->boolean('can_use_festival_studio');
-        $data['can_use_auto_dm'] = $request->boolean('can_use_auto_dm');
-        $data['can_use_ai'] = $request->boolean('can_use_ai');
-        $data['ai_token_quota'] = $request->filled('ai_token_quota') ? (int) $request->input('ai_token_quota') : null;
+        $role = (int) ($data['role'] ?? $user->role);
+        $data = $this->applyRoleAttributes($request, $data, $role, false);
 
         $user->update($data);
 
@@ -298,6 +338,8 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
+        $this->ensureCanModifyTargetUser($user);
+
         if ($user->id === auth()->id()) {
             return response()->json([
                 'success' => false,
@@ -315,6 +357,8 @@ class UserController extends Controller
 
     public function updateStatus(Request $request, User $user)
     {
+        $this->ensureCanModifyTargetUser($user);
+
         $request->validate([
             'status' => 'required|integer|in:' . implode(',', array_keys(User::getStatusList())),
         ]);

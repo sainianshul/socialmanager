@@ -103,7 +103,7 @@ class TicketDataTable extends DataTable
         $user = auth()->user();
         $query = $model->newQuery()->with('user')->latest();
 
-        if (!$user->isAdmin()) {
+        if (!$user->canManageTickets()) {
             $query->where('user_id', $user->id);
         }
 
