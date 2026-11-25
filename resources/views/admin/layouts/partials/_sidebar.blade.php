@@ -114,14 +114,6 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('admin.users.deleted*') ? 'active' : '' }}" href="{{ route('admin.users.deleted') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Deleted Users">
-                            <span class="nav-link-icon d-md-none d-lg-inline-block text-danger">
-                                <i class="ti ti-trash fs-2"></i>
-                            </span>
-                            <span class="nav-link-title">Deleted Users</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.help.*') ? 'active' : '' }}" href="{{ route('admin.help.index') }}" data-bs-toggle="tooltip" data-bs-placement="right" title="Support Tickets">
                             <span class="nav-link-icon d-md-none d-lg-inline-block text-teal">
                                 <i class="ti ti-ticket fs-2"></i>

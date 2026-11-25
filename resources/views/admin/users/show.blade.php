@@ -157,7 +157,7 @@
                                 <div class="datagrid-item">
                                     <div class="datagrid-title">Role</div>
                                     <div class="datagrid-content">
-                                        <span class="badge bg-blue-lt">{{ $user->role_name }}</span>
+                                        <span class="badge badge-outline text-{{ $user->role_color }}">{{ $user->role_name }}</span>
                                     </div>
                                 </div>
                                 <div class="datagrid-item">

@@ -131,6 +131,45 @@ class UserManagementTest extends TestCase
 
         $this->assertStringContainsString('<th>Email</th>', $content);
         $this->assertStringContainsString("{ data: 'email', name: 'email' }", $content);
+        $this->assertStringNotContainsString('Deleted Users', $content);
+        $this->assertStringNotContainsString(route('admin.users.deleted'), $content);
+    }
+
+    public function test_user_datatable_role_badge_is_outline_transparent_without_client_type(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN, 'client_type' => User::CLIENT_TYPE_POLITICIAN]);
+        $client = User::factory()->create(['role' => User::ROLE_USER, 'client_type' => User::CLIENT_TYPE_BUSINESS]);
+
+        $response = $this->actingAs($admin)->getJson(route('admin.users.data'));
+        $response->assertStatus(200);
+
+        $rows = $response->json('data');
+        $this->assertNotEmpty($rows);
+
+        foreach ($rows as $row) {
+            $this->assertStringContainsString('badge badge-outline text-', $row['role']);
+            $this->assertStringNotContainsString('Politician / Leader', $row['role']);
+            $this->assertStringNotContainsString('Business / Enterprise', $row['role']);
+            $this->assertStringNotContainsString('Creator / Personal', $row['role']);
+        }
+    }
+
+    public function test_user_create_and_edit_render_plan_feature_hints_in_info_tooltips(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $client = User::factory()->create(['role' => User::ROLE_USER]);
+
+        foreach ([route('admin.users.create'), route('admin.users.edit', $client->id)] as $url) {
+            $response = $this->actingAs($admin)->get($url);
+            $response->assertStatus(200);
+
+            $content = $response->getContent();
+            $this->assertStringContainsString('data-bs-toggle="tooltip" data-bs-placement="top" title="Multi-account scheduling &amp; publishing"', $content);
+            $this->assertStringContainsString('data-bs-toggle="tooltip" data-bs-placement="top" title="Branded festival posters &amp; templates"', $content);
+            $this->assertStringContainsString('data-bs-toggle="tooltip" data-bs-placement="top" title="Comment-to-DM automated reply"', $content);
+            $this->assertStringContainsString('data-bs-toggle="tooltip" data-bs-placement="top" title="Sentiment &amp; caption generators"', $content);
+            $this->assertStringNotContainsString('<small class="form-hint text-muted d-block">Multi-account scheduling', $content);
+        }
     }
 }
 

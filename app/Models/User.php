@@ -131,6 +131,15 @@ class User extends Authenticatable
         return self::getRoleList()[$this->role] ?? 'Unknown';
     }
 
+    public function getRoleColorAttribute(): string
+    {
+        return match ($this->role) {
+            self::ROLE_ADMIN => 'purple',
+            self::ROLE_MANAGER => 'azure',
+            default => 'blue',
+        };
+    }
+
     public static function getStatusList(): array
     {
         return [

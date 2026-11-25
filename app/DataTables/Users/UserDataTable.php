@@ -41,16 +41,7 @@ class UserDataTable extends DataTable
             })
 
             ->addColumn('role', function (User $user) {
-                $color = match($user->role) {
-                    User::ROLE_ADMIN => 'purple',
-                    User::ROLE_MANAGER => 'azure',
-                    default => 'blue',
-                };
-                $typeBadge = '';
-                if (!empty($user->client_type)) {
-                    $typeBadge = '<span class="badge bg-' . $user->client_type_badge_color . '-lt ms-1">' . e($user->client_type_name) . '</span>';
-                }
-                return '<span class="badge bg-' . $color . '-lt">' . e($user->role_name) . '</span>' . $typeBadge;
+                return '<span class="badge badge-outline text-' . $user->role_color . '">' . e($user->role_name) . '</span>';
             })
 
             // ── Status ───────────────────────────────────────────────
